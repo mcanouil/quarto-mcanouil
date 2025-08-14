@@ -1,0 +1,9 @@
+title: Mcanouil
+author: Mickaël Canouil
+version: 0.0.0
+quarto-required: ">=99.9.0"
+contributes:
+  metadata:
+    project:
+      brand: brand.yml
+

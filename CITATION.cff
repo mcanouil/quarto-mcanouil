@@ -1,13 +1,13 @@
 cff-version: 1.2.0
-title: "{{EXTENSION}} Extension for Quarto"
+title: "mcanouil Extension for Quarto"
 message: "If you use this project, please cite it as below."
 type: software
 authors:
   - family-names: "Canouil"
     given-names: "Mickaël"
     orcid: "https://orcid.org/0000-0002-3396-4549"
-repository-code: "https://github.com/mcanouil/quarto-{{EXTENSION}}"
-url: "http://m.canouil.dev/quarto-{{EXTENSION}}/"
+repository-code: "https://github.com/mcanouil/quarto-mcanouil"
+url: "http://m.canouil.dev/quarto-mcanouil/"
 license: "MIT"
 date-released: "2025-04-05"
 version: 0.0.0
