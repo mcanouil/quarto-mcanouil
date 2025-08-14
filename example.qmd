@@ -1,57 +1,214 @@
 ---
-title: "{mcanouil}"
+title: "Mickaël Canouil's Brand"
 subtitle: "Quarto Extension"
+author: "Mickaël Canouil"
+date: today
+highlight-style: github
 format:
   html:
     output-file: index
-  typst:
-    output-file: example-typst
+    toc: true
+    toc-depth: 3
+  typst-dark:
+    output-file: example-typst-dark
     papersize: a4
     margin:
       x: 2.5cm
       y: 2.5cm
-  pdf-xelatex:
-    output-file: example-xelatex
+    brand-mode: dark
+  typst-light:
+    output-file: example-typst-light
     papersize: a4
     margin:
       x: 2.5cm
       y: 2.5cm
-  pdf-lualatex:
-    output-file: example-lualatex
-    pdf-engine: lualatex
-    papersize: a4
-    margin:
-      x: 2.5cm
-      y: 2.5cm
-  pdf-pdflatex:
-    output-file: example-pdflatex
-    pdf-engine: lualatex
-    papersize: a4
-    margin:
-      x: 2.5cm
-      y: 2.5cm
-  revealjs:
-    output-file: example-revealjs
+    brand-mode: light
+  revealjs-dark:
+    output-file: example-revealjs-dark
     shift-heading-level-by: -1
-  beamer:
-    output-file: example-beamer
-    aspectratio: 169
-  docx:
-    output-file: example-docx
-  pptx:
-    output-file: example-pptx
+    brand-mode: dark
+  revealjs-light:
+    output-file: example-revealjs-light
+    shift-heading-level-by: -1
+    brand-mode: light
 format-links:
   - html
-  - typst
-  - format: pdf-xelatex
-    text: "PDF (XeLaTeX)"
-  - format: pdf-lualatex
-    text: "PDF (LuaLaTeX)"
-  - format: pdf-pdflatex
-    text: "PDF (PDFLaTeX)"
-  - revealjs
-  - beamer
-  - docx
-  - pptx
+  - format: typst-dark
+    text: Typst (Dark)
+  - format: typst-light
+    text: Typst (Light)
+  - format: revealjs-dark
+    text: Reveal.js (Dark)
+  - format: revealjs-light
+    text: Reveal.js (Light)
 embed-resources: true
 ---
+
+## Introduction
+
+This document demonstrates various Quarto markdown elements to showcase the theming capabilities of Mickaël Canouil's brand extension.
+
+## Typography and Text Formatting
+
+### Basic Text Styling
+
+Here's some **bold text**, *italic text*, and ***bold italic text***. You can also use `inline code` within paragraphs.
+
+### Lists
+
+#### Unordered Lists
+
+- First item
+- Second item with **bold text**
+- Third item with *italic text*
+  - Nested item
+  - Another nested item
+    - Deeply nested item
+
+#### Ordered Lists
+
+1. First numbered item
+2. Second numbered item
+3. Third numbered item with `code`
+   a. Sub-item a
+   b. Sub-item b
+   c. Sub-item c
+
+#### Task Lists
+
+- [x] Completed task
+- [ ] Incomplete task
+- [x] Another completed task
+
+## Code Blocks
+
+```python
+def fibonacci(n):
+    """Generate Fibonacci sequence up to n terms."""
+    if n <= 0:
+        return []
+    elif n == 1:
+        return [0]
+    elif n == 2:
+        return [0, 1]
+    
+    sequence = [0, 1]
+    for i in range(2, n):
+        sequence.append(sequence[i-1] + sequence[i-2])
+    
+    return sequence
+
+# Example usage
+fib_numbers = fibonacci(10)
+print(f"First 10 Fibonacci numbers: {fib_numbers}")
+```
+
+## Quotes and Callouts
+
+### Blockquotes
+
+> "The best way to predict the future is to invent it."
+> 
+> — Alan Kay
+
+> This is a longer blockquote that spans multiple lines to demonstrate
+> how the brand theming affects quote styling. It includes various
+> formatting elements like **bold text** and *italic text*.
+
+### Callouts
+
+::: {.callout-note}
+This is a note callout. Use it to highlight important information that readers should pay attention to.
+:::
+
+::: {.callout-warning}
+This is a warning callout. Use it to alert readers about potential issues or important considerations.
+:::
+
+::: {.callout-tip}
+This is a tip callout. Use it to provide helpful suggestions or best practices.
+:::
+
+::: {.callout-important}
+This is an important callout. Use it for critical information that must not be overlooked.
+:::
+
+::: {.callout-caution}
+This is a caution callout. Use it to warn about potential risks or problems.
+:::
+
+## Tables
+
+### Simple Table
+
+| Feature | HTML | Typst | Reveal.js |
+|---------|------|-------|-----------|
+| Typography | ✓ | ✓ | ✓ |
+| Colors | ✓ | ✓ | ✓ |
+| Layout | ✓ | ✓ | ✓ |
+| Interactive | ✓ | ✗ | ✓ |
+
+### Complex Table
+
+| Language | Paradigm | Year | Key Features |
+|----------|----------|------|--------------|
+| Python | Multi-paradigm | 1991 | Simple syntax, extensive libraries |
+| R | Functional, procedural | 1993 | Statistical computing, data analysis |
+| JavaScript | Multi-paradigm | 1995 | Web development, event-driven |
+| Rust | Systems | 2010 | Memory safety, performance |
+
+## Mathematical Expressions
+
+### Inline Mathematics
+
+The quadratic formula is $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$ and Euler's identity states that $e^{i\pi} + 1 = 0$.
+
+### Display Mathematics
+
+The probability density function of a normal distribution is:
+
+$$
+f(x|\mu,\sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}
+$$
+
+A system of linear equations can be represented as:
+
+$$\begin{align}
+ax + by &= c \\
+dx + ey &= f
+\end{align}$$
+
+## Links and References
+
+### External Links
+
+- [Quarto Documentation](https://quarto.org)
+- [Mickaël Canouil's GitHub](https://github.com/mcanouil)
+- [Brand Extension Repository](https://github.com/mcanouil/quarto-mcanouil)
+
+### Internal Links
+
+See the [Typography section](#typography-and-text-formatting) for text formatting examples, or check out the [Code Blocks](#code-blocks) section for syntax highlighting.
+
+## Figures and Images
+
+::: {#fig-placeholder}
+![]({{< placeholder 600 400 format=png >}})
+
+This is a placeholder for an image that would showcase how the brand theming affects figure styling. In a real document, you would include actual images here.
+:::
+
+## Conclusion
+
+This document demonstrates various Quarto markdown elements that benefit from the brand theming provided by this extension. The theming affects:
+
+- **Typography**: Font choices, sizes, and spacing
+- **Colours**: Text, backgrounds, and accent colours
+- **Layout**: Margins, padding, and structural elements
+- **Code**: Syntax highlighting and code block styling
+- **Tables**: Borders, backgrounds, and formatting
+- **Callouts**: Background colors and styling
+- **Mathematical expressions**: Font and styling
+- **Links**: Colours and hover effects
+
+The brand extension ensures consistent visual identity across all supported output formats (HTML, Typst, and Reveal.js).
