@@ -1,0 +1,57 @@
+---
+title: "{{{EXTENSION}}}"
+subtitle: "Quarto Extension"
+format:
+  html:
+    output-file: index
+  typst:
+    output-file: example-typst
+    papersize: a4
+    margin:
+      x: 2.5cm
+      y: 2.5cm
+  pdf-xelatex:
+    output-file: example-xelatex
+    papersize: a4
+    margin:
+      x: 2.5cm
+      y: 2.5cm
+  pdf-lualatex:
+    output-file: example-lualatex
+    pdf-engine: lualatex
+    papersize: a4
+    margin:
+      x: 2.5cm
+      y: 2.5cm
+  pdf-pdflatex:
+    output-file: example-pdflatex
+    pdf-engine: lualatex
+    papersize: a4
+    margin:
+      x: 2.5cm
+      y: 2.5cm
+  revealjs:
+    output-file: example-revealjs
+    shift-heading-level-by: -1
+  beamer:
+    output-file: example-beamer
+    aspectratio: 169
+  docx:
+    output-file: example-docx
+  pptx:
+    output-file: example-pptx
+format-links:
+  - html
+  - typst
+  - format: pdf-xelatex
+    text: "PDF (XeLaTeX)"
+  - format: pdf-lualatex
+    text: "PDF (LuaLaTeX)"
+  - format: pdf-pdflatex
+    text: "PDF (PDFLaTeX)"
+  - revealjs
+  - beamer
+  - docx
+  - pptx
+embed-resources: true
+---
