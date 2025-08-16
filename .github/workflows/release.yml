@@ -25,7 +25,7 @@ jobs:
     secrets: inherit
     with:
       version: "${{ github.event.inputs.version }}"
-      formats: "html typst revealjs"
+      formats: "html typst-dark typst-light revealjs-dark revealjs-light"
       tinytex: false
       quarto: "pre-release"
       r: false
