@@ -27,7 +27,7 @@ jobs:
       version: "${{ github.event.inputs.version }}"
       formats: "html typst-dark typst-light revealjs-dark revealjs-light"
       tinytex: false
-      quarto: "pre-release"
+      quarto: "release"
       r: false
       python: false
       julia: false
