@@ -37,5 +37,5 @@ Outputs of `example.qmd`:
 - [HTML](https://m.canouil.dev/quarto-mcanouil/)
 - [Typst Dark (PDF)](https://m.canouil.dev/quarto-mcanouil/example-typst-dark.pdf)
 - [Typst Light (PDF)](https://m.canouil.dev/quarto-mcanouil/example-typst-light.pdf)
-- [Reveal.js Dark (HTML)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-dark.html)
-- [Reveal.js Light (HTML)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-light.html)
+- [Reveal.js Dark (HTML)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-dark.html) | [Reveal.js Dark (PDF)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-dark.pdf)
+- [Reveal.js Light (HTML)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-light.html) | [Reveal.js Light (PDF)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-light.pdf)
