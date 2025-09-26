@@ -4,6 +4,7 @@ subtitle: "Quarto Extension"
 author: "Mickaël Canouil"
 date: today
 highlight-style: github
+code-annotations: select
 format:
   html:
     output-file: index
@@ -96,12 +97,14 @@ def fibonacci(n):
     for i in range(2, n):
         sequence.append(sequence[i-1] + sequence[i-2])
     
-    return sequence
+    return sequence #<1>
 
 # Example usage
 fib_numbers = fibonacci(10)
 print(f"First 10 Fibonacci numbers: {fib_numbers}")
 ```
+
+1. This comment highlights the return statement in the code above.
 
 ## Quotes and Callouts
 
