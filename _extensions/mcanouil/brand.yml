@@ -107,7 +107,8 @@ defaults:
       }
 
       p code:not(.sourceCode),
-      li code:not(.sourceCode) {
+      li code:not(.sourceCode),
+      td code:not(.sourceCode) {
         background-color: $foreground;
       }
 
@@ -121,7 +122,9 @@ defaults:
         background-color: body-mix(95%);
       }
 
-      p code.sourceCode, li code.sourceCode, td code.sourceCode {
+      p code.sourceCode,
+      li code.sourceCode,
+      td code.sourceCode {
         background-color: inherit;
       }
 
