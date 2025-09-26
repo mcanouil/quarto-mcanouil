@@ -136,6 +136,12 @@ defaults:
         margin-right: 1.5em;
       }
 
+      /* TODO: remove when fixed in Quarto: https://github.com/quarto-dev/quarto-cli/pull/13429 */
+      #code-annotation-line-highlight {
+        margin-left: unset;
+        width: 100%;
+      }
+
       // List Groups
       .list-group-item-action {
         &:hover,
