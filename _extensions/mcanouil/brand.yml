@@ -43,6 +43,7 @@ defaults:
       #quarto-back-to-top {
         box-shadow: 0 .2rem .5rem body-mix(95%), 0 0 .05rem body-mix(95%);
         color: body-mix(5%);
+        bottom: 80px;
       }
 
       .quarto-title-banner {
