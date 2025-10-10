@@ -1,6 +1,6 @@
 title: Mickaël Canouil's Brand
 author: Mickaël Canouil
-version: 0.1.6
+version: 0.1.5
 quarto-required: ">=1.8.20"
 contributes:
   metadata:
