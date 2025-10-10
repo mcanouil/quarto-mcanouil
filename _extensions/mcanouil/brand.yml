@@ -120,6 +120,7 @@ defaults:
 
       div.sourceCode {
         background-color: body-mix(95%);
+        border: 1px solid body-mix(50%);
       }
 
       p code.sourceCode,
