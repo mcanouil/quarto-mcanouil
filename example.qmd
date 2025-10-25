@@ -1,7 +1,10 @@
 ---
 title: "Mickaël Canouil's Brand"
 subtitle: "Quarto Extension"
-author: "Mickaël Canouil"
+author:
+  - name: "Mickaël CANOUIL, _Ph.D._"
+    orcid: "0000-0002-3396-4549"
+    url: "https://mickael.canouil.fr"
 date: today
 highlight-style: github
 code-annotations: select
