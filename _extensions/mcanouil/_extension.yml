@@ -17,3 +17,73 @@ contributes:
               - cosmo
               - brand
               - _extensions/mcanouil/mcanouil/theme.scss
+  formats:
+    typst:
+      template: typst/template.typ # originally from src/resources/formats/typst/pandoc/quarto
+      template-partials:
+        - typst/partials/libs/utilities.typ
+        - typst/partials/libs/definitions.typ
+        - typst/partials/libs/page.typ
+        - typst/partials/libs/colours.typ
+        - typst/partials/libs/typography.typ
+        - typst/partials/libs/decorations.typ
+        - typst/partials/libs/watermark.typ
+        - typst/partials/libs/value-box.typ
+        - typst/partials/libs/panels.typ
+        - typst/partials/libs/badges.typ
+        - typst/partials/libs/dividers.typ
+        - typst/partials/libs/progress.typ
+        - typst/partials/libs/timeline.typ
+        - typst/partials/libs/card-grid.typ
+        - typst/partials/libs/executive-summary.typ
+        - typst/partials/libs/authors.typ
+        - typst/partials/libs/header.typ
+        - typst/partials/libs/footer.typ
+        - typst/partials/libs/margin-section.typ
+        - typst/partials/libs/title-block.typ
+        - typst/partials/libs/list-of.typ
+        - typst/partials/libs/special-sections.typ
+        - typst/partials/libs.typ
+        - typst/partials/show-rules.typ
+        - typst/partials/biblio.typ
+        - typst/partials/notes.typ
+        - typst/partials/typst-template.typ
+        - typst/partials/typst-show.typ
+      shortcodes:
+        - typst/shortcodes/divider.lua
+        - typst/shortcodes/value-box.lua
+        - typst/shortcodes/progress.lua
+      filters:
+        - typst/filters/special-sections.lua
+        - typst/filters/typst-markdown.lua
+      logo: typst/assets/logo.svg
+      orcid-icon: typst/assets/orcid.svg
+      papersize: a4
+      margin:
+        top: 2.5cm
+        bottom: 2.5cm
+        left: 2.5cm
+        right: 2.5cm
+      mainfont: "Alegreya Sans"
+      fontsize: 11pt
+      bibliographystyle: apa
+      number-sections: true
+      section-numbering: "1.1.1."
+      section-pagebreak: true
+      # Unified special sections configuration
+      special-sections:
+        references:
+          name: "References"
+          numbering: "none"
+          prefix: false
+        appendix:
+          name: "Appendix"
+          numbering: "A.a.1."
+          prefix: true
+        supplementary:
+          name: "Supplementary"
+          numbering: "I.i.1."
+          prefix: true
+      toc: true
+      list-of: true
+      header-footer-style: "academic"

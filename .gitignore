@@ -5,3 +5,5 @@
 /.luarc.json
 /.quarto/
 **/*.quarto_ipynb
+.claude/
+template.typ

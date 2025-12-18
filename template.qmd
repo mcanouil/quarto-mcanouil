@@ -1,0 +1,1319 @@
+---
+title: "Typst Template Feature Showcase"
+subtitle: "Complete Guide to the Mickaël CANOUIL Typst Template"
+author:
+  - name:
+      given: Mickaël
+      family: CANOUIL
+    email: pro@mickael.canouil.dev
+    orcid: 0000-0002-3396-4549
+    url: https://mickael.canouil.fr
+    attributes:
+      corresponding: true
+    affiliations:
+      - name: Independent Consultant
+        city: Lille
+        country: France
+  - name:
+      given: Jane
+      family: Doe
+    orcid: 0000-0001-2345-6789
+    affiliations:
+      - name: Example University
+        department: Department of Statistics
+        city: London
+        country: United Kingdom
+date: today
+abstract: |
+  This document showcases all features of the Mickaël CANOUIL Typst template for Quarto.
+  It demonstrates template-specific components including value boxes, info panels, status badges, dividers, progress bars, timelines, card grids, and executive summaries.
+  Additionally, it covers standard Quarto features such as figures, tables, mathematical notation, callouts, code blocks, and cross-references.
+  Use this document as both a learning resource and a quick reference guide for all available template capabilities.
+keywords:
+  - Quarto
+  - Typst
+  - Template
+  - Documentation
+  - Tutorial
+lang: en-GB
+copyright: "© 2026 Mickaël CANOUIL"
+format:
+  mcanouil-typst:
+    header-footer-style: "professional"  # Header and footer style
+    # Colour Mode (light or dark)
+    brand-mode: light
+
+    # Optional Colour Overrides
+    # colour-background: "#fafafa"  # Custom background colour
+    # colour-foreground: "#333333"  # Custom text colour
+    # colour-muted: "#666666"       # Custom muted text colour
+
+    # Decorative Elements
+    show-corner-brackets: true          # Signature corner bracket decorations
+    show-margin-decoration: true        # Coloured bars along page margins
+    show-title-page-background: true    # Geometric background on title page
+    show-heading-underlines: true       # Gradient underlines below headings
+
+    # Logo Configuration
+    show-logo: true                     # Display logo in header
+    # logo-width: 40pt                    # Logo width (optional)
+    # logo-inset: 4pt                     # Logo padding
+    # logo-alt: "Mickaël CANOUIL Logo"   # Logo alternative text
+
+    # Title Page
+    title-page: false                    # Use dedicated title page with special styling
+
+    # Watermark
+    watermark-text: "DEMO"              # Text watermark content
+    # watermark-image: "path/image.png" # Alternative: image watermark path
+    watermark-opacity: 10%              # Watermark transparency (0-100%)
+    watermark-angle: -45deg             # Watermark rotation angle
+    watermark-size: 4em                 # Size for text watermarks
+    watermark-colour: gray              # Colour for text watermarks
+
+    # Typography
+    font-body: "Alegreya Sans"          # Body text font family
+    font-headings: "Alegreya Sans"      # Heading font family
+    font-size: 11pt                     # Base font size
+    heading-weight: "bold"              # Heading font weight
+    heading-style: "normal"             # Heading font style
+    # heading-colour: "#333333"          # Optional heading colour override
+    heading-line-height: 0.65em         # Heading line height
+    title-size: 24pt                    # Title font size
+    subtitle-size: 14pt                 # Subtitle font size
+
+    # Page Layout
+    papersize: a4                       # Paper size (a4, letter, etc)
+    columns: 1                          # Number of columns
+
+    # Document Structure
+    toc: true                           # Include table of contents
+    list-of: true                       # Include list of figures/tables/X
+    number-sections: true               # Number sections
+    section-numbering: "1.1.1."         # Section numbering pattern
+    section-pagebreak: true             # Page break before level 1 headings
+
+    # Special Sections Configuration
+    special-sections:
+      references:
+        name: "References"              # References section name
+        numbering: "none"               # References numbering (use "none" for unnumbered)
+        prefix: false                   # Do not include "References" prefix in headings
+      appendix:
+        name: "Appendix"                # Appendix section name
+        numbering: "A.a."               # Appendix numbering pattern (A.1, A.2, etc)
+        prefix: true                    # Include "Appendix" prefix
+      supplementary:
+        name: "Supplementary"           # Supplementary section name
+        numbering: "I.i."               # Supplementary numbering pattern (I.1, I.2, etc)
+        prefix: true                    # Include "Supplementary" prefix
+
+    # Table Styling
+    # table-stroke: auto                # Border style (auto uses 0.5pt + foreground)
+    # table-inset: 6pt                  # Internal padding
+    # table-fill: alternating           # Fill style (alternating for striped rows, none for solid)
+
+    # Quote and Link Styling
+    # quote-width: 90%                  # Blockquote width percentage
+    # quote-align: center               # Blockquote alignment
+    # link-underline: true              # Underline links
+    # link-underline-opacity: 50%       # Underline opacity
+    # link-colour: auto                 # Optional custom link colour
+
+keep-typ: true                          # Keep intermediate Typst file for debugging
+bibliographystyle: apa                  # Bibliography style
+citeproc: true                          # Enable citation processing
+crossref:
+  custom:
+    - kind: float                       # Define custom cross-reference type
+      reference-prefix: Text
+      key: txt
+references:
+  - id: example_2024
+    author:
+      - family: Example
+        given: Jane
+      - family: Author
+        given: John
+    container-title: Journal of Examples
+    doi: 10.1234/example.2024
+    issued: 2024
+    title: "An Example Article for Demonstrating Citations"
+    type: article-journal
+---
+
+## Introduction {#sec-intro}
+
+This document showcases all features of the Mickaël CANOUIL Typst template for Quarto.
+It serves as both an educational resource and a quick reference guide.
+
+::: {.highlight}
+Navigate using the table of contents to find specific features.
+Each section includes working examples you can copy and adapt for your own documents.
+:::
+
+### Document Organisation
+
+This demonstration is organised into six main sections:
+
+1. **Template-Specific Components** (@sec-components): Value boxes, panels, badges, dividers, progress bars, timelines, card grids, and executive summaries.
+2. **Quarto Features** (@sec-quarto): Figures, tables, mathematics, callouts, and code blocks.
+3. **Typography and Layout** (@sec-typography): Headings, lists, quotations, asides, and layout features.
+4. **Advanced Features** (@sec-advanced): Footnotes, citations, custom cross-references, and special sections.
+5. **Conclusion** (@sec-conclusion): Summary of all features covered.
+
+Cross-references work throughout this document.
+For example, see @sec-components for template components or @fig-example for a figure example.
+
+## Template-Specific Components {#sec-components}
+
+The template provides eight specialised components for professional document creation.
+These components are unique to this Typst template and enhance visual communication.
+
+### Value Boxes {#sec-value-boxes}
+
+Value boxes display metrics, KPIs, and statistics in a visually appealing format.
+They are ideal for dashboards, reports, and presentations.
+
+#### Basic Value Boxes
+
+{{< value-box value="42" unit="%" label="Growth Rate" colour="success" >}}
+
+{{< value-box value="1.2M" unit="€" label="Total Revenue" colour="info" >}}
+
+{{< value-box value="98" unit="%" label="Customer Satisfaction" icon="✓" colour="#2ecc71" >}}
+
+{{< value-box value="24" label="Active Projects" icon="📊" colour="#3498db" >}}
+
+#### Value Box Icons
+
+Value boxes support icons to indicate trends or status:
+
+{{< value-box value="18" unit="%" label="Quarterly Growth" icon="up" colour="success" >}}
+
+{{< value-box value="5" unit="%" label="Operating Costs" icon="down" colour="success" >}}
+
+{{< value-box value="42" unit="%" label="Market Share" icon="stable" colour="info" >}}
+
+#### Value Box Grid Layout
+
+Arrange multiple value boxes using Quarto's `layout-ncol` feature:
+
+::: {layout-ncol=3}
+
+{{< value-box value="42" unit="%" label="Metric A" icon="up" colour="success" >}}
+
+{{< value-box value="87" unit="%" label="Metric B" icon="stable" colour="info" >}}
+
+{{< value-box value="15" unit="%" label="Metric C" icon="down" colour="warning" >}}
+
+:::
+
+**Value Box Parameters:**
+
+- `value`: The numeric value to display (required).
+- `unit`: Unit symbol (%, €, $, etc).
+- `label`: Description text (required).
+- `icon`: Icon shortcuts (up ↑, down ↓, stable —) or any UTF-8 character.
+- `colour`: Colour types (success, warning, danger, info, neutral) or hex colours (#ff0000).
+- `background`: Optional background colour override.
+- `show-border`: Display border around the box (default: true).
+- `alignment`: Content alignment (center, left, right; default: center).
+
+### Info Panels {#sec-panels}
+
+Info panels highlight content with eight distinct styles.
+They provide more flexibility than callouts and support rich content.
+
+#### Panel Style Variants
+
+::: {.panel style="subtle"}
+Subtle panels provide minimal emphasis for background information or supplementary notes.
+Use when you want gentle visual separation without strong emphasis.
+:::
+
+::: {.panel style="emphasis"}
+Emphasis panels offer moderate highlighting for important information that deserves attention.
+They create visual hierarchy without being overwhelming.
+:::
+
+::: {.panel style="accent"}
+Accent panels create strong visual impact for key insights or critical information.
+Use sparingly for maximum effect.
+:::
+
+::: {.panel style="outline"}
+Outline panels provide clean borders without background fill.
+They maintain clarity whilst keeping the design minimal and unobtrusive.
+:::
+
+#### Status-Based Panels
+
+::: {.panel style="info" icon="ℹ"}
+## Information Panel
+
+Info panels use note callout colours for explanatory content.
+Panel titles can be set via the `title` attribute or as the first heading inside the panel.
+:::
+
+::: {.panel style="success" title="Success Panel" icon="✓"}
+Success panels highlight positive outcomes, achievements, or completed tasks.
+They use green tones to convey accomplishment and success.
+:::
+
+::: {.panel style="warning" title="Warning Panel" icon="⚠"}
+Warning panels alert readers to important caveats, limitations, or potential issues.
+Use them to draw attention to matters that require careful consideration.
+:::
+
+::: {.panel style="danger" title="Critical Panel" icon="⛔"}
+Danger panels emphasise critical information, errors, or severe warnings.
+They demand immediate attention through bold red styling.
+:::
+
+#### Panels with Rich Content
+
+::: {.panel style="emphasis" title="Rich Content Example" icon="★"}
+Panels support any content type:
+
+- Unordered and ordered lists.
+- Code blocks and inline code like `function()`.
+- Mathematical notation: $E = mc^2$.
+- **Bold text**, *italic text*, and ***bold italic text***.
+
+This versatility makes panels ideal for technical documentation and reports.
+:::
+
+**Panel Parameters:**
+
+- `style`: Style variant (subtle, emphasis, accent, outline, info, success, warning, danger).
+- `title`: Optional title text (or use first heading inside panel).
+- `icon`: Optional icon (any UTF-8 character or emoji).
+- `border-width`: Border thickness (default: 1pt).
+- `radius`: Corner radius (default: 8pt).
+- `inset`: Internal padding (default: 1.2em).
+- `breakable`: Allow page breaks inside panel (default: false).
+
+### Status Badges {#sec-badges}
+
+Status badges provide compact inline indicators for status, categories, tags, and labels.
+They appear inline with text and use colour-coded styling.
+
+#### Badge Colour Types
+
+Project Status: [Approved]{.badge colour="success"}
+
+[Draft]{.badge colour="warning"} This section is under review.
+
+[Critical]{.badge colour="danger"} Requires immediate attention.
+
+[New Feature]{.badge colour="info"} Recently added capability.
+
+[Internal]{.badge colour="neutral"} For internal use only.
+
+#### Badges with Icons
+
+Badges support optional icons using any UTF-8 character or emoji:
+
+[Completed]{.badge colour="success" icon="✓"} [Pending]{.badge colour="warning" icon="⏳"} [Error]{.badge colour="danger" icon="⚠"}
+
+[Beta]{.badge colour="info" icon="ℹ"} [Documentation]{.badge colour="neutral" icon="📄"}
+
+#### Multiple Badges
+
+Combine multiple badges to provide comprehensive status information:
+
+Document Status: [Active]{.badge colour="success"} [High Priority]{.badge colour="warning"} [Review Required]{.badge colour="info"}
+
+**Badge Parameters:**
+
+- `colour`: Badge colour type (success, warning, danger, info, neutral).
+- `icon`: Optional icon (any UTF-8 character or emoji).
+- `inline`: Display inline or as block (default: true).
+
+### Dividers {#sec-dividers}
+
+Decorative dividers provide visual separation between sections without using headings.
+
+#### Basic Divider
+
+{{< divider >}}
+
+#### Divider with Label
+
+{{< divider label="Section Break" >}}
+
+#### Divider Style Variants
+
+{{< divider style="solid" width="75%" >}}
+
+{{< divider style="dashed" width="75%" >}}
+
+{{< divider style="dotted" width="75%" >}}
+
+{{< divider style="gradient" width="75%" >}}
+
+{{< divider style="ornamental" label="Ornamental Divider" >}}
+
+**Divider Parameters:**
+
+- `style`: Divider style (solid, dashed, dotted, ornamental, gradient).
+- `label`: Optional centred label text.
+- `thickness`: Line thickness (default: 1pt).
+- `width`: Line width as percentage (default: 50%).
+
+### Progress Bars {#sec-progress}
+
+Progress bars visualise completion, distribution, or proportions.
+
+{{< progress value="75" label="Project Completion" colour="success" >}}
+
+{{< progress value="45" label="Budget Utilisation" colour="warning" >}}
+
+{{< progress value="90" label="Server Capacity" colour="danger" >}}
+
+{{< progress value="50" label="Storage Used" colour="info" >}}
+
+{{< progress value="25" label="Baseline Progress" colour="neutral" >}}
+
+#### Progress Bar with Custom Colours
+
+{{< progress value="65" label="Custom Colour Progress" colour="#9b59b6" >}}
+
+**Progress Bar Parameters:**
+
+- `value`: Progress percentage (0-100, required).
+- `label`: Description text (required).
+- `colour`: Colour type (success, warning, danger, info, neutral) or hex colour.
+- `height`: Bar height (default: 1.5em).
+- `show-percentage`: Display percentage label (default: true).
+
+### Timelines {#sec-timelines}
+
+Timeline components display chronological events in vertical or horizontal layouts.
+
+#### Vertical Timeline
+
+::: {.timeline}
+::: {.event title="Project Launch" date="2020"}
+Initial planning, requirements gathering, and stakeholder alignment for the new system architecture.
+:::
+
+::: {.event date="2021"}
+## Development Phase
+
+Core system implementation with iterative testing, refinement, and continuous integration.
+:::
+
+::: {.event date="2022"}
+## Beta Launch
+
+Limited release to select users for comprehensive feedback, bug identification, and usability testing.
+:::
+
+::: {.event date="2023"}
+## Production Release
+
+Full public release with comprehensive documentation, training materials, and support infrastructure.
+:::
+
+::: {.event date="2024"}
+## Version 2.0
+
+Major update featuring enhanced performance, new capabilities, and improved user experience.
+:::
+:::
+
+#### Horizontal Timeline
+
+For fewer events, horizontal timelines provide a compact overview:
+
+::: {.timeline orientation="horizontal"}
+## Q1 2024: Planning
+## Q2 2024: Development
+## Q3 2024: Testing
+## Q4 2024: Launch
+:::
+
+**Timeline Features:**
+
+- Vertical or horizontal layout options.
+- Event dates and titles.
+- Optional detailed descriptions.
+- Automatic spacing and professional markers.
+- Adapts to light and dark colour modes.
+
+### Card Grids {#sec-cards}
+
+Card grids provide flexible layouts for displaying content in card format.
+
+#### Basic Card Grid
+
+::: {.card-grid columns="3"}
+::: {.card}
+## Performance
+
+Optimised for speed with minimal overhead and efficient rendering across all platforms.
+
+---
+
+99.9% uptime guarantee
+:::
+
+::: {.card}
+## Security
+
+Enterprise-grade security with end-to-end encryption, compliance, and regular audits.
+
+---
+
+SOC 2 Type II certified
+:::
+
+::: {.card}
+## Scalability
+
+Scales effortlessly from small teams to global enterprises with millions of users.
+
+---
+
+10M+ active users
+:::
+:::
+
+#### Card Style Variants
+
+Cards support three distinct styles:
+
+::: {.card-grid columns="3"}
+::: {.card style="subtle"}
+## Subtle Style
+
+Light background with subtle border.
+This is the default card style.
+:::
+
+::: {.card style="outlined"}
+## Outlined Style
+
+Clear border with transparent background.
+Clean and minimal appearance.
+:::
+
+::: {.card style="filled" colour="#3498db"}
+## Filled Style
+
+Bold filled background with contrasting text.
+Maximum visual impact.
+:::
+:::
+
+**Card Grid Parameters:**
+
+- `columns`: Number of columns (1-4).
+- Card `style`: subtle, outlined, or filled.
+- Card `colour`: Custom accent colour (for filled style).
+- Cards support title (## Heading), content, and footer (after ---).
+
+### Executive Summary {#sec-exec-summary}
+
+Executive summary blocks provide prominent, professional summary sections for reports.
+
+::: {.executive-summary}
+## Executive Summary
+
+This quarter exceeded all strategic targets across revenue, customer satisfaction, and project delivery.
+
+**Key Achievements:**
+
+- Revenue grew 18% year-over-year, surpassing projected targets.
+- Customer satisfaction score reached 94%, a new company record.
+- All major projects delivered on time and within budget.
+- Team productivity improved 22% through process optimisation.
+
+**Strategic Priorities for Next Quarter:**
+
+1. Scale platform infrastructure to support 50,000 concurrent users.
+2. Expand into three new European markets (Germany, France, Spain).
+3. Enhance security framework with SOC 2 Type II certification.
+4. Launch mobile application for iOS and Android platforms.
+
+**Overall Project Status:** [On Track]{.badge colour="success"} [High Confidence]{.badge colour="info"}
+:::
+
+**Executive Summary Parameters:**
+
+- `title`: Custom title (default: "Executive Summary").
+- `show-corner-brackets`: Include decorative corner brackets (default: true).
+
+## Quarto Features {#sec-quarto}
+
+The template supports all standard Quarto features with enhanced styling.
+
+### Figures {#sec-figures}
+
+#### Simple Figure
+
+![An example figure demonstrating basic figure capabilities with caption and cross-referencing.]({{< placeholder 600 400 >}}){#fig-example}
+
+Reference the figure using @fig-example in your text.
+
+#### Figure with Custom Width
+
+![A wider figure spanning more of the page width to demonstrate flexible sizing.]({{< placeholder 800 300 >}}){#fig-wide width=100%}
+
+See @fig-wide for the wider figure example.
+
+#### Subfigures
+
+::: {#fig-multiple layout-ncol=2}
+![First subfigure showing left panel.]({{< placeholder 400 300 >}}){#fig-sub1}
+
+![Second subfigure showing right panel.]({{< placeholder 400 300 >}}){#fig-sub2}
+
+Two subfigures arranged side by side demonstrating multi-panel layouts.
+:::
+
+Reference the complete figure as @fig-multiple, or individual subfigures as @fig-sub1 and @fig-sub2.
+
+### Tables {#sec-tables}
+
+#### Simple Table
+
+| Column A | Column B | Column C |
+|----------|----------|----------|
+| Value 1  | Value 2  | Value 3  |
+| Value 4  | Value 5  | Value 6  |
+| Value 7  | Value 8  | Value 9  |
+
+: A simple table demonstrating basic table capabilities. {#tbl-simple}
+
+Reference tables using @tbl-simple in your text.
+
+#### Table with Column Alignment
+
+| Left Aligned | Centre Aligned | Right Aligned |
+|:-------------|:--------------:|--------------:|
+| Text         | Text           | Text          |
+| 123          | 456            | 789           |
+| Alpha        | Beta           | Gamma         |
+
+: Column alignment demonstration (left, centre, right). {#tbl-aligned}
+
+See @tbl-aligned for alignment examples.
+
+#### Complex Data Table
+
+| Feature         | Light Mode | Dark Mode | Notes                           |
+|-----------------|:----------:|:---------:|---------------------------------|
+| Background      | `#fafafa`  | `#333333` | Page background colour          |
+| Foreground      | `#333333`  | `#fafafa` | Primary text colour             |
+| Muted           | `#666666`  | `#999999` | Secondary text colour           |
+| Accent          | `#e67e22`  | `#e67e22` | Brand accent colour             |
+| Link            | `#0066cc`  | `#66aaff` | Hyperlink colour                |
+| Corner Brackets | Enabled    | Enabled   | Signature branding element      |
+
+: Template colour scheme comparison between light and dark modes. {#tbl-colours}
+
+Detailed colour information is available in @tbl-colours.
+
+### Mathematics {#sec-maths}
+
+#### Inline Mathematics
+
+Inline mathematical expressions like $\alpha + \beta = \gamma$, $\int_0^1 f(x) \, dx$, and $\sum_{i=1}^{n} i = \frac{n(n+1)}{2}$ integrate seamlessly with text.
+
+The quadratic formula $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$ and Euler's identity $e^{i\pi} + 1 = 0$ demonstrate mathematical typesetting quality.
+
+#### Display Mathematics
+
+Einstein's famous mass-energy equivalence relation:
+
+$$
+E = mc^2
+$$ {#eq-einstein}
+
+The quadratic formula for solving $ax^2 + bx + c = 0$:
+
+$$
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+$$ {#eq-quadratic}
+
+Maxwell's equations governing electromagnetic fields:
+
+$$
+\begin{aligned}
+\nabla \cdot \mathbf{E} &= \frac{\rho}{\epsilon_0} \\
+\nabla \cdot \mathbf{B} &= 0 \\
+\nabla \times \mathbf{E} &= -\frac{\partial \mathbf{B}}{\partial t} \\
+\nabla \times \mathbf{B} &= \mu_0 \mathbf{J} + \mu_0 \epsilon_0 \frac{\partial \mathbf{E}}{\partial t}
+\end{aligned}
+$$ {#eq-maxwell}
+
+Matrix equation demonstrating linear algebra:
+
+$$
+\begin{bmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33}
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\
+x_2 \\
+x_3
+\end{bmatrix}
+=
+\begin{bmatrix}
+b_1 \\
+b_2 \\
+b_3
+\end{bmatrix}
+$$ {#eq-matrix}
+
+Cross-reference equations using @eq-einstein, @eq-quadratic, @eq-maxwell, or @eq-matrix.
+
+### Callouts {#sec-callouts}
+
+Quarto's standard callout blocks provide contextual information.
+
+::: {.callout-note}
+Note callouts provide additional information or context without interrupting the main narrative flow.
+They are ideal for supplementary details that enhance understanding.
+:::
+
+::: {.callout-tip}
+## Pro Tip
+
+Tip callouts offer helpful suggestions, best practices, or recommendations.
+Use them to share expertise and guide readers towards optimal approaches.
+:::
+
+::: {.callout-important}
+## Important Information
+
+Important callouts highlight essential details that readers must not miss.
+They emphasise critical information that affects understanding or outcomes.
+:::
+
+::: {.callout-warning}
+## Warning
+
+Warning callouts alert readers to caveats, limitations, or potential issues.
+They help readers avoid common pitfalls or misunderstandings.
+:::
+
+::: {.callout-caution}
+## Caution
+
+Caution callouts warn about significant risks, dangers, or problematic scenarios.
+They demand attention to prevent errors or adverse consequences.
+:::
+
+### Code Blocks {#sec-code}
+
+#### Inline Code
+
+Variable names like `my_variable`, function calls like `calculate_mean()`, and commands like `quarto render` appear inline with special formatting.
+
+#### Python Code Block
+
+```python
+def fibonacci(n: int) -> int:
+    """Calculate the nth Fibonacci number using recursion."""
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+def fibonacci_iterative(n: int) -> int:
+    """Calculate the nth Fibonacci number iteratively."""
+    if n <= 1:
+        return n
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+
+# Example usage
+result = fibonacci_iterative(10)
+print(f"F(10) = {result}")
+```
+
+#### R Code Block
+
+```r
+# Load required libraries
+library(ggplot2)
+library(dplyr)
+
+# Create sample data
+data <- data.frame(
+  x = 1:10,
+  y = c(2, 4, 6, 8, 10, 12, 14, 16, 18, 20)
+)
+
+# Create visualisation
+ggplot(data, aes(x = x, y = y)) +
+  geom_point(size = 3, colour = "steelblue") +
+  geom_line(colour = "steelblue") +
+  labs(
+    title = "Linear Relationship",
+    x = "X Variable",
+    y = "Y Variable"
+  ) +
+  theme_minimal()
+```
+
+#### Bash Script
+
+```bash
+#!/bin/bash
+# Automated backup script
+
+SOURCE="/home/user/documents"
+BACKUP="/backup/documents"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# Create backup directory if it doesn't exist
+mkdir -p "${BACKUP}"
+
+# Compress and archive
+tar -czf "${BACKUP}/backup_${TIMESTAMP}.tar.gz" "${SOURCE}"
+
+# Verify backup
+if [ $? -eq 0 ]; then
+    echo "Backup completed successfully: backup_${TIMESTAMP}.tar.gz"
+else
+    echo "Backup failed" >&2
+    exit 1
+fi
+```
+
+## Typography and Layout {#sec-typography}
+
+### Heading Levels {#sec-headings}
+
+This section demonstrates all six heading levels with their respective styling.
+
+### Level 3 Heading
+
+Content under level 3 heading demonstrating hierarchy and spacing.
+
+#### Level 4 Heading
+
+Content under level 4 heading with appropriate font sizing.
+
+##### Level 5 Heading
+
+Content under level 5 heading maintaining visual consistency.
+
+###### Level 6 Heading
+
+Content under level 6 heading (the deepest available level).
+
+### Lists {#sec-lists}
+
+#### Unordered Lists
+
+- First item demonstrating unordered list styling.
+- Second item with nested elements:
+  - Nested item 2.1 showing second-level indentation.
+  - Nested item 2.2 with consistent formatting.
+    - Deeply nested item 2.2.1 demonstrating third-level nesting.
+    - Deeply nested item 2.2.2 with proper alignment.
+- Third item returning to top level.
+
+#### Ordered Lists
+
+1. First numbered item establishing sequence.
+2. Second numbered item with sub-steps:
+   a. Sub-step 2.1 using alphabetic numbering.
+   b. Sub-step 2.2 maintaining hierarchy.
+   c. Sub-step 2.3 showing consistent styling.
+3. Third numbered item completing the sequence.
+
+#### Definition Lists
+
+Term One
+: Definition of term one providing clear explanation and context.
+
+Term Two
+: Definition of term two with more detailed information.
+  Definitions can span multiple lines whilst maintaining proper formatting and indentation.
+
+Complex Term
+: A more complex definition that includes **bold text**, *italic text*, and `inline code` to demonstrate rich formatting within definition lists.
+
+### Quotations and Asides {#sec-quotes}
+
+#### Block Quotes
+
+> "The best way to predict the future is to invent it."
+>
+> — Alan Kay
+
+> Longer block quotes demonstrate styling across multiple lines and paragraphs.
+> They maintain consistent formatting, proper indentation, and visual hierarchy.
+>
+> Multi-paragraph quotes preserve spacing and readability whilst clearly distinguishing quoted content from the main narrative.
+
+#### Asides
+
+::: {.callout-caution}
+`.aside` and `.column-margin` are not implemented in Typst yet.
+:::
+
+This is regular paragraph text in the main column.
+
+::: {.aside}
+This is an aside note appearing in the margin.
+Asides provide supplementary information without interrupting the main flow.
+:::
+
+More regular text continues in the main column after the aside.
+
+::: {.column-margin}
+Margin notes offer another way to include supplementary content.
+They appear in the page margin and support rich formatting.
+:::
+
+### Layout Features {#sec-layout}
+
+#### Multi-Column Layout
+
+::: {layout-ncol=2}
+**Column 1:** Content in the first column demonstrating side-by-side layout capabilities.
+This column contains the first half of the content with proper formatting and spacing.
+
+**Column 2:** Content in the second column showing parallel information.
+This column contains the second half, creating a balanced two-column presentation.
+:::
+
+#### Three-Column Layout
+
+::: {layout-ncol=3}
+**First:** Brief content in column one.
+
+**Second:** Brief content in column two.
+
+**Third:** Brief content in column three.
+:::
+
+#### Highlighted Text Blocks
+
+::: {.highlight}
+This block uses highlighted styling for emphasis and visual impact.
+Use highlighted blocks for key takeaways, important statements, or critical information that deserves special attention.
+They create visual hierarchy whilst maintaining readability.
+:::
+
+### Cross-References {#sec-refs}
+
+This document includes comprehensive cross-references throughout:
+
+**Sections:**
+
+- Introduction: @sec-intro
+- Template Components: @sec-components
+- Value Boxes: @sec-value-boxes
+- Figures: @sec-figures
+- Tables: @sec-tables
+- Mathematics: @sec-maths
+- Callouts: @sec-callouts
+
+**Figures:**
+
+- Simple figure: @fig-example
+- Wide figure: @fig-wide
+- Multiple subfigures: @fig-multiple (specifically @fig-sub1 and @fig-sub2)
+
+**Tables:**
+
+- Simple table: @tbl-simple
+- Aligned table: @tbl-aligned
+- Colour scheme table: @tbl-colours
+
+**Equations:**
+
+- Einstein's equation: @eq-einstein
+- Quadratic formula: @eq-quadratic
+- Maxwell's equations: @eq-maxwell
+- Matrix equation: @eq-matrix
+
+## Advanced Features {#sec-advanced}
+
+### Footnotes {#sec-footnotes}
+
+This sentence includes a footnote.[^1]
+Another sentence demonstrates multiple footnotes working together.[^2]
+
+[^1]: First footnote providing additional context, citations, or explanatory information that supplements the main text without disrupting narrative flow.
+
+[^2]: Second footnote demonstrating how multiple footnotes coexist within the same document whilst maintaining clear numbering and proper formatting.
+
+Extended discussion with several footnotes creates a rich layer of supplementary information.[^3]
+
+[^3]: Third footnote showing that footnotes can contain **formatting**, *styles*, and even `code` to enhance their informativeness and utility.
+
+### Citations and Bibliography {#sec-citations}
+
+Citations integrate seamlessly with the bibliography system.
+See @example_2024 for a comprehensive example of citation formatting.
+
+Multiple citations can be grouped together [@example_2024; @example_2024], and citations work with inline text as well.
+According to @example_2024, proper citation practices enhance academic rigour.
+
+The bibliography appears automatically at the end of the document.
+
+### Custom Cross-References {#sec-custom}
+
+The template supports custom cross-reference types beyond the standard sections, figures, tables, and equations.
+
+::: {#txt-example}
+{{< lipsum 1-1 >}}
+
+Example text demonstrating custom cross-reference types.
+:::
+
+Reference custom floats using @txt-example in your text.
+
+### Special Sections {#sec-special}
+
+Special sections (appendix and supplementary) automatically relocate to the document end with customised numbering.
+
+## Conclusion {#sec-conclusion}
+
+This demonstration showcases the complete feature set of the Mickaël CANOUIL Typst template.
+
+### Template-Specific Components
+
+The template provides eight specialised components:
+
+1. **Value Boxes** (@sec-value-boxes): Display metrics, KPIs, and statistics with icons and colours.
+2. **Info Panels** (@sec-panels): Highlight content with eight style variants (subtle, emphasis, accent, outline, info, success, warning, danger).
+3. **Status Badges** (@sec-badges): Provide compact inline status indicators with five colour types.
+4. **Dividers** (@sec-dividers): Create visual separation with multiple style options (solid, dashed, dotted, gradient, ornamental).
+5. **Progress Bars** (@sec-progress): Visualise completion and proportions with customisable colours.
+6. **Timelines** (@sec-timelines): Display chronological events in vertical or horizontal layouts.
+7. **Card Grids** (@sec-cards): Present content in flexible card layouts with three style variants.
+8. **Executive Summaries** (@sec-exec-summary): Create prominent summary blocks for professional reports.
+
+### Quarto Features
+
+Standard Quarto features work seamlessly with enhanced styling:
+
+- **Figures** (@sec-figures): Simple figures, custom widths, subfigures, and featured image styling.
+- **Tables** (@sec-tables): Simple tables, column alignment, and complex data tables.
+- **Mathematics** (@sec-maths): Inline expressions and display equations with cross-references.
+- **Callouts** (@sec-callouts): Five callout types (note, tip, important, warning, caution).
+- **Code Blocks** (@sec-code): Syntax highlighting for Python, R, Bash, and inline code.
+
+### Typography and Layout
+
+Comprehensive typography and layout features:
+
+- **Headings** (@sec-headings): Six heading levels with gradient underlines.
+- **Lists** (@sec-lists): Unordered, ordered, and definition lists with nesting.
+- **Quotations** (@sec-quotes): Block quotes and asides with proper styling.
+- **Layout Features** (@sec-layout): Multi-column layouts and highlighted blocks.
+- **Cross-References** (@sec-refs): Seamless referencing throughout the document.
+
+### Customisation Options
+
+The template supports extensive customisation through YAML parameters:
+
+- **Colour Modes**: Light and dark modes with optional colour overrides.
+- **Decorative Elements**: Corner brackets, margin decoration, title page backgrounds, and heading underlines.
+- **Typography**: Custom fonts, sizes, weights, and line heights.
+- **Page Layout**: Flexible paper sizes, margins, and column configurations.
+- **Watermarks**: Text or image watermarks with customisable opacity, angle, and colour.
+- **Logo**: Flexible logo positioning and sizing with alternative text.
+- **Special Sections**: Configurable appendix and supplementary sections with custom numbering.
+
+### Getting Started
+
+To use these features in your own documents:
+
+1. Install the template extension: `quarto add mcanouil/quarto-mcanouil`
+2. Set the format in YAML front matter: `format: mcanouil-typst`
+3. Customise template parameters as demonstrated in this document's YAML.
+4. Copy and adapt examples from each section as needed.
+
+For additional examples and the complete source code, refer to the `template.qmd` file in the extension repository.
+
+## References {.references}
+
+::: {#refs}
+:::
+
+## Additional Configuration {.appendix}
+
+This appendix section demonstrates the special sections feature.
+Content marked with the `.appendix` class automatically relocates to the document end with special numbering (A.1, A.2, etc).
+
+### Configuration Examples
+
+Additional YAML configuration examples for advanced customisation:
+
+```yaml
+format:
+  mcanouil-typst:
+    # Advanced Typography
+    heading-colour: "#e67e22"          # Custom heading colour
+
+    # Advanced Table Styling
+    table-stroke: 1pt                 # Custom border thickness
+    table-inset: 8pt                  # Custom cell padding
+    table-fill: alternating           # Striped table rows
+
+    # Advanced Quote Styling
+    quote-width: 85%                  # Custom blockquote width
+    quote-align: left                 # Custom blockquote alignment
+
+    # Advanced Link Styling
+    link-underline: false             # Disable link underlines
+    link-colour: "#3498db"            # Custom link colour
+```
+
+### Complete YAML Options Reference
+
+This section documents all available YAML front matter options for customising the template.
+
+#### Style Options
+
+```yaml
+# Header and footer style
+header-footer-style: "professional"  # "academic" or "professional"
+
+# Colour mode
+brand-mode: "light"  # "light" or "dark"
+
+# Override default colours (optional)
+colour-background: "#FFFFFF"  # Hex colour code
+colour-foreground: "#333333"  # Hex colour code
+colour-muted: "#999999"       # Hex colour code
+```
+
+#### Decorative Elements
+
+```yaml
+# Control decorative features
+show-corner-brackets: true          # Corner brackets around content blocks
+show-margin-decoration: true        # Decorative elements in margins
+show-title-page-background: true    # Geometric background on title page
+show-heading-underlines: true       # Underlines beneath headings
+```
+
+#### Logo Configuration
+
+```yaml
+show-logo: true          # Display logo in header
+logo-width: 40pt         # Logo width (omit to use height only)
+logo-inset: 4pt          # Padding around logo
+logo-alt: "Logo text"    # Alternative text for accessibility
+```
+
+#### Watermark Options
+
+```yaml
+watermark-text: "DRAFT"         # Text watermark
+watermark-image: "path/to/img"  # Image watermark path
+watermark-opacity: 10%          # Transparency (0-100%)
+watermark-angle: "-45deg"       # Rotation angle
+watermark-size: 4em             # Text size for text watermarks
+watermark-colour: "gray"        # Colour for text watermarks
+```
+
+#### Typography
+
+```yaml
+# Fonts
+font-body: "Alegreya Sans"      # Body text font
+font-headings: "Alegreya Sans"  # Heading font
+font-size: 11pt                 # Base font size
+
+# Heading styling
+heading-weight: "bold"          # Font weight
+heading-style: "normal"         # Font style (normal/italic)
+heading-colour: null            # Override colour (null uses foreground)
+heading-line-height: 0.65em     # Line height for headings
+title-size: 24pt                # Title font size
+subtitle-size: 14pt             # Subtitle font size
+```
+
+#### Page Layout
+
+```yaml
+papersize: "a4"       # Paper size (a4, letter, a5, etc.)
+columns: 1            # Number of columns (1 or 2)
+
+# Custom margins (optional)
+margin:
+  top: 2.5cm
+  bottom: 2.5cm
+  left: 2.5cm
+  right: 2.5cm
+```
+
+#### Document Structure
+
+```yaml
+toc: true                     # Include table of contents
+list-of: true                 # Include list of figures/tables
+number-sections: true         # Number section headings
+section-numbering: "1.1.1."   # Numbering pattern
+section-pagebreak: true       # Page break before level 1 headings
+```
+
+#### Special Sections
+
+```yaml
+special-sections:
+  references:
+    name: "References"        # Section name
+    numbering: "none"         # Numbering pattern ("none" for unnumbered)
+    prefix: false             # Show section name prefix
+  appendix:
+    name: "Appendix"
+    numbering: "A.a."         # Appendix numbering (A.1, A.2, etc.)
+    prefix: true              # Show "Appendix" prefix
+  supplementary:
+    name: "Supplementary"
+    numbering: "I.i."         # Roman numerals (I.1, I.2, etc.)
+    prefix: true
+```
+
+#### Table Styling
+
+```yaml
+table-stroke: "0.5pt"        # Border thickness
+table-inset: 5pt             # Cell padding
+table-fill: null             # Header background colour (null for foreground)
+```
+
+#### Links and Quotes
+
+```yaml
+quote-width: 75%             # Blockquote width
+quote-align: "center"        # Blockquote alignment
+link-underline: true         # Underline hyperlinks
+link-underline-opacity: 60%  # Link underline transparency
+link-colour: null            # Override link colour (null uses foreground)
+```
+
+#### Professional Style Options
+
+Additional options available when `header-footer-style: "professional"`:
+
+```yaml
+institute: "Company Name"    # Footer left content (defaults to first author affiliation)
+copyright: "© 2025 Company"  # Footer right content
+license: "MIT License"       # Licence info (combined with copyright if both present)
+title-page: true             # Dedicated title page mode
+```
+
+#### Margin Section Configuration
+
+**Note**: Margin sections are only displayed in professional style.
+Currently, margin section styling is controlled by internal constants in [margin-section.typ](_extensions/mcanouil/typst/partials/margin-section.typ):
+
+- `MARGIN-SECTION-REFERENCE-SIZE`: Reference font size for measuring text widths (default: 12pt).
+- `MARGIN-SECTION-FILL-RATIO`: Target fill ratio for vertical constraint; the longest heading occupies at most this percentage of available height (default: 90%).
+- `MARGIN-SECTION-MAX-MARGIN-RATIO`: Maximum font size as percentage of left margin width after rotation (default: 50%).
+- `MARGIN-SECTION-POSITION-HORIZONTAL`: Horizontal position percentage within margin (default: 85%).
+- `MARGIN-SECTION-OPACITY`: Text opacity level (default: 70%).
+- `MARGIN-SECTION-WEIGHT`: Font weight (default: "bold").
+- `MARGIN-SECTION-ROTATION`: Rotation angle (default: -90deg for vertical text).
+- `MARGIN-SECTION-MIN-SIZE`: Minimum text size for accessibility (default: 9pt).
+- `MARGIN-SECTION-HEADING-LEVEL`: Heading level to display (default: 1 for top-level sections).
+
+**Behaviour**:
+
+- The margin section shows the most recent heading of the configured level.
+- Section titles persist across pages until a new heading of that level appears.
+- Supports special section numbering for appendices, supplementary materials, and references.
+- **Automatic font size calculation**: Queries all headings in the document, measures their text width, and calculates the optimal font size subject to two constraints: (1) the longest heading fills at most 90% of available height, and (2) font size does not exceed 50% of the left margin width.
+- Consistent sizing across all pages without text wrapping.
+- Gracefully fails (returns none) if required parameters are missing.
+
+Configuration options may be added in future versions for user customisation via YAML.
+
+#### Default Values
+
+If an option is not specified, the following defaults apply:
+
+| Option                    | Default      | Description                             |
+|---------------------------|--------------|-----------------------------------------|
+| `header-footer-style`     | `"academic"` | Academic style with simple header/footer |
+| `brand-mode`              | `"light"`    | Light colour scheme                     |
+| `show-corner-brackets`    | `true`       | Decorative brackets enabled             |
+| `show-logo`               | `true`       | Logo displayed when provided            |
+| `font-size`               | `11pt`       | Standard readable size                  |
+| `columns`                 | `1`          | Single-column layout                    |
+| `section-pagebreak`       | `true`       | Level 1 headings start new page        |
+| `toc`                     | `false`      | Table of contents not generated         |
+| `list-of`                 | `true`       | List of figures/tables generated        |
+| `number-sections`         | `true`       | Section headings numbered               |
+
+#### Validation
+
+The template validates options and provides helpful error messages:
+
+- Colour values must be valid hex codes or colour names.
+- Size values must include units (pt, em, cm, etc.).
+- Boolean values must be `true` or `false`.
+- Special section numbering must be valid Typst numbering patterns.
+
+### Feature Reference Table
+
+| Component          | Shortcode/Class        | Key Parameters                          |
+|--------------------|------------------------|-----------------------------------------|
+| Value Box          | `{{< value-box >}}`    | value, unit, label, icon, colour        |
+| Panel              | `.panel`               | style, title, icon                      |
+| Badge              | `.badge`               | colour, icon                            |
+| Divider            | `{{< divider >}}`      | style, label, width, thickness          |
+| Progress Bar       | `{{< progress >}}`     | value, label, colour                     |
+| Timeline           | `.timeline`            | orientation                             |
+| Card Grid          | `.card-grid`           | columns                                 |
+| Executive Summary  | `.executive-summary`   | title                                   |
+
+: Complete feature reference with syntax and parameters. {#tbl-appendix-ref .appendix}
+
+## Colour Schemes {.supplementary}
+
+This supplementary section demonstrates additional special section functionality.
+Content marked with `.supplementary` appears after appendices with Roman numeral numbering (I.1, I.2, etc).
+
+### Light Mode Colours
+
+| Element            | Hex Code   | RGB              | Usage                      |
+|--------------------|------------|------------------|----------------------------|
+| Background         | `#fafafa`  | rgb(250,250,250) | Page background            |
+| Foreground         | `#333333`  | rgb(51,51,51)    | Primary text               |
+| Muted              | `#666666`  | rgb(102,102,102) | Secondary text             |
+| Accent             | `#e67e22`  | rgb(230,126,34)  | Brand colour               |
+
+: Light mode colour scheme. {#tbl-supp-light .supplementary}
+
+### Dark Mode Colours
+
+| Element            | Hex Code   | RGB              | Usage                      |
+|--------------------|------------|------------------|----------------------------|
+| Background         | `#333333`  | rgb(51,51,51)    | Page background            |
+| Foreground         | `#fafafa`  | rgb(250,250,250) | Primary text               |
+| Muted              | `#999999`  | rgb(153,153,153) | Secondary text             |
+| Accent             | `#e67e22`  | rgb(230,126,34)  | Brand colour               |
+
+: Dark mode colour scheme. {#tbl-supp-dark .supplementary}
+
+### Callout Colours (WCAG AA Compliant)
+
+| Callout Type | Hex Code   | Contrast Ratio | Accessibility              |
+|--------------|------------|----------------|----------------------------|
+| Note         | `#0066cc`  | 7.5:1          | AA Large Text, AAA Normal  |
+| Tip          | `#009955`  | 6.8:1          | AA Large Text, AAA Normal  |
+| Warning      | `#cc6600`  | 5.2:1          | AA Large Text              |
+| Important    | `#cc0000`  | 5.9:1          | AA Large Text              |
+| Caution      | `#b38f00`  | 6.1:1          | AA Large Text, AAA Normal  |
+
+: Callout colour accessibility compliance. {#tbl-supp-callout .supplementary}
