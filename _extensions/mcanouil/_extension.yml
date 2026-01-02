@@ -6,3 +6,14 @@ contributes:
   metadata:
     project:
       brand: brand.yml
+      format:
+        html:
+          theme:
+            light:
+              - cosmo
+              - brand
+              - _extensions/mcanouil/mcanouil/theme.scss
+            dark:
+              - cosmo
+              - brand
+              - _extensions/mcanouil/mcanouil/theme.scss
