@@ -1,7 +1,10 @@
 ---
 title: "Mickaël Canouil's Brand"
 subtitle: "Quarto Extension"
-author: "Mickaël Canouil"
+author:
+  - name: "Mickaël CANOUIL, _Ph.D._"
+    orcid: "0000-0002-3396-4549"
+    url: "https://mickael.canouil.fr"
 date: today
 highlight-style: github
 code-annotations: select
@@ -120,23 +123,23 @@ print(f"First 10 Fibonacci numbers: {fib_numbers}")
 
 ### Callouts
 
-::: {.callout-note}
+:::: {.callout-note}
 This is a note callout. Use it to highlight important information that readers should pay attention to.
 :::
 
-::: {.callout-warning}
+:::: {.callout-warning}
 This is a warning callout. Use it to alert readers about potential issues or important considerations.
 :::
 
-::: {.callout-tip}
+:::: {.callout-tip}
 This is a tip callout. Use it to provide helpful suggestions or best practices.
 :::
 
-::: {.callout-important}
+:::: {.callout-important}
 This is an important callout. Use it for critical information that must not be overlooked.
 :::
 
-::: {.callout-caution}
+:::: {.callout-caution}
 This is a caution callout. Use it to warn about potential risks or problems.
 :::
 
@@ -195,7 +198,7 @@ See the [Typography section](#typography-and-text-formatting) for text formattin
 
 ## Figures and Images
 
-::: {#fig-placeholder}
+:::: {#fig-placeholder}
 ![]({{< placeholder 600 400 format=png >}})
 
 This is a placeholder for an image that would showcase how the brand theming affects figure styling. In a real document, you would include actual images here.
