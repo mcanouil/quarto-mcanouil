@@ -6,17 +6,6 @@ contributes:
   metadata:
     project:
       brand: brand.yml
-      format:
-        html:
-          theme:
-            light:
-              - cosmo
-              - brand
-              - _extensions/mcanouil/mcanouil/theme.scss
-            dark:
-              - cosmo
-              - brand
-              - _extensions/mcanouil/mcanouil/theme.scss
   formats:
     typst:
       template: typst/template.typ # originally from src/resources/formats/typst/pandoc/quarto
@@ -87,3 +76,13 @@ contributes:
       toc: true
       list-of: true
       header-footer-style: "academic"
+    html:
+      theme:
+        light:
+          - cosmo
+          - brand
+          - ./theme.scss
+        dark:
+          - cosmo
+          - brand
+          - ./theme.scss

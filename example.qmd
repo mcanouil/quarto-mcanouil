@@ -13,6 +13,10 @@ format:
     output-file: index
     toc: true
     toc-depth: 3
+  mcanouil-html:
+    output-file: example-mcanouil-html
+    toc: true
+    toc-depth: 3
   typst-dark:
     output-file: example-typst-dark
     papersize: a4
@@ -37,6 +41,8 @@ format:
     brand-mode: light
 format-links:
   - html
+  - format: mcanouil-html
+    text: HTML (mcanouil)
   - format: typst-dark
     text: Typst (Dark)
   - format: typst-light

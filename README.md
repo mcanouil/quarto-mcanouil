@@ -35,6 +35,7 @@ Here is the source code for a minimal example: [example.qmd](example.qmd).
 Output of `example.qmd`:
 
 - [HTML](https://m.canouil.dev/quarto-mcanouil/)
+- [HTML (mcanouil)](https://m.canouil.dev/quarto-mcanouil/example-mcanouil-html.html)
 - [Typst Dark (PDF)](https://m.canouil.dev/quarto-mcanouil/example-typst-dark.pdf)
 - [Typst Light (PDF)](https://m.canouil.dev/quarto-mcanouil/example-typst-light.pdf)
 - [Reveal.js Dark (HTML)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-dark.html) | [Reveal.js Dark (PDF)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-dark.pdf)
