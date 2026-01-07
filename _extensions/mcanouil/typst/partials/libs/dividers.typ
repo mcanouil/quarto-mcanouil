@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Mickaël Canouil
+// Copyright (c) 2026 Mickaël Canouil
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,9 +65,7 @@
           columns: (1fr, auto, 1fr),
           column-gutter: 0.5em,
           align: (right, center, left),
-          place(horizon, make-line()),
-          centre-content,
-          place(horizon, make-line()),
+          place(horizon, make-line()), centre-content, place(horizon, make-line()),
         )
       ]
     ]
@@ -91,11 +89,13 @@
           spacing: 0pt,
           ..for i in range(20) {
             let opacity-val = if i < 10 { (i + 1) * 10% } else { (20 - i) * 10% }
-            (line(
-              length: 5%,
-              stroke: (paint: colours.muted.transparentize(100% - opacity-val), thickness: thickness),
-            ),)
-          }
+            (
+              line(
+                length: 5%,
+                stroke: (paint: colours.muted.transparentize(100% - opacity-val), thickness: thickness),
+              ),
+            )
+          },
         )
       ]
     ]

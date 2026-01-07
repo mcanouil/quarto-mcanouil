@@ -1207,7 +1207,7 @@ Additional options available when `header-footer-style: "professional"`:
 
 ```yaml
 institute: "Company Name"    # Footer left content (defaults to first author affiliation)
-copyright: "© 2025 Company"  # Footer right content
+copyright: "© 2026 Company"  # Footer right content
 license: "MIT License"       # Licence info (combined with copyright if both present)
 title-page: true             # Dedicated title page mode
 ```

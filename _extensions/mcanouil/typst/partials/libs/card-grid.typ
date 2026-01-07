@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Mickaël Canouil
+// Copyright (c) 2026 Mickaël Canouil
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -85,7 +85,7 @@
           size: CARD-TITLE-SIZE,
           weight: CARD-TITLE-WEIGHT,
           fill: title-colour,
-          card-title
+          card-title,
         )
         v(0.5em)
       }
@@ -94,7 +94,7 @@
       if card-content != none and has-content(card-content) {
         text(
           fill: if card-style == "filled" { colours.background } else { colours.foreground },
-          card-content
+          card-content,
         )
       }
 
@@ -106,10 +106,10 @@
         text(
           size: 0.9em,
           fill: if card-style == "filled" { colours.background.lighten(20%) } else { colours.muted },
-          card-footer
+          card-footer,
         )
       }
-    }
+    },
   )
 }
 
@@ -188,15 +188,17 @@
     // Header row
     table.header(
       [],
-      ..options.map(opt => text(weight: "semibold", opt))
+      ..options.map(opt => text(weight: "semibold", opt)),
     ),
 
     // Feature rows
-    ..features.map(feature => {
-      (
-        text(weight: "medium", feature.name),
-        ..feature.options.map(val => text(val))
-      )
-    }).flatten()
+    ..features
+      .map(feature => {
+        (
+          text(weight: "medium", feature.name),
+          ..feature.options.map(val => text(val)),
+        )
+      })
+      .flatten()
   )
 }

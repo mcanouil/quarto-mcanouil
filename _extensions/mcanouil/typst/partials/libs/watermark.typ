@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Mickaël Canouil
+// Copyright (c) 2026 Mickaël Canouil
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +57,7 @@
       size: size,
       fill: colour.transparentize(100% - opacity),
       weight: "bold",
-    )[#content]
+    )[#content],
   )
 }
 
@@ -78,7 +78,7 @@
     box(
       image(image-path, width: width),
       fill: none.transparentize(100% - opacity),
-    )
+    ),
   )
 }
 
@@ -110,7 +110,7 @@
         angle: watermark-angle,
         size: watermark-size,
         colour: watermark-colour,
-      )
+      ),
     )
   } else if watermark-image != none and watermark-image != "" {
     // Image watermark
@@ -120,7 +120,7 @@
         watermark-image,
         opacity: watermark-opacity,
         angle: watermark-angle,
-      )
+      ),
     )
   }
 }

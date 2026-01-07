@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Mickaël Canouil
+// Copyright (c) 2026 Mickaël Canouil
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -406,10 +406,10 @@
     } else if weight == "black" or weight == "heavy" {
       900
     } else {
-      400  // Default to normal if unrecognised
+      400 // Default to normal if unrecognised
     }
   } else {
-    weight  // Already numeric
+    weight // Already numeric
   }
 
   // Extract numeric value from size (handles both pt and raw numbers)
@@ -425,9 +425,9 @@
   let is-large-text = (size-pt >= 18) or (size-pt >= 14 and numeric-weight >= 700)
 
   if is-large-text {
-    3.0   // WCAG AA for large text
+    3.0 // WCAG AA for large text
   } else {
-    4.5   // WCAG AA for normal text
+    4.5 // WCAG AA for normal text
   }
 }
 
@@ -465,7 +465,7 @@
 
   // Determine whether to lighten or darken based on background luminance
   let bg-luminance = calculate-luminance(bg-colour)
-  let should-lighten = bg-luminance < 0.5  // Darken background = lighten text
+  let should-lighten = bg-luminance < 0.5 // Darken background = lighten text
 
   // Try adjusting in incremental steps to preserve hue
   if preserve-hue {

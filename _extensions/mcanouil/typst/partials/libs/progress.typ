@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Mickaël Canouil
+// Copyright (c) 2026 Mickaël Canouil
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +79,7 @@
             width: progress-ratio * 100%,
             height: 100%,
             fill: bar-colour,
-          )
+          ),
         )
 
         // Percentage label overlay (centred)
@@ -93,12 +93,12 @@
               text(
                 size: 0.85em,
                 weight: "bold",
-                fill: colours.foreground
-              )[#progress-value%]
-            )
+                fill: colours.foreground,
+              )[#progress-value%],
+            ),
           )
         }
       ]
-    }
+    },
   )
 }

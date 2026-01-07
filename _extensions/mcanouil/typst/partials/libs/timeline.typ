@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Mickaël Canouil
+// Copyright (c) 2026 Mickaël Canouil
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -98,9 +98,8 @@
           size: 0.9em,
           fill: colours.muted,
           weight: "semibold",
-          event-date
+          event-date,
         ),
-
         // Marker and line column
         {
           // Create a container for the marker with line extending through
@@ -117,7 +116,7 @@
                     height: TIMELINE-SPACING,
                     fill: line-col,
                     stroke: none,
-                  )
+                  ),
                 )
               }
 
@@ -131,7 +130,7 @@
                     height: TIMELINE-SPACING + TIMELINE-MARKER-RADIUS + 3em,
                     fill: line-col,
                     stroke: none,
-                  )
+                  ),
                 )
               }
 
@@ -142,15 +141,14 @@
                   radius: TIMELINE-MARKER-RADIUS,
                   fill: marker-col,
                   stroke: TIMELINE-LINE-WIDTH + colours.background,
-                )
+                ),
               )
 
               // Reserve space for marker
               v(TIMELINE-MARKER-RADIUS * 2)
-            }
+            },
           )
         },
-
         // Content column
         {
           // Title
@@ -158,7 +156,7 @@
             weight: "semibold",
             size: 1em,
             fill: colours.foreground,
-            event-title
+            event-title,
           )
 
           // Description (if provided)
@@ -167,10 +165,10 @@
             text(
               size: 0.9em,
               fill: colours.foreground,
-              event-description
+              event-description,
             )
           }
-        }
+        },
       )
     }.flatten()
   )
@@ -228,7 +226,7 @@
             size: 0.85em,
             fill: colours.muted,
             weight: "semibold",
-            event-date
+            event-date,
           )
 
           v(0.2em)
@@ -238,7 +236,7 @@
             size: 0.9em,
             fill: colours.foreground,
             weight: "medium",
-            event-title
+            event-title,
           )
         },
       )
@@ -253,8 +251,8 @@
               start: (-0.5em, 0pt),
               end: (2.5em, 0pt),
               stroke: TIMELINE-LINE-WIDTH + line-col,
-            )
-          )
+            ),
+          ),
         )
       }
 

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Mickaël Canouil
+// Copyright (c) 2026 Mickaël Canouil
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -212,7 +212,7 @@
           weight: title-weight,
           fill: panel-colours.title,
         )[#icon-display#title]
-      }
+      },
     )
   }
 
@@ -234,7 +234,7 @@
         it
       }
       text(fill: panel-colours.content)[#content]
-    }
+    },
   )
 }
 
