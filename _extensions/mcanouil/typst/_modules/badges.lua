@@ -35,6 +35,9 @@
 local wrapper = require(
   quarto.utils.resolve_path('../_modules/wrapper.lua'):gsub('%.lua$', '')
 )
+local utils = require(
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+)
 
 -- ============================================================================
 -- COMPONENT PROCESSING
@@ -47,7 +50,7 @@ local wrapper = require(
 --- @return pandoc.RawInline Typst code inline
 local function process_span(span, config)
   -- Convert content to plain text
-  local content = pandoc.utils.stringify(span.content)
+  local content = utils.stringify(span.content)
 
   -- Convert attributes to table
   local attrs = wrapper.attributes_to_table(span)

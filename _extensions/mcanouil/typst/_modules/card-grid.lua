@@ -35,54 +35,33 @@
 local typst_utils = require(
   quarto.utils.resolve_path('../_modules/typst-utils.lua'):gsub('%.lua$', '')
 )
+local utils = require(
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+)
+local content_extraction = require(
+  quarto.utils.resolve_path('../_modules/content-extraction.lua'):gsub('%.lua$', '')
+)
 
 -- ============================================================================
 -- HELPER FUNCTIONS
 -- ============================================================================
 
---- Extract card data from a div
---- Extracts title from first heading, splits content by horizontal rule
---- @param div pandoc.Div The card div
---- @return table Card data with title, content, footer, style, colour
+--- Extract card data from a div.
+--- Uses content_extraction.parse_sections() for header/body/footer extraction.
+--- @param div pandoc.Div The card div.
+--- @return table Card data with title, content, footer, style, colour.
 local function extract_card(div)
-  local card = {}
+  local parsed = content_extraction.parse_sections(div.content)
 
-  -- Get style and colour from attributes
-  card.style = div.attributes.style
-  card.colour = div.attributes.colour
-
-  local blocks = pandoc.List(div.content)
-  local content_blocks = pandoc.List()
-  local footer_blocks = pandoc.List()
-  local in_footer = false
-
-  -- Process blocks
-  for i, block in ipairs(blocks) do
-    if block.t == 'Header' and not card.title then
-      -- First heading becomes title
-      card.title = pandoc.utils.stringify(block.content)
-    elseif block.t == 'HorizontalRule' then
-      -- Horizontal rule splits content and footer
-      in_footer = true
-    elseif in_footer then
-      footer_blocks:insert(block)
-    else
-      -- Skip the heading that was used as title
-      if block.t ~= 'Header' or card.title ~= pandoc.utils.stringify(block.content) then
-        content_blocks:insert(block)
-      end
-    end
-  end
-
-  -- Convert blocks to strings
-  if #content_blocks > 0 then
-    card.content = pandoc.utils.stringify(content_blocks)
-  end
-  if #footer_blocks > 0 then
-    card.footer = pandoc.utils.stringify(footer_blocks)
-  end
-
-  return card
+  return {
+    title = parsed.header_text,
+    content = parsed.body_blocks and #parsed.body_blocks > 0
+      and utils.stringify(parsed.body_blocks) or nil,
+    footer = parsed.footer_blocks and #parsed.footer_blocks > 0
+      and utils.stringify(parsed.footer_blocks) or nil,
+    style = div.attributes.style,
+    colour = div.attributes.colour
+  }
 end
 
 -- ============================================================================

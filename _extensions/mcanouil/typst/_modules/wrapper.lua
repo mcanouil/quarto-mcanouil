@@ -35,6 +35,9 @@
 local typst_utils = require(
   quarto.utils.resolve_path('../_modules/typst-utils.lua'):gsub('%.lua$', '')
 )
+local utils = require(
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+)
 
 -- ============================================================================
 -- HELPER FUNCTIONS
@@ -73,7 +76,7 @@ local function extract_first_heading_as_title(el, attrs)
     -- Check if first element is a header
     if first_elem.t == 'Header' then
       -- Extract header text as title
-      attrs['title'] = pandoc.utils.stringify(first_elem.content)
+      attrs['title'] = utils.stringify(first_elem.content)
       -- Remove header from content
       local new_content = {}
       for i = 2, #el.content do

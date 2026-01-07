@@ -59,7 +59,7 @@ local function extract_event(div)
     local blocks = pandoc.List(div.content)
     for i, block in ipairs(blocks) do
       if block.t == 'Header' then
-        event.title = pandoc.utils.stringify(block.content)
+        event.title = utils.stringify(block.content)
         -- Remove the heading from content
         blocks:remove(i)
         break
@@ -70,7 +70,7 @@ local function extract_event(div)
 
   -- Description is remaining content
   if #div.content > 0 then
-    event.description = pandoc.utils.stringify(div.content)
+    event.description = utils.stringify(div.content)
   end
 
   return event
@@ -104,7 +104,7 @@ local function process_div(div, config)
       end
     elseif block.t == 'Header' then
       -- Event as heading (extract date from heading text if formatted as "YYYY: Title")
-      local heading_text = pandoc.utils.stringify(block.content)
+      local heading_text = utils.stringify(block.content)
       local date, title = heading_text:match('^([^:]+):%s*(.+)$')
       if date and title then
         events:insert({
