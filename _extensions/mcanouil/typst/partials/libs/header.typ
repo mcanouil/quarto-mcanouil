@@ -106,6 +106,8 @@
   let right-margin = current-margin.right
   let total-horizontal = left-margin + right-margin
   let top-margin = current-margin.top
+  // Use symmetric margin for header content (minimum of left/right)
+  let symmetric-margin = calc.min(left-margin, right-margin)
 
   place(
     top + left,
@@ -115,8 +117,8 @@
       width: 100% + total-horizontal,
       fill: colours.foreground,
       inset: (
-        left: left-margin + HEADER-PROFESSIONAL-PADDING-HORIZONTAL,
-        right: right-margin + HEADER-PROFESSIONAL-PADDING-HORIZONTAL,
+        left: symmetric-margin + HEADER-PROFESSIONAL-PADDING-HORIZONTAL,
+        right: symmetric-margin + HEADER-PROFESSIONAL-PADDING-HORIZONTAL,
         top: HEADER-PROFESSIONAL-PADDING-VERTICAL,
         bottom: HEADER-PROFESSIONAL-PADDING-VERTICAL,
       ),

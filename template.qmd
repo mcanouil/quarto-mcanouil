@@ -1,6 +1,6 @@
 ---
-title: "Typst Template Feature Showcase"
-subtitle: "Complete Guide to the Mickaël CANOUIL Typst Template"
+title: "Mickaël CANOUIL Typst Template"
+subtitle: "Complete Guide"
 author:
   - name:
       given: Mickaël
@@ -41,7 +41,7 @@ format:
   mcanouil-typst:
     header-footer-style: "professional"  # Header and footer style
     # Colour Mode (light or dark)
-    brand-mode: light
+    brand-mode: dark
 
     # Optional Colour Overrides
     # colour-background: "#fafafa"  # Custom background colour
@@ -61,7 +61,7 @@ format:
     # logo-alt: "Mickaël CANOUIL Logo"  # Logo alternative text
 
     # Title Page and Section Pages
-    title-page: false                   # Use dedicated title page with special styling
+    title-page: true                   # Use dedicated title page with special styling
     section-page: true                 # Use dedicated section pages for level-1 headings
 
     # Watermark

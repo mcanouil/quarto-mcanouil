@@ -101,6 +101,8 @@
   let left-margin = current-margin.left
   let right-margin = current-margin.right
   let total-horizontal = left-margin + right-margin
+  // Use symmetric margin for footer content (minimum of left/right)
+  let symmetric-margin = calc.min(left-margin, right-margin)
 
   place(
     bottom + left,
@@ -110,8 +112,8 @@
       width: 100% + total-horizontal,
       fill: colours.foreground,
       inset: (
-        left: left-margin + FOOTER-PROFESSIONAL-PADDING-HORIZONTAL,
-        right: right-margin + FOOTER-PROFESSIONAL-PADDING-HORIZONTAL,
+        left: symmetric-margin + FOOTER-PROFESSIONAL-PADDING-HORIZONTAL,
+        right: symmetric-margin + FOOTER-PROFESSIONAL-PADDING-HORIZONTAL,
         top: FOOTER-PROFESSIONAL-PADDING-VERTICAL,
         bottom: FOOTER-PROFESSIONAL-PADDING-VERTICAL,
       ),

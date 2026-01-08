@@ -46,7 +46,9 @@ contributes:
       filters:
         - typst/filters/special-sections.lua
         - typst/filters/typst-markdown.lua
-      logo: typst/assets/logo.svg
+      logo:
+        light: logos/logo-light.svg
+        dark: logos/logo-dark.svg
       orcid-icon: typst/assets/orcid.svg
       papersize: a4
       margin:
