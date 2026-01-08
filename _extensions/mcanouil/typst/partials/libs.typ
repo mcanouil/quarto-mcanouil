@@ -40,3 +40,5 @@ $list-of.typ()$
 $special-sections.typ()$
 
 $margin-section.typ()$
+
+$section-page.typ()$

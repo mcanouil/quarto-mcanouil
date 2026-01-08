@@ -266,6 +266,11 @@
   margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm),
   heading-level: MARGIN-SECTION-HEADING-LEVEL,
 ) = context {
+  // Skip margin section on section pages (they have their own layout)
+  if section-page-state.get() {
+    return none
+  }
+
   // Validate required parameters (fail gracefully for decorative element)
   if colours == none {
     return none

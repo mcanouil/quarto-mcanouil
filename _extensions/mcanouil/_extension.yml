@@ -32,6 +32,7 @@ contributes:
         - typst/partials/libs/title-block.typ
         - typst/partials/libs/list-of.typ
         - typst/partials/libs/special-sections.typ
+        - typst/partials/libs/section-page.typ
         - typst/partials/libs.typ
         - typst/partials/show-rules.typ
         - typst/partials/biblio.typ

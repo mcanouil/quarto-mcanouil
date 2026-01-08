@@ -38,6 +38,10 @@
 /// when margins change mid-document (e.g., professional style symmetric to asymmetric)
 #let current-margin-state = state("current-margin", (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm))
 
+/// State to track if current page is a section page
+/// Used by margin-section to skip rendering on section pages
+#let section-page-state = state("section-page", false)
+
 // ============================================================================
 // Content validation and type checking
 // ============================================================================

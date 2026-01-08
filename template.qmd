@@ -56,12 +56,13 @@ format:
 
     # Logo Configuration
     show-logo: true                     # Display logo in header
-    # logo-width: 40pt                    # Logo width (optional)
-    # logo-inset: 4pt                     # Logo padding
-    # logo-alt: "Mickaël CANOUIL Logo"   # Logo alternative text
+    # logo-width: 40pt                  # Logo width (optional)
+    # logo-inset: 4pt                   # Logo padding
+    # logo-alt: "Mickaël CANOUIL Logo"  # Logo alternative text
 
-    # Title Page
-    title-page: false                    # Use dedicated title page with special styling
+    # Title Page and Section Pages
+    title-page: false                   # Use dedicated title page with special styling
+    section-page: true                 # Use dedicated section pages for level-1 headings
 
     # Watermark
     watermark-text: "DEMO"              # Text watermark content
@@ -907,6 +908,29 @@ Use highlighted blocks for key takeaways, important statements, or critical info
 They create visual hierarchy whilst maintaining readability.
 :::
 
+### Section Pages {#sec-section-pages}
+
+When `section-page: true` is enabled, level-1 headings are rendered on dedicated section pages with special styling:
+
+- **Banner**: A coloured banner at 20% from the top of the page, spanning 75% of the page width from the left edge.
+- **Inverted colours**: The banner uses the foreground colour as background, with the section title in the background colour.
+- **Heading underline**: The banner includes the signature gradient underline with inverted colours.
+- **Subsection outline**: Below the banner, an outline of subsections within that section is displayed (respecting `toc-depth`).
+- **Symmetric margins**: Section pages use symmetric margins, similar to the title page.
+- **Single-column**: Section pages are always single-column, regardless of the document's column setting.
+- **No margin section**: The professional style margin section is suppressed on section pages.
+
+Section pages apply to all level-1 headings except those with `outlined: false` (such as TOC and list-of sections).
+
+**YAML Configuration:**
+
+```yaml
+format:
+  mcanouil-typst:
+    section-page: true    # Enable section pages
+    toc-depth: 3          # Controls outline depth on section pages
+```
+
 ### Cross-References {#sec-refs}
 
 This document includes comprehensive cross-references throughout:
@@ -916,6 +940,7 @@ This document includes comprehensive cross-references throughout:
 - Introduction: @sec-intro
 - Template Components: @sec-components
 - Value Boxes: @sec-value-boxes
+- Section Pages: @sec-section-pages
 - Figures: @sec-figures
 - Tables: @sec-tables
 - Mathematics: @sec-maths
@@ -1163,6 +1188,7 @@ list-of: true                 # Include list of figures/tables
 number-sections: true         # Number section headings
 section-numbering: "1.1.1."   # Numbering pattern
 section-pagebreak: true       # Page break before level 1 headings
+section-page: true            # Dedicated section pages for level-1 headings
 ```
 
 #### Special Sections
@@ -1251,6 +1277,7 @@ If an option is not specified, the following defaults apply:
 | `font-size`               | `11pt`       | Standard readable size                  |
 | `columns`                 | `1`          | Single-column layout                    |
 | `section-pagebreak`       | `true`       | Level 1 headings start new page        |
+| `section-page`            | `false`      | Dedicated section pages disabled        |
 | `toc`                     | `false`      | Table of contents not generated         |
 | `list-of`                 | `true`       | List of figures/tables generated        |
 | `number-sections`         | `true`       | Section headings numbered               |

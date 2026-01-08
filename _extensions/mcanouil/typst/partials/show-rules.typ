@@ -37,6 +37,10 @@
 /// @param font-headings Heading font family
 /// @param section-pagebreak Whether to add breaks before level 1 headings
 /// @param show-heading-underlines Whether to show underlines
+/// @param section-page Whether to render section pages for level-1 headings
+/// @param margin Page margins for section pages
+/// @param cols Number of columns for restoring after section page
+/// @param toc-depth Maximum heading depth for section page outline
 /// @param heading-weight Heading font weight
 /// @param heading-style Heading font style
 /// @param heading-colour Heading colour
@@ -48,11 +52,31 @@
   font-headings,
   section-pagebreak,
   show-heading-underlines,
+  section-page: false,
+  margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm),
+  cols: 1,
+  toc-depth: 3,
   heading-weight: none,
   heading-style: none,
   heading-colour: none,
   heading-line-height: none,
 ) = {
+  // For level-1 headings with section-page enabled, render section page instead
+  // Skip headings that are not outlined (e.g., TOC, list-of sections)
+  if it.level == 1 and section-page and it.outlined {
+    return render-section-page(
+      it,
+      colours,
+      font-headings,
+      margin: margin,
+      cols: cols,
+      toc-depth: toc-depth,
+      heading-weight: heading-weight,
+      heading-style: heading-style,
+      heading-colour: heading-colour,
+      heading-line-height: heading-line-height,
+    )
+  }
   let style = get-heading-style(
     it.level,
     colours,

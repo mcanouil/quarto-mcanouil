@@ -112,6 +112,8 @@
 /// Document Structure:
 /// @param section-numbering Section numbering pattern
 /// @param section-pagebreak Whether to add breaks before level 1 headings (default: true)
+/// @param section-page Whether to render dedicated section pages for level-1 headings (default: false)
+/// @param toc-depth Maximum heading depth for TOC and section page outlines (default: 3)
 /// @param has-outlines Whether document has TOC or list-of sections
 /// @param page-break-inside Control page breaks inside elements (auto, avoid, or dictionary)
 ///
@@ -193,6 +195,8 @@
   // Document Structure
   section-numbering: none,
   section-pagebreak: true,
+  section-page: false,
+  toc-depth: 3,
   has-outlines: false,
   page-break-inside: auto,
   // Table Styling
@@ -454,6 +458,10 @@
       font-headings,
       section-pagebreak,
       show-heading-underlines,
+      section-page: section-page,
+      margin: margin,
+      cols: cols,
+      toc-depth: toc-depth,
       heading-weight: heading-weight,
       heading-style: heading-style,
       heading-colour: heading-colour,

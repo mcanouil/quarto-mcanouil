@@ -255,6 +255,12 @@ $if(section-numbering)$
   section-numbering: "$section-numbering$",
 $endif$
   section-pagebreak: $section-pagebreak$,
+$if(section-page)$
+  section-page: $section-page$,
+$endif$
+$if(toc-depth)$
+  toc-depth: $toc-depth$,
+$endif$
 $if(toc)$
   has-outlines: true,
 $elseif(list-of)$
