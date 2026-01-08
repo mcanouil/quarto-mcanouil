@@ -56,7 +56,8 @@ format:
 
     # Logo Configuration
     show-logo: true                     # Display logo in header
-    # logo-width: 40pt                  # Logo width (optional)
+    # logo-width: 5cm                   # Logo width (optional)
+    # logo-height: 5cm                  # Logo height (optional)
     # logo-inset: 4pt                   # Logo padding
     # logo-alt: "Mickaël CANOUIL Logo"  # Logo alternative text
 

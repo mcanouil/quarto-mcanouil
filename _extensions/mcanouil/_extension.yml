@@ -47,8 +47,16 @@ contributes:
         - typst/filters/special-sections.lua
         - typst/filters/typst-markdown.lua
       logo:
-        light: logos/logo-light.svg
-        dark: logos/logo-dark.svg
+        light:
+          path: logos/logo-light.svg
+          alt: "Mickaël CANOUIL Logo"
+          width: 7cm
+        dark:
+          path: logos/logo-dark.svg
+          alt: "Mickaël CANOUIL Logo"
+          width: 7cm
+      logo-light: logos/logo-light.svg
+      logo-dark: logos/logo-dark.svg
       orcid-icon: typst/assets/orcid.svg
       papersize: a4
       margin:

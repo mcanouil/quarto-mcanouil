@@ -67,6 +67,7 @@
 /// @param show-logo Whether to show logo in header
 /// @param logo Path to logo image file
 /// @param logo-width Optional logo width (if none, uses height)
+/// @param logo-height Optional logo height
 /// @param logo-inset Logo padding
 /// @param logo-alt Alternative text for logo image
 /// @param orcid-icon Path to ORCID icon file
@@ -155,7 +156,10 @@
   // Logo Configuration
   show-logo: true,
   logo: none,
+  logo-light: none,
+  logo-dark: none,
   logo-width: none,
+  logo-height: none,
   logo-inset: 0pt,
   logo-alt: none,
   orcid-icon: none,
@@ -562,9 +566,13 @@
       has-outlines: has-outlines,
       title-page: title-page,
       logo: logo,
+      logo-light: logo-light,
+      logo-dark: logo-dark,
       logo-width: logo-width,
+      logo-height: logo-height,
       logo-inset: logo-inset,
       logo-alt: logo-alt,
+      brand-mode: brand-mode,
       title-size: title-size,
       subtitle-size: subtitle-size,
       abstract-title: abstract-title,

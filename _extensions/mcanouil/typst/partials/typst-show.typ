@@ -118,10 +118,25 @@ $if(logo.path)$
 $elseif(logo)$
   logo: "$logo$",
 $endif$
+$if(logo-light)$
+  logo-light: "$logo-light$",
+$elseif(logo.light)$
+  logo-light: "$logo.light$",
+$endif$
+$if(logo-dark)$
+  logo-dark: "$logo-dark$",
+$elseif(logo.dark)$
+  logo-dark: "$logo.dark$",
+$endif$
 $if(logo.width)$
   logo-width: $logo.width$,
 $elseif(logo-width)$
   logo-width: $logo-width$,
+$endif$
+$if(logo.height)$
+  logo-height: $logo.height$,
+$elseif(logo-height)$
+  logo-height: $logo-height$,
 $endif$
 $if(logo.inset)$
   logo-inset: $logo.inset$,

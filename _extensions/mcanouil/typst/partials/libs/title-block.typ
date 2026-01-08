@@ -65,10 +65,13 @@
   has-outlines: false,
   title-page: false,
   logo: none,
+  logo-light: none,
+  logo-dark: none,
   logo-width: none,
   logo-height: 1.5em,
   logo-inset: 0pt,
   logo-alt: none,
+  brand-mode: "light",
   title-size: 24pt,
   subtitle-size: 14pt,
   abstract-title: "Abstract",
@@ -76,6 +79,18 @@
 ) = {
   // Collect affiliations and create mapping
   let (affiliations, aff-map) = collect-affiliations(authors)
+
+  // For title page: invert logo selection based on brand-mode
+  // Dark mode (dark background) -> use light logo (visible on dark)
+  // Light mode (light background) -> use dark logo (visible on light)
+  // Note: .replace("\\", "") removes backslash escapes from paths (Quarto escaping workaround)
+  let title-page-logo = if brand-mode == "dark" and logo-light != none {
+    logo-light.replace("\\", "")
+  } else if brand-mode == "light" and logo-dark != none {
+    logo-dark.replace("\\", "")
+  } else {
+    logo // fallback to standard logo
+  }
 
   // Shared content blocks (defined at function level for use in both modes)
   let abstract-content = if abstract != none [
@@ -112,12 +127,13 @@
     // Vertically centre the title block on the page
     align(center + horizon)[
       // Logo at top of title block (2x the header logo size)
-      #if logo != none {
+      // Uses inverted logo for title page (light logo on dark background, etc.)
+      #if title-page-logo != none {
         // Use width if specified, otherwise use height
         if logo-width != none {
-          image(logo, width: logo-width, alt: if logo-alt != none { logo-alt } else { "" })
+          image(title-page-logo, width: logo-width, alt: if logo-alt != none { logo-alt } else { "" })
         } else {
-          image(logo, height: logo-height * 4, alt: if logo-alt != none { logo-alt } else { "" })
+          image(title-page-logo, height: logo-height * 4, alt: if logo-alt != none { logo-alt } else { "" })
         }
         v(2em)
       }
