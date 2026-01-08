@@ -26,6 +26,7 @@
 // License: MIT
 
 #show: mcanouil-article.with(
+// Document Metadata
 $if(title)$
   title: [$title$],
 $endif$
@@ -72,12 +73,12 @@ $endif$
 $if(keywords)$
   keywords: ($for(keywords)$"$keywords$",$endfor$),
 $endif$
+// Colour Configuration
 $if(brand-mode)$
   brand-mode: "$brand-mode$",
 $else$
   brand-mode: "light",
 $endif$
-$-- Colour overrides (hierarchical or flat) --$
 $if(colour.background)$
   colour-background: $colour.background$,
 $elseif(colour-background)$
@@ -93,6 +94,7 @@ $if(colour.muted)$
 $elseif(colour-muted)$
   colour-muted: $colour-muted$,
 $endif$
+// Decorative Elements
 $if(show-corner-brackets)$
   show-corner-brackets: $show-corner-brackets$,
 $endif$
@@ -105,7 +107,7 @@ $endif$
 $if(show-heading-underlines)$
   show-heading-underlines: $show-heading-underlines$,
 $endif$
-$-- Logo configuration (hierarchical or flat) --$
+// Logo Configuration
 $if(logo.enabled)$
   show-logo: $logo.enabled$,
 $elseif(show-logo)$
@@ -131,10 +133,14 @@ $if(logo.alt)$
 $elseif(logo-alt)$
   logo-alt: "$logo-alt$",
 $endif$
+$if(orcid-icon)$
+  orcid-icon: "$orcid-icon$",
+$endif$
+// Title Page
 $if(title-page)$
   title-page: $title-page$,
 $endif$
-$-- Header/Footer style configuration --$
+// Header and Footer
 $if(header-footer-style)$
   header-footer-style: "$header-footer-style$",
 $endif$
@@ -147,7 +153,7 @@ $endif$
 $if(license)$
   license: [$license.text$],
 $endif$
-$-- Watermark configuration (hierarchical or flat) --$
+// Watermark
 $if(watermark.text)$
   watermark-text: "$watermark.text$",
 $elseif(watermark-text)$
@@ -178,12 +184,7 @@ $if(watermark.colour)$
 $elseif(watermark-colour)$
   watermark-colour: $watermark-colour$,
 $endif$
-$if(orcid-icon)$
-  orcid-icon: "$orcid-icon$",
-$endif$
-$if(papersize)$
-  paper: "$papersize$",
-$endif$
+// Typography
 $if(mainfont)$
   font-body: "$mainfont$",
 $endif$
@@ -193,7 +194,6 @@ $endif$
 $if(fontsize)$
   font-size: $fontsize$,
 $endif$
-$-- Heading configuration (hierarchical or flat) --$
 $if(heading.weight)$
   heading-weight: "$heading.weight$",
 $elseif(heading-weight)$
@@ -226,8 +226,23 @@ $endif$
 $if(labels.keywords)$
   keywords-title: "$labels.keywords$",
 $endif$
+// Page Layout
+$if(papersize)$
+  paper: "$papersize$",
+$endif$
+$if(margin)$
+  margin: (
+    top: $margin.top$,
+    bottom: $margin.bottom$,
+    left: $margin.left$,
+    right: $margin.right$,
+  ),
+$endif$
 $if(columns)$
   cols: $columns$,
+$endif$
+$if(column-gutter)$
+  column-gutter: $column-gutter$,
 $endif$
 $if(lang)$
   lang: "$lang$",
@@ -235,6 +250,7 @@ $endif$
 $if(region)$
   region: "$region$",
 $endif$
+// Document Structure
 $if(section-numbering)$
   section-numbering: "$section-numbering$",
 $endif$
@@ -252,6 +268,56 @@ $if(page-break-inside)$
     quote: $page-break-inside.quote$,
     terms: $page-break-inside.terms$,
   )$else$$page-break-inside$$endif$,
+$endif$
+// Table Styling
+$if(table.stroke)$
+  table-stroke: $table.stroke$,
+$elseif(table-stroke)$
+  table-stroke: $table-stroke$,
+$endif$
+$if(table.inset)$
+  table-inset: $table.inset$,
+$elseif(table-inset)$
+  table-inset: $table-inset$,
+$endif$
+$if(table.fill)$
+  table-fill: $if(table.fill/pairs)$(
+$for(table.fill/pairs)$
+    $it.key$: $it.value$,
+$endfor$
+  )$else$"$table.fill$"$endif$,
+$elseif(table-fill)$
+  table-fill: "$table-fill$",
+$endif$
+// Quote Styling
+$if(quote.width)$
+  quote-width: $quote.width$,
+$elseif(quote-width)$
+  quote-width: $quote-width$,
+$endif$
+$if(quote.align)$
+  quote-align: $quote.align$,
+$elseif(quote-align)$
+  quote-align: $quote-align$,
+$endif$
+// Figure and Link Styling
+$if(figure-placement)$
+  figure-placement: $figure-placement$,
+$endif$
+$if(link.underline)$
+  link-underline: $link.underline$,
+$elseif(link-underline)$
+  link-underline: $link-underline$,
+$endif$
+$if(link.underline-opacity)$
+  link-underline-opacity: $link.underline-opacity$,
+$elseif(link-underline-opacity)$
+  link-underline-opacity: $link-underline-opacity$,
+$endif$
+$if(link.colour)$
+  link-colour: $link.colour$,
+$elseif(link-colour)$
+  link-colour: $link-colour$,
 $endif$
 )
 

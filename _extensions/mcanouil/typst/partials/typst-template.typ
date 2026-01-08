@@ -43,6 +43,7 @@
 /// This is the main template function that configures the entire document.
 /// It sets up page layout, typography, styling, and processes all document metadata.
 ///
+/// Document Metadata:
 /// @param title Document title
 /// @param subtitle Document subtitle
 /// @param authors Array of author dictionaries (Quarto normalised schema)
@@ -50,25 +51,42 @@
 /// @param abstract Abstract text
 /// @param keywords Array of keywords
 ///
-/// Styling options:
+/// Colour Configuration:
 /// @param brand-mode Colour mode ("light" or "dark")
-/// @param show-decorations Whether to show corner bracket decorations
+/// @param colour-background Optional background colour override
+/// @param colour-foreground Optional foreground colour override
+/// @param colour-muted Optional muted colour override
+///
+/// Decorative Elements:
+/// @param show-corner-brackets Whether to show corner bracket decorations
+/// @param show-margin-decoration Whether to show coloured bars along page margins
+/// @param show-title-page-background Whether to show geometric background on title page
+/// @param show-heading-underlines Whether to show gradient underlines below headings
+///
+/// Logo Configuration:
 /// @param show-logo Whether to show logo in header
 /// @param logo Path to logo image file
 /// @param logo-width Optional logo width (if none, uses height)
-/// @param logo-height Logo height (title-page mode uses 4x this value)
 /// @param logo-inset Logo padding
 /// @param logo-alt Alternative text for logo image
 /// @param orcid-icon Path to ORCID icon file
+///
+/// Title Page:
 /// @param title-page Whether to use dedicated title page mode
+///
+/// Header and Footer:
 /// @param header-footer-style Header/footer layout style ('academic' or 'professional')
-/// @param institute Institute name for professional footer left (defaults to first author affiliation → URL)
+/// @param institute Institute name for professional footer left (defaults to first author affiliation or URL)
 /// @param copyright Copyright statement for professional footer right
 /// @param license License information for professional footer right (combined with copyright if both present)
 ///
-/// Page setup:
-/// @param paper Paper size (default: "a4")
-/// @param margin Page margins dictionary
+/// Watermark:
+/// @param watermark-text Text content for watermark
+/// @param watermark-image Path to image file for watermark
+/// @param watermark-opacity Watermark transparency (default: 10%)
+/// @param watermark-angle Watermark rotation angle (default: -45deg)
+/// @param watermark-size Size for text watermarks (default: 4em)
+/// @param watermark-colour Colour for text watermarks (default: gray)
 ///
 /// Typography:
 /// @param font-body Body text font family
@@ -81,45 +99,67 @@
 /// @param title-size Title font size
 /// @param subtitle-size Subtitle font size
 /// @param abstract-title Abstract section heading
+/// @param keywords-title Keywords section heading
 ///
-/// Layout:
-/// @param columns Number of columns (default: 1)
-/// @param figure-placement Figure placement strategy (none: in-place, auto: floating, top/bottom: specific placement)
+/// Page Layout:
+/// @param paper Paper size (default: "a4")
+/// @param margin Page margins dictionary
+/// @param cols Number of columns (default: 1)
+/// @param column-gutter Space between columns (default: 1em)
 /// @param lang Document language code
 /// @param region Document region code
 ///
-/// Numbering and outlines:
+/// Document Structure:
 /// @param section-numbering Section numbering pattern
-/// @param section-pagebreak Whether to add breaks before level 1 headings (column breaks for multi-column, default: true)
+/// @param section-pagebreak Whether to add breaks before level 1 headings (default: true)
 /// @param has-outlines Whether document has TOC or list-of sections
+/// @param page-break-inside Control page breaks inside elements (auto, avoid, or dictionary)
+///
+/// Table Styling:
+/// @param table-stroke Table border style (auto uses 0.5pt + foreground)
+/// @param table-inset Table cell padding
+/// @param table-fill Table fill style (none, "alternating", or custom)
+///
+/// Quote Styling:
+/// @param quote-width Blockquote width percentage
+/// @param quote-align Blockquote alignment
+///
+/// Figure and Link Styling:
+/// @param figure-placement Figure placement strategy (none: in-place, auto: floating, top/bottom: specific)
+/// @param link-underline Whether to underline links
+/// @param link-underline-opacity Link underline opacity
+/// @param link-colour Optional custom link colour
 ///
 /// @param body Document body content
 /// @return Configured document
 #let mcanouil-article(
-  // Metadata
+  // Document Metadata
   title: none,
   subtitle: none,
   authors: (),
   date: none,
   abstract: none,
   keywords: (),
-  // Styling options
+  // Colour Configuration
   brand-mode: "light",
   colour-background: none,
   colour-foreground: none,
   colour-muted: none,
+  // Decorative Elements
   show-corner-brackets: true,
   show-margin-decoration: true,
   show-title-page-background: true,
   show-heading-underlines: true,
+  // Logo Configuration
   show-logo: true,
   logo: none,
   logo-width: none,
   logo-inset: 0pt,
   logo-alt: none,
   orcid-icon: none,
+  // Title Page
   title-page: false,
-  // Header/Footer style
+  // Header and Footer
   header-footer-style: "academic",
   institute: none,
   copyright: none,
@@ -131,9 +171,6 @@
   watermark-angle: -45deg,
   watermark-size: 4em,
   watermark-colour: gray,
-  // Page setup
-  paper: "a4",
-  margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm),
   // Typography
   font-body: "Alegreya Sans",
   font-headings: "Alegreya Sans",
@@ -146,27 +183,30 @@
   subtitle-size: 14pt,
   abstract-title: "Abstract",
   keywords-title: "Keywords",
-  // Layout
+  // Page Layout
+  paper: "a4",
+  margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm),
   cols: 1,
   column-gutter: 1em,
+  lang: "en",
+  region: "GB",
+  // Document Structure
+  section-numbering: none,
+  section-pagebreak: true,
+  has-outlines: false,
+  page-break-inside: auto,
+  // Table Styling
   table-stroke: auto,
   table-inset: 6pt,
   table-fill: none,
+  // Quote Styling
   quote-width: 90%,
   quote-align: center,
+  // Figure and Link Styling
   figure-placement: none, // Keep figures/tables in their sections (use 'auto' for floating)
   link-underline: true,
   link-underline-opacity: 50%,
   link-colour: none,
-  lang: "en",
-  region: "GB",
-  // Section numbering
-  section-numbering: none,
-  section-pagebreak: true,
-  // Outlines (TOC, LOF, LOT)
-  has-outlines: false,
-  // Page break control
-  page-break-inside: auto,
   // Content
   body,
 ) = {
