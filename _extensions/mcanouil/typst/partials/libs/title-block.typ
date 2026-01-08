@@ -36,6 +36,7 @@
 /// @param authors Array of author dictionaries
 /// @param date Publication date
 /// @param abstract Abstract text
+/// @param keywords Array of keywords
 /// @param colours Colour dictionary
 /// @param show-corner-brackets Whether to show corner bracket decorations
 /// @param orcid-icon Path to ORCID icon file
@@ -49,6 +50,7 @@
 /// @param title-size Title font size
 /// @param subtitle-size Subtitle font size
 /// @param abstract-title Abstract section heading
+/// @param keywords-title Keywords section heading
 /// @return Formatted title block content
 #let mcanouil-title-block(
   title: none,
@@ -56,6 +58,7 @@
   authors: (),
   date: none,
   abstract: none,
+  keywords: (),
   colours: none,
   show-corner-brackets: true,
   orcid-icon: none,
@@ -69,9 +72,22 @@
   title-size: 24pt,
   subtitle-size: 14pt,
   abstract-title: "Abstract",
+  keywords-title: "Keywords",
 ) = {
   // Collect affiliations and create mapping
   let (affiliations, aff-map) = collect-affiliations(authors)
+
+  // Keywords content block (defined at function level for use in both modes)
+  let keywords-content = if keywords != () [
+    #block(
+      width: 100%,
+      inset: (left: 2em, right: 2em),
+      [
+        #text(weight: "bold", size: 10pt)[#keywords-title] #text(size: 10pt, style: "italic")[#keywords.join(", ")]
+      ],
+    )
+    #v(1em)
+  ]
 
   // Title page mode: centred content with logo, no abstract/affiliations on first page
   if title-page {
@@ -145,6 +161,10 @@
         v(1em)
       }
 
+      #if keywords != () {
+        keywords-content
+      }
+
       #if authors.len() > 0 {
         affiliations-section(authors, affiliations, colours, orcid-icon: orcid-icon)
         v(1em)
@@ -214,6 +234,10 @@
       )
       v(1em)
     }
+
+    if keywords != () [
+      #keywords-content
+    ]
 
     // Affiliations, ORCID, and corresponding author section (below abstract)
     if authors.len() > 0 {

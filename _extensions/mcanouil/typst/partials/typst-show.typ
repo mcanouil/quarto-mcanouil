@@ -69,6 +69,9 @@ $endif$
 $if(abstract)$
   abstract: [$abstract$],
 $endif$
+$if(keywords)$
+  keywords: ($for(keywords)$"$keywords$",$endfor$),
+$endif$
 $if(brand-mode)$
   brand-mode: "$brand-mode$",
 $else$
@@ -219,6 +222,9 @@ $if(subtitle-size)$
 $endif$
 $if(labels.abstract)$
   abstract-title: "$labels.abstract$",
+$endif$
+$if(labels.keywords)$
+  keywords-title: "$labels.keywords$",
 $endif$
 $if(columns)$
   cols: $columns$,

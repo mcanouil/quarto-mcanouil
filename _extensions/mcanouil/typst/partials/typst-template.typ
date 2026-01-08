@@ -145,6 +145,7 @@
   title-size: 24pt,
   subtitle-size: 14pt,
   abstract-title: "Abstract",
+  keywords-title: "Keywords",
   // Layout
   cols: 1,
   column-gutter: 1em,
@@ -506,6 +507,7 @@
       authors: authors,
       date: date,
       abstract: abstract,
+      keywords: keywords,
       colours: colours,
       show-corner-brackets: show-corner-brackets,
       orcid-icon: orcid-icon,
@@ -518,6 +520,7 @@
       title-size: title-size,
       subtitle-size: subtitle-size,
       abstract-title: abstract-title,
+      keywords-title: keywords-title,
     )
   }
 
