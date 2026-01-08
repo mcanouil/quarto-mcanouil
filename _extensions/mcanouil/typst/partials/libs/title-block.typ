@@ -77,7 +77,20 @@
   // Collect affiliations and create mapping
   let (affiliations, aff-map) = collect-affiliations(authors)
 
-  // Keywords content block (defined at function level for use in both modes)
+  // Shared content blocks (defined at function level for use in both modes)
+  let abstract-content = if abstract != none [
+    #block(
+      width: 100%,
+      inset: (left: 2em, right: 2em),
+      [
+        #text(weight: "bold", size: 10pt)[#abstract-title]
+        #v(0.3em)
+        #text(size: 10pt, style: "italic")[#abstract]
+      ],
+    )
+    #v(1em)
+  ]
+
   let keywords-content = if keywords != () [
     #block(
       width: 100%,
@@ -86,6 +99,11 @@
         #text(weight: "bold", size: 10pt)[#keywords-title] #text(size: 10pt, style: "italic")[#keywords.join(", ")]
       ],
     )
+    #v(1em)
+  ]
+
+  let affiliations-content = if authors.len() > 0 [
+    #affiliations-section(authors, affiliations, colours, orcid-icon: orcid-icon)
     #v(1em)
   ]
 
@@ -148,27 +166,9 @@
 
     // Abstract and affiliations on their own page (page 2), vertically centred
     align(horizon)[
-      #if abstract != none {
-        block(
-          width: 100%,
-          inset: (left: 2em, right: 2em),
-          [
-            #text(weight: "bold", size: 10pt)[#abstract-title]
-            #v(0.3em)
-            #text(size: 10pt, style: "italic")[#abstract]
-          ],
-        )
-        v(1em)
-      }
-
-      #if keywords != () {
-        keywords-content
-      }
-
-      #if authors.len() > 0 {
-        affiliations-section(authors, affiliations, colours, orcid-icon: orcid-icon)
-        v(1em)
-      }
+      #abstract-content
+      #keywords-content
+      #affiliations-content
     ]
 
     // Page break before body content (or outlines) starts
@@ -221,29 +221,10 @@
       v(1.5em)
     }
 
-    // Abstract
-    if abstract != none {
-      block(
-        width: 100%,
-        inset: (left: 2em, right: 2em),
-        [
-          #text(weight: "bold", size: 10pt)[#abstract-title]
-          #v(0.3em)
-          #text(size: 10pt, style: "italic")[#abstract]
-        ],
-      )
-      v(1em)
-    }
-
-    if keywords != () [
-      #keywords-content
-    ]
-
-    // Affiliations, ORCID, and corresponding author section (below abstract)
-    if authors.len() > 0 {
-      affiliations-section(authors, affiliations, colours, orcid-icon: orcid-icon)
-      v(1em)
-    }
+    // Abstract, keywords, and affiliations
+    abstract-content
+    keywords-content
+    affiliations-content
 
     // Line separator (hidden when outlines are present)
     if not has-outlines {
