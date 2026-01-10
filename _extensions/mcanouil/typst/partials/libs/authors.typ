@@ -283,7 +283,7 @@
             let orcid-url = "https://orcid.org/" + author.orcid
             if orcid-icon != none {
               text(size: 9pt, fill: colours.muted)[
-                #name: #link(orcid-url)[#box(baseline: 0.1em, image(orcid-icon.replace("\\", ""), width: 10pt)) #author.orcid]
+                #name: #link(orcid-url)[#box(baseline: 0.1em, image(orcid-icon.replace("\\", ""), width: 10pt, alt: "ORCID")) #author.orcid]
               ]
             } else {
               text(size: 9pt, fill: colours.muted)[

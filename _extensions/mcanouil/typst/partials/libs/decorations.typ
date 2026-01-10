@@ -82,6 +82,7 @@
 
 /// Corner brackets decoration - signature branding element
 /// Draws brackets at top-right and bottom-left corners
+/// Brackets are marked as PDF artifacts for accessibility
 /// @param content Content to wrap with brackets
 /// @param colours Colour dictionary
 /// @param size Bracket size
@@ -99,27 +100,33 @@
     inset: (x: BRACKET-BOX-INSET, y: BRACKET-BOX-INSET),
     {
       // Top-right bracket (vertical line then horizontal)
-      place(
-        bottom + right,
-        dx: inset,
-        dy: inset,
-        curve(
-          stroke: thickness + colours.foreground,
-          curve.line((0pt, 0pt)),
-          curve.line((size, 0pt)),
-          curve.line((size, -size)),
+      // Marked as artifact for PDF accessibility
+      pdf.artifact(
+        place(
+          bottom + right,
+          dx: inset,
+          dy: inset,
+          curve(
+            stroke: thickness + colours.foreground,
+            curve.line((0pt, 0pt)),
+            curve.line((size, 0pt)),
+            curve.line((size, -size)),
+          ),
         ),
       )
       // Bottom-left bracket (horizontal line then vertical)
-      place(
-        top + left,
-        dx: -inset,
-        dy: -inset,
-        curve(
-          stroke: thickness + colours.foreground,
-          curve.line((size, 0pt)),
-          curve.line((0pt, 0pt)),
-          curve.line((0pt, size)),
+      // Marked as artifact for PDF accessibility
+      pdf.artifact(
+        place(
+          top + left,
+          dx: -inset,
+          dy: -inset,
+          curve(
+            stroke: thickness + colours.foreground,
+            curve.line((size, 0pt)),
+            curve.line((0pt, 0pt)),
+            curve.line((0pt, size)),
+          ),
         ),
       )
       content
@@ -128,6 +135,7 @@
 }
 
 /// Margin decoration - configurable gradient bars along page edges
+/// All decorations are marked as PDF artifacts for accessibility
 /// @param colours Colour dictionary
 /// @param margin Page margin dictionary
 /// @param decorate-left Enable left margin decoration
@@ -150,56 +158,64 @@
 
   // Left margin decoration (gradient from top to bottom)
   if decorate-left != false and decorate-left != none {
-    place(
-      top + left,
-      dx: 0pt,
-      dy: 0pt,
-      box(
-        width: width,
-        height: 100%,
-        fill: colours.foreground,
+    pdf.artifact(
+      place(
+        top + left,
+        dx: 0pt,
+        dy: 0pt,
+        box(
+          width: width,
+          height: 100%,
+          fill: colours.foreground,
+        ),
       ),
     )
   }
 
   // Right margin decoration (gradient from bottom to top)
   if decorate-right != false and decorate-right != none {
-    place(
-      top + right,
-      dx: 0pt,
-      dy: 0pt,
-      box(
-        width: width,
-        height: 100%,
-        fill: colours.foreground,
+    pdf.artifact(
+      place(
+        top + right,
+        dx: 0pt,
+        dy: 0pt,
+        box(
+          width: width,
+          height: 100%,
+          fill: colours.foreground,
+        ),
       ),
     )
   }
 
   // Top margin decoration (gradient from left to right)
   if decorate-top != false and decorate-top != none {
-    place(
-      top + left,
-      dx: 0pt,
-      dy: 0pt,
-      box(
-        width: 100%,
-        height: width,
-        fill: colours.foreground,
+    pdf.artifact(
+      place(
+        top + left,
+        dx: 0pt,
+        dy: 0pt,
+        box(
+          width: 100%,
+          height: width,
+          fill: colours.foreground,
+        ),
       ),
     )
   }
 
   // Bottom margin decoration (gradient from right to left)
   if decorate-bottom != false and decorate-bottom != none {
-    place(
-      bottom + left,
-      dx: 0pt,
-      dy: 0pt,
-      box(
-        width: 100%,
-        height: width,
-        fill: colours.foreground,
+    pdf.artifact(
+      place(
+        bottom + left,
+        dx: 0pt,
+        dy: 0pt,
+        box(
+          width: 100%,
+          height: width,
+          fill: colours.foreground,
+        ),
       ),
     )
   }
@@ -207,6 +223,7 @@
 
 /// Title page geometric background decoration
 /// Creates a stylistic abstract geometric pattern with corner brackets
+/// All elements are marked as PDF artifacts for accessibility
 /// @param colours Colour dictionary
 /// @param margin Page margin dictionary
 /// @return Decoration content for title page background
@@ -219,102 +236,119 @@
   let margin-offset-y = margin.top / 2
 
   // Large circle in top-right area
-  place(
-    top + right,
-    dx: 3cm,
-    dy: -2cm,
-    circle(
-      radius: 8cm,
-      fill: colours.foreground.transparentize(95%),
+  pdf.artifact(
+    place(
+      top + right,
+      dx: 3cm,
+      dy: -2cm,
+      circle(
+        radius: 8cm,
+        fill: colours.foreground.transparentize(95%),
+      ),
     ),
   )
 
   // Medium circle in bottom-left
-  place(
-    bottom + left,
-    dx: -4cm,
-    dy: 3cm,
-    circle(
-      radius: 6cm,
-      fill: colours.foreground.transparentize(93%),
+  pdf.artifact(
+    place(
+      bottom + left,
+      dx: -4cm,
+      dy: 3cm,
+      circle(
+        radius: 6cm,
+        fill: colours.foreground.transparentize(93%),
+      ),
     ),
   )
 
   // Small decorative circle top-left
-  place(
-    top + left,
-    dx: 2cm,
-    dy: 4cm,
-    circle(
-      radius: 2cm,
-      fill: colours.foreground.transparentize(90%),
+  pdf.artifact(
+    place(
+      top + left,
+      dx: 2cm,
+      dy: 4cm,
+      circle(
+        radius: 2cm,
+        fill: colours.foreground.transparentize(90%),
+      ),
     ),
   )
 
   // Diagonal line accent from top-left towards centre
-  place(
-    top + left,
-    dx: 0pt,
-    dy: 0pt,
-    line(
-      start: (0pt, page-h * 0.3),
-      end: (page-w * 0.4, 0pt),
-      stroke: 2pt + colours.foreground.transparentize(92%),
+  pdf.artifact(
+    place(
+      top + left,
+      dx: 0pt,
+      dy: 0pt,
+      line(
+        start: (0pt, page-h * 0.3),
+        end: (page-w * 0.4, 0pt),
+        stroke: 2pt + colours.foreground.transparentize(92%),
+      ),
     ),
   )
 
   // Diagonal line accent from bottom-right
-  place(
-    bottom + right,
-    dx: 0pt,
-    dy: 0pt,
-    line(
-      start: (0pt, -page-h * 0.25),
-      end: (-page-w * 0.35, 0pt),
-      stroke: 2pt + colours.foreground.transparentize(92%),
+  pdf.artifact(
+    place(
+      bottom + right,
+      dx: 0pt,
+      dy: 0pt,
+      line(
+        start: (0pt, -page-h * 0.25),
+        end: (-page-w * 0.35, 0pt),
+        stroke: 2pt + colours.foreground.transparentize(92%),
+      ),
     ),
   )
 
   // Small decorative circle bottom-right
-  place(
-    bottom + right,
-    dx: -2.5cm,
-    dy: -1cm,
-    circle(
-      radius: 1.5cm,
-      fill: colours.foreground.transparentize(92%),
+  pdf.artifact(
+    place(
+      bottom + right,
+      dx: -2.5cm,
+      dy: -1cm,
+      circle(
+        radius: 1.5cm,
+        fill: colours.foreground.transparentize(92%),
+      ),
     ),
   )
 
   // Top-right corner bracket (aligned with page corner, in middle of margin)
-  place(
-    top + right,
-    dx: -margin-offset-x,
-    dy: margin-offset-y,
-    curve(
-      stroke: bracket-thickness + colours.foreground,
-      curve.line((0pt, bracket-size)),
-      curve.line((0pt, 0pt)),
-      curve.line((-bracket-size, 0pt)),
+  pdf.artifact(
+    place(
+      top + right,
+      dx: -margin-offset-x,
+      dy: margin-offset-y,
+      curve(
+        stroke: bracket-thickness + colours.foreground,
+        curve.line((0pt, bracket-size)),
+        curve.line((0pt, 0pt)),
+        curve.line((-bracket-size, 0pt)),
+      ),
     ),
   )
 
   // Bottom-left corner bracket (aligned with page corner, in middle of margin)
-  place(
-    bottom + left,
-    dx: margin.left / 2,
-    dy: -(margin.bottom / 2),
-    curve(
-      stroke: bracket-thickness + colours.foreground,
-      curve.line((bracket-size, 0pt)),
-      curve.line((0pt, 0pt)),
-      curve.line((0pt, -bracket-size)),
+  pdf.artifact(
+    place(
+      bottom + left,
+      dx: margin.left / 2,
+      dy: -(margin.bottom / 2),
+      curve(
+        stroke: bracket-thickness + colours.foreground,
+        curve.line((bracket-size, 0pt)),
+        curve.line((0pt, 0pt)),
+        curve.line((0pt, -bracket-size)),
+      ),
     ),
   )
 }
 
 /// Highlight block - styled block with dashed border and corner brackets
 /// Internal implementation (called via mcanouil-highlight wrapper in typst-show.typ)
+/// Corner brackets are marked as PDF artifacts for accessibility
 /// @param content Content to highlight
 /// @param colours Colour dictionary
 /// @param bracket-size Size of corner brackets
@@ -349,19 +383,23 @@
       ),
       fill: colour-mix(colours, 95%),
       {
-        // Top-right corner bracket (rounded)
-        place(
-          bottom + right,
-          dx: inset,
-          dy: inset,
-          bracket,
+        // Top-right corner bracket (rounded) - marked as artifact
+        pdf.artifact(
+          place(
+            bottom + right,
+            dx: inset,
+            dy: inset,
+            bracket,
+          ),
         )
-        // Bottom-left corner bracket (rounded)
-        place(
-          top + left,
-          dx: -inset,
-          dy: -inset,
-          rotate(180deg, bracket),
+        // Bottom-left corner bracket (rounded) - marked as artifact
+        pdf.artifact(
+          place(
+            top + left,
+            dx: -inset,
+            dy: -inset,
+            rotate(180deg, bracket),
+          ),
         )
         // Disable TOC inclusion and numbering for headings inside highlight block
         show heading: it => {
@@ -400,6 +438,7 @@
 
 /// Heading underline - gradient decoration below headings
 /// Thickness and width proportional to heading level
+/// Marked as PDF artifact for accessibility
 /// @param colours Colour dictionary
 /// @param level Heading level (1-6)
 /// @return Underline decoration
@@ -409,30 +448,34 @@
   let height = HEADING-UNDERLINE-HEIGHTS.at(idx)
   // Reset first-line-indent to ensure left alignment
   set par(first-line-indent: 0pt)
-  stack(
-    dir: ttb,
-    spacing: 0pt,
-    // Gradient box
-    box(
-      width: width,
-      height: height,
-      fill: gradient.linear(
-        colours.foreground,
-        colours.background,
-        angle: 0deg,
+  // Mark entire underline decoration as artifact for accessibility
+  pdf.artifact(
+    stack(
+      dir: ttb,
+      spacing: 0pt,
+      // Gradient box
+      box(
+        width: width,
+        height: height,
+        fill: gradient.linear(
+          colours.foreground,
+          colours.background,
+          angle: 0deg,
+        ),
       ),
+      // Full-width line only for level 1
+      if level == 1 {
+        line(
+          length: 100%,
+          stroke: HEADING-UNDERLINE-THICKNESS + colours.foreground.transparentize(HEADING-UNDERLINE-OPACITY),
+        )
+      },
     ),
-    // Full-width line only for level 1
-    if level == 1 {
-      line(
-        length: 100%,
-        stroke: HEADING-UNDERLINE-THICKNESS + colours.foreground.transparentize(HEADING-UNDERLINE-OPACITY),
-      )
-    },
   )
 }
 
 /// Callout block - styled admonition with left border and corner brackets
+/// Corner brackets are marked as PDF artifacts for accessibility
 /// @param callout-type Type of callout ("note", "tip", "warning", "important", "caution")
 /// @param callout-colour Main colour for the callout type
 /// @param title Optional title for the callout
@@ -479,19 +522,23 @@
     stroke: (left: CALLOUT-BORDER-LEFT-WIDTH + validated-callout-colour),
     breakable: true,
     {
-      // Top-right corner bracket
-      place(
-        bottom + right,
-        dx: CALLOUT-INSET,
-        dy: CALLOUT-INSET,
-        bracket,
+      // Top-right corner bracket - marked as artifact
+      pdf.artifact(
+        place(
+          bottom + right,
+          dx: CALLOUT-INSET,
+          dy: CALLOUT-INSET,
+          bracket,
+        ),
       )
-      // Bottom-left corner bracket
-      place(
-        top + left,
-        dx: -CALLOUT-INSET,
-        dy: -CALLOUT-INSET,
-        rotate(180deg, bracket),
+      // Bottom-left corner bracket - marked as artifact
+      pdf.artifact(
+        place(
+          top + left,
+          dx: -CALLOUT-INSET,
+          dy: -CALLOUT-INSET,
+          rotate(180deg, bracket),
+        ),
       )
 
       // Title section (if provided)

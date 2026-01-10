@@ -73,6 +73,8 @@
 // ============================================================================
 
 /// Render the section banner with title
+/// The banner is marked as a PDF artifact for accessibility since it is
+/// a visual presentation of the heading (the semantic heading is placed separately)
 /// @param heading The heading element
 /// @param colours Colour dictionary
 /// @param font-headings Heading font family
@@ -129,26 +131,30 @@
   }
 
   // Position banner from left edge to 75% of page width
-  place(
-    top + left,
-    dx: -margin.left,
-    dy: banner-top,
-    box(
-      width: page-w * SECTION-PAGE-BANNER-WIDTH,
-      fill: colours.foreground,
-      inset: SECTION-PAGE-BANNER-PADDING,
-      {
-        set text(
-          font: font-headings,
-          size: SECTION-PAGE-BANNER-TITLE-SIZE,
-          weight: "bold",
-          fill: colours.background,
-        )
-        title-content
-        linebreak()
-        v(-0.8em)
-        inverted-underline
-      },
+  // Marked as artifact since this is a visual presentation of the heading
+  // The semantic heading is placed separately for TOC and accessibility
+  pdf.artifact(
+    place(
+      top + left,
+      dx: -margin.left,
+      dy: banner-top,
+      box(
+        width: page-w * SECTION-PAGE-BANNER-WIDTH,
+        fill: colours.foreground,
+        inset: SECTION-PAGE-BANNER-PADDING,
+        {
+          set text(
+            font: font-headings,
+            size: SECTION-PAGE-BANNER-TITLE-SIZE,
+            weight: "bold",
+            fill: colours.background,
+          )
+          title-content
+          linebreak()
+          v(-0.8em)
+          inverted-underline
+        },
+      ),
     ),
   )
 }
@@ -281,17 +287,18 @@
   let inset = SECTION-PAGE-OUTLINE-INSET
 
   // Build final content with corner brackets at all four corners
+  // Brackets are marked as PDF artifacts for accessibility
   let final-content = box(
     inset: inset,
     {
-      // Top-right corner bracket (original orientation)
-      place(bottom + right, dx: inset, dy: inset, bracket)
-      // Bottom-left corner bracket (rotated 180deg)
-      place(top + left, dx: -inset, dy: -inset, rotate(180deg, bracket))
-      // Top-left corner bracket (rotated 90deg)
-      place(bottom + left, dx: -inset, dy: inset, rotate(90deg, bracket))
-      // Bottom-right corner bracket (rotated 270deg)
-      place(top + right, dx: inset, dy: -inset, rotate(270deg, bracket))
+      // Top-right corner bracket (original orientation) - marked as artifact
+      pdf.artifact(place(bottom + right, dx: inset, dy: inset, bracket))
+      // Bottom-left corner bracket (rotated 180deg) - marked as artifact
+      pdf.artifact(place(top + left, dx: -inset, dy: -inset, rotate(180deg, bracket)))
+      // Top-left corner bracket (rotated 90deg) - marked as artifact
+      pdf.artifact(place(bottom + left, dx: -inset, dy: inset, rotate(90deg, bracket)))
+      // Bottom-right corner bracket (rotated 270deg) - marked as artifact
+      pdf.artifact(place(top + right, dx: inset, dy: -inset, rotate(270deg, bracket)))
 
       // Ensure content is left-aligned within the box
       align(left, inner-content)
@@ -353,8 +360,9 @@
     // Render subsection outline
     section-page-outline(it, colours, font-headings, toc-depth: toc-depth, margin: symmetric-margin)
 
-    // Hidden heading for TOC and PDF bookmarks
-    // Use display: none style but keep it in the document structure
+    // Semantic heading for TOC, PDF bookmarks, and accessibility
+    // Visually hidden but remains in document structure for screen readers
+    // The visual banner rendering is marked as an artifact
     hide[
       #set text(size: 0pt)
       #it

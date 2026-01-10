@@ -360,6 +360,7 @@
 
   // Page setup with header, footer, and margin decorations
   // When title-page is enabled, first page has no header/footer and geometric background
+  // Headers and footers are marked as PDF artifacts for accessibility
   set page(
     paper: paper,
     margin: margin,
@@ -368,15 +369,17 @@
       if title-page and counter(page).get().first() == 1 {
         none
       } else {
-        mcanouil-header(
-          style: header-footer-style,
-          title: title,
-          subtitle: subtitle,
-          logo: logo,
-          logo-alt: logo-alt,
-          colours: colours,
-          show-logo: show-logo,
-          margin: margin,
+        pdf.artifact(
+          mcanouil-header(
+            style: header-footer-style,
+            title: title,
+            subtitle: subtitle,
+            logo: logo,
+            logo-alt: logo-alt,
+            colours: colours,
+            show-logo: show-logo,
+            margin: margin,
+          ),
         )
       }
     },
@@ -384,12 +387,14 @@
       if title-page and counter(page).get().first() == 1 {
         none
       } else {
-        mcanouil-footer(
-          style: header-footer-style,
-          left-content: footer-left-content,
-          right-content: footer-right-content,
-          colours: colours,
-          margin: margin,
+        pdf.artifact(
+          mcanouil-footer(
+            style: header-footer-style,
+            left-content: footer-left-content,
+            right-content: footer-right-content,
+            colours: colours,
+            margin: margin,
+          ),
         )
       }
     },

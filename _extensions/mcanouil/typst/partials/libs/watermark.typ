@@ -83,6 +83,7 @@
 }
 
 /// Apply watermark to page background
+/// Watermarks are marked as PDF artifacts for accessibility
 /// @param watermark-text Text for watermark (if provided)
 /// @param watermark-image Path to image for watermark (if provided)
 /// @param watermark-opacity Transparency (0-100%, default: 10%)
@@ -101,25 +102,29 @@
   watermark-position: center + horizon,
 ) = {
   if watermark-text != none and watermark-text != "" {
-    // Text watermark
-    place(
-      watermark-position,
-      render-text-watermark(
-        watermark-text,
-        opacity: watermark-opacity,
-        angle: watermark-angle,
-        size: watermark-size,
-        colour: watermark-colour,
+    // Text watermark - marked as artifact for accessibility
+    pdf.artifact(
+      place(
+        watermark-position,
+        render-text-watermark(
+          watermark-text,
+          opacity: watermark-opacity,
+          angle: watermark-angle,
+          size: watermark-size,
+          colour: watermark-colour,
+        ),
       ),
     )
   } else if watermark-image != none and watermark-image != "" {
-    // Image watermark
-    place(
-      watermark-position,
-      render-image-watermark(
-        watermark-image,
-        opacity: watermark-opacity,
-        angle: watermark-angle,
+    // Image watermark - marked as artifact for accessibility
+    pdf.artifact(
+      place(
+        watermark-position,
+        render-image-watermark(
+          watermark-image,
+          opacity: watermark-opacity,
+          angle: watermark-angle,
+        ),
       ),
     )
   }

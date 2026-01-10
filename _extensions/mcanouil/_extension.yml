@@ -87,6 +87,8 @@ contributes:
       toc: true
       list-of: true
       header-footer-style: "academic"
+      # PDF/UA-1 standard for accessibility compliance (requires Typst >= 0.14)
+      pdf-standard: ua-1
     html:
       theme:
         light:

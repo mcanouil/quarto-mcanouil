@@ -193,6 +193,7 @@
 }
 
 /// Apply blockquote styling with decorative quotes
+/// Decorative quotation marks are marked as PDF artifacts for accessibility
 /// @param it Quote element
 /// @param colours Colour dictionary
 /// @param quote-width Quote block width
@@ -212,20 +213,24 @@
       stroke: (left: 3pt + colours.foreground),
       breakable: breakable-settings.quote,
       {
-        // Opening quotation mark - top left
-        place(
-          top + left,
-          dx: -18pt,
-          dy: -10pt,
-          text(size: 3em, fill: colours.foreground.transparentize(70%), font: "Georgia", ["]),
+        // Opening quotation mark - top left (marked as artifact)
+        pdf.artifact(
+          place(
+            top + left,
+            dx: -18pt,
+            dy: -10pt,
+            text(size: 3em, fill: colours.foreground.transparentize(70%), font: "Georgia", ["]),
+          ),
         )
         it.body
-        // Closing quotation mark - bottom right
-        place(
-          bottom + right,
-          dx: 18pt,
-          dy: 24pt,
-          text(size: 3em, fill: colours.foreground.transparentize(70%), font: "Georgia", ["]),
+        // Closing quotation mark - bottom right (marked as artifact)
+        pdf.artifact(
+          place(
+            bottom + right,
+            dx: 18pt,
+            dy: 24pt,
+            text(size: 3em, fill: colours.foreground.transparentize(70%), font: "Georgia", ["]),
+          ),
         )
       },
     )
@@ -306,6 +311,7 @@
 }
 
 /// Apply callout styling with branded design
+/// Ensures non-colour differentiation through title text for accessibility
 /// @param it Callout figure element
 /// @param colours Colour dictionary
 /// @param breakable-settings Breakable configuration
@@ -317,11 +323,21 @@
   // Get the appropriate colour for this callout type
   let colour = callout-colour(callout-type)
 
-  // Extract title from caption if present
+  // Default titles for accessibility (non-colour differentiation)
+  let default-titles = (
+    note: "Note",
+    tip: "Tip",
+    warning: "Warning",
+    important: "Important",
+    caution: "Caution",
+  )
+
+  // Extract title from caption if present, otherwise use default based on type
   let title-content = if it.caption != none {
     it.caption.body
   } else {
-    none
+    // Use default title for accessibility when no custom title provided
+    default-titles.at(callout-type, default: upper(callout-type.first()) + callout-type.slice(1))
   }
 
   // Render the styled callout
