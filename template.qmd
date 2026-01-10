@@ -431,7 +431,7 @@ Major update featuring enhanced performance, new capabilities, and improved user
 
 For fewer events, horizontal timelines provide a compact overview:
 
-::: {.timeline orientation="horizontal"}
+::: {.timeline orientation="horizontal" alt="Project timeline showing quarterly milestones for 2024"}
 ## Q1 2024: Planning
 ## Q2 2024: Development
 ## Q3 2024: Testing
@@ -453,7 +453,7 @@ Card grids provide flexible layouts for displaying content in card format.
 
 #### Basic Card Grid
 
-::: {.card-grid columns="3"}
+::: {.card-grid columns="3" alt="Feature cards showing Performance, Security, and Scalability capabilities"}
 ::: {.card}
 ## Performance
 
@@ -489,7 +489,7 @@ Scales effortlessly from small teams to global enterprises with millions of user
 
 Cards support three distinct styles:
 
-::: {.card-grid columns="3"}
+::: {.card-grid columns="3" alt="Card style comparison showing subtle, outlined, and filled variants"}
 ::: {.card style="subtle"}
 ## Subtle Style
 
@@ -1318,13 +1318,13 @@ The template validates options and provides helpful error messages:
 
 | Component          | Shortcode/Class        | Key Parameters                          |
 |--------------------|------------------------|-----------------------------------------|
-| Value Box          | `{{< value-box >}}`    | value, unit, label, icon, colour        |
+| Value Box          | `{{< value-box >}}`    | value, unit, label, icon, colour, alt   |
 | Panel              | `.panel`               | style, title, icon                      |
 | Badge              | `.badge`               | colour, icon                            |
 | Divider            | `{{< divider >}}`      | style, label, width, thickness          |
-| Progress Bar       | `{{< progress >}}`     | value, label, colour                     |
-| Timeline           | `.timeline`            | orientation                             |
-| Card Grid          | `.card-grid`           | columns                                 |
+| Progress Bar       | `{{< progress >}}`     | value, label, colour                    |
+| Timeline           | `.timeline`            | orientation, alt                        |
+| Card Grid          | `.card-grid`           | columns, alt                            |
 | Executive Summary  | `.executive-summary`   | title                                   |
 
 : Complete feature reference with syntax and parameters. {#tbl-appendix-ref .appendix}
