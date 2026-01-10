@@ -221,6 +221,7 @@ Arrange multiple value boxes using Quarto's `layout-ncol` feature:
 - `background`: Optional background colour override.
 - `show-border`: Display border around the box (default: true).
 - `alignment`: Content alignment (center, left, right; default: center).
+- `alt`: Optional alt text for accessibility when using grid layouts (wraps grid in figure with alt text).
 
 ### Info Panels {#sec-panels}
 
@@ -444,6 +445,7 @@ For fewer events, horizontal timelines provide a compact overview:
 - Optional detailed descriptions.
 - Automatic spacing and professional markers.
 - Adapts to light and dark colour modes.
+- Optional `alt` parameter for accessibility (wraps grid in figure with alt text).
 
 ### Card Grids {#sec-cards}
 
@@ -513,6 +515,7 @@ Maximum visual impact.
 **Card Grid Parameters:**
 
 - `columns`: Number of columns (1-4).
+- `alt`: Optional alt text for accessibility (wraps grid in figure with alt text).
 - Card `style`: subtle, outlined, or filled.
 - Card `colour`: Custom accent colour (for filled style).
 - Cards support title (## Heading), content, and footer (after ---).
@@ -1056,6 +1059,17 @@ The template supports extensive customisation through YAML parameters:
 - **Logo**: Flexible logo positioning and sizing with alternative text.
 - **Special Sections**: Configurable appendix and supplementary sections with custom numbering.
 
+### Accessibility
+
+The template is designed with PDF accessibility (PDF/UA-1) compliance in mind:
+
+- **PDF/UA-1 Standard**: Enabled by default via `pdf-standard: ua-1` (requires Typst >= 0.14).
+- **Semantic Structure**: Proper heading hierarchy, tables with headers, and semantic elements.
+- **Decorative Elements as Artifacts**: Corner brackets, margin decorations, watermarks, and other decorative elements are marked as PDF artifacts so screen readers skip them.
+- **Alt Text Support**: Grid-based components (horizontal timelines, card grids, value box grids) support an optional `alt` parameter for accessibility descriptions.
+- **Non-Colour Differentiation**: Callouts include default titles (Note, Tip, Warning, etc.) to ensure information is not conveyed by colour alone.
+- **WCAG AA Contrast**: Colours are validated to meet WCAG AA contrast requirements.
+
 ### Getting Started
 
 To use these features in your own documents:
@@ -1192,6 +1206,13 @@ section-pagebreak: true       # Page break before level 1 headings
 section-page: true            # Dedicated section pages for level-1 headings
 ```
 
+#### Accessibility
+
+```yaml
+# PDF/UA-1 accessibility standard (requires Typst >= 0.14)
+pdf-standard: ua-1            # Produces accessible tagged PDFs
+```
+
 #### Special Sections
 
 ```yaml
@@ -1282,6 +1303,7 @@ If an option is not specified, the following defaults apply:
 | `toc`                     | `false`      | Table of contents not generated         |
 | `list-of`                 | `true`       | List of figures/tables generated        |
 | `number-sections`         | `true`       | Section headings numbered               |
+| `pdf-standard`            | `ua-1`       | PDF/UA-1 accessibility standard         |
 
 #### Validation
 

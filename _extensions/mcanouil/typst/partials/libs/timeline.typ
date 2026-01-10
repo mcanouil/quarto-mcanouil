@@ -180,8 +180,9 @@
 /// @param events Array of event dictionaries with keys: date, title
 /// @param colours Colour scheme dictionary
 /// @param marker-colour Optional custom marker colour
+/// @param alt Optional alt text for accessibility (wraps grid in figure when provided)
 /// @return Content Horizontal timeline visualisation
-#let render-horizontal-timeline(events, colours, marker-colour: none) = {
+#let render-horizontal-timeline(events, colours, marker-colour: none, alt: none) = {
   // Determine marker colour
   let marker-col = if marker-colour != none {
     marker-colour
@@ -201,7 +202,7 @@
     }
   }
 
-  grid(
+  let content = grid(
     columns: columns,
     column-gutter: 0.5em,
     align: center + top,
@@ -259,4 +260,11 @@
       items
     }.flatten()
   )
+
+  // Wrap in figure with alt text for accessibility if provided
+  if alt != none {
+    figure(content, alt: alt, kind: "timeline", supplement: none)
+  } else {
+    content
+  }
 }

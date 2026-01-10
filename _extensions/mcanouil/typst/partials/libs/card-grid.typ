@@ -119,6 +119,7 @@
 /// @param cards Array of card configuration dictionaries
 /// @param columns Number of columns (default: 3)
 /// @param colours Colour scheme dictionary
+/// @param alt Optional alt text for accessibility (wraps grid in figure when provided)
 /// @return Content Card grid layout
 ///
 /// @usage
@@ -133,18 +134,25 @@
 ///   colours
 /// )
 /// ```
-#let render-card-grid(cards, columns: 3, colours) = {
+#let render-card-grid(cards, columns: 3, colours, alt: none) = {
   // Create column specification
   let cols = ()
   for _ in range(columns) {
     cols.push(1fr)
   }
 
-  grid(
+  let content = grid(
     columns: cols,
     gutter: CARD-GAP,
     ..cards.map(card => render-card(card, colours))
   )
+
+  // Wrap in figure with alt text for accessibility if provided
+  if alt != none {
+    figure(content, alt: alt, kind: "card-grid", supplement: none)
+  } else {
+    content
+  }
 }
 
 /// Render a feature comparison grid.

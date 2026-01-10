@@ -239,14 +239,16 @@
 /// @param columns Number of columns in the grid
 /// @param gap Spacing between boxes
 /// @param colours Colour scheme dictionary
+/// @param alt Optional alt text for accessibility (wraps grid in figure when provided)
 /// @return Content Grid of value boxes
 #let value-box-grid(
   boxes: (),
   columns: 3,
   gap: 1em,
   colours: (:),
+  alt: none,
 ) = {
-  grid(
+  let content = grid(
     columns: columns,
     column-gutter: gap,
     row-gutter: gap,
@@ -261,6 +263,13 @@
       )
     })
   )
+
+  // Wrap in figure with alt text for accessibility if provided
+  if alt != none {
+    figure(content, alt: alt, kind: "value-box-grid", supplement: none)
+  } else {
+    content
+  }
 }
 
 // ============================================================================
