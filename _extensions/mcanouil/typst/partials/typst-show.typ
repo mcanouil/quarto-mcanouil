@@ -433,10 +433,12 @@ $endif$
     heading(title-case([$toc-title$]), outlined: false, bookmarked: true, numbering: none)
     v(1em)
     // Style level 1 outline entries with extra spacing and bold (scoped to TOC only)
+    // Use set text to style as bold for PDF/UA-1 compliance
     {
       show outline.entry.where(level: 1): it => {
         v(0.5em, weak: true)
-        strong(it)
+        set text(weight: "bold")
+        it
       }
       outline(
         title: none,

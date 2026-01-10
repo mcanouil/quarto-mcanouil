@@ -239,29 +239,32 @@
   quote-block
 }
 
-/// Apply definition list styling
+/// Apply definition list styling whilst preserving semantic structure for PDF/UA
+/// Use show terms.item to preserve the terms wrapper for PDF/UA-1 compliance
 /// @param it Terms element
 /// @param colours Colour dictionary
 /// @param breakable-settings Breakable configuration
-/// @return Styled definition list
+/// @return Styled definition list with preserved semantics
 #let apply-terms-style(it, colours, breakable-settings) = {
-  let terms-content = it
-    .children
-    .map(child => [
-      #block(below: 0.2em)[#strong[#child.term]]
-      #block(
-        above: 0em,
-        fill: colour-mix(colours, 95%),
-        inset: (left: 1.5em, right: 0.5em, top: 0.3em, bottom: 0.3em),
-        radius: 3pt,
-      )[#child.description]
-    ])
-    .join()
-
+  show terms.item: item => {
+    // Use set text to style term as bold for PDF/UA-1 compliance
+    block(below: 0.2em)[
+      #set text(weight: "bold")
+      #item.term
+    ]
+    // Style description with background
+    block(
+      above: 0em,
+      fill: colour-mix(colours, 95%),
+      inset: (left: 1.5em, right: 0.5em, top: 0.3em, bottom: 0.3em),
+      radius: 3pt,
+    )[#item.description]
+  }
+  // Return original terms element to preserve semantic structure
   if breakable-settings.terms == auto {
-    terms-content
+    it
   } else {
-    block(breakable: breakable-settings.terms, terms-content)
+    block(breakable: breakable-settings.terms, it)
   }
 }
 
