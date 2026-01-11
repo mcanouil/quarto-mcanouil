@@ -1,19 +1,58 @@
 title: Mickaël Canouil's Brand
 author: Mickaël Canouil
-version: 0.1.6
+version: 0.2.0
 quarto-required: ">=1.8.20"
 contributes:
-  metadata:
+  project:
     project:
+      type: website
       brand: brand.yml
-      format:
-        html:
-          theme:
-            light:
-              - cosmo
-              - brand
-              - _extensions/mcanouil/mcanouil/theme.scss
-            dark:
-              - cosmo
-              - brand
-              - _extensions/mcanouil/mcanouil/theme.scss
+    website:
+      favicon: logos/logo-light-path.svg
+      back-to-top-navigation: true
+      page-navigation: true
+      navbar:
+        background: dark
+        search: true
+        logo:
+          light: logos/logo-dark.svg
+          dark: logos/logo-light.svg
+        logo-alt: "Mickaël CANOUIL logo"
+      page-footer:
+        border: true
+        left: |
+          Powered by [Quarto](https://quarto.org).
+        center: |
+          &copy; []{#current-year} Mickaël CANOUIL.
+        right: |
+          [CC BY NC SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+    format: mcanouil-html
+  formats:
+    html:
+      theme:
+        light:
+          - cosmo
+          - brand
+          - html/theme.scss
+        dark:
+          - cosmo
+          - brand
+          - html/theme.scss
+      toc: true
+      toc-depth: 4
+      code-copy: true
+      code-overflow: wrap
+      highlight-style: github
+      anchor-sections: true
+      link-external-newwindow: true
+      email-obfuscate: javascript
+      fig-align: center
+      grid:
+        sidebar-width: 300px
+        body-width: 900px
+        margin-width: 300px
+      include-after-body:
+        - file: html/scripts/ordinal-dates.html
+        - file: html/scripts/current-year.html
+        - file: html/scripts/categories-alphabetical.html
+        - file: html/scripts/modal-clipboardjs.html
