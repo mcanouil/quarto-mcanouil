@@ -3,6 +3,9 @@ author: Mickaël Canouil
 version: 0.2.0
 quarto-required: ">=1.8.20"
 contributes:
+  revealjs-plugins:
+    - revealjs-plugin/mcanouil
+    - revealjs-plugin/tabset
   project:
     project:
       type: website
@@ -138,3 +141,41 @@ contributes:
       header-footer-style: "academic"
       # PDF/UA-1 standard for accessibility compliance (requires Typst >= 0.14)
       pdf-standard: ua-1
+    revealjs:
+      theme:
+        - default
+        - brand
+        - revealjs/theme.scss
+      template-partials:
+        - revealjs/partials/title-slide.html
+      filters:
+        - revealjs/filters/section-slides.lua
+      revealjs-plugins:
+        - revealjs-plugin/mcanouil
+        - revealjs-plugin/tabset
+      # Section slide options (handled by mcanouil-revealjs plugin)
+      section-slide-style: banner
+      section-slide-outline: true
+      # Plugin feature toggles
+      mcanouil-revealjs:
+        sectionOutline: true
+        dateSuperscript: true
+        faviconFromLogo: true
+        codeAnnotations: true
+        menuLogoVisibility: true
+        # Section slide background colour (null = use body colour)
+        sectionBackground: "#333333"
+      # Standard Reveal.js options
+      transition: slide
+      slide-number: c
+      hash: true
+      center: false
+      logo:
+        light: logos/logo-dark.svg
+        dark: logos/logo-light.svg
+      footer: |
+        <a href="https://mickael.canouil.fr/">mickael.canouil.fr</a>
+        |
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/">License: CC-BY-SA-4.0</a>
+      date-format: "dddd[, the] Do [of] MMMM, YYYY"
+      code-annotations: select

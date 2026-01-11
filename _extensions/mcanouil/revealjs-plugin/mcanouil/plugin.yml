@@ -1,0 +1,3 @@
+name: RevealJsMCanouil
+script: revealjs-mcanouil.js
+stylesheet: revealjs-mcanouil.css

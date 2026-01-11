@@ -1,0 +1,399 @@
+/*-- scss:defaults --*/
+
+// Brand colours (inherited from brand.yml via Quarto)
+// These are fallback values if brand.yml is not available
+$body-bg: #fafafa !default;
+$body-color: #333333 !default;
+$presentation-heading-color: $body-color !default;
+
+// Font settings (Alegreya Sans from brand.yml)
+$font-family-sans-serif: "Alegreya Sans", sans-serif !default;
+$presentation-heading-font: $font-family-sans-serif !default;
+$presentation-font-size-root: 36px !default;
+
+// Derived colours
+$link-color: $body-color !default;
+$text-muted: mix($body-bg, $body-color, 35%) !default;
+
+// Section slide colours (inverted by default)
+$section-slide-bg: $body-color !default;
+$section-slide-fg: $body-bg !default;
+
+/*-- scss:rules --*/
+
+// ===========================
+// UTILITY FUNCTIONS
+// ===========================
+
+// Helper function to mix background and foreground colours
+@function body-mix($weight) {
+  @return mix($body-bg, $body-color, $weight);
+}
+
+// ===========================
+// BASE STYLES
+// ===========================
+
+.reveal {
+
+  // Enhanced focus states for accessibility
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid $body-color;
+    outline-offset: 2px;
+  }
+}
+
+// ===========================
+// NAVIGATION CONTROLS
+// ===========================
+
+.reveal .controls {
+  color: $body-color;
+}
+
+.reveal .progress {
+  background: body-mix(90%);
+
+  span {
+    background: $body-color;
+  }
+}
+
+.reveal .slide-number {
+  color: $text-muted;
+  background-color: transparent;
+}
+
+// ===========================
+// CODE STYLING
+// ===========================
+
+.reveal pre {
+  background-color: body-mix(95%);
+  border: 1px solid body-mix(50%);
+  border-radius: 4px;
+
+  code {
+    background-color: transparent;
+  }
+}
+
+.reveal code:not(pre code) {
+  background-color: $body-color;
+  color: $body-bg;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+// ===========================
+// DEBUG - remove after testing
+// ===========================
+
+.reveal .slides section {
+  border: 2px solid red;
+}
+
+// ===========================
+// SECTION SLIDES (Level-1 Headings)
+// ===========================
+
+// Ensure section slides fill their parent (for nested sections in vertical stacks)
+.reveal .slides>section>section.section-slide {
+  width: 100%;
+  height: 100%;
+}
+
+// Base section slide styling with CSS custom property support
+// Background is set via data-background-color attribute (handled by Lua filter)
+// Reveal.js renders backgrounds in separate .slide-background elements
+.reveal .slides section.section-slide {
+  // Text colour for section slides (light on dark background)
+  color: var(--mcanouil-section-fg, $section-slide-fg);
+
+  h1,
+  h2 {
+    color: inherit;
+  }
+
+  a {
+    color: var(--mcanouil-section-fg, $section-slide-fg);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // Banner style (default) - matches Typst section-page
+  &.section-style-banner {
+    .section-banner {
+      padding: 1.5em 2em;
+
+      h1 {
+        font-size: 1.8em;
+        font-weight: 700;
+        margin: 0;
+        overflow-wrap: break-word;
+        hyphens: auto;
+      }
+
+      // Gradient underline decoration
+      &::after {
+        content: "";
+        display: block;
+        margin-top: 0.5em;
+        height: 4px;
+        background: linear-gradient(90deg,
+            var(--mcanouil-section-fg, $section-slide-fg),
+            var(--mcanouil-section-bg, $section-slide-bg));
+        width: 150pt;
+      }
+    }
+
+    // Subsection outline with corner brackets
+    .section-outline {
+      position: relative; // For corner bracket pseudo-elements
+      max-width: 40%;
+      padding: 1.5em;
+      margin-top: 2em;
+      text-align: left;
+      color: var(--mcanouil-section-fg, $section-slide-fg);
+
+      // Corner bracket decorations
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        width: 12pt;
+        height: 12pt;
+        border-color: var(--mcanouil-outline-border, var(--mcanouil-section-fg, $section-slide-fg));
+        border-style: solid;
+      }
+
+      &::before {
+        top: 0;
+        left: 0;
+        border-width: 2pt 0 0 2pt;
+      }
+
+      &::after {
+        bottom: 0;
+        right: 0;
+        border-width: 0 2pt 2pt 0;
+      }
+
+      ul {
+        list-style: disc;
+        margin: 0;
+        padding-left: 1.2em;
+        font-size: 0.7em;
+        color: inherit;
+
+        li {
+          margin: 0.3em 0;
+          color: inherit;
+
+          &::marker {
+            color: inherit;
+          }
+
+          a {
+            color: inherit;
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Full style - entire slide with inverted colours
+  &.section-style-full {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    h1 {
+      font-size: 2em;
+      font-weight: 700;
+      text-align: center;
+
+      &::after {
+        content: "";
+        display: block;
+        margin: 0.5em auto 0;
+        height: 4px;
+        background: linear-gradient(90deg,
+            var(--mcanouil-section-fg, $section-slide-fg),
+            var(--mcanouil-section-bg, $section-slide-bg));
+        width: 150pt;
+      }
+    }
+  }
+
+  // Minimal style - simple centred heading
+  &.section-style-minimal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    h1 {
+      font-size: 1.5em;
+      font-weight: 500;
+      text-align: center;
+    }
+  }
+
+}
+
+// ===========================
+// STANDARD SLIDES
+// ===========================
+
+.reveal .slides section:not(.section-slide):not(.quarto-title-block):not(.mcanouil-title-slide) {
+
+  // Heading underlines (matching HTML/Typst theme)
+  h2,
+  h3 {
+    &::after {
+      content: "";
+      display: block;
+      margin-top: 0.3em;
+      background: linear-gradient(90deg, $body-color, $body-bg);
+    }
+  }
+
+  h2::after {
+    width: 120pt;
+    height: 3pt;
+  }
+
+  h3::after {
+    width: 100pt;
+    height: 2.5pt;
+  }
+}
+
+// ===========================
+// TITLE SLIDE STYLING
+// ===========================
+
+.reveal .mcanouil-title-slide {
+  .title-content {
+    position: relative;
+    padding: 2em;
+    text-align: center;
+
+    // Corner bracket decorations (brand signature element)
+    .corner-bracket {
+      position: absolute;
+      width: 28pt;
+      height: 28pt;
+
+      &.top-right {
+        top: 0;
+        right: 0;
+        border-top: 6pt solid $body-color;
+        border-right: 6pt solid $body-color;
+      }
+
+      &.bottom-left {
+        bottom: 0;
+        left: 0;
+        border-bottom: 6pt solid $body-color;
+        border-left: 6pt solid $body-color;
+      }
+    }
+
+    // Title styling
+    .title {
+      font-weight: 700;
+      margin-bottom: 0.5em;
+      color: $body-color;
+    }
+
+    // Subtitle styling
+    .subtitle {
+      font-size: 0.7em;
+      color: $text-muted;
+      margin-top: 0;
+    }
+
+    // Authors container
+    .quarto-title-authors {
+      margin-top: 2em;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.5em;
+
+      .quarto-title-author {
+        text-align: center;
+
+        .quarto-title-author-name {
+          font-weight: 500;
+          margin-bottom: 0.2em;
+
+          a {
+            color: inherit;
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+
+        .quarto-title-author-orcid {
+          img {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-left: 0.3em;
+          }
+        }
+
+        .quarto-title-author-email {
+          font-size: 0.6em;
+          color: $text-muted;
+          margin-top: 0;
+          margin-bottom: 0.4em;
+
+          a {
+            color: inherit;
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+
+        .quarto-title-affiliation {
+          font-size: 0.6em;
+          color: $text-muted;
+          margin: 0.2em 0;
+
+          a {
+            color: inherit;
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+    }
+
+    // Date styling
+    .date {
+      font-size: 0.6em;
+      color: $text-muted;
+      margin-top: 2em;
+    }
+  }
+}
