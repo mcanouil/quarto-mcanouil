@@ -3,13 +3,15 @@ author: Mickaël Canouil
 version: 0.2.0
 quarto-required: ">=1.8.20"
 contributes:
+  metadata:
+    project:
+      brand: brand.yml
   revealjs-plugins:
     - revealjs-plugin/mcanouil
     - revealjs-plugin/tabset
   project:
     project:
       type: website
-      brand: brand.yml
     website:
       favicon: logos/logo-light-path.svg
       back-to-top-navigation: true
