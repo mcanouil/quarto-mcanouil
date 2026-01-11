@@ -1,7 +1,7 @@
 /*-- scss:defaults --*/
 
-// Brand colours (inherited from brand.yml via Quarto)
-// These are fallback values if brand.yml is not available
+// Brand colours (from brand.yml via Quarto's brand integration)
+// Use !default so brand values take precedence
 $body-bg: #fafafa !default;
 $body-color: #333333 !default;
 $presentation-heading-color: $body-color !default;
@@ -19,15 +19,26 @@ $text-muted: mix($body-bg, $body-color, 35%) !default;
 $section-slide-bg: $body-color !default;
 $section-slide-fg: $body-bg !default;
 
-/*-- scss:rules --*/
-
-// ===========================
-// UTILITY FUNCTIONS
-// ===========================
+/*-- scss:functions --*/
 
 // Helper function to mix background and foreground colours
 @function body-mix($weight) {
   @return mix($body-bg, $body-color, $weight);
+}
+
+/*-- scss:rules --*/
+
+// ===========================
+// CSS CUSTOM PROPERTIES
+// ===========================
+
+// Expose brand-derived colours to JavaScript
+// These can be overridden via mcanouil-revealjs plugin config
+.reveal {
+  --mcanouil-body-bg: #{$body-bg};
+  --mcanouil-body-color: #{$body-color};
+  --mcanouil-section-bg: #{$section-slide-bg};
+  --mcanouil-section-fg: #{$section-slide-fg};
 }
 
 // ===========================
@@ -35,7 +46,6 @@ $section-slide-fg: $body-bg !default;
 // ===========================
 
 .reveal {
-
   // Enhanced focus states for accessibility
   a:focus-visible,
   button:focus-visible {
@@ -87,29 +97,20 @@ $section-slide-fg: $body-bg !default;
 }
 
 // ===========================
-// DEBUG - remove after testing
-// ===========================
-
-.reveal .slides section {
-  border: 2px solid red;
-}
-
-// ===========================
 // SECTION SLIDES (Level-1 Headings)
 // ===========================
 
-// Ensure section slides fill their parent (for nested sections in vertical stacks)
+// Ensure section slides fill their parent and are isolated from siblings
+// CSS containment prevents layout shifts on other slides in the stack
 .reveal .slides>section>section.section-slide {
   width: 100%;
   height: 100%;
+  contain: layout;
 }
 
-// Base section slide styling with CSS custom property support
-// Background is set via data-background-color attribute (handled by Lua filter)
-// Reveal.js renders backgrounds in separate .slide-background elements
+// Base section slide styling (same theme as regular slides)
 .reveal .slides section.section-slide {
-  // Text colour for section slides (light on dark background)
-  color: var(--mcanouil-section-fg, $section-slide-fg);
+  color: $body-color;
 
   h1,
   h2 {
@@ -117,17 +118,37 @@ $section-slide-fg: $body-bg !default;
   }
 
   a {
-    color: var(--mcanouil-section-fg, $section-slide-fg);
+    color: $body-color;
 
     &:hover {
       text-decoration: underline;
     }
   }
 
-  // Banner style (default) - matches Typst section-page
+  // Banner style (default) - uses CSS Grid for layout isolation
+  // Grid layout: title bottom-left, outline top-right
+  // This avoids position: absolute/relative which causes layout shifts on sibling slides
   &.section-style-banner {
+    // Override Reveal.js center class
+    display: grid !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      ".      outline"
+      "banner banner";
+    height: 100%;
+    width: 100%;
+    contain: layout;
+    padding: 2em;
+    box-sizing: border-box;
+
     .section-banner {
-      padding: 1.5em 2em;
+      grid-area: banner;
+      align-self: end;
+      justify-self: start;
+      padding: 1em 1.5em;
 
       h1 {
         font-size: 1.8em;
@@ -143,21 +164,21 @@ $section-slide-fg: $body-bg !default;
         display: block;
         margin-top: 0.5em;
         height: 4px;
-        background: linear-gradient(90deg,
-            var(--mcanouil-section-fg, $section-slide-fg),
-            var(--mcanouil-section-bg, $section-slide-bg));
+        background: linear-gradient(90deg, $body-color, $body-bg);
         width: 150pt;
       }
     }
 
-    // Subsection outline with corner brackets
+    // Subsection outline with corner brackets - positioned top-right via grid
     .section-outline {
-      position: relative; // For corner bracket pseudo-elements
-      max-width: 40%;
+      grid-area: outline;
+      align-self: start;
+      justify-self: end;
+      position: relative; // Only for pseudo-element positioning within this element
+      max-width: 100%;
       padding: 1.5em;
-      margin-top: 2em;
       text-align: left;
-      color: var(--mcanouil-section-fg, $section-slide-fg);
+      color: $body-color;
 
       // Corner bracket decorations
       &::before,
@@ -166,7 +187,7 @@ $section-slide-fg: $body-bg !default;
         position: absolute;
         width: 12pt;
         height: 12pt;
-        border-color: var(--mcanouil-outline-border, var(--mcanouil-section-fg, $section-slide-fg));
+        border-color: $body-color;
         border-style: solid;
       }
 
@@ -282,34 +303,125 @@ $section-slide-fg: $body-bg !default;
 // ===========================
 
 .reveal .mcanouil-title-slide {
+  position: relative;
+  overflow: visible;
+
+  // Geometric background shapes (circles)
+  .bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    background-color: body-mix(85%);
+    z-index: 0;
+  }
+
+  .circle-1 {
+    width: 400px;
+    height: 400px;
+    top: -150px;
+    right: -100px;
+  }
+
+  .circle-2 {
+    width: 300px;
+    height: 300px;
+    bottom: -100px;
+    left: -80px;
+  }
+
+  .circle-3 {
+    width: 200px;
+    height: 200px;
+    top: 40%;
+    right: 10%;
+  }
+
+  .circle-4 {
+    width: 150px;
+    height: 150px;
+    bottom: 20%;
+    left: 15%;
+  }
+
+  .circle-5 {
+    width: 100px;
+    height: 100px;
+    top: -30px;
+    left: -25px;
+  }
+
   .title-content {
     position: relative;
     padding: 2em;
     text-align: center;
+    z-index: 1;
 
-    // Corner bracket decorations (brand signature element)
+    // Corner bracket base styles
     .corner-bracket {
       position: absolute;
+      border-color: $body-color;
+      border-style: solid;
+    }
+
+    // Outer corner brackets (around entire content area)
+    .corner-bracket.outer {
       width: 28pt;
       height: 28pt;
 
       &.top-right {
         top: 0;
         right: 0;
-        border-top: 6pt solid $body-color;
-        border-right: 6pt solid $body-color;
+        border-width: 6pt 6pt 0 0;
       }
 
       &.bottom-left {
         bottom: 0;
         left: 0;
-        border-bottom: 6pt solid $body-color;
-        border-left: 6pt solid $body-color;
+        border-width: 0 0 6pt 6pt;
       }
     }
 
-    // Title styling
-    .title {
+    // Title block container with inner corner brackets
+    .title-block {
+      position: relative;
+      display: inline-block;
+      padding: 1em 1.5em;
+      margin-bottom: 0;
+
+      // Inner corner brackets (smaller, around title/subtitle only)
+      .corner-bracket.inner {
+        width: 16pt;
+        height: 16pt;
+
+        &.top-left {
+          top: 0;
+          left: 0;
+          border-width: 3pt 0 0 3pt;
+        }
+
+        &.bottom-right {
+          bottom: 0;
+          right: 0;
+          border-width: 0 3pt 3pt 0;
+        }
+      }
+
+      .title {
+        font-size: 2em;
+        font-weight: 700;
+        margin-bottom: 0.3em;
+        color: $body-color;
+      }
+
+      p.subtitle {
+        font-size: 0.7em;
+        color: $text-muted;
+        margin: 0 !important;
+        margin-bottom: 0 !important;
+      }
+    }
+
+    // Title styling (fallback for titles outside title-block)
+    >.title {
       font-weight: 700;
       margin-bottom: 0.5em;
       color: $body-color;
@@ -324,7 +436,7 @@ $section-slide-fg: $body-bg !default;
 
     // Authors container
     .quarto-title-authors {
-      margin-top: 2em;
+      margin-top: 0.5em;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;

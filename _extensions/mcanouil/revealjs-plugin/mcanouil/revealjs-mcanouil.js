@@ -26,7 +26,8 @@ window.RevealJsMCanouil = function () {
     menuLogoVisibility: true,
     // Section slide options
     sectionSlideStyle: "banner",
-    // Colour customisation (null = use CSS defaults)
+    // Colour customisation (null = use brand.yml colours via CSS custom properties)
+    // Override these to use custom colours instead of brand-derived values
     sectionBackground: null,
     sectionForeground: null,
     outlineBorderColor: null,
@@ -268,6 +269,7 @@ window.RevealJsMCanouil = function () {
 
   /**
    * Add subsection outline to section slide
+   * Inserts at start of slide (before banner) for correct grid placement
    * @param {Element} slide - Section slide element
    * @param {Array} subsections - Array of subsection objects
    */
@@ -286,7 +288,8 @@ window.RevealJsMCanouil = function () {
     });
 
     outline.appendChild(ul);
-    slide.appendChild(outline);
+    // Insert at start of slide for correct grid layout (outline top-right, banner bottom-left)
+    slide.insertBefore(outline, slide.firstChild);
   }
 
   // =========================================================================
@@ -505,73 +508,40 @@ window.RevealJsMCanouil = function () {
   }
 
   // =========================================================================
-  // MENU/LOGO/FOOTER VISIBILITY AND STYLING
+  // MENU/LOGO/FOOTER VISIBILITY
   // =========================================================================
 
   /**
-   * Update menu button, logo, slide number visibility, and colours
-   * based on slide position and type (title slide vs section slide)
+   * Update menu button, logo, slide number, and footer visibility
+   * Hide on title slide, show on all other slides
    * @param {Object} event - Slide change event or indices object
    */
   function updateMenuVisibility(event) {
     const indexh = event.indexh !== undefined ? event.indexh : 0;
     const isTitle = indexh === 0;
 
-    // Get current slide to check if it's a section slide
-    const currentSlide = event.currentSlide || document.querySelector(".reveal .slides > section.present");
-    const isSectionSlide = currentSlide && currentSlide.classList.contains("section-slide");
-
-    // Menu button - hide on title, invert colour on section slides
+    // Menu button - hide on title slide
     const menuButton = document.querySelector(".slide-menu-button");
     if (menuButton) {
       menuButton.style.display = isTitle ? "none" : "";
-      if (isSectionSlide) {
-        menuButton.classList.add("section-slide-menu");
-      } else {
-        menuButton.classList.remove("section-slide-menu");
-      }
     }
 
-    // Logo - hide on title, swap light/dark version on section slides
+    // Logo - hide on title slide
     const logoImg = document.querySelector("div.has-logo > img.slide-logo");
     if (logoImg) {
       logoImg.style.display = isTitle ? "none" : "";
-
-      // Swap logo source for section slides (light logo on dark background)
-      if (!logoImg.dataset.srcLight) {
-        // Store original sources on first run
-        logoImg.dataset.srcLight = logoImg.src;
-        // Try to find dark version by swapping 'dark' and 'light' in path
-        const darkSrc = logoImg.src.replace("logo-dark", "logo-light");
-        logoImg.dataset.srcDark = darkSrc !== logoImg.src ? darkSrc : logoImg.src;
-      }
-
-      if (isSectionSlide) {
-        logoImg.src = logoImg.dataset.srcDark;
-      } else {
-        logoImg.src = logoImg.dataset.srcLight;
-      }
     }
 
-    // Slide number - hide on title, invert colour on section slides
+    // Slide number - hide on title slide
     const slideNumber = document.querySelector(".reveal .slide-number");
     if (slideNumber) {
       slideNumber.style.display = isTitle ? "none" : "";
-      if (isSectionSlide) {
-        slideNumber.classList.add("section-slide-number");
-      } else {
-        slideNumber.classList.remove("section-slide-number");
-      }
     }
 
-    // Footer colour inversion on section slides
+    // Footer - hide on title slide
     const footer = document.querySelector(".reveal .footer");
     if (footer) {
-      if (isSectionSlide) {
-        footer.classList.add("section-slide-footer");
-      } else {
-        footer.classList.remove("section-slide-footer");
-      }
+      footer.style.display = isTitle ? "none" : "";
     }
   }
 };

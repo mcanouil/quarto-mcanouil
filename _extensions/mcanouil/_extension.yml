@@ -20,8 +20,8 @@ contributes:
         background: dark
         search: true
         logo:
-          light: logos/logo-dark.svg
-          dark: logos/logo-light.svg
+          light: logos/logo-dark-path.svg
+          dark: logos/logo-light-path.svg
         logo-alt: "Mickaël CANOUIL logo"
       page-footer:
         border: true
@@ -144,14 +144,13 @@ contributes:
       # PDF/UA-1 standard for accessibility compliance (requires Typst >= 0.14)
       pdf-standard: ua-1
     revealjs:
+      brand-mode: dark
       theme:
         - default
-        - brand
         - revealjs/theme.scss
+        - brand
       template-partials:
         - revealjs/partials/title-slide.html
-      filters:
-        - revealjs/filters/section-slides.lua
       revealjs-plugins:
         - revealjs-plugin/mcanouil
         - revealjs-plugin/tabset
@@ -165,16 +164,15 @@ contributes:
         faviconFromLogo: true
         codeAnnotations: true
         menuLogoVisibility: true
-        # Section slide background colour (null = use body colour)
-        sectionBackground: "#333333"
+        # Section slide colours are derived from brand.yml via SCSS
       # Standard Reveal.js options
       transition: slide
       slide-number: c
       hash: true
       center: false
       logo:
-        light: logos/logo-dark.svg
-        dark: logos/logo-light.svg
+        light: logos/logo-dark-path.svg
+        dark: logos/logo-light-path.svg
       footer: |
         <a href="https://mickael.canouil.fr/">mickael.canouil.fr</a>
         |

@@ -1,14 +1,28 @@
 <section id="$idprefix$title-slide" $for(title-slide-attributes/pairs)$ $it.key$="$it.value$" $endfor$
   class="quarto-title-block mcanouil-title-slide">
+  <!-- Geometric background shapes -->
+  <div class="bg-shape circle-1"></div>
+  <div class="bg-shape circle-2"></div>
+  <div class="bg-shape circle-3"></div>
+  <div class="bg-shape circle-4"></div>
+  <div class="bg-shape circle-5"></div>
+
   <div class="title-content">
-    <div class="corner-bracket top-right"></div>
-    <div class="corner-bracket bottom-left"></div>
+    <!-- Outer corner brackets (around entire content) -->
+    <div class="corner-bracket outer top-right"></div>
+    <div class="corner-bracket outer bottom-left"></div>
 
-    <h1 class="title">$title$</h1>
+    <!-- Title block with inner corner brackets -->
+    <div class="title-block">
+      <div class="corner-bracket inner top-left"></div>
+      <div class="corner-bracket inner bottom-right"></div>
 
-    $if(subtitle)$
-    <p class="subtitle">$subtitle$</p>
-    $endif$
+      <h1 class="title">$title$</h1>
+
+      $if(subtitle)$
+      <p class="subtitle">$subtitle$</p>
+      $endif$
+    </div>
 
     <div class="quarto-title-authors">
       $for(by-author)$

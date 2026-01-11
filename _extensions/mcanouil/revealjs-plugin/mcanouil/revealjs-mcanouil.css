@@ -80,32 +80,7 @@
 }
 
 /* =========================================================================
-   UI COLOUR INVERSION ON SECTION SLIDES
-   ========================================================================= */
-
-/* Footer */
-.reveal .footer.section-slide-footer {
-  color: #fafafa;
-}
-
-.reveal .footer.section-slide-footer a {
-  color: #fafafa;
-}
-
-/* Menu button - override SVG icon with light version */
-.reveal .slide-menu-button.section-slide-menu .fas.fa-bars::before {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23fafafa" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg>');
-}
-
-/* Slide number */
-.reveal .slide-number.section-slide-number,
-.reveal .slide-number.section-slide-number a {
-  color: #fafafa;
-  background-color: transparent;
-}
-
-/* =========================================================================
-   UI ELEMENT HOVER EFFECTS (applies to both regular and section slides)
+   UI ELEMENT HOVER EFFECTS
    ========================================================================= */
 
 .reveal .footer a:hover,

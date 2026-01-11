@@ -15,7 +15,9 @@ author:
         city: Lille
         country: France
 date: today
-format: mcanouil-revealjs
+format:
+  mcanouil-revealjs:
+    brand-mode: dark
 ---
 
 # Introduction
