@@ -1,7 +1,9 @@
 .DS_Store
-*.html
-*.pdf
-*_files/
+/*.typ
+/*.html
+/*.pdf
+/*_files/
 /.luarc.json
 /.quarto/
 **/*.quarto_ipynb
+.claude/

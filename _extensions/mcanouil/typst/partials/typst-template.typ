@@ -1,0 +1,599 @@
+// MIT License
+//
+// Copyright (c) 2026 Mickaël Canouil
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+// Mickael CANOUIL Typst Template
+// A branded template matching the mickael.canouil.fr website style
+// Author: Mickaël Canouil
+// License: MIT
+
+// Import partials
+// #import "colours.typ": mcanouil-colours, colour-mix, foreground-alpha
+// #import "typography.typ": fonts, paragraph-settings, get-heading-style
+// #import "decorations.typ": corner-brackets, heading-underline, image-border, featured-image, highlight-block, margin-decoration, title-page-background
+// #import "utilities.typ": has-content, content-to-str
+// #import "authors.typ": format-author-name, format-author-name-str, author-block, affiliations-section
+// #import "header.typ": mcanouil-header
+// #import "footer.typ": mcanouil-footer
+// #import "title-block.typ": mcanouil-title-block
+
+// ============================================================================
+// Main template function
+// ============================================================================
+
+/// Create branded article document
+/// This is the main template function that configures the entire document.
+/// It sets up page layout, typography, styling, and processes all document metadata.
+///
+/// Document Metadata:
+/// @param title Document title
+/// @param subtitle Document subtitle
+/// @param authors Array of author dictionaries (Quarto normalised schema)
+/// @param date Publication date
+/// @param abstract Abstract text
+/// @param keywords Array of keywords
+///
+/// Colour Configuration:
+/// @param brand-mode Colour mode ("light" or "dark")
+/// @param colour-background Optional background colour override
+/// @param colour-foreground Optional foreground colour override
+/// @param colour-muted Optional muted colour override
+///
+/// Decorative Elements:
+/// @param show-corner-brackets Whether to show corner bracket decorations
+/// @param show-margin-decoration Whether to show coloured bars along page margins
+/// @param show-title-page-background Whether to show geometric background on title page
+/// @param show-heading-underlines Whether to show gradient underlines below headings
+///
+/// Logo Configuration:
+/// @param show-logo Whether to show logo in header
+/// @param logo Path to logo image file
+/// @param logo-width Optional logo width (if none, uses height)
+/// @param logo-height Optional logo height
+/// @param logo-inset Logo padding
+/// @param logo-alt Alternative text for logo image
+/// @param orcid-icon Path to ORCID icon file
+///
+/// Title Page:
+/// @param title-page Whether to use dedicated title page mode
+///
+/// Header and Footer:
+/// @param header-footer-style Header/footer layout style ('academic' or 'professional')
+/// @param institute Institute name for professional footer left (defaults to first author affiliation or URL)
+/// @param copyright Copyright statement for professional footer right
+/// @param license License information for professional footer right (combined with copyright if both present)
+///
+/// Watermark:
+/// @param watermark-text Text content for watermark
+/// @param watermark-image Path to image file for watermark
+/// @param watermark-opacity Watermark transparency (default: 10%)
+/// @param watermark-angle Watermark rotation angle (default: -45deg)
+/// @param watermark-size Size for text watermarks (default: 4em)
+/// @param watermark-colour Colour for text watermarks (default: gray)
+///
+/// Typography:
+/// @param font-body Body text font family
+/// @param font-headings Heading font family
+/// @param font-size Base font size
+/// @param heading-weight Heading font weight
+/// @param heading-style Heading font style
+/// @param heading-colour Heading colour (defaults to foreground)
+/// @param heading-line-height Heading line height
+/// @param title-size Title font size
+/// @param subtitle-size Subtitle font size
+/// @param abstract-title Abstract section heading
+/// @param keywords-title Keywords section heading
+///
+/// Page Layout:
+/// @param paper Paper size (default: "a4")
+/// @param margin Page margins dictionary
+/// @param cols Number of columns (default: 1)
+/// @param column-gutter Space between columns (default: 1em)
+/// @param lang Document language code
+/// @param region Document region code
+///
+/// Document Structure:
+/// @param section-numbering Section numbering pattern
+/// @param section-pagebreak Whether to add breaks before level 1 headings (default: true)
+/// @param section-page Whether to render dedicated section pages for level-1 headings (default: false)
+/// @param toc-depth Maximum heading depth for TOC and section page outlines (default: 3)
+/// @param has-outlines Whether document has TOC or list-of sections
+/// @param page-break-inside Control page breaks inside elements (auto, avoid, or dictionary)
+///
+/// Table Styling:
+/// @param table-stroke Table border style (auto uses 0.5pt + foreground)
+/// @param table-inset Table cell padding
+/// @param table-fill Table fill style (none, "alternating", or custom)
+///
+/// Quote Styling:
+/// @param quote-width Blockquote width percentage
+/// @param quote-align Blockquote alignment
+///
+/// Figure and Link Styling:
+/// @param figure-placement Figure placement strategy (none: in-place, auto: floating, top/bottom: specific)
+/// @param link-underline Whether to underline links
+/// @param link-underline-opacity Link underline opacity
+/// @param link-colour Optional custom link colour
+///
+/// @param body Document body content
+/// @return Configured document
+#let mcanouil-article(
+  // Document Metadata
+  title: none,
+  subtitle: none,
+  authors: (),
+  date: none,
+  abstract: none,
+  keywords: (),
+  // Colour Configuration
+  brand-mode: "light",
+  colour-background: none,
+  colour-foreground: none,
+  colour-muted: none,
+  // Decorative Elements
+  show-corner-brackets: true,
+  show-margin-decoration: true,
+  show-title-page-background: true,
+  show-heading-underlines: true,
+  // Logo Configuration
+  show-logo: true,
+  logo: none,
+  logo-light: none,
+  logo-dark: none,
+  logo-width: none,
+  logo-height: none,
+  logo-inset: 0pt,
+  logo-alt: none,
+  orcid-icon: none,
+  // Title Page
+  title-page: false,
+  // Header and Footer
+  header-footer-style: "academic",
+  institute: none,
+  copyright: none,
+  license: none,
+  // Watermark
+  watermark-text: none,
+  watermark-image: none,
+  watermark-opacity: 10%,
+  watermark-angle: -45deg,
+  watermark-size: 4em,
+  watermark-colour: gray,
+  // Typography
+  font-body: "Alegreya Sans",
+  font-headings: "Alegreya Sans",
+  font-size: 11pt,
+  heading-weight: "bold",
+  heading-style: "normal",
+  heading-colour: none,
+  heading-line-height: 0.65em,
+  title-size: 24pt,
+  subtitle-size: 14pt,
+  abstract-title: "Abstract",
+  keywords-title: "Keywords",
+  // Page Layout
+  paper: "a4",
+  margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm),
+  cols: 1,
+  column-gutter: 1em,
+  lang: "en",
+  region: "GB",
+  // Document Structure
+  section-numbering: none,
+  section-pagebreak: true,
+  section-page: false,
+  toc-depth: 3,
+  has-outlines: false,
+  page-break-inside: auto,
+  // Table Styling
+  table-stroke: auto,
+  table-inset: 6pt,
+  table-fill: none,
+  // Quote Styling
+  quote-width: 90%,
+  quote-align: center,
+  // Figure and Link Styling
+  figure-placement: none, // Keep figures/tables in their sections (use 'auto' for floating)
+  link-underline: true,
+  link-underline-opacity: 50%,
+  link-colour: none,
+  // Content
+  body,
+) = {
+  // Resolve colours based on mode with optional colour overrides
+  let colours = mcanouil-colours(
+    mode: brand-mode,
+    colour-background: colour-background,
+    colour-foreground: colour-foreground,
+    colour-muted: colour-muted,
+  )
+
+  // Automatically disable title-page mode when there's no title
+  let title-page = if title == none { false } else { title-page }
+
+  // Define content margins for professional style (asymmetric, used after title block)
+  // Professional style uses wider left margin to accommodate margin section
+  let content-margin = if (
+    header-footer-style == "professional" and margin == (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm)
+  ) {
+    (top: 4cm, bottom: 2.5cm, left: 3cm, right: 2.5cm)
+  } else {
+    margin
+  }
+
+  // Initial margin: symmetric for professional style (title block pages)
+  // This ensures pages with title block have equal left/right margins
+  // Asymmetric margins are applied after the title block
+  let margin = if (
+    header-footer-style == "professional" and margin == (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm)
+  ) {
+    (top: 4cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm)
+  } else {
+    content-margin
+  }
+
+  // Process page-break-inside configuration
+  let breakable-settings = process-breakable-settings(page-break-inside)
+
+  // Get first author information for footer
+  let first-author = if authors.len() > 0 {
+    format-author-name(authors.at(0))
+  } else {
+    none
+  }
+
+  let first-author-contact = if authors.len() > 0 {
+    format-author-contact(authors.at(0))
+  } else {
+    none
+  }
+
+  // Get first author affiliation name for professional footer fallback
+  let first-author-affiliation = if authors.len() > 0 {
+    let author = authors.at(0)
+    if author.affiliations != none and author.affiliations.len() > 0 {
+      let first-aff = author.affiliations.at(0)
+      if has-content(first-aff.name) {
+        first-aff.name
+      } else {
+        none
+      }
+    } else {
+      none
+    }
+  } else {
+    none
+  }
+
+  // Get first author URL for professional footer fallback
+  let first-author-url = if authors.len() > 0 {
+    let author = authors.at(0)
+    if has-content(author.url) {
+      let url-str = if type(author.url) == str {
+        author.url
+      } else {
+        content-to-str(author.url)
+      }
+      url-str.replace("\\/", "/").replace("https://", "").replace("http://", "")
+    } else {
+      none
+    }
+  } else {
+    none
+  }
+
+  // Determine footer left content based on style
+  let footer-left-content = if header-footer-style == "professional" {
+    // Priority: institute → affiliation → URL → none
+    if institute != none {
+      institute
+    } else if first-author-affiliation != none {
+      first-author-affiliation
+    } else if first-author-url != none {
+      first-author-url
+    } else {
+      none
+    }
+  } else {
+    // Academic style: use first author
+    first-author
+  }
+
+  // Determine footer right content based on style
+  let footer-right-content = if header-footer-style == "professional" {
+    // Combine copyright and license when both available
+    if copyright != none and license != none {
+      [#copyright · #license]
+    } else if copyright != none {
+      copyright
+    } else if license != none {
+      license
+    } else {
+      none
+    }
+  } else {
+    // Academic style: use contact info
+    first-author-contact
+  }
+
+  // Document metadata for PDF properties (requires strings, not content)
+  // Note: Only include optional fields if they have values (Typst doesn't accept none for some fields)
+  let doc-params = (
+    author: authors.map(a => format-author-name-str(a)),
+  )
+
+  if title != none {
+    doc-params.insert("title", content-to-str(title))
+  }
+
+  if keywords != () {
+    doc-params.insert("keywords", keywords)
+  }
+
+  if date != none {
+    doc-params.insert("date", auto)
+  }
+
+  set document(..doc-params)
+
+  // Initialize margin state with initial margin value
+  // This allows header/footer/margin-section to access current margins dynamically
+  current-margin-state.update(margin)
+
+  // Page setup with header, footer, and margin decorations
+  // When title-page is enabled, first page has no header/footer and geometric background
+  // Headers and footers are marked as PDF artifacts for accessibility
+  set page(
+    paper: paper,
+    margin: margin,
+    fill: colours.background,
+    header: context {
+      if title-page and counter(page).get().first() == 1 {
+        none
+      } else {
+        pdf.artifact(
+          mcanouil-header(
+            style: header-footer-style,
+            title: title,
+            subtitle: subtitle,
+            logo: logo,
+            logo-alt: logo-alt,
+            colours: colours,
+            show-logo: show-logo,
+            margin: margin,
+          ),
+        )
+      }
+    },
+    footer: context {
+      if title-page and counter(page).get().first() == 1 {
+        none
+      } else {
+        pdf.artifact(
+          mcanouil-footer(
+            style: header-footer-style,
+            left-content: footer-left-content,
+            right-content: footer-right-content,
+            colours: colours,
+            margin: margin,
+          ),
+        )
+      }
+    },
+    background: context {
+      {
+        if title-page and counter(page).get().first() == 1 {
+          if show-title-page-background {
+            title-page-background(colours, margin: margin)
+          }
+        } else if show-margin-decoration and header-footer-style == "academic" {
+          // Only show margin decoration when style is academic
+          margin-decoration(
+            colours,
+            margin: margin,
+            decorate-left: true,
+            decorate-right: true,
+            decorate-top: true,
+            decorate-bottom: true,
+            width: 0.25cm,
+          )
+        }
+
+        // Display section in margin (professional style shows vertical section title)
+        margin-section(
+          style: header-footer-style,
+          colours: colours,
+          margin: margin,
+        )
+
+        // Apply watermark on all pages
+        apply-watermark(
+          watermark-text: watermark-text,
+          watermark-image: watermark-image,
+          watermark-opacity: watermark-opacity,
+          watermark-angle: watermark-angle,
+          watermark-size: watermark-size,
+          watermark-colour: watermark-colour,
+        )
+      }
+    },
+  )
+
+  // Text defaults
+  set text(
+    font: font-body,
+    size: font-size,
+    fill: colours.foreground,
+    lang: lang,
+    region: region,
+    hyphenate: true, // Enable hyphenation for better text flow
+  )
+
+  // Paragraph settings
+  set par(
+    justify: paragraph-settings.justify,
+    leading: paragraph-settings.leading,
+    first-line-indent: paragraph-settings.first-line-indent,
+  )
+
+  // Section numbering (will be overridden in special section modes)
+  set heading(numbering: section-numbering)
+
+  // Show rules - each defined in show-rules.typ for better readability
+
+  // Heading styles
+  show heading: it => {
+    apply-heading-style(
+      it,
+      colours,
+      font-headings,
+      section-pagebreak,
+      show-heading-underlines,
+      section-page: section-page,
+      margin: margin,
+      cols: cols,
+      toc-depth: toc-depth,
+      heading-weight: heading-weight,
+      heading-style: heading-style,
+      heading-colour: heading-colour,
+      heading-line-height: heading-line-height,
+    )
+  }
+
+  // Link styling
+  show link: it => apply-link-style(it, colours, link-colour, link-underline, link-underline-opacity)
+
+  // Code block styling
+  show raw.where(block: true): it => apply-code-block-style(it, colours, breakable-settings)
+
+  // Inline code styling
+  show raw.where(block: false): it => apply-inline-code-style(it, colours)
+
+  // Blockquote styling
+  show quote.where(block: true): it => apply-quote-style(it, colours, quote-width, quote-align, breakable-settings)
+
+  // Definition list styling
+  show terms: it => apply-terms-style(it, colours, breakable-settings)
+
+  // Table styling with customisation options
+  set table(
+    inset: table-inset,
+    stroke: if table-stroke == auto {
+      0.5pt + colours.foreground
+    } else {
+      table-stroke
+    },
+    fill: if table-fill == "alternating" {
+      (x, y) => if calc.odd(y) { colour-mix(colours, 97%) } else { none }
+    } else {
+      table-fill
+    },
+  )
+
+  // Table show rule
+  show table: it => apply-table-style(it, breakable-settings)
+
+  // Table header styling
+  show table.cell.where(y: 0): set text(weight: "bold")
+
+  // Figure placement control
+  set figure(placement: figure-placement)
+
+  // Figure numbering
+  // In special sections, the heading numbering is set by the Lua filter.
+  // We query the most recent heading's numbering to derive figure numbers.
+  set figure(numbering: n => context {
+    let headings = query(selector(heading).before(here()))
+    if headings.len() > 0 {
+      let last-heading = headings.last()
+      if last-heading.numbering != none {
+        let h-counter = counter(heading).at(here())
+        if h-counter.len() > 0 and h-counter.at(0) > 0 {
+          // Determine the section numbering pattern from the heading
+          // For appendix (A.1.a) and supplementary (I.1.i), extract first level pattern
+          let h-num = if type(last-heading.numbering) == function {
+            // Call the numbering function with just the first level counter
+            (last-heading.numbering)(h-counter.at(0))
+          } else {
+            numbering(last-heading.numbering, h-counter.at(0))
+          }
+          // Format as "section.figure" (e.g., "A.1", "I.2", "1.3")
+          [#h-num.#n]
+        } else {
+          str(n)
+        }
+      } else {
+        str(n)
+      }
+    } else {
+      str(n)
+    }
+  })
+
+  // Figure show rule
+  show figure: it => apply-figure-style(it, colours)
+
+  // Callout show rule
+  show figure.where(kind: it => type(it) == str and it.starts-with("quarto-callout-")): it => {
+    apply-callout-style(it, colours, breakable-settings)
+  }
+
+  // Title block
+  if title != none or subtitle != none or authors.len() > 0 or date != none or abstract != none {
+    mcanouil-title-block(
+      title: title,
+      subtitle: subtitle,
+      authors: authors,
+      date: date,
+      abstract: abstract,
+      keywords: keywords,
+      colours: colours,
+      show-corner-brackets: show-corner-brackets,
+      orcid-icon: orcid-icon,
+      has-outlines: has-outlines,
+      title-page: title-page,
+      logo: logo,
+      logo-light: logo-light,
+      logo-dark: logo-dark,
+      logo-width: logo-width,
+      logo-height: logo-height,
+      logo-inset: logo-inset,
+      logo-alt: logo-alt,
+      brand-mode: brand-mode,
+      title-size: title-size,
+      subtitle-size: subtitle-size,
+      abstract-title: abstract-title,
+      keywords-title: keywords-title,
+    )
+  }
+
+  // Main content (columns applied via set page in typst-show.typ after outlines)
+  // This ensures title block and outlines render in single column
+  // For professional style, switch to asymmetric margins after title block
+  if header-footer-style == "professional" and margin != content-margin {
+    // Update margin state and apply asymmetric content margins after title block
+    current-margin-state.update(content-margin)
+    set page(margin: content-margin)
+    body
+  } else {
+    body
+  }
+}

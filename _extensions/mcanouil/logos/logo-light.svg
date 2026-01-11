@@ -8,8 +8,8 @@
    sodipodi:docname="logo-light.svg"
    inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
    inkscape:export-filename="logo-light.png"
-   inkscape:export-xdpi="95.059998"
-   inkscape:export-ydpi="95.059998"
+   inkscape:export-xdpi="95.06311"
+   inkscape:export-ydpi="95.06311"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,8 +24,8 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#505050"
      inkscape:zoom="3.0715627"
-     inkscape:cx="135.9243"
-     inkscape:cy="66.252921"
+     inkscape:cx="116.71584"
+     inkscape:cy="64.950653"
      inkscape:window-width="1512"
      inkscape:window-height="828"
      inkscape:window-x="0"
@@ -59,45 +59,44 @@
      y="50.325771"
      text-anchor="middle"
      class="firstname"
-     fill="#fafafa"
+     fill="#333333"
      id="text1"
-     style="font-size:42.6667px;stroke-width:0.980111"><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:42.6667px;font-family:'Dancing Script';-inkscape-font-specification:'Dancing Script'"
+     style="font-size:42.6667px;stroke-width:0.980111;fill:#fafafa;fill-opacity:1"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:42.6667px;font-family:'Dancing Script';-inkscape-font-specification:'Dancing Script';fill:#fafafa;fill-opacity:1"
        id="tspan1">Mickaël</tspan></text>
-  <g
-     id="g2"
-     transform="translate(6.9393626,-2.7822668)">
-    <line
-       x1="100"
-       y1="66"
-       x2="146"
-       y2="66"
-       stroke="#fafafa"
-       stroke-width="0.75"
-       id="line1" />
-    <line
-       x1="154"
-       y1="66"
-       x2="200"
-       y2="66"
-       stroke="#fafafa"
-       stroke-width="0.75"
-       id="line2" />
-    <circle
-       cx="150"
-       cy="66"
-       r="2.5"
-       fill="#fafafa"
-       id="circle2" />
-  </g>
+  <line
+     x1="106.93936"
+     y1="63.217731"
+     x2="152.93936"
+     y2="63.217731"
+     stroke="#333333"
+     stroke-width="0.75"
+     id="line1"
+     style="stroke:#fafafa;stroke-opacity:1" />
+  <line
+     x1="160.93936"
+     y1="63.217731"
+     x2="206.93936"
+     y2="63.217731"
+     stroke="#333333"
+     stroke-width="0.75"
+     id="line2"
+     style="stroke:#fafafa;stroke-opacity:1" />
+  <circle
+     cx="156.93936"
+     cy="63.217731"
+     r="2.5"
+     fill="#333333"
+     id="circle2"
+     style="fill:#fafafa;fill-opacity:1" />
   <text
      x="149.22797"
      y="98.768845"
      text-anchor="middle"
      class="lastname"
-     fill="#fafafa"
+     fill="#333333"
      id="text2"
-     style="font-size:40.6335px;stroke-width:1.0693"><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Alegreya SC';-inkscape-font-specification:'Alegreya SC'"
+     style="font-size:40.6335px;stroke-width:1.0693;fill:#fafafa;fill-opacity:1"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Alegreya SC';-inkscape-font-specification:'Alegreya SC';fill:#fafafa;fill-opacity:1"
        id="tspan2">CANOUIL</tspan></text>
 </svg>
