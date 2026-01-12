@@ -6,7 +6,7 @@
  * - Date superscript formatting (1st, 2nd, 3rd)
  * - Favicon generation from slide logo
  * - Code annotation fragment synchronisation
- * - Menu/logo visibility on title slide
+ * - Title slide chrome visibility (menu/logo/footer/slide-number)
  *
  * @author Mickaël Canouil
  * @license MIT
@@ -22,11 +22,9 @@ window.RevealJsMCanouil = function () {
     sectionOutline: true,
     dateSuperscript: true,
     faviconFromLogo: true,
-    codeAnnotations: true, // Enable fragment navigation through code annotations
-    menuLogoVisibility: true,
+    codeAnnotationFragments: true, // Enable fragment navigation through code annotations
+    hideTitleSlideChrome: true, // Hide menu/logo/footer/slide-number on title slide
     debugBorders: false, // Show coloured borders on slides for overflow debugging
-    // Section slide options
-    sectionSlideStyle: "banner",
     // Colour customisation (null = use brand.yml colours via CSS custom properties)
     // Override these to use custom colours instead of brand-derived values
     sectionBackground: null,
@@ -114,18 +112,19 @@ window.RevealJsMCanouil = function () {
         if (config.faviconFromLogo) {
           setFaviconFromLogo();
         }
-        if (config.menuLogoVisibility) {
-          updateMenuVisibility(deck.getIndices());
+        if (config.hideTitleSlideChrome) {
+          updateTitleSlideChrome(deck.getIndices());
         }
-        if (config.codeAnnotations) {
+        if (config.codeAnnotationFragments) {
           setupCodeAnnotationFragments();
         }
         if (config.debugBorders) {
           applyDebugBorders();
         }
+        processSocialHandles();
       });
 
-      if (config.codeAnnotations) {
+      if (config.codeAnnotationFragments) {
         deck.on("fragmentshown", function (event) {
           onAnnotationFragmentShown(event);
         });
@@ -134,9 +133,9 @@ window.RevealJsMCanouil = function () {
         });
       }
 
-      if (config.menuLogoVisibility) {
+      if (config.hideTitleSlideChrome) {
         deck.on("slidechanged", function (event) {
-          updateMenuVisibility(event);
+          updateTitleSlideChrome(event);
         });
       }
     },
@@ -209,17 +208,14 @@ window.RevealJsMCanouil = function () {
       if (h1) {
         sectionSlides.push({ section: section, h1: h1 });
 
-        // Add section slide classes
+        // Add section slide class
         section.classList.add("section-slide");
-        section.classList.add("section-style-" + config.sectionSlideStyle);
 
         // Section slide styling is handled entirely by CSS via .section-slide class
         // Background and foreground colours are derived from brand.yml via SCSS variables
 
-        // For banner style, wrap heading in banner div
-        if (config.sectionSlideStyle === "banner") {
-          wrapInBanner(section, h1);
-        }
+        // Wrap heading in banner div
+        wrapInBanner(section, h1);
       }
     });
 
@@ -585,15 +581,15 @@ window.RevealJsMCanouil = function () {
   }
 
   // =========================================================================
-  // MENU/LOGO/FOOTER VISIBILITY
+  // TITLE SLIDE CHROME VISIBILITY
   // =========================================================================
 
   /**
-   * Update menu button, logo, slide number, and footer visibility
-   * Hide on title slide, show on all other slides
+   * Update menu button, logo, slide number, and footer visibility.
+   * Hide on title slide, show on all other slides.
    * @param {Object} event - Slide change event or indices object (unused, kept for API compatibility)
    */
-  function updateMenuVisibility(event) {
+  function updateTitleSlideChrome(event) {
     // Use class-based detection for robustness (works regardless of slide position)
     const currentSlide = document.querySelector(
       ".reveal .slides > section.present, .reveal .slides > section > section.present"
@@ -674,6 +670,46 @@ window.RevealJsMCanouil = function () {
         nested.style.border = "3px solid blue";
         nested.style.boxSizing = "border-box";
       });
+    });
+  }
+
+  // =========================================================================
+  // SOCIAL HANDLES
+  // =========================================================================
+
+  /**
+   * Process social handle elements to extract just the handle from URLs.
+   * Extracts the part after the last "/" from the text content, decodes URL encoding,
+   * and adds "@" prefix for social media platforms.
+   */
+  function processSocialHandles() {
+    const handles = document.querySelectorAll(".social-handle");
+    handles.forEach(function (handle) {
+      var text = handle.textContent.trim();
+      // Extract part after last "/"
+      const lastSlashIndex = text.lastIndexOf("/");
+      if (lastSlashIndex !== -1 && lastSlashIndex < text.length - 1) {
+        text = text.substring(lastSlashIndex + 1);
+      }
+      // Decode URL-encoded characters (e.g., %40 -> @)
+      try {
+        text = decodeURIComponent(text);
+      } catch (e) {
+        // Keep original if decoding fails
+      }
+      // Add @ prefix for social media platforms (not website/linkedin)
+      const parent = handle.closest(".social-link");
+      if (parent) {
+        const needsAtPrefix =
+          parent.classList.contains("github") ||
+          parent.classList.contains("twitter") ||
+          parent.classList.contains("bluesky") ||
+          parent.classList.contains("mastodon");
+        if (needsAtPrefix && !text.startsWith("@")) {
+          text = "@" + text;
+        }
+      }
+      handle.textContent = text;
     });
   }
 };

@@ -129,151 +129,111 @@ $section-slide-fg: $body-bg !default;
     }
   }
 
-  // Banner style (default) - uses CSS Grid for layout isolation
+  // Banner style - uses CSS Grid for layout isolation
   // Grid layout: title bottom-left, outline top-right
   // This avoids position: absolute/relative which causes layout shifts on sibling slides
-  &.section-style-banner {
-    // Override Reveal.js center class
-    display: grid !important;
-    align-items: stretch !important;
-    justify-content: stretch !important;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-      ".      outline"
-      "banner banner";
-    height: 100%;
-    width: 100%;
-    contain: layout;
-    padding: 2em;
-    box-sizing: border-box;
+  // Override Reveal.js center class
+  display: grid !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    ".      outline"
+    "banner banner";
+  height: 100%;
+  width: 100%;
+  contain: layout;
+  padding: 2em;
+  box-sizing: border-box;
 
-    .section-banner {
-      grid-area: banner;
-      align-self: end;
-      justify-self: start;
-      padding: 1em 1.5em;
+  .section-banner {
+    grid-area: banner;
+    align-self: end;
+    justify-self: start;
+    padding: 1em 1.5em;
 
-      h1 {
-        font-size: 1.8em;
-        font-weight: 700;
-        margin: 0;
-        overflow-wrap: break-word;
-        hyphens: auto;
-      }
-
-      // Gradient underline decoration
-      &::after {
-        content: "";
-        display: block;
-        margin-top: 0.5em;
-        height: 4px;
-        background: linear-gradient(90deg, $body-color, $body-bg);
-        width: 150pt;
-      }
+    h1 {
+      font-size: 1.8em;
+      font-weight: 700;
+      margin: 0;
+      overflow-wrap: break-word;
+      hyphens: auto;
     }
 
-    // Subsection outline with corner brackets - positioned top-right via grid
-    .section-outline {
-      grid-area: outline;
-      align-self: start;
-      justify-self: end;
-      position: relative; // Only for pseudo-element positioning within this element
-      max-width: 100%;
-      padding: 0.75em;
-      text-align: left;
-      color: $body-color;
-      background-color: body-mix(95%);
-      border-radius: 4px;
+    // Gradient underline decoration
+    &::after {
+      content: "";
+      display: block;
+      margin-top: 0.5em;
+      height: 4px;
+      background: linear-gradient(90deg, $body-color, $body-bg);
+      width: 150pt;
+    }
+  }
 
-      // Corner bracket decorations
-      &::before,
-      &::after {
-        content: "";
-        position: absolute;
-        width: 12pt;
-        height: 12pt;
-        border-color: $body-color;
-        border-style: solid;
-      }
+  // Subsection outline with corner brackets - positioned top-right via grid
+  .section-outline {
+    grid-area: outline;
+    align-self: start;
+    justify-self: end;
+    position: relative; // Only for pseudo-element positioning within this element
+    max-width: 100%;
+    padding: 0.75em;
+    text-align: left;
+    color: $body-color;
+    background-color: body-mix(95%);
+    border-radius: 4px;
 
-      &::before {
-        top: 0;
-        left: 0;
-        border-width: 2pt 0 0 2pt;
-      }
+    // Corner bracket decorations
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 12pt;
+      height: 12pt;
+      border-color: $body-color;
+      border-style: solid;
+    }
 
-      &::after {
-        bottom: 0;
-        right: 0;
-        border-width: 0 2pt 2pt 0;
-      }
+    &::before {
+      top: 0;
+      left: 0;
+      border-width: 2pt 0 0 2pt;
+    }
 
-      ul {
-        list-style: disc;
-        margin: 0;
-        padding-left: 1em;
-        font-size: 0.7em;
+    &::after {
+      bottom: 0;
+      right: 0;
+      border-width: 0 2pt 2pt 0;
+    }
+
+    ul {
+      list-style: disc;
+      margin: 0;
+      padding-left: 1em;
+      font-size: 0.7em;
+      color: inherit;
+
+      li {
+        margin: 0.3em 0;
         color: inherit;
 
-        li {
-          margin: 0.3em 0;
+        &::marker {
           color: inherit;
+        }
 
-          &::marker {
-            color: inherit;
-          }
+        a {
+          color: inherit;
+          text-decoration: none;
 
-          a {
-            color: inherit;
-            text-decoration: none;
-
-            &:hover {
-              text-decoration: underline;
-            }
+          &:hover {
+            text-decoration: underline;
           }
         }
       }
     }
   }
-
-  // Full style - entire slide with inverted colours
-  &.section-style-full {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    h1 {
-      font-size: 2em;
-      font-weight: 700;
-      text-align: center;
-
-      &::after {
-        content: "";
-        display: block;
-        margin: 0.5em auto 0;
-        height: 4px;
-        background: linear-gradient(90deg,
-            var(--mcanouil-section-fg, $section-slide-fg),
-            var(--mcanouil-section-bg, $section-slide-bg));
-        width: 150pt;
-      }
-    }
-  }
-
-  // Minimal style - simple centred heading
-  &.section-style-minimal {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    h1 {
-      font-size: 1.5em;
-      font-weight: 500;
-      text-align: center;
-    }
-  }
-
 }
 
 // ===========================
@@ -748,8 +708,9 @@ $section-slide-fg: $body-bg !default;
 
     .social-link {
       display: inline-flex;
+      flex-direction: column;
       align-items: center;
-      gap: 0.3em;
+      gap: 0.2em;
       font-size: 0.6em;
       color: $body-color;
       text-decoration: none;
@@ -763,8 +724,17 @@ $section-slide-fg: $body-bg !default;
       }
 
       .icon {
-        width: 1.2em;
-        height: 1.2em;
+        width: 1.5em;
+        height: 1.5em;
+      }
+
+      .social-label {
+        font-weight: 500;
+      }
+
+      .social-handle {
+        font-size: 0.8em;
+        color: $text-muted;
       }
     }
   }

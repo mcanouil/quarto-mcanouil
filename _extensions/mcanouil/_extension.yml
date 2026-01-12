@@ -34,6 +34,7 @@ contributes:
     format: mcanouil-html
   formats:
     html:
+      # Theme
       theme:
         light:
           - cosmo
@@ -43,26 +44,48 @@ contributes:
           - cosmo
           - brand
           - html/theme.scss
-      toc: true
-      toc-depth: 4
-      code-copy: true
-      code-overflow: wrap
       highlight-style: github
-      anchor-sections: true
-      link-external-newwindow: true
-      email-obfuscate: javascript
-      fig-align: center
+      # Layout
       grid:
         sidebar-width: 300px
         body-width: 900px
         margin-width: 300px
+      fig-align: center
+      # Table of contents
+      toc: true
+      toc-depth: 4
+      # Code
+      code-copy: true
+      code-overflow: wrap
+      # Navigation
+      anchor-sections: true
+      link-external-newwindow: true
+      # Other
+      email-obfuscate: javascript
+      # Include files
       include-after-body:
         - file: html/scripts/ordinal-dates.html
         - file: html/scripts/current-year.html
         - file: html/scripts/categories-alphabetical.html
         - file: html/scripts/modal-clipboardjs.html
     typst:
-      template: typst/template.typ # originally from src/resources/formats/typst/pandoc/quarto
+      # Brand
+      brand-mode: light
+      # Logo/Visual assets
+      logo:
+        light:
+          path: logos/logo-light-path.svg
+          alt: "Mickaël CANOUIL Logo"
+          width: 7cm
+        dark:
+          path: logos/logo-dark-path.svg
+          alt: "Mickaël CANOUIL Logo"
+          width: 7cm
+      logo-light: logos/logo-light-path.svg
+      logo-dark: logos/logo-dark-path.svg
+      orcid-icon: typst/assets/orcid.svg
+      # Template
+      template: typst/template.typ
       template-partials:
         - typst/partials/libs/utilities.typ
         - typst/partials/libs/definitions.typ
@@ -93,6 +116,7 @@ contributes:
         - typst/partials/notes.typ
         - typst/partials/typst-template.typ
         - typst/partials/typst-show.typ
+      # Shortcodes and filters
       shortcodes:
         - typst/shortcodes/divider.lua
         - typst/shortcodes/value-box.lua
@@ -100,31 +124,20 @@ contributes:
       filters:
         - typst/filters/special-sections.lua
         - typst/filters/typst-markdown.lua
-      logo:
-        light:
-          path: logos/logo-light.svg
-          alt: "Mickaël CANOUIL Logo"
-          width: 7cm
-        dark:
-          path: logos/logo-dark.svg
-          alt: "Mickaël CANOUIL Logo"
-          width: 7cm
-      logo-light: logos/logo-light.svg
-      logo-dark: logos/logo-dark.svg
-      orcid-icon: typst/assets/orcid.svg
+      # Typography
+      mainfont: "Alegreya Sans"
+      fontsize: 11pt
+      # Page/Layout
       papersize: a4
       margin:
         top: 2.5cm
         bottom: 2.5cm
         left: 2.5cm
         right: 2.5cm
-      mainfont: "Alegreya Sans"
-      fontsize: 11pt
-      bibliographystyle: apa
+      # Section/Numbering
       number-sections: true
       section-numbering: "1.1.1."
       section-pagebreak: true
-      # Unified special sections configuration
       special-sections:
         references:
           name: "References"
@@ -138,49 +151,53 @@ contributes:
           name: "Supplementary"
           numbering: "I.i.1."
           prefix: true
+      # Table of contents
       toc: true
       list-of: true
+      # Other
+      bibliographystyle: apa
       header-footer-style: "academic"
-      # PDF/UA-1 standard for accessibility compliance (requires Typst >= 0.14)
       pdf-standard: ua-1
     revealjs:
+      # Brand
       brand-mode: dark
+      # Logo/Visual assets
+      logo:
+        light: logos/logo-dark-path.svg
+        dark: logos/logo-light-path.svg
+      favicon-from-logo: true
+      # Theme
       theme:
         - default
         - revealjs/theme.scss
         - brand
+      # Template
       template: revealjs/template.html
       template-partials:
         - revealjs/partials/title-slide.html
         - revealjs/partials/closing-slide.html
+      # Plugins
       revealjs-plugins:
         - revealjs-plugin/mcanouil
         - revealjs-plugin/tabset
-      # Section slide options (handled by mcanouil-revealjs plugin)
-      section-slide-style: banner
-      section-slide-outline: true
-      # Plugin feature toggles
-      mcanouil-revealjs:
-        sectionOutline: true
-        dateSuperscript: true
-        faviconFromLogo: true
-        codeAnnotations: true
-        menuLogoVisibility: true
-        # Section slide colours are derived from brand.yml via SCSS
+      # Plugin options (handled by mcanouil-revealjs plugin)
+      # Section slide colours are derived from brand.yml via SCSS
+      section-outline: true
+      date-superscript: true
+      code-annotation-fragments: true
+      hide-title-slide-chrome: true
       # Standard Reveal.js options
       transition: slide
       slide-number: c
       hash: true
       center: false
-      logo:
-        light: logos/logo-dark-path.svg
-        dark: logos/logo-light-path.svg
+      date-format: "dddd[, the] Do [of] MMMM, YYYY"
+      code-annotations: select
+      # Footer/Closing
       footer: |
         <a href="https://mickael.canouil.fr/">mickael.canouil.fr</a>
         |
         <a href="https://creativecommons.org/licenses/by-sa/4.0/">License: CC-BY-SA-4.0</a>
-      date-format: "dddd[, the] Do [of] MMMM, YYYY"
-      code-annotations: select
       closing-slide:
         photo: "https://github.com/mcanouil.png"
         title: "Independent Consultant"

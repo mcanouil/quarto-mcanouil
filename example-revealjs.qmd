@@ -17,7 +17,6 @@ author:
 date: today
 format:
   mcanouil-revealjs:
-    brand-mode: light
     debug-borders: true
 ---
 
