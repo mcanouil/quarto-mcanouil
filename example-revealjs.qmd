@@ -18,6 +18,7 @@ date: today
 format:
   mcanouil-revealjs:
     brand-mode: dark
+    debug-borders: true
 ---
 
 # Introduction
