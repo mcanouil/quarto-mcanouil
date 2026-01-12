@@ -24,6 +24,7 @@ window.RevealJsMCanouil = function () {
     faviconFromLogo: true,
     codeAnnotations: true, // Enable fragment navigation through code annotations
     menuLogoVisibility: true,
+    debugBorders: false, // Show coloured borders on slides for overflow debugging
     // Section slide options
     sectionSlideStyle: "banner",
     // Colour customisation (null = use brand.yml colours via CSS custom properties)
@@ -35,13 +36,69 @@ window.RevealJsMCanouil = function () {
 
   let config = {};
 
+  /**
+   * Convert kebab-case string to camelCase.
+   * @param {string} str - Kebab-case string (e.g., "debug-borders")
+   * @returns {string} CamelCase string (e.g., "debugBorders")
+   */
+  function kebabToCamel(str) {
+    return str.replace(/-([a-z])/g, function (_match, letter) {
+      return letter.toUpperCase();
+    });
+  }
+
+  /**
+   * Normalise config object keys from kebab-case to camelCase.
+   * Allows users to specify options in YAML-friendly format.
+   * @param {Object} obj - Config object with potentially kebab-case keys
+   * @returns {Object} Config object with camelCase keys
+   */
+  function normaliseConfig(obj) {
+    var result = {};
+    Object.keys(obj).forEach(function (key) {
+      var camelKey = kebabToCamel(key);
+      result[camelKey] = obj[key];
+    });
+    return result;
+  }
+
   return {
     id: "mcanouil-revealjs",
 
     init: function (deck) {
       // Merge user config with defaults
-      const userConfig = deck.getConfig()["mcanouil-revealjs"] || {};
-      config = { ...defaults, ...userConfig };
+      // Check both plugin namespace and top-level config for user options
+      // This allows users to specify options directly under the format:
+      //   format:
+      //     mcanouil-revealjs:
+      //       debug-borders: true
+      // Or under the plugin namespace:
+      //   format:
+      //     mcanouil-revealjs:
+      //       mcanouil-revealjs:
+      //         debug-borders: true
+      const deckConfig = deck.getConfig();
+      const pluginConfig = normaliseConfig(deckConfig["mcanouil-revealjs"] || {});
+
+      // Extract relevant top-level options (those matching our defaults)
+      const topLevelConfig = {};
+      Object.keys(defaults).forEach(function (key) {
+        // Check camelCase version
+        if (deckConfig[key] !== undefined) {
+          topLevelConfig[key] = deckConfig[key];
+        }
+        // Check kebab-case version
+        const kebabKey = key.replace(/([A-Z])/g, function (match) {
+          return "-" + match.toLowerCase();
+        });
+        if (deckConfig[kebabKey] !== undefined) {
+          topLevelConfig[key] = deckConfig[kebabKey];
+        }
+      });
+
+      // Merge: defaults < plugin namespace < top-level
+      // Top-level options take precedence (what user writes directly under format)
+      config = { ...defaults, ...pluginConfig, ...topLevelConfig };
 
       // Apply colour customisations via CSS custom properties
       applyColourCustomisation(config);
@@ -62,6 +119,9 @@ window.RevealJsMCanouil = function () {
         }
         if (config.codeAnnotations) {
           setupCodeAnnotationFragments();
+        }
+        if (config.debugBorders) {
+          applyDebugBorders();
         }
       });
 
@@ -566,5 +626,54 @@ window.RevealJsMCanouil = function () {
     if (footer) {
       footer.style.display = isTitle ? "none" : "";
     }
+  }
+
+  // =========================================================================
+  // DEBUG BORDERS
+  // =========================================================================
+
+  /**
+   * Apply debug borders to all slides for overflow detection.
+   * Colour coding:
+   * - Red: Regular slides (top-level sections)
+   * - Blue: Nested slides (vertical stack)
+   * - Green: Title and closing slides
+   * - Orange: Section slides
+   * - Magenta dashed: Slides container boundary
+   */
+  function applyDebugBorders() {
+    // Apply border to slides container
+    const slidesContainer = document.querySelector(".reveal .slides");
+    if (slidesContainer) {
+      slidesContainer.style.outline = "2px dashed magenta";
+      slidesContainer.style.outlineOffset = "-2px";
+    }
+
+    // Apply borders to all slide sections
+    const sections = document.querySelectorAll(".reveal .slides > section");
+    sections.forEach(function (section) {
+      // Determine border colour based on slide type
+      var borderColour = "red"; // Default for regular slides
+
+      if (
+        section.classList.contains("mcanouil-title-slide") ||
+        section.classList.contains("mcanouil-closing-slide")
+      ) {
+        borderColour = "green";
+      } else if (section.classList.contains("section-slide")) {
+        borderColour = "orange";
+      }
+
+      // Apply inline styles
+      section.style.border = "3px solid " + borderColour;
+      section.style.boxSizing = "border-box";
+
+      // Handle nested sections (vertical slides)
+      const nestedSections = section.querySelectorAll("section");
+      nestedSections.forEach(function (nested) {
+        nested.style.border = "3px solid blue";
+        nested.style.boxSizing = "border-box";
+      });
+    });
   }
 };

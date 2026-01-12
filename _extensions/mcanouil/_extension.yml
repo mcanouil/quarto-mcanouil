@@ -149,8 +149,10 @@ contributes:
         - default
         - revealjs/theme.scss
         - brand
+      template: revealjs/template.html
       template-partials:
         - revealjs/partials/title-slide.html
+        - revealjs/partials/closing-slide.html
       revealjs-plugins:
         - revealjs-plugin/mcanouil
         - revealjs-plugin/tabset
@@ -179,3 +181,13 @@ contributes:
         <a href="https://creativecommons.org/licenses/by-sa/4.0/">License: CC-BY-SA-4.0</a>
       date-format: "dddd[, the] Do [of] MMMM, YYYY"
       code-annotations: select
+      closing-slide:
+        photo: "https://github.com/mcanouil.png"
+        title: "Independent Consultant"
+        social:
+          website: https://mickael.canouil.fr
+          github: mcanouil
+          linkedin: MickaelCanouil
+          bluesky: mickael.canouil.fr
+          mastodon: https://fosstodon.org/%40MickaelCanouil
+          twitter: MickaelCanouil

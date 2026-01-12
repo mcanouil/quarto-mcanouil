@@ -274,7 +274,7 @@ $section-slide-fg: $body-bg !default;
 // STANDARD SLIDES
 // ===========================
 
-.reveal .slides section:not(.section-slide):not(.quarto-title-block):not(.mcanouil-title-slide) {
+.reveal .slides section:not(.section-slide):not(.quarto-title-block):not(.mcanouil-title-slide):not(.mcanouil-closing-slide) {
 
   // Heading underlines (matching HTML/Typst theme)
   h2,
@@ -305,6 +305,11 @@ $section-slide-fg: $body-bg !default;
 .reveal .mcanouil-title-slide {
   position: relative;
   overflow: visible;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   // Geometric background shapes (circles)
   .bg-shape {
@@ -351,9 +356,16 @@ $section-slide-fg: $body-bg !default;
 
   .title-content {
     position: relative;
+    width: 100%;
+    height: 100%;
     padding: 2em;
     text-align: center;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 
     // Corner bracket base styles
     .corner-bracket {
@@ -529,5 +541,225 @@ $section-slide-fg: $body-bg !default;
     background-color: body-mix(90%);
     padding: 0.1em 0.3em;
     border-radius: 3px;
+  }
+}
+
+// ===========================
+// CLOSING SLIDE STYLING
+// ===========================
+
+.reveal .mcanouil-closing-slide {
+  position: relative;
+  overflow: visible;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // Geometric background shapes (matching title slide)
+  .bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    background-color: body-mix(85%);
+    z-index: 0;
+  }
+
+  .circle-1 {
+    width: 400px;
+    height: 400px;
+    top: -150px;
+    right: -100px;
+  }
+
+  .circle-2 {
+    width: 300px;
+    height: 300px;
+    bottom: -100px;
+    left: -80px;
+  }
+
+  .circle-3 {
+    width: 200px;
+    height: 200px;
+    top: 40%;
+    right: 10%;
+  }
+
+  .circle-4 {
+    width: 150px;
+    height: 150px;
+    bottom: 20%;
+    left: 15%;
+  }
+
+  .circle-5 {
+    width: 100px;
+    height: 100px;
+    top: -30px;
+    left: -25px;
+  }
+
+  .closing-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 2em;
+    text-align: center;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+
+    // Corner bracket base styles (matching title slide)
+    .corner-bracket {
+      position: absolute;
+      border-color: $body-color;
+      border-style: solid;
+    }
+
+    // Outer corner brackets
+    .corner-bracket.outer {
+      width: 28pt;
+      height: 28pt;
+
+      &.top-right {
+        top: 0;
+        right: 0;
+        border-width: 6pt 6pt 0 0;
+      }
+
+      &.bottom-left {
+        bottom: 0;
+        left: 0;
+        border-width: 0 0 6pt 6pt;
+      }
+    }
+  }
+
+  .speaker-card {
+    position: relative;
+    display: inline-block;
+    padding: 1.5em 2em;
+
+    // Inner corner brackets
+    .corner-bracket.inner {
+      width: 16pt;
+      height: 16pt;
+
+      &.top-left {
+        top: 0;
+        left: 0;
+        border-width: 3pt 0 0 3pt;
+      }
+
+      &.bottom-right {
+        bottom: 0;
+        right: 0;
+        border-width: 0 3pt 3pt 0;
+      }
+    }
+
+    // T-shape layout: photo left, details right
+    .speaker-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2em;
+      margin-bottom: 1.5em;
+    }
+
+    .speaker-photo {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px solid $body-color;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .speaker-details {
+      text-align: left;
+    }
+
+    .speaker-name {
+      font-size: 1.5em;
+      font-weight: 700;
+      margin: 0;
+      margin-bottom: 0.2em;
+      color: $body-color;
+
+      a {
+        color: inherit;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .speaker-orcid {
+      img {
+        width: 16px;
+        height: 16px;
+        vertical-align: middle;
+        margin-left: 0.3em;
+      }
+    }
+
+    .speaker-title {
+      font-size: 0.8em;
+      color: $text-muted;
+      margin: 0;
+      margin-bottom: 0.3em;
+    }
+
+    .speaker-email {
+      font-size: 0.6em;
+      color: $text-muted;
+      margin: 0;
+
+      a {
+        color: inherit;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  .social-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1em;
+    margin-top: 1em;
+
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3em;
+      font-size: 0.6em;
+      color: $body-color;
+      text-decoration: none;
+      padding: 0.3em 0.6em;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: body-mix(90%);
+        text-decoration: none;
+      }
+
+      .icon {
+        width: 1.2em;
+        height: 1.2em;
+      }
+    }
   }
 }

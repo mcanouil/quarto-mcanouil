@@ -146,4 +146,22 @@
     border-radius: 50%;
     padding: 0.1em 0.3em;
   }
+
+  /* Closing slide print styles - prevent overflow */
+  .reveal .mcanouil-closing-slide {
+    overflow: hidden !important;
+  }
+
+  .reveal .mcanouil-closing-slide .bg-shape {
+    display: none !important;
+  }
+
+  /* Title slide print styles - prevent overflow */
+  .reveal .mcanouil-title-slide {
+    overflow: hidden !important;
+  }
+
+  .reveal .mcanouil-title-slide .bg-shape {
+    display: none !important;
+  }
 }
