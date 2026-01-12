@@ -83,6 +83,9 @@ $section-slide-fg: $body-bg !default;
   background-color: body-mix(95%);
   border: 1px solid body-mix(50%);
   border-radius: 4px;
+  box-sizing: border-box;
+  max-width: 100%;
+  width: 100%;
 
   code {
     background-color: transparent;
