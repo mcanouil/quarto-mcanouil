@@ -17,7 +17,7 @@ author:
 date: today
 format:
   mcanouil-revealjs:
-    debug-borders: true
+    debug-borders: false
 ---
 
 # Introduction
