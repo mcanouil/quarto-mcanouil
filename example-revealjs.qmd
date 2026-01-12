@@ -1,0 +1,306 @@
+---
+title: "Reveal.js Format Test"
+subtitle: "Comprehensive Component Testing"
+author:
+  - name:
+      given: Mickaël
+      family: CANOUIL
+    email: pro@mickael.canouil.dev
+    orcid: 0000-0002-3396-4549
+    url: https://mickael.canouil.fr
+    attributes:
+      corresponding: true
+    affiliations:
+      - name: Independent Consultant
+        city: Lille
+        country: France
+date: today
+format:
+  mcanouil-revealjs:
+    debug-borders: false
+---
+
+# Introduction
+
+## About This Test
+
+This presentation tests all components of the mcanouil Reveal.js format.
+
+- Title slide styling with corner brackets.
+- Section slides with banner style.
+- Gradient underlines on headings.
+- Code blocks and annotations.
+
+## Features Being Tested
+
+1. Custom title slide partial.
+2. Section slide detection.
+3. Subsection outline generation.
+4. Date superscript formatting.
+5. Menu/logo visibility.
+
+# Typography
+
+## Heading Levels
+
+### Level 3 Heading
+
+This tests the gradient underline on different heading levels.
+
+#### Level 4 Heading
+
+Level 4 headings should not have underlines.
+
+## Text Formatting
+
+Regular paragraph text using **Alegreya Sans** font.
+
+- **Bold text** for emphasis.
+- *Italic text* for titles.
+- `Inline code` styling.
+- [Links](https://mickael.canouil.fr) inherit colours.
+
+## Lists
+
+Unordered list:
+
+- First item.
+- Second item.
+- Third item with longer text to test wrapping behaviour.
+
+Ordered list:
+
+1. First step.
+2. Second step.
+3. Third step.
+
+# Code Examples
+
+## Basic Code Block
+
+```r
+# R code example
+library(ggplot2)
+
+ggplot(mtcars) +
+  aes(x = mpg, y = wt) +
+  geom_point() +
+  theme_minimal()
+```
+
+## Code with Line Highlighting
+
+```{r}
+#| eval: false
+#| echo: true
+#| code-line-numbers: "|1|2-3|4-6"
+# Step-by-step code reveal
+data <- mtcars
+data[["efficiency"]] <- data[["mpg"]] / data[["wt"]]
+
+ggplot(data) +
+  aes(x = efficiency, y = hp) +
+  geom_point()
+```
+
+## Python Example
+
+```python
+import polars as pl
+from plotnine import ggplot, aes, geom_point
+
+# Load and transform data
+df = pl.read_csv("data.csv")
+df = df.with_columns(
+    (pl.col("value") * 2).alias("doubled")
+)
+```
+
+## Code Annotations
+
+```{r}
+#| eval: false
+#| echo: true
+library(dplyr) # <1>
+
+mtcars |> # <2>
+  filter(mpg > 20) |> # <3>
+  select(mpg, cyl, hp) |> # <4>
+  arrange(desc(mpg)) # <5>
+```
+
+1. Load the dplyr package for data manipulation.
+2. Start with the mtcars dataset.
+3. Filter rows where mpg is greater than 20.
+4. Select only the columns we need.
+5. Sort by mpg in descending order.
+
+## Tabset Example
+
+::: {.panel-tabset}
+
+### R Code
+
+```{r}
+#| eval: false
+#| echo: true
+# R implementation
+library(ggplot2)
+
+ggplot(mtcars) +
+  aes(x = mpg, y = wt) +
+  geom_point()
+```
+
+### Python Code
+
+```python
+# Python implementation
+from plotnine import ggplot, aes, geom_point
+from plotnine.data import mtcars
+
+(
+    ggplot(mtcars)
+    + aes(x="mpg", y="wt")
+    + geom_point()
+)
+```
+
+### Output
+
+The plot shows the relationship between fuel efficiency (mpg) and weight (wt).
+
+:::
+
+# Callouts and Blocks
+
+## Callout Examples
+
+::: {.callout-note}
+This is a note callout to highlight important information.
+:::
+
+::: {.callout-warning}
+This is a warning callout for cautionary messages.
+:::
+
+::: {.callout-tip}
+This is a tip callout for helpful suggestions.
+:::
+
+## Blockquotes
+
+> "The best way to predict the future is to invent it."
+>
+> --- Alan Kay
+
+## Columns Layout
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Left Column**
+
+Content on the left side of the slide.
+:::
+
+::: {.column width="50%"}
+**Right Column**
+
+Content on the right side of the slide.
+:::
+
+::::
+
+# Tables and Data
+
+## Simple Table
+
+| Package | Purpose | Language |
+|---------|---------|----------|
+| ggplot2 | Visualisation | R |
+| polars | Data manipulation | Python |
+| Quarto | Publishing | Multiple |
+
+## Data Summary
+
+```{r}
+#| echo: false
+#| eval: true
+summary(mtcars[, 1:4])
+```
+
+# Visual Elements
+
+## Images
+
+When using images, they should be centred and properly sized.
+
+## Incremental Reveals
+
+::: {.incremental}
+- First point appears.
+- Then the second.
+- Finally the third.
+:::
+
+## Fragments
+
+::: {.fragment}
+This appears first.
+:::
+
+::: {.fragment}
+This appears second.
+:::
+
+::: {.fragment}
+This appears third.
+:::
+
+# Background Variations
+
+## Testing Section Styles
+
+The plugin supports three section slide styles:
+
+1. **Banner** (default): Heading in a banner at 20% from top.
+2. **Full**: Centred heading with full inverted background.
+3. **Minimal**: Simple centred heading.
+
+## Background Effects
+
+Available background effects:
+
+- **Solid**: Plain inverted colour.
+- **Gradient**: Linear gradient (default).
+- **Pattern**: Dots, diagonal lines, or grid.
+
+# Conclusion
+
+## Summary
+
+This test presentation covers:
+
+- Title slide with author metadata.
+- Section slides with outlines.
+- Typography and text formatting.
+- Code blocks with syntax highlighting.
+- Callouts and special blocks.
+- Tables and data display.
+- Incremental reveals and fragments.
+
+## Next Steps
+
+1. Render the presentation.
+2. Check all components visually.
+3. Test light and dark modes.
+4. Verify PDF export.
+
+## Thank You
+
+Questions?
+
+Website: [mickael.canouil.fr](https://mickael.canouil.fr)
+
+GitHub: [github.com/mcanouil](https://github.com/mcanouil)
