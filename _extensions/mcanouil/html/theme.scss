@@ -1241,6 +1241,13 @@ figure:has(img.img-styled) {
   }
 }
 
+// Featured image styling for blog posts
+.img-featured {
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px #060c37;
+  margin-bottom: 2rem;
+}
+
 // Index page content styling
 body.quarto-about-solana,
 #quarto-content:has(.quarto-about-solana) {
