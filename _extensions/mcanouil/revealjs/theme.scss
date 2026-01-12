@@ -46,6 +46,7 @@ $section-slide-fg: $body-bg !default;
 // ===========================
 
 .reveal {
+
   // Enhanced focus states for accessibility
   a:focus-visible,
   button:focus-visible {
@@ -179,9 +180,11 @@ $section-slide-fg: $body-bg !default;
       justify-self: end;
       position: relative; // Only for pseudo-element positioning within this element
       max-width: 100%;
-      padding: 1.5em;
+      padding: 0.75em;
       text-align: left;
       color: $body-color;
+      background-color: body-mix(95%);
+      border-radius: 4px;
 
       // Corner bracket decorations
       &::before,
@@ -209,7 +212,7 @@ $section-slide-fg: $body-bg !default;
       ul {
         list-style: disc;
         margin: 0;
-        padding-left: 1.2em;
+        padding-left: 1em;
         font-size: 0.7em;
         color: inherit;
 

@@ -17,7 +17,7 @@ author:
 date: today
 format:
   mcanouil-revealjs:
-    brand-mode: dark
+    brand-mode: light
     debug-borders: true
 ---
 
@@ -227,7 +227,7 @@ Content on the right side of the slide.
 
 ```{r}
 #| echo: false
-#| eval: false
+#| eval: true
 summary(mtcars[, 1:4])
 ```
 
