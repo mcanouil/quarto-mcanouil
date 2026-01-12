@@ -153,8 +153,8 @@ window.RevealJsMCanouil = function () {
         section.classList.add("section-slide");
         section.classList.add("section-style-" + config.sectionSlideStyle);
 
-        // Background colour is set by Lua filter (section-slides.lua) via data-background-color
-        // The filter runs during Pandoc AST processing, before HTML generation
+        // Section slide styling is handled entirely by CSS via .section-slide class
+        // Background and foreground colours are derived from brand.yml via SCSS variables
 
         // For banner style, wrap heading in banner div
         if (config.sectionSlideStyle === "banner") {
@@ -189,15 +189,10 @@ window.RevealJsMCanouil = function () {
     const banner = document.createElement("div");
     banner.className = "section-banner";
 
-    // Clone heading into banner
-    const headingClone = heading.cloneNode(true);
-    banner.appendChild(headingClone);
-
-    // Insert banner at start of slide
+    // Insert banner at start of slide, then move heading into it
+    // Using move semantics avoids DOM duplication and accessibility issues
     slide.insertBefore(banner, slide.firstChild);
-
-    // Hide original heading
-    heading.style.display = "none";
+    banner.appendChild(heading);
   }
 
   /**
@@ -276,13 +271,17 @@ window.RevealJsMCanouil = function () {
   function addSectionOutline(slide, subsections) {
     const outline = document.createElement("div");
     outline.className = "section-outline";
+    outline.setAttribute("role", "navigation");
+    outline.setAttribute("aria-label", "Section outline");
 
     const ul = document.createElement("ul");
+    ul.setAttribute("role", "list");
     subsections.forEach(function (sub) {
       const li = document.createElement("li");
       const a = document.createElement("a");
       a.href = "#/" + sub.id;
       a.textContent = sub.text;
+      a.setAttribute("title", "Jump to: " + sub.text);
       li.appendChild(a);
       ul.appendChild(li);
     });
@@ -311,9 +310,10 @@ window.RevealJsMCanouil = function () {
     ];
     const dateElements = document.querySelectorAll(selectors.join(", "));
     dateElements.forEach(function (el) {
+      // Wrap ordinal suffixes in <sup> - styling handled by CSS (.reveal .date sup)
       el.innerHTML = el.innerHTML.replace(
         /(\d+)(st|nd|rd|th)\b/gi,
-        '$1<sup style="font-size: 0.6em; vertical-align: super;">$2</sup>'
+        "$1<sup>$2</sup>"
       );
     });
   }
@@ -382,6 +382,24 @@ window.RevealJsMCanouil = function () {
   // =========================================================================
 
   /**
+   * Get the next available fragment index for a slide.
+   * Finds the maximum existing fragment index and returns the next one.
+   * @param {Element} slide - The slide element
+   * @returns {number} The next available fragment index
+   */
+  function getNextFragmentIndex(slide) {
+    const allFragments = slide.querySelectorAll(".fragment[data-fragment-index]");
+    let maxIndex = -1;
+    allFragments.forEach(function (fragment) {
+      const idx = parseInt(fragment.getAttribute("data-fragment-index"), 10);
+      if (!isNaN(idx) && idx > maxIndex) {
+        maxIndex = idx;
+      }
+    });
+    return maxIndex + 1;
+  }
+
+  /**
    * Set up fragment triggers for code annotations.
    * Creates invisible fragment elements for each annotation anchor,
    * allowing navigation through annotations with arrow keys.
@@ -405,9 +423,8 @@ window.RevealJsMCanouil = function () {
       // Get the parent container to append fragments
       const parentNode = codeBlock.closest(".cell") || codeBlock.parentNode;
 
-      // Find existing fragment count to set proper indices
-      const existingFragments = slide.querySelectorAll(".fragment:not(.code-annotation-fragment)");
-      let currentIndex = existingFragments.length;
+      // Find the next available fragment index (robust: checks existing indices)
+      let currentIndex = getNextFragmentIndex(slide);
 
       // Create invisible fragment triggers for each annotation
       anchors.forEach(function (anchor, i) {
@@ -514,11 +531,17 @@ window.RevealJsMCanouil = function () {
   /**
    * Update menu button, logo, slide number, and footer visibility
    * Hide on title slide, show on all other slides
-   * @param {Object} event - Slide change event or indices object
+   * @param {Object} event - Slide change event or indices object (unused, kept for API compatibility)
    */
   function updateMenuVisibility(event) {
-    const indexh = event.indexh !== undefined ? event.indexh : 0;
-    const isTitle = indexh === 0;
+    // Use class-based detection for robustness (works regardless of slide position)
+    const currentSlide = document.querySelector(
+      ".reveal .slides > section.present, .reveal .slides > section > section.present"
+    );
+    const isTitle = currentSlide && (
+      currentSlide.classList.contains("mcanouil-title-slide") ||
+      currentSlide.classList.contains("quarto-title-block")
+    );
 
     // Menu button - hide on title slide
     const menuButton = document.querySelector(".slide-menu-button");

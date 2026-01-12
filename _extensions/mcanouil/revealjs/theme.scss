@@ -509,3 +509,25 @@ $section-slide-fg: $body-bg !default;
     }
   }
 }
+
+// ===========================
+// SPEAKER NOTES
+// ===========================
+
+.reveal .speaker-notes {
+  font-family: $font-family-sans-serif;
+  font-size: 1.2em;
+  line-height: 1.5;
+
+  h1,
+  h2,
+  h3 {
+    color: $body-color;
+  }
+
+  code {
+    background-color: body-mix(90%);
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+  }
+}

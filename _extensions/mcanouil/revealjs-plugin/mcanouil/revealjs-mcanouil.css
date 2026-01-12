@@ -90,6 +90,38 @@
 }
 
 /* =========================================================================
+   TOUCH TARGET SIZES
+   ========================================================================= */
+
+@media (pointer: coarse) {
+  .reveal .slides section.section-slide .section-outline a {
+    display: inline-block;
+    min-height: 44px;
+    padding: 0.5em;
+  }
+
+  .reveal .slides section.section-slide .section-outline li {
+    margin: 0.5em 0;
+  }
+}
+
+/* =========================================================================
+   REDUCED MOTION
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal .slides section.section-slide .section-outline,
+  .reveal .slides section.section-slide .section-banner {
+    opacity: 1;
+    animation: none;
+  }
+
+  .reveal .slides section.section-slide {
+    transition: none;
+  }
+}
+
+/* =========================================================================
    PRINT/PDF STYLES
    ========================================================================= */
 
@@ -97,10 +129,21 @@
   .reveal .slides section.section-slide .section-outline {
     opacity: 1;
     animation: none;
+    display: block !important;
+    border: 1px solid currentColor;
+    padding: 0.5em;
+    margin-bottom: 1em;
   }
 
   .reveal .slides section.section-slide .section-banner {
     opacity: 1;
     animation: none;
+  }
+
+  /* Ensure code annotations are visible in PDF */
+  .reveal .code-annotation-anchor {
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    padding: 0.1em 0.3em;
   }
 }
