@@ -20,16 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Mickaël CANOUIL Typst Template
-// A branded template matching the mickael.canouil.fr website style
+// Invoice Template
+// Business invoice document type with sender/recipient details, line items, and payment information.
 // Author: Mickaël Canouil
 // License: MIT
-//
-// Note: Document type templates are now in partials/document-types/
-// - report.typ: mcanouil-report (academic/professional reports)
-// - invoice.typ: mcanouil-invoice (business invoices)
-// - letter.typ: mcanouil-letter (formal correspondence)
-// - cv.typ: mcanouil-cv (curriculum vitae)
-//
-// The dispatcher in libs/document-type-dispatcher.typ routes to the
-// appropriate template based on the document-type parameter.
+
+/// Create branded invoice document.
+/// Placeholder implementation; will be fully implemented in a subsequent task.
+///
+/// @param body The document body content (typically line items table).
+/// @param ..args All parameters (forwarded to base template for now).
+/// @return The rendered invoice document.
+#let mcanouil-invoice(
+  ..args,
+) = {
+  // TODO: Implement invoice-specific layout
+  // For now, delegate to mcanouil-report as a placeholder
+  mcanouil-report(..args)
+}

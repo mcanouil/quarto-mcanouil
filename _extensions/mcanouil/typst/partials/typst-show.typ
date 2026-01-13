@@ -21,11 +21,15 @@
 // SOFTWARE.
 
 // Quarto metadata mapping to Typst template
-// Maps YAML frontmatter to mcanouil-article function parameters
+// Maps YAML frontmatter to mcanouil-document dispatcher function parameters.
+// The dispatcher routes to the appropriate template based on document-type.
 // Author: Mickaël Canouil
 // License: MIT
 
-#show: mcanouil-article.with(
+#show: mcanouil-document.with(
+// Document Type (report, invoice, letter, cv)
+
+  document-type: $if(document-type)$"$document-type$"$else$"report"$endif$,
 // Document Metadata
 $if(title)$
   title: [$title$],

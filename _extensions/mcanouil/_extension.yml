@@ -69,6 +69,8 @@ contributes:
         - file: html/scripts/categories-alphabetical.html
         - file: html/scripts/modal-clipboardjs.html
     typst:
+      # Document type
+      document-type: report
       # Brand
       brand-mode: light
       # Logo/Visual assets
@@ -110,6 +112,11 @@ contributes:
         - typst/partials/libs/list-of.typ
         - typst/partials/libs/special-sections.typ
         - typst/partials/libs/section-page.typ
+        - typst/partials/libs/document-type-dispatcher.typ
+        - typst/partials/document-types/report.typ
+        - typst/partials/document-types/invoice.typ
+        - typst/partials/document-types/letter.typ
+        - typst/partials/document-types/cv.typ
         - typst/partials/libs.typ
         - typst/partials/show-rules.typ
         - typst/partials/biblio.typ

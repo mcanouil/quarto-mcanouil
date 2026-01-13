@@ -31,6 +31,13 @@ $show-rules.typ()$
 
 $typst-template.typ()$
 
+// Document type templates (must be loaded after shared components)
+$report.typ()$
+$invoice.typ()$
+$letter.typ()$
+$cv.typ()$
+$document-type-dispatcher.typ()$
+
 $for(header-includes)$
 $header-includes$
 $endfor$
