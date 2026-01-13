@@ -41,7 +41,7 @@ format:
   mcanouil-typst:
     header-footer-style: "professional"  # Header and footer style
     # Colour Mode (light or dark)
-    brand-mode: dark
+    brand-mode: light
 
     # Optional Colour Overrides
     # colour-background: "#fafafa"  # Custom background colour

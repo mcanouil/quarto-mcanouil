@@ -240,7 +240,9 @@
   let content-size = measure(single-column-content)
 
   // Determine if we need two columns
-  let use-two-columns = content-size.height > available-height and subsections.len() >= SECTION-PAGE-OUTLINE-MIN-FOR-COLUMNS
+  let use-two-columns = (
+    content-size.height > available-height and subsections.len() >= SECTION-PAGE-OUTLINE-MIN-FOR-COLUMNS
+  )
 
   // Build inner content (entries with optional two-column layout)
   let inner-content = {
@@ -259,8 +261,7 @@
         columns: (col-width, col-width),
         column-gutter: SECTION-PAGE-OUTLINE-COLUMN-GAP,
         align: (left, left),
-        col1.join(),
-        col2.join(),
+        col1.join(), col2.join(),
       )
     } else {
       entries.join()
@@ -288,19 +289,29 @@
 
   // Build final content with corner brackets at all four corners
   // Brackets are marked as PDF artifacts for accessibility
+  // Using scale() to flip brackets preserves the curve shape correctly
+  // Original bracket: L-corner at (size, 0), legs extend LEFT and UP
+  // - Bottom-right: original (legs go left+up into box)
+  // - Bottom-left: flip x (legs go right+up into box)
+  // - Top-right: flip y (legs go left+down into box)
+  // - Top-left: flip x+y (legs go right+down into box)
+  let bracket-size = SECTION-PAGE-OUTLINE-BRACKET-SIZE
   let final-content = box(
     inset: inset,
     {
-      // Top-right corner bracket (original orientation) - marked as artifact
-      pdf.artifact(place(bottom + right, dx: inset, dy: inset, bracket))
-      // Bottom-left corner bracket (rotated 180deg) - marked as artifact
-      pdf.artifact(place(top + left, dx: -inset, dy: -inset, rotate(180deg, bracket)))
-      // Top-left corner bracket (rotated 90deg) - marked as artifact
-      pdf.artifact(place(bottom + left, dx: -inset, dy: inset, rotate(90deg, bracket)))
-      // Bottom-right corner bracket (rotated 270deg) - marked as artifact
-      pdf.artifact(place(top + right, dx: inset, dy: -inset, rotate(270deg, bracket)))
+      // Bottom-right corner bracket (original)
+      pdf.artifact(place(bottom + right, dx: inset - bracket-size, dy: inset - bracket-size, bracket))
+      // Bottom-left corner bracket (flip horizontally)
+      pdf.artifact(place(bottom + left, dx: -inset + bracket-size, dy: inset - bracket-size, scale(x: -100%, bracket)))
+      // Top-right corner bracket (flip vertically)
+      pdf.artifact(place(top + right, dx: inset - bracket-size, dy: -inset + bracket-size, scale(y: -100%, bracket)))
+      // Top-left corner bracket (flip both = 180deg rotation)
+      pdf.artifact(place(top + left, dx: -inset + bracket-size, dy: -inset + bracket-size, scale(
+        x: -100%,
+        y: -100%,
+        bracket,
+      )))
 
-      // Ensure content is left-aligned within the box
       align(left, inner-content)
     },
   )
