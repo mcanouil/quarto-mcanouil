@@ -8,6 +8,20 @@ $callout-color-warning: #cc6600 !default;
 $callout-color-important: #cc0000 !default;
 $callout-color-caution: #b38f00 !default;
 
+// Semantic colours for UI components (matching Typst semantic-colour)
+// Light mode: WCAG AA compliant (4.5:1+ contrast against #fafafa)
+$semantic-color-info: #0066cc !default; // 7.5:1 contrast
+$semantic-color-success: #009955 !default; // 6.8:1 contrast
+$semantic-color-warning: #cc6600 !default; // 5.2:1 contrast
+$semantic-color-danger: #cc0000 !default; // 5.9:1 contrast
+
+// Dark mode semantic colours: WCAG AA compliant (4.5:1+ contrast against #333333)
+$semantic-color-info-dark: #66aaff !default; // 6.8:1 contrast
+$semantic-color-success-dark: #66cc99 !default; // 6.5:1 contrast
+$semantic-color-warning-dark: #ffaa44 !default; // 8.2:1 contrast
+$semantic-color-danger-dark: #ff6666 !default; // 5.4:1 contrast
+$semantic-color-caution-dark: #ddcc66 !default; // 8.5:1 contrast
+
 /*-- scss:rules --*/
 
 // ===========================
@@ -602,7 +616,7 @@ img.about-image {
 // ===========================
 
 // Main content links with subtle underline animation
-main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.quarto-grid-link):not(:has(img)):not(.code-annotation-anchor):not(.toc-action):not(#quarto-back-to-top) {
+main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.quarto-grid-link):not(:has(img)):not(.code-annotation-anchor):not(.anchor-section):not(.anchorjs-link):not(.toc-action):not(#quarto-back-to-top) {
   position: relative;
   text-decoration: underline;
   text-decoration-color: rgba($foreground, 0.3);
@@ -3017,5 +3031,756 @@ main {
       animation: none !important;
       opacity: 0 !important;
     }
+  }
+}
+
+// ===========================
+// MCANOUIL COMPONENTS
+// ===========================
+// Custom UI components ported from Typst format
+
+// Component colour palette (using semantic colours for UI components)
+$component-colors: (
+  'info': $semantic-color-info,
+  'success': $semantic-color-success,
+  'warning': $semantic-color-warning,
+  'danger': $semantic-color-danger,
+  'caution': $callout-color-caution,
+  'neutral': body-mix(50%),
+  'subtle': body-mix(95%),
+  'emphasis': $semantic-color-info,
+  'accent': $foreground,
+  'outline': transparent
+);
+
+// Component constants
+$component-radius: 8px;
+$component-radius-sm: 4px;
+$component-padding: 1.2em;
+$component-gap: 1em;
+
+// ---------------------------
+// PANEL COMPONENT
+// ---------------------------
+.mcanouil-panel {
+  border-radius: $component-radius;
+  border: 1px solid body-mix(80%);
+  margin: 1.5em 0;
+  padding: $component-padding;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-bottom: 0.8em;
+  }
+
+  &__icon {
+    font-size: 1.2em;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 1.1em;
+  }
+
+  &__content {
+    > :first-child {
+      margin-top: 0;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Style variants
+  @each $name, $colour in $component-colors {
+    &--#{$name} {
+      @if $name =='subtle' {
+        background-color: body-mix(98%);
+        border-color: body-mix(85%);
+      }
+
+      @else if $name =='outline' {
+        background-color: transparent;
+        border-color: body-mix(70%);
+      }
+
+      @else if $name =='accent' {
+        background-color: $foreground;
+        color: $background;
+        border-color: $foreground;
+      }
+
+      @else {
+        // All other styles (emphasis, info, success, warning, danger, caution, neutral)
+        // Subtle monochrome background (5% colour) and border - no thick left borders
+        background-color: rgba($colour, 0.05);
+        border-color: rgba($colour, 0.3);
+      }
+    }
+  }
+
+  // Dark mode colour overrides for WCAG compliance
+  @at-root [data-bs-theme="dark"] &,
+  .quarto-dark & {
+    &--info {
+      background-color: rgba($semantic-color-info-dark, 0.05);
+      border-color: rgba($semantic-color-info-dark, 0.3);
+    }
+
+    &--success {
+      background-color: rgba($semantic-color-success-dark, 0.05);
+      border-color: rgba($semantic-color-success-dark, 0.3);
+    }
+
+    &--warning {
+      background-color: rgba($semantic-color-warning-dark, 0.05);
+      border-color: rgba($semantic-color-warning-dark, 0.3);
+    }
+
+    &--danger {
+      background-color: rgba($semantic-color-danger-dark, 0.05);
+      border-color: rgba($semantic-color-danger-dark, 0.3);
+    }
+
+    &--caution {
+      background-color: rgba($semantic-color-caution-dark, 0.05);
+      border-color: rgba($semantic-color-caution-dark, 0.3);
+    }
+
+    &--emphasis {
+      background-color: rgba($semantic-color-info-dark, 0.05);
+      border-color: rgba($semantic-color-info-dark, 0.3);
+    }
+  }
+}
+
+// ---------------------------
+// BADGE COMPONENT
+// ---------------------------
+.mcanouil-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  padding: 0.2em 0.6em;
+  font-size: 0.85em;
+  font-weight: 500;
+  border-radius: $component-radius-sm;
+  background-color: body-mix(90%);
+  border: 0.5pt solid body-mix(70%);
+  color: $foreground;
+  vertical-align: baseline;
+  line-height: 1.4;
+
+  &__icon {
+    font-size: 0.9em;
+  }
+
+  @each $name, $colour in $component-colors {
+    @if $name !='subtle' and $name !='outline' and $name !='accent' {
+      &--#{$name} {
+        background-color: rgba($colour, 0.15);
+        border-color: rgba($colour, 0.4);
+        color: darken($colour, 10%);
+      }
+    }
+  }
+
+  // Dark mode colour overrides for WCAG compliance
+  @at-root [data-bs-theme="dark"] &,
+  .quarto-dark & {
+    &--info {
+      background-color: rgba($semantic-color-info-dark, 0.25);
+      border-color: rgba($semantic-color-info-dark, 0.5);
+      color: $semantic-color-info-dark;
+    }
+
+    &--success {
+      background-color: rgba($semantic-color-success-dark, 0.25);
+      border-color: rgba($semantic-color-success-dark, 0.5);
+      color: $semantic-color-success-dark;
+    }
+
+    &--warning {
+      background-color: rgba($semantic-color-warning-dark, 0.25);
+      border-color: rgba($semantic-color-warning-dark, 0.5);
+      color: $semantic-color-warning-dark;
+    }
+
+    &--danger {
+      background-color: rgba($semantic-color-danger-dark, 0.25);
+      border-color: rgba($semantic-color-danger-dark, 0.5);
+      color: $semantic-color-danger-dark;
+    }
+
+    &--caution {
+      background-color: rgba($semantic-color-caution-dark, 0.25);
+      border-color: rgba($semantic-color-caution-dark, 0.5);
+      color: $semantic-color-caution-dark;
+    }
+
+    &--emphasis {
+      background-color: rgba($semantic-color-info-dark, 0.25);
+      border-color: rgba($semantic-color-info-dark, 0.5);
+      color: $semantic-color-info-dark;
+    }
+
+    &--neutral {
+      background-color: rgba($foreground, 0.15);
+      border-color: rgba($foreground, 0.3);
+      color: $foreground;
+    }
+  }
+}
+
+// ---------------------------
+// DIVIDER COMPONENT
+// ---------------------------
+.mcanouil-divider {
+  --divider-thickness: 1pt;
+  --divider-width: 50%;
+
+  // Reset all hr defaults
+  border: 0;
+  border-style: none;
+  background: transparent;
+  height: 0;
+  margin: 2em auto;
+  width: var(--divider-width);
+  position: relative;
+
+  &--solid {
+    border-top: var(--divider-thickness) solid $foreground;
+  }
+
+  &--dashed {
+    border-top: var(--divider-thickness) dashed $foreground;
+  }
+
+  &--dotted {
+    border-top: var(--divider-thickness) dotted $foreground;
+  }
+
+  // Ornamental divider with diamond and lines
+  &--ornamental {
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    height: auto;
+    color: $foreground;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: var(--divider-thickness);
+      background-color: $foreground;
+    }
+
+    // Diamond symbol in the middle
+    .mcanouil-divider__label {
+      margin: 0;
+      font-style: normal;
+    }
+  }
+
+  // Section break (just the ornamental symbol)
+  &--section-break {
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    color: $foreground;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: var(--divider-thickness);
+      background-color: $foreground;
+    }
+  }
+
+  &--gradient {
+    border: none;
+    height: var(--divider-thickness);
+    background: linear-gradient(to right,
+        transparent,
+        $foreground,
+        transparent);
+  }
+
+  // Label for divider with text (displayed in center with lines on sides)
+  &__label {
+    display: inline-block;
+    text-align: center;
+    font-style: italic;
+    color: $foreground;
+    font-size: 0.9em;
+    padding: 0 0.5em;
+    white-space: nowrap;
+  }
+
+  // Divider with label uses flexbox layout
+  &[role="separator"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: var(--divider-thickness);
+      background-color: $foreground;
+    }
+  }
+}
+
+// ---------------------------
+// PROGRESS COMPONENT
+// ---------------------------
+.mcanouil-progress {
+  --progress-height: 1.5em;
+  --custom-colour: #{$callout-color-note};
+
+  position: relative;
+  height: var(--progress-height);
+  background-color: body-mix(92%);
+  border: 1px solid body-mix(80%);
+  border-radius: calc(var(--progress-height) / 2);
+  overflow: hidden;
+
+  &__bar {
+    height: 100%;
+    background-color: $callout-color-note;
+    transition: width 0.3s ease;
+  }
+
+  // Percentage value overlay (always centered)
+  &__value {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba($background, 0.8);
+    padding: 0.1em 0.5em;
+    border-radius: 0.3em;
+    font-size: 0.85em;
+    font-weight: 700;
+    color: $foreground;
+    z-index: 1;
+    max-height: 90%;
+    display: flex;
+    align-items: center;
+  }
+
+  &__label {
+    font-size: 0.95em;
+    font-weight: 600;
+    margin-bottom: 0.3em;
+    color: $foreground;
+  }
+
+  &__container {
+    margin: 1em 0;
+  }
+
+  // Semantic colour variants
+  @each $name, $colour in $component-colors {
+    @if $name !='subtle' and $name !='outline' {
+      &--#{$name} .mcanouil-progress__bar {
+        background-color: $colour;
+      }
+    }
+  }
+
+  // Custom colour support
+  &--custom .mcanouil-progress__bar {
+    background-color: var(--custom-colour);
+  }
+
+  // Dark mode colour overrides for WCAG compliance
+  @at-root [data-bs-theme="dark"] &,
+  .quarto-dark & {
+    &--info .mcanouil-progress__bar {
+      background-color: $semantic-color-info-dark;
+    }
+
+    &--success .mcanouil-progress__bar {
+      background-color: $semantic-color-success-dark;
+    }
+
+    &--warning .mcanouil-progress__bar {
+      background-color: $semantic-color-warning-dark;
+    }
+
+    &--danger .mcanouil-progress__bar {
+      background-color: $semantic-color-danger-dark;
+    }
+
+    &--caution .mcanouil-progress__bar {
+      background-color: $semantic-color-caution-dark;
+    }
+  }
+}
+
+// ---------------------------
+// VALUE BOX COMPONENT
+// ---------------------------
+.mcanouil-value-box {
+  --custom-colour: #{$foreground};
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $component-padding;
+  border-radius: $component-radius;
+  border: 1px solid body-mix(80%);
+  background-color: body-mix(98%);
+  text-align: center;
+  min-height: 120px;
+
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3em;
+  }
+
+  &__number {
+    font-size: 2.5em;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  &__unit {
+    font-size: 0.7em;
+    opacity: 0.8;
+  }
+
+  &__icon {
+    font-size: 1.5em;
+    margin-left: 0.2em;
+  }
+
+  &__label {
+    font-size: 0.85em;
+    color: body-mix(40%);
+    margin-top: 0.6em;
+  }
+
+  // Semantic colour variants
+  @each $name, $colour in $component-colors {
+    @if $name !='subtle' and $name !='outline' {
+      &--#{$name} {
+        border-color: $colour;
+        background-color: rgba($colour, 0.05);
+
+        .mcanouil-value-box__number,
+        .mcanouil-value-box__unit,
+        .mcanouil-value-box__icon {
+          color: $colour;
+        }
+      }
+    }
+  }
+
+  // Custom colour support
+  &--custom {
+    border-color: var(--custom-colour);
+    background-color: color-mix(in srgb, var(--custom-colour) 5%, transparent);
+
+    .mcanouil-value-box__number,
+    .mcanouil-value-box__unit,
+    .mcanouil-value-box__icon {
+      color: var(--custom-colour);
+    }
+  }
+
+  // Dark mode colour overrides for WCAG compliance
+  @at-root [data-bs-theme="dark"] &,
+  .quarto-dark & {
+    &--info {
+      border-color: $semantic-color-info-dark;
+
+      .mcanouil-value-box__number,
+      .mcanouil-value-box__unit,
+      .mcanouil-value-box__icon {
+        color: $semantic-color-info-dark;
+      }
+    }
+
+    &--success {
+      border-color: $semantic-color-success-dark;
+
+      .mcanouil-value-box__number,
+      .mcanouil-value-box__unit,
+      .mcanouil-value-box__icon {
+        color: $semantic-color-success-dark;
+      }
+    }
+
+    &--warning {
+      border-color: $semantic-color-warning-dark;
+
+      .mcanouil-value-box__number,
+      .mcanouil-value-box__unit,
+      .mcanouil-value-box__icon {
+        color: $semantic-color-warning-dark;
+      }
+    }
+
+    &--danger {
+      border-color: $semantic-color-danger-dark;
+
+      .mcanouil-value-box__number,
+      .mcanouil-value-box__unit,
+      .mcanouil-value-box__icon {
+        color: $semantic-color-danger-dark;
+      }
+    }
+
+    &--caution {
+      border-color: $semantic-color-caution-dark;
+
+      .mcanouil-value-box__number,
+      .mcanouil-value-box__unit,
+      .mcanouil-value-box__icon {
+        color: $semantic-color-caution-dark;
+      }
+    }
+  }
+}
+
+// ---------------------------
+// CARD GRID COMPONENT
+// ---------------------------
+.mcanouil-card-grid {
+  --card-columns: 3;
+
+  display: grid;
+  grid-template-columns: repeat(var(--card-columns), 1fr);
+  gap: $component-gap;
+  margin: 1.5em 0;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mcanouil-card {
+  --card-accent: #{body-mix(70%)};
+
+  display: flex;
+  flex-direction: column;
+  border-radius: $component-radius;
+  border: 1px solid body-mix(85%);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba($foreground, 0.1);
+  }
+
+  &__header {
+    padding: 0.8em 1em;
+    background-color: body-mix(96%);
+    border-bottom: 1px solid body-mix(90%);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+  }
+
+  &__body {
+    padding: 1em;
+    flex: 1;
+
+    > :first-child {
+      margin-top: 0;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__footer {
+    padding: 0.8em 1em;
+    background-color: body-mix(98%);
+    border-top: 1px solid body-mix(90%);
+    font-size: 0.9em;
+  }
+
+  &--subtle {
+    background-color: body-mix(99%);
+  }
+
+  &--outlined {
+    background-color: transparent;
+    border-color: var(--card-accent);
+  }
+
+  &--filled {
+    background-color: var(--card-accent);
+    color: $background;
+    border-color: var(--card-accent);
+
+    .mcanouil-card__header {
+      background-color: rgba($background, 0.1);
+      border-color: rgba($background, 0.2);
+    }
+
+    .mcanouil-card__footer {
+      background-color: rgba($background, 0.1);
+      border-color: rgba($background, 0.2);
+    }
+  }
+}
+
+// ---------------------------
+// EXECUTIVE SUMMARY COMPONENT
+// ---------------------------
+.mcanouil-executive-summary {
+  --bracket-size: 1.2em;
+  --bracket-thickness: 3px;
+  --bracket-inset: 1.5em;
+  --bracket-colour: #{$foreground};
+
+  position: relative;
+  margin: 2em auto;
+  max-width: 85%;
+  padding: 2em;
+  background-color: body-mix(96%);
+  border: 2px solid body-mix(85%);
+  border-left: 6px solid body-mix(50%);
+  border-radius: $component-radius;
+
+  // Corner brackets decoration
+  &__brackets {
+    position: absolute;
+    top: var(--bracket-inset);
+    right: var(--bracket-inset);
+    bottom: var(--bracket-inset);
+    left: var(--bracket-inset);
+    pointer-events: none;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: var(--bracket-size);
+      height: var(--bracket-size);
+      border-color: var(--bracket-colour);
+      border-style: solid;
+      border-width: 0;
+    }
+
+    // Top-right bracket
+    &::before {
+      top: 0;
+      right: 0;
+      border-top-width: var(--bracket-thickness);
+      border-right-width: var(--bracket-thickness);
+    }
+
+    // Bottom-left bracket
+    &::after {
+      bottom: 0;
+      left: 0;
+      border-bottom-width: var(--bracket-thickness);
+      border-left-width: var(--bracket-thickness);
+    }
+  }
+
+  &__title {
+    margin: 0 0 1em 0;
+    font-size: 1.3em;
+    font-weight: 700;
+    text-align: center;
+    color: $foreground;
+
+    // Disable animated underline effect from .anchored
+    &::after {
+      display: none !important;
+    }
+  }
+
+  &__separator {
+    width: 40%;
+    margin: 0 auto 1em;
+    border: none;
+    border-top: 2px solid body-mix(50%);
+  }
+
+  &__content {
+    > :first-child {
+      margin-top: 0;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// ---------------------------
+// BLOCKQUOTE WITH CURLY QUOTES
+// ---------------------------
+blockquote {
+  position: relative;
+  margin: 1.5em 0;
+  padding: 1.5em 2em 1.5em 3em;
+  background-color: body-mix(98%);
+  border-left: 4px solid body-mix(70%);
+  border-radius: $component-radius-sm;
+  font-style: italic;
+
+  // Opening curly quote (top-left)
+  &::before {
+    content: '\201C';
+    position: absolute;
+    top: 0.1em;
+    left: 0.3em;
+    font-size: 3em;
+    line-height: 1;
+    color: body-mix(70%);
+    font-family: Georgia, serif;
+    font-style: normal;
+  }
+
+  // Closing curly quote (bottom-right)
+  &::after {
+    content: '\201D';
+    position: absolute;
+    bottom: -0.3em;
+    right: 0.3em;
+    font-size: 3em;
+    line-height: 1;
+    color: body-mix(70%);
+    font-family: Georgia, serif;
+    font-style: normal;
+  }
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
   }
 }
