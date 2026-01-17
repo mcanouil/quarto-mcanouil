@@ -134,7 +134,8 @@ M.render_value_box = function(kwargs, config)
   local icon_html = ''
   if icon then
     local icon_char = html_utils.get_icon(icon)
-    icon_html = html_utils.bem_span('value-box', 'icon', nil, { ['aria-hidden'] = 'true' }, html_utils.escape_html(icon_char))
+    icon_html = html_utils.bem_span('value-box', 'icon', nil, { ['aria-hidden'] = 'true' },
+      html_utils.escape_html(icon_char))
   end
 
   -- Build value row
@@ -176,7 +177,8 @@ M.render_badge = function(kwargs, config)
   local icon_html = ''
   if icon then
     local icon_char = html_utils.get_icon(icon)
-    icon_html = html_utils.bem_span('badge', 'icon', nil, { ['aria-hidden'] = 'true' }, html_utils.escape_html(icon_char)) .. ' '
+    icon_html = html_utils.bem_span('badge', 'icon', nil, { ['aria-hidden'] = 'true' }, html_utils.escape_html(icon_char)) ..
+    ' '
   end
 
   local text_html = html_utils.bem_span('badge', 'text', nil, nil, html_utils.escape_html(text))

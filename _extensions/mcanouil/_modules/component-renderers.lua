@@ -227,14 +227,25 @@ M.render_card = function(div, config)
   table.insert(result, pandoc.RawBlock('html', string.format('<div class="%s">', html_utils.bem_class('card', 'body'))))
 
   -- Process content, separating footer
+  -- Supports both explicit .card-footer divs and HorizontalRule (---) separator
   local footer_content = {}
   local body_content = {}
+  local found_hr = false
+
   for _, item in ipairs(div.content) do
     if item.t == 'Div' and item.classes and item.classes:includes('card-footer') then
+      -- Explicit card-footer div
       for _, footer_item in ipairs(item.content) do
         table.insert(footer_content, footer_item)
       end
+    elseif item.t == 'HorizontalRule' then
+      -- HorizontalRule marks start of footer section
+      found_hr = true
+    elseif found_hr then
+      -- Content after HorizontalRule goes to footer
+      table.insert(footer_content, item)
     else
+      -- Content before HorizontalRule goes to body
       table.insert(body_content, item)
     end
   end

@@ -110,6 +110,7 @@
    ========================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+
   .reveal .slides section.section-slide .section-outline,
   .reveal .slides section.section-slide .section-banner {
     opacity: 1;

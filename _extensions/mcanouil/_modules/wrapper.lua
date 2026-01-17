@@ -179,7 +179,8 @@ local function create_wrapped_handler(block, extract_title, extra_attrs)
     end
 
     -- Add content wrapper opening
-    table.insert(result, pandoc.RawBlock('html', string.format('<div class="%s">', html_utils.bem_class(block, 'content'))))
+    table.insert(result,
+      pandoc.RawBlock('html', string.format('<div class="%s">', html_utils.bem_class(block, 'content'))))
 
     -- Add original content
     for _, item in ipairs(div.content) do

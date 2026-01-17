@@ -23,11 +23,11 @@ contributes:
       page-footer:
         border: true
         left: |
-          Powered by [Quarto](https://quarto.org).
+          Powered by [Quarto](https://quarto.org){target="_blank" rel="noopener noreferrer"}.
         center: |
           &copy; []{#current-year} Mickaël CANOUIL.
         right: |
-          [CC BY NC SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+          [CC BY NC SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/){target="_blank" rel="noopener noreferrer"}.
     format: mcanouil-html
   formats:
     common:
@@ -37,7 +37,8 @@ contributes:
         - shortcodes/progress.lua
         - shortcodes/badge.lua
       filters:
-        - filters/components.lua
+        - at: pre-quarto
+          path: filters/components.lua
     html:
       # Theme
       theme:
@@ -73,6 +74,7 @@ contributes:
         - file: html/scripts/current-year.html
         - file: html/scripts/categories-alphabetical.html
         - file: html/scripts/modal-clipboardjs.html
+        - file: html/scripts/external-links.html
     typst:
       # Document type
       document-type: report
@@ -202,9 +204,9 @@ contributes:
       code-annotations: select
       # Footer/Closing
       footer: |
-        <a href="https://mickael.canouil.fr/">mickael.canouil.fr</a>
+        <a href="https://mickael.canouil.fr/" target="_blank" rel="noopener noreferrer">mickael.canouil.fr</a>
         |
-        <a href="https://creativecommons.org/licenses/by-sa/4.0/">License: CC-BY-SA-4.0</a>
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">License: CC-BY-SA-4.0</a>
       closing-slide:
         photo: "https://github.com/mcanouil.png"
         title: "Independent Consultant"

@@ -72,11 +72,11 @@ M.escape_html = function(text)
   if text == nil then return '' end
   if type(text) ~= 'string' then text = tostring(text) end
   local result = text
-    :gsub('&', '&amp;')
-    :gsub('<', '&lt;')
-    :gsub('>', '&gt;')
-    :gsub('"', '&quot;')
-    :gsub("'", '&#39;')
+      :gsub('&', '&amp;')
+      :gsub('<', '&lt;')
+      :gsub('>', '&gt;')
+      :gsub('"', '&quot;')
+      :gsub("'", '&#39;')
   return result
 end
 
@@ -90,10 +90,10 @@ M.escape_attribute = function(value)
   if value == nil then return '' end
   if type(value) ~= 'string' then value = tostring(value) end
   local result = value
-    :gsub('&', '&amp;')
-    :gsub('"', '&quot;')
-    :gsub('<', '&lt;')
-    :gsub('>', '&gt;')
+      :gsub('&', '&amp;')
+      :gsub('"', '&quot;')
+      :gsub('<', '&lt;')
+      :gsub('>', '&gt;')
   return result
 end
 
@@ -404,7 +404,8 @@ M.render_progress = function(kwargs, config)
       M.bem_class('progress', 'value'),
       value)
   end
-  local bar_html = string.format('<div class="%s" style="%s" role="progressbar" aria-valuenow="%d" aria-valuemin="0" aria-valuemax="100">%s</div>',
+  local bar_html = string.format(
+    '<div class="%s" style="%s" role="progressbar" aria-valuenow="%d" aria-valuemin="0" aria-valuemax="100">%s</div>',
     M.bem_class('progress', 'bar'),
     bar_style,
     value,

@@ -56,9 +56,9 @@ local function extract_card(div)
   return {
     title = parsed.header_text,
     content = parsed.body_blocks and #parsed.body_blocks > 0
-      and utils.stringify(parsed.body_blocks) or nil,
+        and utils.stringify(parsed.body_blocks) or nil,
     footer = parsed.footer_blocks and #parsed.footer_blocks > 0
-      and utils.stringify(parsed.footer_blocks) or nil,
+        and utils.stringify(parsed.footer_blocks) or nil,
     style = div.attributes.style,
     colour = div.attributes.colour
   }
