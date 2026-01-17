@@ -22,7 +22,7 @@
 # SOFTWARE.
 ]]
 
---- @module config
+--- @module typst-config
 --- @author Mickaël Canouil
 --- @version 1.0.0
 --- @brief Configuration parsing and validation for typst-markdown filter
@@ -33,7 +33,7 @@
 -- ============================================================================
 
 local utils = require(
-  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('../_modules/typst-core-utils.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================
@@ -80,14 +80,6 @@ local function get_builtin_mappings()
       },
       ['card-grid'] = {
         wrapper = 'mcanouil-card-grid',
-        arguments = true
-      },
-      ['timeline'] = {
-        wrapper = 'mcanouil-timeline',
-        arguments = true
-      },
-      ['horizontal-timeline'] = {
-        wrapper = 'mcanouil-horizontal-timeline',
         arguments = true
       }
     },

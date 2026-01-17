@@ -399,20 +399,6 @@ $endif$
   render-executive-summary(content, colours: mcanouil-colours(mode: effective-brand-mode), ..args)
 }
 
-// Wrapper for timeline rendering
-#let mcanouil-timeline(events, ..args) = {
-  render-timeline(events, mcanouil-colours(mode: effective-brand-mode), ..args)
-}
-
-// Wrapper for horizontal timeline rendering
-// Horizontal timelines are not breakable to maintain visual integrity
-#let mcanouil-horizontal-timeline(events, ..args) = {
-  block(
-    breakable: false,
-    render-horizontal-timeline(events, mcanouil-colours(mode: effective-brand-mode), ..args)
-  )
-}
-
 // Wrapper for card grid rendering
 #let mcanouil-card-grid(cards, ..args) = {
   render-card-grid(cards, mcanouil-colours(mode: effective-brand-mode), ..args)

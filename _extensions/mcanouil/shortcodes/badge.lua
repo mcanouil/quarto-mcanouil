@@ -22,16 +22,22 @@
 # SOFTWARE.
 ]]
 
---- @module progress
+--- @module badge
 --- @author Mickaël Canouil
 --- @version 1.0.0
---- @brief Progress bar shortcode for Typst format
---- @description Provides {{< progress >}} shortcode for rendering progress bars.
---- This shortcode generates calls to #mcanouil-progress defined in typst-show.typ.
+--- @brief Format-agnostic badge shortcode
+--- @description Provides {{< badge >}} shortcode for rendering inline badges
+--- for HTML and Reveal.js formats. Returns Null for Typst (badges use span syntax).
 
---- Load Typst utilities module
-local typst_utils = require(
-  quarto.utils.resolve_path('../_modules/typst-utils.lua'):gsub('%.lua$', '')
+-- ============================================================================
+-- MODULE IMPORTS
+-- ============================================================================
+
+local format_utils = require(
+  quarto.utils.resolve_path('../_modules/format-utils.lua'):gsub('%.lua$', '')
+)
+local shortcode_renderers = require(
+  quarto.utils.resolve_path('../_modules/shortcode-renderers.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================
@@ -40,5 +46,16 @@ local typst_utils = require(
 
 --- @type table<string, function> Shortcode handlers
 return {
-  ['progress'] = typst_utils.create_shortcode_handler('mcanouil-progress')
+  ['badge'] = function(_args, kwargs, _meta)
+    local format = format_utils.get_format()
+
+    if format == 'html' or format == 'revealjs' then
+      -- HTML-based rendering
+      local config = format_utils.get_config()
+      return pandoc.RawInline('html', shortcode_renderers.render_badge(kwargs, config))
+    end
+
+    -- Typst uses [text]{.badge} span syntax, not a shortcode
+    return pandoc.Null()
+  end
 }

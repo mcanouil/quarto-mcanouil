@@ -23,7 +23,7 @@
 ]]
 
 --- MC Utils - Common utility functions for Quarto Lua filters and shortcodes
---- @module utils
+--- @module typst-core-utils
 --- @author Mickaël Canouil
 --- @version 1.0.0
 

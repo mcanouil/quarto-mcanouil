@@ -22,7 +22,7 @@
 # SOFTWARE.
 ]]
 
---- @module badges
+--- @module typst-badges
 --- @author Mickaël Canouil
 --- @version 1.0.0
 --- @brief Handles badge spans for visual indicators
@@ -33,10 +33,10 @@
 -- ============================================================================
 
 local wrapper = require(
-  quarto.utils.resolve_path('../_modules/wrapper.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('../_modules/typst-wrapper.lua'):gsub('%.lua$', '')
 )
 local utils = require(
-  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('../_modules/typst-core-utils.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================

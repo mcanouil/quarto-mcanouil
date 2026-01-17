@@ -26,7 +26,7 @@ author:
 date: today
 abstract: |
   This document showcases all features of the Mickaël CANOUIL Typst template for Quarto.
-  It demonstrates template-specific components including value boxes, info panels, status badges, dividers, progress bars, timelines, card grids, and executive summaries.
+  It demonstrates template-specific components including value boxes, info panels, status badges, dividers, progress bars, card grids, and executive summaries.
   Additionally, it covers standard Quarto features such as figures, tables, mathematical notation, callouts, code blocks, and cross-references.
   Use this document as both a learning resource and a quick reference guide for all available template capabilities.
 keywords:
@@ -38,6 +38,10 @@ keywords:
 lang: en-GB
 copyright: "© 2026 Mickaël CANOUIL"
 format:
+  mcanouil-html: default
+  mcanouil-revealjs:
+    scrollable: true
+    output-ext: revealjs.html
   mcanouil-typst:
     header-footer-style: "professional"  # Header and footer style
     # Colour Mode (light or dark)
@@ -158,7 +162,7 @@ Each section includes working examples you can copy and adapt for your own docum
 
 This demonstration is organised into six main sections:
 
-1. **Template-Specific Components** (@sec-components): Value boxes, panels, badges, dividers, progress bars, timelines, card grids, and executive summaries.
+1. **Template-Specific Components** (@sec-components): Value boxes, panels, badges, dividers, progress bars, card grids, and executive summaries.
 2. **Quarto Features** (@sec-quarto): Figures, tables, mathematics, callouts, and code blocks.
 3. **Typography and Layout** (@sec-typography): Headings, lists, quotations, asides, and layout features.
 4. **Advanced Features** (@sec-advanced): Footnotes, citations, custom cross-references, and special sections.
@@ -391,62 +395,6 @@ Progress bars visualise completion, distribution, or proportions.
 - `height`: Bar height (default: 1.5em).
 - `show-percentage`: Display percentage label (default: true).
 
-### Timelines {#sec-timelines}
-
-Timeline components display chronological events in vertical or horizontal layouts.
-
-#### Vertical Timeline
-
-::: {.timeline}
-::: {.event title="Project Launch" date="2020"}
-Initial planning, requirements gathering, and stakeholder alignment for the new system architecture.
-:::
-
-::: {.event date="2021"}
-## Development Phase
-
-Core system implementation with iterative testing, refinement, and continuous integration.
-:::
-
-::: {.event date="2022"}
-## Beta Launch
-
-Limited release to select users for comprehensive feedback, bug identification, and usability testing.
-:::
-
-::: {.event date="2023"}
-## Production Release
-
-Full public release with comprehensive documentation, training materials, and support infrastructure.
-:::
-
-::: {.event date="2024"}
-## Version 2.0
-
-Major update featuring enhanced performance, new capabilities, and improved user experience.
-:::
-:::
-
-#### Horizontal Timeline
-
-For fewer events, horizontal timelines provide a compact overview:
-
-::: {.timeline orientation="horizontal" alt="Project timeline showing quarterly milestones for 2024"}
-## Q1 2024: Planning
-## Q2 2024: Development
-## Q3 2024: Testing
-## Q4 2024: Launch
-:::
-
-**Timeline Features:**
-
-- Vertical or horizontal layout options.
-- Event dates and titles.
-- Optional detailed descriptions.
-- Automatic spacing and professional markers.
-- Adapts to light and dark colour modes.
-- Optional `alt` parameter for accessibility (wraps grid in figure with alt text).
-
 ### Card Grids {#sec-cards}
 
 Card grids provide flexible layouts for displaying content in card format.
@@ -559,22 +507,47 @@ The template supports all standard Quarto features with enhanced styling.
 
 #### Simple Figure
 
-![An example figure demonstrating basic figure capabilities with caption and cross-referencing.]({{< placeholder 600 400 >}}){#fig-example}
+::: {#fig-example}
+
+{{< placeholder 600 400 >}}
+
+An example figure demonstrating basic figure capabilities with caption and cross-referencing.
+
+:::
 
 Reference the figure using @fig-example in your text.
 
 #### Figure with Custom Width
 
-![A wider figure spanning more of the page width to demonstrate flexible sizing.]({{< placeholder 800 300 >}}){#fig-wide width=100%}
+::: {#fig-wide width=100%}
+
+{{< placeholder 800 300 >}}
+
+A wider figure spanning more of the page width to demonstrate flexible sizing.
+
+:::
 
 See @fig-wide for the wider figure example.
 
 #### Subfigures
 
 ::: {#fig-multiple layout-ncol=2}
-![First subfigure showing left panel.]({{< placeholder 400 300 >}}){#fig-sub1}
 
-![Second subfigure showing right panel.]({{< placeholder 400 300 >}}){#fig-sub2}
+::: {#fig-sub1}
+
+{{< placeholder 400 300 >}}
+
+First subfigure showing left panel.
+
+:::
+
+::: {#fig-sub2}
+
+{{< placeholder 400 300 >}}
+
+Second subfigure showing right panel.
+
+:::
 
 Two subfigures arranged side by side demonstrating multi-panel layouts.
 :::
@@ -1023,9 +996,8 @@ The template provides eight specialised components:
 3. **Status Badges** (@sec-badges): Provide compact inline status indicators with five colour types.
 4. **Dividers** (@sec-dividers): Create visual separation with multiple style options (solid, dashed, dotted, gradient, ornamental).
 5. **Progress Bars** (@sec-progress): Visualise completion and proportions with customisable colours.
-6. **Timelines** (@sec-timelines): Display chronological events in vertical or horizontal layouts.
-7. **Card Grids** (@sec-cards): Present content in flexible card layouts with three style variants.
-8. **Executive Summaries** (@sec-exec-summary): Create prominent summary blocks for professional reports.
+6. **Card Grids** (@sec-cards): Present content in flexible card layouts with three style variants.
+7. **Executive Summaries** (@sec-exec-summary): Create prominent summary blocks for professional reports.
 
 ### Quarto Features
 
@@ -1066,7 +1038,7 @@ The template is designed with PDF accessibility (PDF/UA-1) compliance in mind:
 - **PDF/UA-1 Standard**: Enabled by default via `pdf-standard: ua-1` (requires Typst >= 0.14).
 - **Semantic Structure**: Proper heading hierarchy, tables with headers, and semantic elements.
 - **Decorative Elements as Artifacts**: Corner brackets, margin decorations, watermarks, and other decorative elements are marked as PDF artifacts so screen readers skip them.
-- **Alt Text Support**: Grid-based components (horizontal timelines, card grids, value box grids) support an optional `alt` parameter for accessibility descriptions.
+- **Alt Text Support**: Grid-based components (card grids, value box grids) support an optional `alt` parameter for accessibility descriptions.
 - **Non-Colour Differentiation**: Callouts include default titles (Note, Tip, Warning, etc.) to ensure information is not conveyed by colour alone.
 - **WCAG AA Contrast**: Colours are validated to meet WCAG AA contrast requirements.
 
@@ -1323,7 +1295,6 @@ The template validates options and provides helpful error messages:
 | Badge              | `.badge`               | colour, icon                            |
 | Divider            | `{{< divider >}}`      | style, label, width, thickness          |
 | Progress Bar       | `{{< progress >}}`     | value, label, colour                    |
-| Timeline           | `.timeline`            | orientation, alt                        |
 | Card Grid          | `.card-grid`           | columns, alt                            |
 | Executive Summary  | `.executive-summary`   | title                                   |
 

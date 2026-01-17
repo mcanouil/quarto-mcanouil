@@ -22,7 +22,7 @@
 # SOFTWARE.
 ]]
 
---- @module card-grid
+--- @module typst-card-grid
 --- @author Mickaël Canouil
 --- @version 1.0.0
 --- @brief Handles card grid divs with complex card extraction
@@ -36,10 +36,10 @@ local typst_utils = require(
   quarto.utils.resolve_path('../_modules/typst-utils.lua'):gsub('%.lua$', '')
 )
 local utils = require(
-  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('../_modules/typst-core-utils.lua'):gsub('%.lua$', '')
 )
 local content_extraction = require(
-  quarto.utils.resolve_path('../_modules/content-extraction.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('../_modules/typst-content-extraction.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================

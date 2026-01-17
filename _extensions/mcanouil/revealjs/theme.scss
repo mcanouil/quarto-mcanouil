@@ -37,6 +37,20 @@ $section-slide-fg: $body-bg !default;
 /*-- scss:rules --*/
 
 // ===========================
+// SHARED COMPONENTS IMPORT
+// ===========================
+// Import shared component styles (mixin-based)
+// Override sizing for slide presentation
+$mc-radius: 6px;
+$mc-radius-sm: 4px;
+$mc-padding: 0.8em;
+$mc-gap: 0.8em;
+$mc-margin: 0.8em 0;
+$mc-value-box-height: 100px;
+
+@import '../scss/components';
+
+// ===========================
 // CSS CUSTOM PROPERTIES
 // ===========================
 
@@ -47,6 +61,25 @@ $section-slide-fg: $body-bg !default;
   --mcanouil-body-color: #{$body-color};
   --mcanouil-section-bg: #{$section-slide-bg};
   --mcanouil-section-fg: #{$section-slide-fg};
+
+  // Shared component theming custom properties
+  --mc-fg: #{$body-color};
+  --mc-bg: #{$body-bg};
+  --mc-muted: #{$text-muted};
+  --mc-border: #{body-mix(80%)};
+  --mc-border-strong: #{body-mix(50%)};
+  --mc-surface: #{body-mix(98%)};
+
+  // Semantic colours
+  --mc-info: #{$callout-color-note};
+  --mc-success: #{$callout-color-tip};
+  --mc-warning: #{$callout-color-warning};
+  --mc-danger: #{$callout-color-important};
+  --mc-caution: #{$callout-color-caution};
+  --mc-neutral: #{body-mix(50%)};
+
+  // Include all shared component styles inside .reveal
+  @include all;
 }
 
 // ===========================
@@ -750,450 +783,5 @@ $section-slide-fg: $body-bg !default;
 // ===========================
 // MCANOUIL COMPONENTS
 // ===========================
-// Custom UI components for Reveal.js presentations
-// Scaled for slide readability
-
-// Component colour palette (reusing callout colours)
-$component-colors: (
-  'info': $callout-color-note,
-  'success': $callout-color-tip,
-  'warning': $callout-color-warning,
-  'danger': $callout-color-important,
-  'caution': $callout-color-caution,
-  'neutral': body-mix(50%),
-  'subtle': body-mix(95%),
-  'emphasis': $callout-color-note,
-  'accent': $body-color,
-  'outline': transparent
-);
-
-// Component constants (scaled for slides)
-$component-radius: 6px;
-$component-radius-sm: 4px;
-$component-padding: 0.8em;
-$component-gap: 0.8em;
-
-// Reveal.js component wrapper
-.reveal-component {
-  font-size: var(--r-main-font-size, 1em);
-}
-
-// ---------------------------
-// PANEL COMPONENT
-// ---------------------------
-.reveal .mcanouil-panel {
-  border-radius: $component-radius;
-  border: 1px solid body-mix(75%);
-  margin: 0.8em 0;
-  overflow: hidden;
-  font-size: 0.85em;
-
-  &__header {
-    padding: 0.5em $component-padding;
-    background-color: body-mix(92%);
-    border-bottom: 1px solid body-mix(85%);
-    display: flex;
-    align-items: center;
-    gap: 0.4em;
-  }
-
-  &__icon {
-    font-size: 1.1em;
-  }
-
-  &__title {
-    font-weight: 600;
-    font-size: 1em;
-  }
-
-  &__content {
-    padding: $component-padding;
-
-    > :first-child {
-      margin-top: 0;
-    }
-
-    > :last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  // Style variants
-  @each $name, $colour in $component-colors {
-    &--#{$name} {
-      @if $name =='subtle' {
-        background-color: body-mix(97%);
-        border-color: body-mix(85%);
-      }
-
-      @else if $name =='outline' {
-        background-color: transparent;
-        border-color: body-mix(70%);
-      }
-
-      @else if $name =='accent' {
-        background-color: $body-color;
-        color: $body-bg;
-        border-color: $body-color;
-
-        .mcanouil-panel__header {
-          background-color: rgba($body-bg, 0.1);
-          border-color: rgba($body-bg, 0.2);
-        }
-      }
-
-      @else {
-        border-left: 3px solid $colour;
-
-        .mcanouil-panel__header {
-          background-color: rgba($colour, 0.1);
-          border-color: rgba($colour, 0.2);
-        }
-      }
-    }
-  }
-}
-
-// ---------------------------
-// BADGE COMPONENT
-// ---------------------------
-.reveal .mcanouil-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.2em;
-  padding: 0.15em 0.5em;
-  font-size: 0.75em;
-  font-weight: 500;
-  border-radius: $component-radius-sm;
-  background-color: body-mix(88%);
-  color: $body-color;
-  vertical-align: baseline;
-  line-height: 1.3;
-
-  &__icon {
-    font-size: 0.85em;
-  }
-
-  @each $name, $colour in $component-colors {
-    @if $name !='subtle' and $name !='outline' and $name !='accent' {
-      &--#{$name} {
-        background-color: rgba($colour, 0.2);
-        color: $colour;
-      }
-    }
-  }
-}
-
-// ---------------------------
-// DIVIDER COMPONENT
-// ---------------------------
-.reveal .mcanouil-divider {
-  --divider-thickness: 1px;
-  --divider-width: 50%;
-
-  border: none;
-  margin: 1em auto;
-  width: var(--divider-width);
-  position: relative;
-
-  &--solid {
-    border-top: var(--divider-thickness) solid body-mix(70%);
-  }
-
-  &--dashed {
-    border-top: var(--divider-thickness) dashed body-mix(70%);
-  }
-
-  &--dotted {
-    border-top: var(--divider-thickness) dotted body-mix(70%);
-  }
-
-  &--ornamental {
-    border: none;
-    text-align: center;
-    height: 1.2em;
-
-    &::before {
-      content: '◆';
-      color: body-mix(50%);
-      font-size: 0.7em;
-    }
-  }
-
-  &--gradient {
-    border: none;
-    height: var(--divider-thickness);
-    background: linear-gradient(to right,
-        transparent,
-        body-mix(50%),
-        transparent);
-  }
-
-  &__label {
-    display: block;
-    text-align: center;
-    font-style: italic;
-    color: body-mix(40%);
-    font-size: 0.8em;
-    margin-top: 0.4em;
-  }
-}
-
-// ---------------------------
-// PROGRESS COMPONENT
-// ---------------------------
-.reveal .mcanouil-progress {
-  --progress-height: 1.2em;
-
-  height: var(--progress-height);
-  background-color: body-mix(88%);
-  border-radius: $component-radius-sm;
-  overflow: hidden;
-
-  &__bar {
-    height: 100%;
-    background-color: $callout-color-note;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: $body-bg;
-    font-size: 0.7em;
-    font-weight: 600;
-    transition: width 0.3s ease;
-  }
-
-  &__label {
-    font-size: 0.8em;
-    margin-bottom: 0.2em;
-    color: body-mix(30%);
-  }
-
-  &__container {
-    margin: 0.8em 0;
-  }
-
-  @each $name, $colour in $component-colors {
-    @if $name !='subtle' and $name !='outline' {
-      &--#{$name} .mcanouil-progress__bar {
-        background-color: $colour;
-      }
-    }
-  }
-}
-
-// ---------------------------
-// VALUE BOX COMPONENT
-// ---------------------------
-.reveal .mcanouil-value-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: $component-padding;
-  border-radius: $component-radius;
-  border: 1px solid body-mix(78%);
-  background-color: body-mix(97%);
-  text-align: center;
-  min-height: 80px;
-
-  &__value {
-    display: flex;
-    align-items: baseline;
-    gap: 0.2em;
-  }
-
-  &__number {
-    font-size: 2em;
-    font-weight: 700;
-    line-height: 1.1;
-  }
-
-  &__unit {
-    font-size: 0.6em;
-    opacity: 0.8;
-  }
-
-  &__icon {
-    font-size: 1.2em;
-    margin-left: 0.15em;
-  }
-
-  &__label {
-    font-size: 0.75em;
-    color: body-mix(40%);
-    margin-top: 0.3em;
-  }
-
-  @each $name, $colour in $component-colors {
-    @if $name !='subtle' and $name !='outline' {
-      &--#{$name} {
-        border-color: $colour;
-        background-color: rgba($colour, 0.08);
-
-        .mcanouil-value-box__number {
-          color: $colour;
-        }
-
-        .mcanouil-value-box__icon {
-          color: $colour;
-        }
-      }
-    }
-  }
-}
-
-// ---------------------------
-// CARD GRID COMPONENT
-// ---------------------------
-.reveal .mcanouil-card-grid {
-  --card-columns: 2;
-
-  display: grid;
-  grid-template-columns: repeat(var(--card-columns), 1fr);
-  gap: $component-gap;
-  margin: 0.8em 0;
-}
-
-.reveal .mcanouil-card {
-  --card-accent: #{body-mix(70%)};
-
-  display: flex;
-  flex-direction: column;
-  border-radius: $component-radius;
-  border: 1px solid body-mix(83%);
-  overflow: hidden;
-  font-size: 0.85em;
-
-  &__header {
-    padding: 0.5em 0.8em;
-    background-color: body-mix(94%);
-    border-bottom: 1px solid body-mix(88%);
-  }
-
-  &__title {
-    margin: 0;
-    font-size: 1em;
-    font-weight: 600;
-  }
-
-  &__body {
-    padding: 0.8em;
-    flex: 1;
-
-    > :first-child {
-      margin-top: 0;
-    }
-
-    > :last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  &__footer {
-    padding: 0.5em 0.8em;
-    background-color: body-mix(97%);
-    border-top: 1px solid body-mix(90%);
-    font-size: 0.85em;
-  }
-
-  &--subtle {
-    background-color: body-mix(98%);
-  }
-
-  &--outlined {
-    background-color: transparent;
-    border-color: var(--card-accent);
-  }
-
-  &--filled {
-    background-color: var(--card-accent);
-    color: $body-bg;
-    border-color: var(--card-accent);
-
-    .mcanouil-card__header {
-      background-color: rgba($body-bg, 0.1);
-      border-color: rgba($body-bg, 0.2);
-    }
-
-    .mcanouil-card__footer {
-      background-color: rgba($body-bg, 0.1);
-      border-color: rgba($body-bg, 0.2);
-    }
-  }
-}
-
-// ---------------------------
-// EXECUTIVE SUMMARY COMPONENT
-// ---------------------------
-.reveal .mcanouil-executive-summary {
-  position: relative;
-  margin: 0.8em 0;
-  padding: 1em 1em 1em 1.5em;
-  background-color: body-mix(97%);
-  border: 1px solid body-mix(83%);
-  border-left: 4px solid $callout-color-note;
-  border-radius: $component-radius;
-
-  &__brackets {
-    position: absolute;
-    top: 0.4em;
-    right: 0.4em;
-    bottom: 0.4em;
-    left: 0.4em;
-    pointer-events: none;
-
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      width: 0.8em;
-      height: 0.8em;
-      border-color: body-mix(68%);
-      border-style: solid;
-      border-width: 0;
-    }
-
-    &::before {
-      top: 0;
-      right: 0;
-      border-top-width: 2px;
-      border-right-width: 2px;
-    }
-
-    &::after {
-      bottom: 0;
-      left: 0;
-      border-bottom-width: 2px;
-      border-left-width: 2px;
-    }
-  }
-
-  &__title {
-    margin: 0 0 0.3em 0;
-    font-size: 1.1em;
-    font-weight: 700;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: $body-color;
-  }
-
-  &__separator {
-    width: 2.5em;
-    margin: 0.4em auto 0.8em;
-    border: none;
-    border-top: 2px solid $callout-color-note;
-  }
-
-  &__content {
-    font-size: 0.9em;
-
-    > :first-child {
-      margin-top: 0;
-    }
-
-    > :last-child {
-      margin-bottom: 0;
-    }
-  }
-}
+// Components are now provided by the shared partial (../scss/_components.scss)
+// and included via @include all; inside .reveal above

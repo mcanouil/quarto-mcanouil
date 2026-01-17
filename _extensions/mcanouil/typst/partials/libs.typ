@@ -21,8 +21,6 @@ $dividers.typ()$
 
 $progress.typ()$
 
-$timeline.typ()$
-
 $card-grid.typ()$
 
 $executive-summary.typ()$

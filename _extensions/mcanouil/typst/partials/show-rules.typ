@@ -181,14 +181,12 @@
 /// @param colours Colour dictionary
 /// @return Styled inline code
 #let apply-inline-code-style(it, colours) = {
-  // Use regular colour-mix for subtle background that's just slightly different
-  // This gives us a subtle tint without inverting contrast
   box(
     fill: colour-mix(colours, 90%),
     inset: (x: 3pt, y: 0pt),
     outset: (y: 3pt),
     radius: 2pt,
-    text(fill: colours.foreground, it),
+    it,
   )
 }
 

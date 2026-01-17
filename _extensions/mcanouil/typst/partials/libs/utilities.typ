@@ -87,7 +87,7 @@
 /// Convert content to plain string (for PDF metadata)
 /// @param content Content to convert
 /// @return String representation
-#let content-to-str(c) = {
+#let content-to-string(c) = {
   if c == none {
     ""
   } else if type(c) == str {
@@ -96,9 +96,9 @@
     if c.has("text") {
       c.text
     } else if c.has("children") {
-      c.children.map(content-to-str).join("")
+      c.children.map(content-to-string).join("")
     } else if c.has("body") {
-      content-to-str(c.body)
+      content-to-string(c.body)
     } else {
       ""
     }

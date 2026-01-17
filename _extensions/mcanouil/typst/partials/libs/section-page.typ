@@ -362,32 +362,23 @@
   section-page-state.update(true)
 
   // Section page content with single column and symmetric margins
-  {
-    set page(margin: symmetric-margin, columns: 1)
-
+  // Use page() function instead of set page() to avoid container restriction
+  page(margin: symmetric-margin, columns: 1)[
     // Render banner
-    section-page-banner(it, colours, font-headings, margin: symmetric-margin)
+    #section-page-banner(it, colours, font-headings, margin: symmetric-margin)
 
     // Render subsection outline
-    section-page-outline(it, colours, font-headings, toc-depth: toc-depth, margin: symmetric-margin)
+    #section-page-outline(it, colours, font-headings, toc-depth: toc-depth, margin: symmetric-margin)
 
     // Semantic heading for TOC, PDF bookmarks, and accessibility
     // Visually hidden but remains in document structure for screen readers
     // The visual banner rendering is marked as an artifact
-    hide[
+    #hide[
       #set text(size: 0pt)
       #it
     ]
-  }
-
-  // Page break after section page
-  pagebreak(weak: true)
+  ]
 
   // Reset section page state
   section-page-state.update(false)
-
-  // Restore column layout
-  {
-    set page(columns: cols)
-  }
 }

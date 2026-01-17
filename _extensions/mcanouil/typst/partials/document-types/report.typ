@@ -276,7 +276,7 @@
       let url-str = if type(author.url) == str {
         author.url
       } else {
-        content-to-str(author.url)
+        content-to-string(author.url)
       }
       url-str.replace("\\/", "/").replace("https://", "").replace("http://", "")
     } else {
@@ -327,7 +327,7 @@
   )
 
   if title != none {
-    doc-params.insert("title", content-to-str(title))
+    doc-params.insert("title", content-to-string(title))
   }
 
   if keywords != () {
@@ -521,8 +521,13 @@
           } else {
             numbering(last-heading.numbering, h-counter.at(0))
           }
+          // Convert to string and strip trailing dot if present
+          let h-num-str = content-to-string(h-num)
+          if h-num-str.ends-with(".") {
+            h-num-str = h-num-str.slice(0, -1)
+          }
           // Format as "section.figure" (e.g., "A.1", "I.2", "1.3")
-          [#h-num.#n]
+          [#h-num-str.#n]
         } else {
           str(n)
         }

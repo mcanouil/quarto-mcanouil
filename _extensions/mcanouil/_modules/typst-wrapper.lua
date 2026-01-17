@@ -22,7 +22,7 @@
 # SOFTWARE.
 ]]
 
---- @module wrapper
+--- @module typst-wrapper
 --- @author Mickaël Canouil
 --- @version 1.0.0
 --- @brief Wrapper generation utilities for typst-markdown filter
@@ -36,7 +36,7 @@ local typst_utils = require(
   quarto.utils.resolve_path('../_modules/typst-utils.lua'):gsub('%.lua$', '')
 )
 local utils = require(
-  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('../_modules/typst-core-utils.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================

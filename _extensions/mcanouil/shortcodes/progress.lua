@@ -22,14 +22,23 @@
 # SOFTWARE.
 ]]
 
---- @module divider
+--- @module progress
 --- @author Mickaël Canouil
 --- @version 1.0.0
---- @brief Divider shortcode for Typst format
---- @description Provides {{< divider >}} shortcode for rendering decorative dividers.
---- This shortcode generates calls to #mcanouil-divider defined in typst-show.typ.
+--- @brief Format-agnostic progress shortcode
+--- @description Provides {{< progress >}} shortcode for rendering progress bars
+--- across HTML, Reveal.js, and Typst formats.
 
---- Load Typst utilities module
+-- ============================================================================
+-- MODULE IMPORTS
+-- ============================================================================
+
+local format_utils = require(
+  quarto.utils.resolve_path('../_modules/format-utils.lua'):gsub('%.lua$', '')
+)
+local html_utils = require(
+  quarto.utils.resolve_path('../_modules/html-utils.lua'):gsub('%.lua$', '')
+)
 local typst_utils = require(
   quarto.utils.resolve_path('../_modules/typst-utils.lua'):gsub('%.lua$', '')
 )
@@ -40,5 +49,18 @@ local typst_utils = require(
 
 --- @type table<string, function> Shortcode handlers
 return {
-  ['divider'] = typst_utils.create_shortcode_handler('mcanouil-divider')
+  ['progress'] = function(_args, kwargs, _meta)
+    local format = format_utils.get_format()
+
+    if format == 'typst' then
+      -- Typst rendering
+      return pandoc.RawBlock('typst', typst_utils.build_shortcode_function_call('mcanouil-progress', kwargs))
+    elseif format == 'html' or format == 'revealjs' then
+      -- HTML-based rendering
+      local config = format_utils.get_config()
+      return pandoc.RawBlock('html', html_utils.render_progress(kwargs, config))
+    end
+
+    return pandoc.Null()
+  end
 }

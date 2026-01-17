@@ -49,18 +49,14 @@
 
 /// Get colour for value box.
 /// Supports predefined colour types or custom colour values (hex codes, rgb(), etc.).
+/// Uses semantic colours (brighter) for UI components, not callout colours.
 /// @param colour Colour type (success, warning, danger, info, neutral) or custom colour (e.g., "#ff0000", rgb(...))
 /// @param colours Colour scheme dictionary
 /// @return Color Colour for the value box
 #let get-value-box-colour(colour, colours) = {
-  if colour == "success" {
-    callout-colour("tip")
-  } else if colour == "warning" {
-    callout-colour("caution")
-  } else if colour == "danger" {
-    callout-colour("important")
-  } else if colour == "info" {
-    callout-colour("note")
+  // Use semantic-colour for predefined types (brighter colours for UI components)
+  if colour == "success" or colour == "warning" or colour == "danger" or colour == "info" {
+    semantic-colour(colour, colours)
   } else if colour == "neutral" {
     colours.muted
   } else if colour != none and colour != "" {
@@ -153,9 +149,9 @@
   // Use 4.5:1 ratio to cover both value text (large, could use 3:1) and unit text (small, needs 4.5:1)
   let validated-accent = ensure-contrast(accent-colour, bg-colour, min-ratio: 4.5, preserve-hue: true)
 
-  // Determine border colour
+  // Determine border colour (uses validated accent to match text)
   let border-colour = if show-border {
-    get-adaptive-border(accent-colour, colours)
+    get-adaptive-border(validated-accent, colours)
   } else {
     none
   }

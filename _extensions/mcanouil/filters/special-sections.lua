@@ -25,12 +25,21 @@
 --- @module special-sections
 --- @author Mickaël Canouil
 --- @version 2.0.0
---- @brief Simplified special sections filter for document reorganisation
+--- @brief Simplified special sections filter for document reorganisation (Typst only)
 --- @description Reorganises special section content (references, appendix, supplementary)
 --- to document end and emits direct Typst commands for heading numbering.
 
 --- Extension name constant
 local EXTENSION_NAME = 'special-sections'
+
+-- ============================================================================
+-- FORMAT CHECK
+-- ============================================================================
+
+-- This filter only applies to Typst format
+if not quarto.doc.is_format('typst') then
+  return {}
+end
 
 -- ============================================================================
 -- CONSTANTS AND STATE

@@ -27,6 +27,10 @@
 
 $libs.typ()$
 
+// $if(highlighting-definitions)$
+// $highlighting-definitions$
+// $endif$
+
 $show-rules.typ()$
 
 $typst-template.typ()$

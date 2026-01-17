@@ -6,9 +6,6 @@ contributes:
   metadata:
     project:
       brand: brand.yml
-  revealjs-plugins:
-    - revealjs-plugin/mcanouil
-    - revealjs-plugin/tabset
   project:
     project:
       type: website
@@ -33,6 +30,14 @@ contributes:
           [CC BY NC SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
     format: mcanouil-html
   formats:
+    common:
+      shortcodes:
+        - shortcodes/divider.lua
+        - shortcodes/value-box.lua
+        - shortcodes/progress.lua
+        - shortcodes/badge.lua
+      filters:
+        - filters/components.lua
     html:
       # Theme
       theme:
@@ -73,6 +78,7 @@ contributes:
       document-type: report
       # Brand
       brand-mode: light
+      highlight-style: none
       # Logo/Visual assets
       logo:
         light:
@@ -101,7 +107,6 @@ contributes:
         - typst/partials/libs/badges.typ
         - typst/partials/libs/dividers.typ
         - typst/partials/libs/progress.typ
-        - typst/partials/libs/timeline.typ
         - typst/partials/libs/card-grid.typ
         - typst/partials/libs/executive-summary.typ
         - typst/partials/libs/authors.typ
@@ -123,14 +128,9 @@ contributes:
         - typst/partials/notes.typ
         - typst/partials/typst-template.typ
         - typst/partials/typst-show.typ
-      # Shortcodes and filters
-      shortcodes:
-        - typst/shortcodes/divider.lua
-        - typst/shortcodes/value-box.lua
-        - typst/shortcodes/progress.lua
+      # Typst-specific filters
       filters:
-        - typst/filters/special-sections.lua
-        - typst/filters/typst-markdown.lua
+        - filters/special-sections.lua
       # Typography
       mainfont: "Alegreya Sans"
       fontsize: 11pt

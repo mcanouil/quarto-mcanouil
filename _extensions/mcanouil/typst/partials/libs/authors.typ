@@ -27,7 +27,7 @@
 // License: MIT
 
 // Import shared utilities
-// #import "utilities.typ": has-content, is-empty, content-to-str, unescape-email
+// #import "utilities.typ": has-content, is-empty, content-to-string, unescape-email
 
 // ============================================================================
 // Author name formatting
@@ -59,7 +59,7 @@
 /// @param author Author dictionary from Quarto normalised schema
 /// @return Formatted author name as string
 #let format-author-name-str(author) = {
-  content-to-str(format-author-name(author))
+  content-to-string(format-author-name(author))
 }
 
 /// Get author contact information with fallback priority
@@ -72,7 +72,7 @@
     let url-str = if type(author.url) == str {
       author.url
     } else {
-      content-to-str(author.url)
+      content-to-string(author.url)
     }
     // Remove escaped backslashes from Pandoc (e.g., https:\/\/ -> https://)
     url-str = url-str.replace("\\/", "/")
@@ -115,10 +115,10 @@
       for aff in author.affiliations {
         // Create a key from affiliation details
         let parts = ()
-        if has-content(aff.department) { parts.push(content-to-str(aff.department)) }
-        if has-content(aff.name) { parts.push(content-to-str(aff.name)) }
-        if has-content(aff.city) { parts.push(content-to-str(aff.city)) }
-        if has-content(aff.country) { parts.push(content-to-str(aff.country)) }
+        if has-content(aff.department) { parts.push(content-to-string(aff.department)) }
+        if has-content(aff.name) { parts.push(content-to-string(aff.name)) }
+        if has-content(aff.city) { parts.push(content-to-string(aff.city)) }
+        if has-content(aff.country) { parts.push(content-to-string(aff.country)) }
         let key = parts.join("|")
 
         if key not in aff-map {
@@ -141,10 +141,10 @@
   if author.affiliations != none {
     for aff in author.affiliations {
       let parts = ()
-      if has-content(aff.department) { parts.push(content-to-str(aff.department)) }
-      if has-content(aff.name) { parts.push(content-to-str(aff.name)) }
-      if has-content(aff.city) { parts.push(content-to-str(aff.city)) }
-      if has-content(aff.country) { parts.push(content-to-str(aff.country)) }
+      if has-content(aff.department) { parts.push(content-to-string(aff.department)) }
+      if has-content(aff.name) { parts.push(content-to-string(aff.name)) }
+      if has-content(aff.city) { parts.push(content-to-string(aff.city)) }
+      if has-content(aff.country) { parts.push(content-to-string(aff.country)) }
       let key = parts.join("|")
       if key in aff-map {
         indices.push(aff-map.at(key))
