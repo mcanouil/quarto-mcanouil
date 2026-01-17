@@ -587,12 +587,6 @@ $mc-breakpoint-sm: 576px !default;
 /// Executive summary component mixin
 @mixin executive-summary {
   .mc-executive-summary {
-    // Component-level CSS custom properties for bracket styling
-    --bracket-size: 1.2em;
-    --bracket-thickness: 3px;
-    --bracket-inset: 1.5em;
-    --bracket-colour: var(--mc-fg);
-
     position: relative;
     margin: 2em auto;
     max-width: 85%;
@@ -601,40 +595,6 @@ $mc-breakpoint-sm: 576px !default;
     border: 2px solid var(--mc-border);
     border-left: 6px solid var(--mc-border-strong, var(--mc-muted));
     border-radius: $mc-radius;
-
-    &__brackets {
-      position: absolute;
-      top: var(--bracket-inset);
-      right: var(--bracket-inset);
-      bottom: var(--bracket-inset);
-      left: var(--bracket-inset);
-      pointer-events: none;
-
-      &::before,
-      &::after {
-        content: '';
-        position: absolute;
-        width: var(--bracket-size);
-        height: var(--bracket-size);
-        border-color: var(--bracket-colour);
-        border-style: solid;
-        border-width: 0;
-      }
-
-      &::before {
-        top: 0;
-        right: 0;
-        border-top-width: var(--bracket-thickness);
-        border-right-width: var(--bracket-thickness);
-      }
-
-      &::after {
-        bottom: 0;
-        left: 0;
-        border-bottom-width: var(--bracket-thickness);
-        border-left-width: var(--bracket-thickness);
-      }
-    }
 
     &__title {
       margin: 0 0 1em 0;

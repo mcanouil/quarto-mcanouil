@@ -143,7 +143,7 @@ M.render_executive_summary = function(div, config)
   wrapper.extract_first_heading_as_title(div, attrs)
 
   local title = attrs.title or 'Executive Summary'
-  local show_brackets = attrs['show-corner-brackets'] ~= 'false'
+  local show_brackets = attrs['show-corner-brackets'] == 'true'
 
   local base_class = class_prefix .. html_utils.bem_class('executive-summary')
 
