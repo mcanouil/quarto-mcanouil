@@ -445,6 +445,12 @@
 
   // Show rules - each defined in show-rules.typ for better readability
 
+  // Reset figure counter at level 1 headings for section-prefixed numbering
+  show heading.where(level: 1): it => {
+    counter(figure).update(0)
+    it
+  }
+
   // Heading styles
   show heading: it => {
     apply-heading-style(
@@ -504,38 +510,26 @@
   set figure(placement: figure-placement)
 
   // Figure numbering
-  // In special sections, the heading numbering is set by the Lua filter.
-  // We query the most recent heading's numbering to derive figure numbers.
-  set figure(numbering: n => context {
-    let headings = query(selector(heading).before(here()))
-    if headings.len() > 0 {
-      let last-heading = headings.last()
-      if last-heading.numbering != none {
-        let h-counter = counter(heading).at(here())
-        if h-counter.len() > 0 and h-counter.at(0) > 0 {
-          // Determine the section numbering pattern from the heading
-          // For appendix (A.1.a) and supplementary (I.1.i), extract first level pattern
-          let h-num = if type(last-heading.numbering) == function {
-            // Call the numbering function with just the first level counter
-            (last-heading.numbering)(h-counter.at(0))
-          } else {
-            numbering(last-heading.numbering, h-counter.at(0))
-          }
-          // Convert to string and strip trailing dot if present
-          let h-num-str = content-to-string(h-num)
-          if h-num-str.ends-with(".") {
-            h-num-str = h-num-str.slice(0, -1)
-          }
-          // Format as "section.figure" (e.g., "A.1", "I.2", "1.3")
-          [#h-num-str.#n]
-        } else {
-          str(n)
-        }
+  // Uses section-type state (updated by Lua filter for special sections)
+  // and counter(heading).get() to derive section-prefixed figure numbers.
+  // This approach avoids context/here() issues with outline().
+  set figure(numbering: (..num) => {
+    let h-count = counter(heading).get()
+    let fig-num = num.pos().first()
+    let stype = section-type.get()
+
+    if h-count.len() > 0 and h-count.first() > 0 {
+      // Determine prefix based on section type
+      let prefix = if stype == "appendix" {
+        numbering("A", h-count.first())
+      } else if stype == "supplementary" {
+        numbering("I", h-count.first())
       } else {
-        str(n)
+        str(h-count.first())
       }
+      [#prefix.#fig-num]
     } else {
-      str(n)
+      str(fig-num)
     }
   })
 

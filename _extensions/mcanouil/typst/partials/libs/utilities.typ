@@ -42,6 +42,10 @@
 /// Used by margin-section to skip rendering on section pages
 #let section-page-state = state("section-page", false)
 
+/// State to track current section type ("main", "appendix", "supplementary", "references")
+/// Used by figure numbering to determine the correct prefix format
+#let section-type = state("section-type", "main")
+
 // ============================================================================
 // Content validation and type checking
 // ============================================================================

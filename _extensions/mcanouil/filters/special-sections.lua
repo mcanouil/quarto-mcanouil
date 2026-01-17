@@ -63,7 +63,7 @@ end
 -- ============================================================================
 
 --- Generate Typst code for section start
---- Emits direct commands to reset counter and set numbering function
+--- Emits direct commands to reset counter, set numbering function, and update section-type state
 --- @param section_type string Section type name
 --- @return string Typst code to emit
 local function generate_section_start(section_type)
@@ -75,6 +75,12 @@ local function generate_section_start(section_type)
 
   -- Reset heading counter
   table.insert(lines, '#counter(heading).update(0)')
+
+  -- Reset figure counter for new section
+  table.insert(lines, '#counter(figure).update(0)')
+
+  -- Update section-type state for figure numbering
+  table.insert(lines, string.format('#section-type.update("%s")', section_type))
 
   -- Set numbering function (predefined in special-sections.typ)
   if section_type == 'references' then

@@ -568,6 +568,26 @@ Reference the complete figure as @fig-multiple, or individual subfigures as @fig
 
 Reference tables using @tbl-simple in your text.
 
+#### Tables with Subtables
+
+::: {#tbl-subtables layout-ncol=2}
+
+| Alpha | Beta |
+|-------|------|
+| A1    | B1   |
+
+: First subtable. {#tbl-sub1}
+
+| Gamma | Delta |
+|-------|-------|
+| G1    | D1    |
+
+: Second subtable. {#tbl-sub2}
+
+Two subtables arranged side by side demonstrating multi-table layouts.
+
+:::
+
 #### Table with Column Alignment
 
 | Left Aligned | Centre Aligned | Right Aligned |

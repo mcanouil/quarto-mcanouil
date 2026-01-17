@@ -94,17 +94,33 @@
   context {
     let figcounter = counter(figure.where(kind: kind))
     let n-super = figcounter.get().first() + 1
+    let h-count = counter(heading).get()
+    let stype = section-type.get()
+
+    // Calculate section-prefixed super figure number
+    let super-prefix = if h-count.len() > 0 and h-count.first() > 0 {
+      let prefix = if stype == "appendix" {
+        numbering("A", h-count.first())
+      } else if stype == "supplementary" {
+        numbering("I", h-count.first())
+      } else {
+        str(h-count.first())
+      }
+      prefix + "."
+    } else {
+      ""
+    }
+
     set figure.caption(position: position)
     [#figure(
         kind: kind,
         supplement: supplement,
         caption: caption,
         {
-          show figure.where(kind: kind): set figure(numbering: _ => numbering(
-            subrefnumbering,
-            n-super,
-            quartosubfloatcounter.get().first() + 1,
-          ))
+          show figure.where(kind: kind): set figure(numbering: _ => {
+            // Use section-prefixed numbering for subfigures
+            [#super-prefix#n-super#numbering("a", quartosubfloatcounter.get().first() + 1)]
+          })
           show figure.where(kind: kind): set figure.caption(position: position)
 
           show figure: it => {
