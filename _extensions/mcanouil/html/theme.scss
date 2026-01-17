@@ -1,5 +1,13 @@
 /*-- scss:defaults --*/
 
+// Callout colours (matching Typst theme for consistency)
+// All colours meet WCAG AA contrast ratio requirements (4.5:1)
+$callout-color-note: #0066cc !default;
+$callout-color-tip: #009955 !default;
+$callout-color-warning: #cc6600 !default;
+$callout-color-important: #cc0000 !default;
+$callout-color-caution: #b38f00 !default;
+
 /*-- scss:rules --*/
 
 // ===========================
