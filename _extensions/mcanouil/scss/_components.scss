@@ -190,9 +190,9 @@ $mc-breakpoint-sm: 576px !default;
     }
 
     &--neutral {
-      background-color: color-mix(in srgb, var(--mc-fg) 10%, transparent);
-      border-color: color-mix(in srgb, var(--mc-fg) 25%, transparent);
-      color: var(--mc-fg);
+      background-color: color-mix(in srgb, var(--mc-muted) 10%, transparent);
+      border-color: color-mix(in srgb, var(--mc-muted) 25%, transparent);
+      color: var(--mc-muted);
     }
   }
 }
@@ -368,6 +368,10 @@ $mc-breakpoint-sm: 576px !default;
 
     &--caution .mc-progress__bar {
       background-color: var(--mc-caution);
+    }
+
+    &--neutral .mc-progress__bar {
+      background-color: var(--mc-muted);
     }
 
     &--custom .mc-progress__bar {

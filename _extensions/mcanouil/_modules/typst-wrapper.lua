@@ -36,23 +36,15 @@ local typst_utils = require(
   quarto.utils.resolve_path('../_modules/typst-utils.lua'):gsub('%.lua$', '')
 )
 local utils = require(
-  quarto.utils.resolve_path('../_modules/typst-core-utils.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================
 -- HELPER FUNCTIONS
 -- ============================================================================
 
---- Convert Pandoc AttributeList to plain table for easier processing
---- @param element table Element with attributes field (Div, Span, Table, Image)
---- @return table Plain table with attribute key-value pairs
-local function attributes_to_table(element)
-  local attrs = {}
-  for k, v in pairs(element.attributes) do
-    attrs[k] = v
-  end
-  return attrs
-end
+-- Use shared attributes_to_table from utils module
+local attributes_to_table = utils.attributes_to_table
 
 --- Build Typst attribute string from a table of key-value pairs
 --- @param attrs table Attribute key-value pairs

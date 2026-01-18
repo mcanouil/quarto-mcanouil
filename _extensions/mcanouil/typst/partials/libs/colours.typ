@@ -160,7 +160,7 @@
   } else if colour-type == "info" {
     COLOUR-SEMANTIC-INFO
   } else if colour-type == "neutral" {
-    colours.muted
+    colour-mix(colours, 50%)
   } else if type(colour-type) == str and colour-type.starts-with("#") {
     // Custom hex colour
     rgb(colour-type)

@@ -258,14 +258,23 @@
 // Configuration processing utilities
 // ============================================================================
 
+/// Default breakable settings for page-break-inside configuration
+/// Tables and quotes are breakable by default, callouts are not
+#let BREAKABLE-DEFAULTS = (
+  table: true,
+  callout: false,
+  code: auto,
+  quote: true,
+  terms: auto,
+)
+
 /// Process page-break-inside configuration into breakable settings
 /// Converts various input formats into a consistent dictionary
 /// @param page-break-inside Raw configuration (auto, bool, or dictionary)
 /// @return Dictionary with breakable settings for each element type
 #let process-breakable-settings(page-break-inside) = {
   if page-break-inside == auto {
-    // Defaults: tables and quotes breakable, callouts not
-    (table: true, callout: false, code: auto, quote: true, terms: auto)
+    BREAKABLE-DEFAULTS
   } else if type(page-break-inside) == bool {
     // Global setting applied to all element types
     (
@@ -278,15 +287,15 @@
   } else if type(page-break-inside) == dictionary {
     // Granular settings with defaults for missing keys
     (
-      table: page-break-inside.at("table", default: true),
-      callout: page-break-inside.at("callout", default: false),
-      code: page-break-inside.at("code", default: auto),
-      quote: page-break-inside.at("quote", default: true),
-      terms: page-break-inside.at("terms", default: auto),
+      table: page-break-inside.at("table", default: BREAKABLE-DEFAULTS.table),
+      callout: page-break-inside.at("callout", default: BREAKABLE-DEFAULTS.callout),
+      code: page-break-inside.at("code", default: BREAKABLE-DEFAULTS.code),
+      quote: page-break-inside.at("quote", default: BREAKABLE-DEFAULTS.quote),
+      terms: page-break-inside.at("terms", default: BREAKABLE-DEFAULTS.terms),
     )
   } else {
     // Fallback to defaults
-    (table: true, callout: false, code: auto, quote: true, terms: auto)
+    BREAKABLE-DEFAULTS
   }
 }
 

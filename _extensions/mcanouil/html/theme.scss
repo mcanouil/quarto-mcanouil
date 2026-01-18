@@ -190,10 +190,12 @@ p:empty {
 // ===========================
 // CODE STYLING
 // ===========================
+// Inline code styling matching Typst: subtle background, foreground text
+// Uses body-mix(90%) for background (90% background, 10% foreground)
 code,
 a>code {
-  color: $background;
-  background-color: $foreground;
+  color: $foreground;
+  background-color: body-mix(90%);
 }
 
 a>code {
@@ -230,6 +232,50 @@ td code.sourceCode {
 .code-annotation-gutter-bg,
 .code-annotation-gutter {
   all: unset;
+}
+
+// ===========================
+// CALLOUT STYLING
+// ===========================
+// Callout styling matching Typst: left border in callout colour, subtle background
+// Border colour matches the callout type for visual consistency
+
+.callout {
+  // Override Quarto defaults - only left border in callout colour
+  border: none !important;
+  border-left: 4px solid !important;
+  border-radius: 4px !important;
+
+  // Subtle background using colour mix
+  &.callout-note {
+    background-color: color-mix(in srgb, $callout-color-note 8%, $background) !important;
+    border-left-color: $callout-color-note !important;
+  }
+
+  &.callout-tip {
+    background-color: color-mix(in srgb, $callout-color-tip 8%, $background) !important;
+    border-left-color: $callout-color-tip !important;
+  }
+
+  &.callout-warning {
+    background-color: color-mix(in srgb, $callout-color-warning 8%, $background) !important;
+    border-left-color: $callout-color-warning !important;
+  }
+
+  &.callout-important {
+    background-color: color-mix(in srgb, $callout-color-important 8%, $background) !important;
+    border-left-color: $callout-color-important !important;
+  }
+
+  &.callout-caution {
+    background-color: color-mix(in srgb, $callout-color-caution 8%, $background) !important;
+    border-left-color: $callout-color-caution !important;
+  }
+
+  // Title styling
+  .callout-title-container {
+    font-weight: 600;
+  }
 }
 
 // ===========================
@@ -1497,8 +1543,8 @@ body.quarto-about-solana,
 // ===========================
 
 code:not(.sourceCode) {
-  color: $background !important;
-  background-color: $foreground !important;
+  color: $foreground !important;
+  background-color: body-mix(90%) !important;
 }
 
 // Inline code styling with hover effects

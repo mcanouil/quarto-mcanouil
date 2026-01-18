@@ -404,6 +404,26 @@ $endif$
   render-card-grid(cards, mcanouil-colours(mode: effective-brand-mode), ..args)
 }
 
+// Wrapper for standalone .card divs
+#let mcanouil-card(content, ..args) = {
+  let colours = mcanouil-colours(mode: effective-brand-mode)
+  let named = args.named()
+  let card-title = named.at("title", default: none)
+  let card-footer = named.at("footer", default: none)
+  let card-colour = named.at("colour", default: colours.muted)
+  let card-style = named.at("style", default: "subtle")
+  render-card(
+    (
+      title: card-title,
+      content: content,
+      footer: card-footer,
+      colour: card-colour,
+      style: card-style,
+    ),
+    colours,
+  )
+}
+
 // Wrapper for code windows with filename
 // Sets state for apply-code-block-style to render as code window
 // is-auto: true when filename is auto-generated from language (applies smallcaps)

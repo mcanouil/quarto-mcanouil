@@ -364,7 +364,6 @@
             logo-alt: logo-alt,
             colours: colours,
             show-logo: show-logo,
-            margin: margin,
           ),
         )
       }
@@ -379,7 +378,6 @@
             left-content: footer-left-content,
             right-content: footer-right-content,
             colours: colours,
-            margin: margin,
           ),
         )
       }

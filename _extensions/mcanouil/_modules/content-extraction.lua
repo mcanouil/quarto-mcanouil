@@ -23,14 +23,14 @@
 ]]
 
 --- MC Content Extraction - Content processing and extraction utilities for Quarto extensions
---- @module typst-content-extraction
+--- @module content-extraction
 --- @author Mickaël Canouil
 --- @version 1.0.0
 
 local content_module = {}
 
 -- Load utils module for raw_header function
-local utils = require(quarto.utils.resolve_path("../_modules/typst-core-utils.lua"):gsub("%.lua$", ""))
+local utils = require(quarto.utils.resolve_path("../_modules/utils.lua"):gsub("%.lua$", ""))
 
 -- ============================================================================
 -- SECTION EXTRACTION

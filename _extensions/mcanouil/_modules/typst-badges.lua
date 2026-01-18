@@ -36,7 +36,7 @@ local wrapper = require(
   quarto.utils.resolve_path('../_modules/typst-wrapper.lua'):gsub('%.lua$', '')
 )
 local utils = require(
-  quarto.utils.resolve_path('../_modules/typst-core-utils.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================

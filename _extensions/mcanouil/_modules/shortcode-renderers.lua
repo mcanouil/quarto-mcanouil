@@ -35,6 +35,9 @@
 local html_utils = require(
   quarto.utils.resolve_path('../_modules/html-utils.lua'):gsub('%.lua$', '')
 )
+local utils = require(
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+)
 
 local M = {}
 
@@ -106,7 +109,7 @@ M.render_value_box = function(kwargs, config)
   local unit = to_string(kwargs.unit)
   local label = to_string(kwargs.label) or ''
   local icon = to_string(kwargs.icon)
-  local colour = to_string(kwargs.colour) or to_string(kwargs.color) or 'info'
+  local colour = utils.get_colour(kwargs, 'info')
 
   -- Handle custom colours (hex, rgb, hsl)
   local modifier = html_utils.get_colour_modifier(colour)
@@ -166,7 +169,7 @@ M.render_badge = function(kwargs, config)
   config = config or M.HTML_CONFIG
 
   local text = to_string(kwargs.text) or to_string(kwargs[1]) or ''
-  local colour = to_string(kwargs.colour) or to_string(kwargs.color) or 'neutral'
+  local colour = utils.get_colour(kwargs, 'neutral')
   local icon = to_string(kwargs.icon)
 
   local modifier = html_utils.get_colour_modifier(colour) or colour

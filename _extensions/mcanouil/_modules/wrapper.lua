@@ -35,21 +35,16 @@
 local html_utils = require(
   quarto.utils.resolve_path('../_modules/html-utils.lua'):gsub('%.lua$', '')
 )
+local utils = require(
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+)
 
 -- ============================================================================
 -- HELPER FUNCTIONS
 -- ============================================================================
 
---- Convert Pandoc AttributeList to plain table for easier processing.
---- @param element table Element with attributes field (Div, Span)
---- @return table Plain table with attribute key-value pairs
-local function attributes_to_table(element)
-  local attrs = {}
-  for k, v in pairs(element.attributes) do
-    attrs[k] = v
-  end
-  return attrs
-end
+-- Use shared attributes_to_table from utils module
+local attributes_to_table = utils.attributes_to_table
 
 --- Extract first heading from element content and set as title attribute.
 --- If the first element is a Header, extracts its text as title and removes it from content.

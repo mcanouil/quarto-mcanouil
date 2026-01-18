@@ -44,6 +44,7 @@
 // ============================================================================
 
 /// Render a single card with optional title, content, and footer.
+/// Header and footer have distinct background from body (matching HTML styling).
 ///
 /// @param config Card configuration dictionary
 /// @param colours Colour scheme dictionary
@@ -59,17 +60,43 @@
   let card-title = config.at("title", default: none)
   let card-content = config.at("content", default: none)
   let card-footer = config.at("footer", default: none)
-  let card-colour = config.at("colour", default: colours.muted)
+  let card-colour-raw = config.at("colour", default: colours.muted)
   let card-style = config.at("style", default: "subtle")
 
+  // Convert colour string to colour object if needed
+  let card-colour = if type(card-colour-raw) == str {
+    rgb(card-colour-raw)
+  } else {
+    card-colour-raw
+  }
+
   // Determine card styling based on style
-  let (bg-colour, border-colour, title-colour) = if card-style == "filled" {
-    (card-colour, card-colour.darken(10%), colours.background)
+  let (bg-colour, border-colour, title-colour, header-bg, content-colour) = if card-style == "filled" {
+    (
+      card-colour,
+      card-colour.darken(10%),
+      colours.background,
+      card-colour.darken(8%),
+      colours.background,
+    )
   } else if card-style == "outlined" {
-    (colours.background, card-colour, colours.foreground)
+    (
+      colours.background,
+      card-colour,
+      colours.foreground,
+      get-adaptive-background(colours.muted, colours),
+      colours.foreground,
+    )
   } else {
     // "subtle" style
-    (get-adaptive-background(card-colour, colours), get-adaptive-border(card-colour, colours), colours.foreground)
+    let adaptive-bg = get-adaptive-background(card-colour, colours)
+    (
+      adaptive-bg,
+      get-adaptive-border(card-colour, colours),
+      colours.foreground,
+      get-adaptive-background(colours.muted, colours),
+      colours.foreground,
+    )
   }
 
   box(
@@ -77,36 +104,58 @@
     fill: bg-colour,
     stroke: CARD-BORDER-WIDTH + border-colour,
     radius: CARD-RADIUS,
-    inset: CARD-INSET,
+    clip: true,
     {
-      // Title
+      // Header with title (distinct background)
       if card-title != none and has-content(card-title) {
-        text(
-          size: CARD-TITLE-SIZE,
-          weight: CARD-TITLE-WEIGHT,
-          fill: title-colour,
-          card-title,
+        block(
+          width: 100%,
+          fill: header-bg,
+          inset: (x: CARD-INSET, y: 0.8em),
+          below: 0pt,
+          {
+            text(
+              size: CARD-TITLE-SIZE,
+              weight: CARD-TITLE-WEIGHT,
+              fill: title-colour,
+              card-title,
+            )
+          },
         )
-        v(0.5em)
-      }
-
-      // Content
-      if card-content != none and has-content(card-content) {
-        text(
-          fill: if card-style == "filled" { colours.background } else { colours.foreground },
-          card-content,
-        )
-      }
-
-      // Footer
-      if card-footer != none and has-content(card-footer) {
-        v(0.5em)
         line(length: 100%, stroke: 0.5pt + border-colour)
-        v(0.5em)
-        text(
-          size: 0.9em,
-          fill: if card-style == "filled" { colours.background.lighten(20%) } else { colours.muted },
-          card-footer,
+      }
+
+      // Body content
+      if card-content != none and has-content(card-content) {
+        block(
+          width: 100%,
+          inset: CARD-INSET,
+          above: 0pt,
+          below: 0pt,
+          {
+            text(
+              fill: content-colour,
+              card-content,
+            )
+          },
+        )
+      }
+
+      // Footer (distinct background)
+      if card-footer != none and has-content(card-footer) {
+        line(length: 100%, stroke: 0.5pt + border-colour)
+        block(
+          width: 100%,
+          fill: header-bg,
+          inset: (x: CARD-INSET, y: 0.8em),
+          above: 0pt,
+          {
+            text(
+              size: 0.9em,
+              fill: if card-style == "filled" { colours.background.lighten(20%) } else { colours.muted },
+              card-footer,
+            )
+          },
         )
       }
     },

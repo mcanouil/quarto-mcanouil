@@ -33,7 +33,7 @@
 -- ============================================================================
 
 local utils = require(
-  quarto.utils.resolve_path('../_modules/typst-core-utils.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================
@@ -80,6 +80,10 @@ local function get_builtin_mappings()
       },
       ['card-grid'] = {
         wrapper = 'mcanouil-card-grid',
+        arguments = true
+      },
+      ['card'] = {
+        wrapper = 'mcanouil-card',
         arguments = true
       }
     },

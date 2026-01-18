@@ -26,7 +26,7 @@ author:
 date: today
 abstract: |
   This document showcases all features of the Mickaël CANOUIL Typst template for Quarto.
-  It demonstrates template-specific components including value boxes, info panels, status badges, dividers, progress bars, card grids, and executive summaries.
+  It demonstrates template-specific components including value boxes, info panels, status badges, dividers, progress bars, cards, card grids, executive summaries, and highlighted blocks.
   Additionally, it covers standard Quarto features such as figures, tables, mathematical notation, callouts, code blocks, and cross-references.
   Use this document as both a learning resource and a quick reference guide for all available template capabilities.
 keywords:
@@ -37,12 +37,15 @@ keywords:
   - Tutorial
 lang: en-GB
 copyright: "© 2026 Mickaël CANOUIL"
-code-window: true
-code-window-auto-filename: true
+extensions:
+  code-window:
+    enabled: true
+    auto-filename: true
 format:
   mcanouil-html: default
   mcanouil-revealjs:
     scrollable: true
+    smaller: true
     output-ext: revealjs.html
   mcanouil-typst:
     header-footer-style: "professional"  # Header and footer style
@@ -175,7 +178,7 @@ For example, see @sec-components for template components or @fig-example for a f
 
 ## Template-Specific Components {#sec-components}
 
-The template provides eight specialised components for professional document creation.
+The template provides nine specialised components for professional document creation.
 These components are unique to this Typst template and enhance visual communication.
 
 ### Value Boxes {#sec-value-boxes}
@@ -470,6 +473,24 @@ Maximum visual impact.
 - Card `colour`: Custom accent colour (for filled style).
 - Cards support title (## Heading), content, and footer (after ---).
 
+#### Standalone Cards
+
+Individual cards can be used outside of card grids for single-item emphasis:
+
+::: {.card style="outlined"}
+## Standalone Card Example
+
+This card is used independently, not within a card-grid.
+It provides the same styling options as cards within grids.
+:::
+
+::: {.card style="filled" colour="#9b59b6"}
+## Filled Standalone Card
+
+Filled cards with custom colours work perfectly as standalone components.
+Ideal for call-to-action blocks or featured content.
+:::
+
 ### Executive Summary {#sec-exec-summary}
 
 Executive summary blocks provide prominent, professional summary sections for reports.
@@ -715,6 +736,27 @@ They demand attention to prevent errors or adverse consequences.
 #### Inline Code
 
 Variable names like `my_variable`, function calls like `calculate_mean()`, and commands like `quarto render` appear inline with special formatting.
+
+#### Code Windows
+
+When `extensions.code-window.enabled: true` is set, code blocks with a `filename` attribute display a macOS-style window header.
+Auto-generated filenames from language names use small-caps styling.
+
+```{.python filename="fibonacci.py"}
+def fibonacci(n: int) -> int:
+    """Calculate the nth Fibonacci number."""
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+```
+
+```{.r filename="analysis.R"}
+# Load data and create summary
+data <- read.csv("data.csv")
+summary(data)
+```
+
+With `auto-filename: true`, code blocks without explicit filenames show the language name:
 
 #### Python Code Block
 
@@ -1011,15 +1053,17 @@ This demonstration showcases the complete feature set of the Mickaël CANOUIL Ty
 
 ### Template-Specific Components
 
-The template provides eight specialised components:
+The template provides nine specialised components:
 
 1. **Value Boxes** (@sec-value-boxes): Display metrics, KPIs, and statistics with icons and colours.
 2. **Info Panels** (@sec-panels): Highlight content with eight style variants (subtle, emphasis, accent, outline, info, success, warning, danger).
 3. **Status Badges** (@sec-badges): Provide compact inline status indicators with five colour types.
 4. **Dividers** (@sec-dividers): Create visual separation with multiple style options (solid, dashed, dotted, gradient, ornamental).
 5. **Progress Bars** (@sec-progress): Visualise completion and proportions with customisable colours.
-6. **Card Grids** (@sec-cards): Present content in flexible card layouts with three style variants.
-7. **Executive Summaries** (@sec-exec-summary): Create prominent summary blocks for professional reports.
+6. **Cards** (@sec-cards): Individual card components for featured content with three style variants.
+7. **Card Grids** (@sec-cards): Present multiple cards in flexible grid layouts.
+8. **Executive Summaries** (@sec-exec-summary): Create prominent summary blocks for professional reports.
+9. **Highlighted Blocks** (@sec-layout): Draw attention to key information with subtle background emphasis.
 
 ### Quarto Features
 
@@ -1029,7 +1073,7 @@ Standard Quarto features work seamlessly with enhanced styling:
 - **Tables** (@sec-tables): Simple tables, column alignment, and complex data tables.
 - **Mathematics** (@sec-maths): Inline expressions and display equations with cross-references.
 - **Callouts** (@sec-callouts): Five callout types (note, tip, important, warning, caution).
-- **Code Blocks** (@sec-code): Syntax highlighting for Python, R, Bash, and inline code.
+- **Code Blocks** (@sec-code): Syntax highlighting for Python, R, Bash, inline code, and macOS-style code windows.
 
 ### Typography and Layout
 
@@ -1317,8 +1361,10 @@ The template validates options and provides helpful error messages:
 | Badge              | `.badge`               | colour, icon                            |
 | Divider            | `{{< divider >}}`      | style, label, width, thickness          |
 | Progress Bar       | `{{< progress >}}`     | value, label, colour                    |
+| Card               | `.card`                | style, colour                           |
 | Card Grid          | `.card-grid`           | columns, alt                            |
 | Executive Summary  | `.executive-summary`   | title                                   |
+| Highlight          | `.highlight`           | (none)                                  |
 
 : Complete feature reference with syntax and parameters. {#tbl-appendix-ref .appendix}
 

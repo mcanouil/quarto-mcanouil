@@ -31,6 +31,9 @@
 
 local M = {}
 
+-- Extension name for config namespace
+local EXTENSION_NAME = 'code-window'
+
 -- ============================================================================
 -- DEFAULT CONFIGURATION
 -- ============================================================================
@@ -52,6 +55,7 @@ M.DEFAULT_CONFIG = {
 -- ============================================================================
 
 --- Load configuration from document metadata.
+--- Reads from extensions.code-window.* namespace.
 --- @param meta pandoc.Meta Document metadata
 --- @return CodeWindowConfig Configuration table
 function M.get_config(meta)
@@ -61,16 +65,19 @@ function M.get_config(meta)
     typst_wrapper = M.DEFAULT_CONFIG.typst_wrapper,
   }
 
-  if meta['code-window'] then
-    config.enabled = pandoc.utils.stringify(meta['code-window']) == 'true'
+  local ext_config = meta.extensions and meta.extensions[EXTENSION_NAME]
+  if not ext_config then
+    return config
   end
 
-  if meta['code-window-auto-filename'] then
-    config.auto_filename = pandoc.utils.stringify(meta['code-window-auto-filename']) == 'true'
+  if ext_config.enabled ~= nil then
+    config.enabled = pandoc.utils.stringify(ext_config.enabled) == 'true'
   end
-
-  if meta['code-window-wrapper'] then
-    config.typst_wrapper = pandoc.utils.stringify(meta['code-window-wrapper'])
+  if ext_config['auto-filename'] ~= nil then
+    config.auto_filename = pandoc.utils.stringify(ext_config['auto-filename']) == 'true'
+  end
+  if ext_config.wrapper ~= nil then
+    config.typst_wrapper = pandoc.utils.stringify(ext_config.wrapper)
   end
 
   return config

@@ -89,7 +89,6 @@
 /// @param logo-alt Alternative text for logo image
 /// @param colours Colour dictionary
 /// @param show-logo Whether to display the logo
-/// @param margin Page margins dictionary (fallback, uses page.margin when available)
 /// @return Formatted professional header content
 #let mcanouil-header-professional(
   title: none,
@@ -98,7 +97,6 @@
   logo-alt: none,
   colours: none,
   show-logo: true,
-  margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm),
 ) = context {
   // Use current margin from state (dynamically adapts to margin changes mid-document)
   let current-margin = current-margin-state.get()
@@ -182,7 +180,6 @@
 /// @param logo-alt Alternative text for logo image
 /// @param colours Colour dictionary
 /// @param show-logo Whether to display the logo
-/// @param margin Page margins dictionary
 /// @return Formatted header content based on style
 #let mcanouil-header(
   style: "academic",
@@ -192,7 +189,6 @@
   logo-alt: none,
   colours: none,
   show-logo: true,
-  margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm),
 ) = {
   if style == "professional" {
     mcanouil-header-professional(
@@ -202,7 +198,6 @@
       logo-alt: logo-alt,
       colours: colours,
       show-logo: show-logo,
-      margin: margin,
     )
   } else {
     mcanouil-header-academic(

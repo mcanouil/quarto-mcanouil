@@ -28,6 +28,14 @@
 --- @brief HTML-specific utility functions for component rendering
 --- @description Provides value conversion, escaping, and element generation for HTML output.
 
+-- ============================================================================
+-- MODULE IMPORTS
+-- ============================================================================
+
+local utils = require(
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+)
+
 local M = {}
 
 -- ============================================================================
@@ -376,7 +384,7 @@ M.render_progress = function(kwargs, config)
 
   local value = tonumber(M.to_string(kwargs.value)) or 0
   local label = M.to_string(kwargs.label)
-  local colour = M.to_string(kwargs.colour) or M.to_string(kwargs.color) or 'info'
+  local colour = utils.get_colour(kwargs, 'info')
   local show_value = M.to_string(kwargs['show-value']) ~= 'false'
   local height = M.to_string(kwargs.height) or default_height
 

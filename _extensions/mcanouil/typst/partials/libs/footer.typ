@@ -87,14 +87,12 @@
 /// @param centre-content Content for centre section (page counter, bold)
 /// @param right-content Content for right section (confidential label)
 /// @param colours Colour dictionary
-/// @param margin Page margins dictionary (fallback, uses page.margin when available)
 /// @return Formatted professional footer content
 #let mcanouil-footer-professional(
   left-content: none,
   centre-content: none,
   right-content: none,
   colours: none,
-  margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm),
 ) = context {
   // Use current margin from state (dynamically adapts to margin changes mid-document)
   let current-margin = current-margin-state.get()
@@ -167,7 +165,6 @@
 /// @param centre-content Content for centre section
 /// @param right-content Content for right section
 /// @param colours Colour dictionary
-/// @param margin Page margins dictionary
 /// @return Formatted footer content based on style
 #let mcanouil-footer(
   style: "academic",
@@ -175,7 +172,6 @@
   centre-content: none,
   right-content: none,
   colours: none,
-  margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm),
 ) = {
   if style == "professional" {
     mcanouil-footer-professional(
@@ -183,7 +179,6 @@
       centre-content: centre-content,
       right-content: right-content,
       colours: colours,
-      margin: margin,
     )
   } else {
     mcanouil-footer-academic(

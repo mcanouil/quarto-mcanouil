@@ -23,7 +23,7 @@
 ]]
 
 --- MC Utils - Common utility functions for Quarto Lua filters and shortcodes
---- @module typst-core-utils
+--- @module utils
 --- @author Mickaël Canouil
 --- @version 1.0.0
 
@@ -328,6 +328,17 @@ function utils_module.get_value(fields, obj)
   return value
 end
 
+--- Convert Pandoc AttributeList to plain table for easier processing.
+--- @param element table Element with attributes field (Div, Span, Table, Image)
+--- @return table Plain table with attribute key-value pairs
+function utils_module.attributes_to_table(element)
+  local attrs = {}
+  for k, v in pairs(element.attributes) do
+    attrs[k] = v
+  end
+  return attrs
+end
+
 -- ============================================================================
 -- HTML RAW GENERATION UTILITIES
 -- ============================================================================
@@ -543,6 +554,27 @@ function utils_module.resolve_project_path(path)
   else
     return path
   end
+end
+
+-- ============================================================================
+-- COLOUR UTILITIES
+-- ============================================================================
+
+--- Get colour value from attributes table, accepting both British and American spellings.
+--- Checks for 'colour' first (British, primary), then falls back to 'color' (American).
+--- @param attrs table Attributes table (kwargs or element.attributes)
+--- @param default string|nil Default value if neither spelling is found
+--- @return string|nil Colour value or default
+--- @usage local colour = utils_module.get_colour(kwargs, 'info')
+function utils_module.get_colour(attrs, default)
+  if attrs == nil then
+    return default
+  end
+  local value = attrs.colour or attrs.color
+  if utils_module.is_empty(value) then
+    return default
+  end
+  return utils_module.stringify(value)
 end
 
 -- ============================================================================

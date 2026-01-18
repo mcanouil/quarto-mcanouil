@@ -134,9 +134,10 @@ $mc-value-box-height: 100px;
   }
 }
 
+// Inline code styling matching Typst: subtle background, foreground text
 .reveal code:not(pre code) {
-  background-color: $body-color;
-  color: $body-bg;
+  background-color: body-mix(90%);
+  color: $body-color;
   padding: 0.1em 0.3em;
   border-radius: 3px;
 }
@@ -870,6 +871,47 @@ $mc-value-box-height: 100px;
         font-size: 0.8em;
       }
     }
+  }
+}
+
+// ===========================
+// CALLOUT STYLING
+// ===========================
+// Callout styling matching Typst: left border in callout colour, subtle background
+
+.reveal .callout {
+  // Override Quarto defaults - only left border in callout colour
+  border: none !important;
+  border-left: 4px solid !important;
+  border-radius: 4px !important;
+
+  &.callout-note {
+    background-color: color-mix(in srgb, $callout-color-note 8%, $body-bg) !important;
+    border-left-color: $callout-color-note !important;
+  }
+
+  &.callout-tip {
+    background-color: color-mix(in srgb, $callout-color-tip 8%, $body-bg) !important;
+    border-left-color: $callout-color-tip !important;
+  }
+
+  &.callout-warning {
+    background-color: color-mix(in srgb, $callout-color-warning 8%, $body-bg) !important;
+    border-left-color: $callout-color-warning !important;
+  }
+
+  &.callout-important {
+    background-color: color-mix(in srgb, $callout-color-important 8%, $body-bg) !important;
+    border-left-color: $callout-color-important !important;
+  }
+
+  &.callout-caution {
+    background-color: color-mix(in srgb, $callout-color-caution 8%, $body-bg) !important;
+    border-left-color: $callout-color-caution !important;
+  }
+
+  .callout-title-container {
+    font-weight: 600;
   }
 }
 

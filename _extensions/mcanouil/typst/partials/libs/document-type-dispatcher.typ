@@ -26,7 +26,7 @@
 // License: MIT
 
 /// Supported document types
-#let DOCUMENT_TYPES = "report" // ("report", "invoice", "letter", "cv")
+#let DOCUMENT_TYPES = ("report", "invoice", "letter", "cv")
 
 /// Main document dispatcher function.
 /// Routes to the appropriate template function based on document-type.

@@ -177,6 +177,9 @@ function Meta(meta)
       end,
       ['card-grid'] = function(div, config)
         return typst_card_grid.process_div(div, config)
+      end,
+      ['card'] = function(div, config)
+        return typst_card_grid.process_card_div(div, config)
       end
     }
 
@@ -194,12 +197,57 @@ end
 -- ELEMENT TRANSFORMATIONS
 -- ============================================================================
 
---- Process Div elements
+-- Container classes that must be processed before their children
+local CONTAINER_CLASSES = {
+  ['card-grid'] = true
+}
+
+--- Process container Div elements (first pass)
+--- Handles divs that contain other component divs and must extract them before transformation.
 --- @param div pandoc.Div Div element to process
 --- @return pandoc.RawBlock|table|pandoc.Div Transformed element or original
-function Div(div)
+local function DivContainers(div)
   if not CURRENT_FORMAT then
     return div
+  end
+
+  -- Only process container classes in this pass
+  for _, class in ipairs(div.classes) do
+    if CONTAINER_CLASSES[class] then
+      if CURRENT_FORMAT == 'html' or CURRENT_FORMAT == 'revealjs' then
+        local handler = DIV_HANDLERS[class]
+        if handler then
+          return handler(div)
+        end
+      elseif CURRENT_FORMAT == 'typst' then
+        if TYPST_DIV_MAPPINGS[class] then
+          local config = TYPST_DIV_MAPPINGS[class]
+          local handler = DIV_HANDLERS[class]
+          if handler then
+            return handler(div, config)
+          end
+        end
+      end
+    end
+  end
+
+  return div
+end
+
+--- Process non-container Div elements (second pass)
+--- Handles individual component divs after containers have been processed.
+--- @param div pandoc.Div Div element to process
+--- @return pandoc.RawBlock|table|pandoc.Div Transformed element or original
+local function DivComponents(div)
+  if not CURRENT_FORMAT then
+    return div
+  end
+
+  -- Skip container classes (already processed)
+  for _, class in ipairs(div.classes) do
+    if CONTAINER_CLASSES[class] then
+      return div
+    end
   end
 
   if CURRENT_FORMAT == 'html' or CURRENT_FORMAT == 'revealjs' then
@@ -320,7 +368,12 @@ end
 -- FILTER EXPORTS
 -- ============================================================================
 
+-- Three-pass filter:
+-- 1. Meta: Load configuration
+-- 2. DivContainers: Process container divs (card-grid) before children are transformed
+-- 3. DivComponents + others: Process individual components
 return {
   { Meta = Meta },
-  { Div = Div, Span = Span, Table = Table, Image = Image, CodeBlock = CodeBlock }
+  { Div = DivContainers },
+  { Div = DivComponents, Span = Span, Table = Table, Image = Image, CodeBlock = CodeBlock }
 }
