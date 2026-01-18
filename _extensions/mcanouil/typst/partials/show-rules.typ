@@ -154,25 +154,171 @@
   }
 }
 
-/// Apply code block styling with optional page breaks
+// ============================================================================
+// Code Window Constants and State
+// ============================================================================
+
+// State to hold filename for code window styling
+// Set by mcanouil-code-window wrapper, read by apply-code-block-style
+#let code-window-filename = state("code-window-filename", none)
+
+// Traffic light button constants (macOS standard)
+#let TRAFFIC-LIGHT-SIZE = 10pt
+#let TRAFFIC-LIGHT-GAP = 5pt
+#let TRAFFIC-LIGHT-CLOSE = rgb("#ff5f56")
+#let TRAFFIC-LIGHT-MINIMISE = rgb("#ffbd2e")
+#let TRAFFIC-LIGHT-MAXIMISE = rgb("#27c93f")
+
+// Code window layout constants
+#let CODE-WINDOW-RADIUS = 8pt
+#let CODE-WINDOW-BORDER-WIDTH = 1pt
+#let CODE-WINDOW-TITLEBAR-INSET = (x: 1em, y: 0.6em)
+
+/// Render macOS-style traffic light buttons
+/// @return Content Three circular buttons in a horizontal row
+#let render-traffic-lights() = {
+  box(
+    inset: (right: 8pt),
+    stack(
+      dir: ltr,
+      spacing: TRAFFIC-LIGHT-GAP,
+      circle(radius: TRAFFIC-LIGHT-SIZE / 2, fill: TRAFFIC-LIGHT-CLOSE, stroke: none),
+      circle(radius: TRAFFIC-LIGHT-SIZE / 2, fill: TRAFFIC-LIGHT-MINIMISE, stroke: none),
+      circle(radius: TRAFFIC-LIGHT-SIZE / 2, fill: TRAFFIC-LIGHT-MAXIMISE, stroke: none),
+    ),
+  )
+}
+
+/// Render code block as macOS-style window with traffic lights
 /// @param it Code block element
+/// @param filename Filename to display in title bar
+/// @param is-auto Whether filename is auto-generated (applies smallcaps styling)
 /// @param colours Colour dictionary
+/// @param content-fill Background fill for content area
+/// @param content-inset Content padding
+/// @param border-colour Border colour
 /// @param breakable-settings Breakable configuration
-/// @return Styled code block
-#let apply-code-block-style(it, colours, breakable-settings) = {
-  let code-block = block(
+/// @return Styled code window
+#let render-code-window-block(
+  it,
+  filename,
+  is-auto,
+  colours,
+  content-fill,
+  content-inset,
+  border-colour,
+  breakable-settings,
+) = {
+  // Title bar is darker than content by darkening the content fill
+  // This ensures consistent relative contrast in both light and dark modes
+  let titlebar-bg = content-fill.darken(5%)
+  let filename-colour = colours.muted
+
+  let code-window = block(
     width: 100%,
-    fill: colour-mix(colours, 95%),
-    inset: 8pt,
-    radius: 4pt,
-    stroke: 1pt + colour-mix(colours, 50%),
-    it,
+    stroke: CODE-WINDOW-BORDER-WIDTH + border-colour,
+    radius: CODE-WINDOW-RADIUS,
+    clip: true,
+    {
+      // Title bar with bottom border separator
+      block(
+        width: 100%,
+        fill: titlebar-bg,
+        inset: CODE-WINDOW-TITLEBAR-INSET,
+        below: 0pt,
+        radius: 0pt,
+        stroke: (bottom: CODE-WINDOW-BORDER-WIDTH + border-colour),
+        {
+          grid(
+            columns: (auto, 1fr),
+            align: (left + horizon, right + horizon),
+            gutter: 0.5em,
+            stroke: 0pt,
+            render-traffic-lights(),
+            if filename != none {
+              text(
+                // Smaller size for auto-generated filenames (simulated small caps)
+                size: if is-auto { 0.7em } else { 0.85em },
+                weight: 500,
+                fill: filename-colour,
+                font: ("Fira Code", "Menlo", "Monaco", "Consolas", "monospace"),
+                // Apply uppercase for auto-generated filenames (simulated small caps)
+                if is-auto { upper(filename) } else { filename },
+              )
+            },
+          )
+        },
+      )
+      // Content area with same background as standard code blocks
+      block(
+        width: 100%,
+        fill: content-fill,
+        inset: content-inset,
+        radius: 0pt,
+        stroke: 0pt,
+        it,
+      )
+    },
   )
 
   if breakable-settings.code == auto {
-    code-block
+    code-window
   } else {
-    block(breakable: breakable-settings.code, code-block)
+    block(breakable: breakable-settings.code, code-window)
+  }
+}
+
+/// Apply code block styling with optional page breaks
+/// Handles both standard code blocks and code windows (when filename state is set)
+/// @param it Code block element
+/// @param colours Colour dictionary
+/// @param breakable-settings Breakable configuration
+/// @return Styled code block or code window
+#let apply-code-block-style(it, colours, breakable-settings) = context {
+  // Shared styling values (ensures consistent background)
+  // Uses colour-mix to keep code blocks close to page background in both modes
+  let content-fill = colour-mix(colours, 95%)
+  let content-inset = 8pt
+  let content-radius = 4pt
+  let border-colour = colour-mix(colours, 50%)
+
+  // Check if this is a code window (filename state set by wrapper)
+  // State is now a dictionary with 'filename' and 'is-auto' keys
+  let window-state = code-window-filename.get()
+
+  if window-state != none {
+    // Reset state immediately to avoid affecting subsequent blocks
+    code-window-filename.update(none)
+    // Extract filename and is-auto flag from state
+    let filename = window-state.filename
+    let is-auto = window-state.at("is-auto", default: false)
+    // Render macOS-style window
+    render-code-window-block(
+      it,
+      filename,
+      is-auto,
+      colours,
+      content-fill,
+      content-inset,
+      border-colour,
+      breakable-settings,
+    )
+  } else {
+    // Standard code block styling
+    let code-block = block(
+      width: 100%,
+      fill: content-fill,
+      inset: content-inset,
+      radius: content-radius,
+      stroke: 1pt + border-colour,
+      it,
+    )
+
+    if breakable-settings.code == auto {
+      code-block
+    } else {
+      block(breakable: breakable-settings.code, code-block)
+    }
   }
 }
 

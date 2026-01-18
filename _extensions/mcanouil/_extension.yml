@@ -31,6 +31,8 @@ contributes:
     format: mcanouil-html
   formats:
     common:
+      code-window: true
+      code-window-auto-filename: true
       shortcodes:
         - shortcodes/divider.lua
         - shortcodes/value-box.lua
@@ -216,4 +218,3 @@ contributes:
           linkedin: MickaelCanouil
           bluesky: mickael.canouil.fr
           mastodon: https://fosstodon.org/%40MickaelCanouil
-          twitter: MickaelCanouil

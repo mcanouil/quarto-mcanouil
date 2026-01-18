@@ -37,6 +37,8 @@ keywords:
   - Tutorial
 lang: en-GB
 copyright: "© 2026 Mickaël CANOUIL"
+code-window: true
+code-window-auto-filename: true
 format:
   mcanouil-html: default
   mcanouil-revealjs:

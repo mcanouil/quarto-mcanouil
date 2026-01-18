@@ -781,6 +781,99 @@ $mc-value-box-height: 100px;
 }
 
 // ===========================
+// CODE WITH FILENAME (macOS-style)
+// ===========================
+
+.reveal {
+  .code-with-filename {
+    margin: 0.8em 0;
+    border: 1px solid body-mix(50%);
+    border-radius: 8px;
+    overflow: hidden;
+
+    // Filename header (title bar)
+    .code-with-filename-file {
+      background-color: body-mix(92%);
+      border-bottom: 1px solid body-mix(50%);
+      padding: 0 0.2em;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      min-height: 1.2em;
+
+      // Traffic light buttons (macOS style) - 50% larger than HTML version
+      &::before {
+        content: "";
+        display: inline-flex;
+        flex-shrink: 0;
+        width: 72px;
+        height: 21px;
+        margin-right: 8px;
+        background-image: radial-gradient(circle at 10px 10.5px, #ff5f56 9px, transparent 9px),
+          radial-gradient(circle at 36px 10.5px, #ffbd2e 9px, transparent 9px),
+          radial-gradient(circle at 62px 10.5px, #27c93f 9px, transparent 9px);
+      }
+
+      // Remove Quarto's default ::after pseudo-element
+      &::after {
+        content: none !important;
+        display: none !important;
+      }
+
+      pre {
+        margin: 0;
+        padding: 0;
+        background-color: transparent;
+        border: none;
+        font-size: 0.55em;
+        font-weight: 500;
+        color: $text-muted;
+        font-family: "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
+        flex-grow: 1;
+        text-align: right;
+
+        strong {
+          font-weight: 500;
+        }
+      }
+    }
+
+    // Code block immediately after filename
+    .code-copy-outer-scaffold,
+    div.sourceCode {
+      margin: 0;
+      border-radius: 0;
+      border: none;
+      max-height: none;
+      overflow: visible;
+    }
+
+    div.sourceCode {
+      border-top: none;
+
+      pre {
+        max-height: none;
+        overflow: visible;
+      }
+    }
+
+    // Ensure code content doesn't get unnecessary scrollbar
+    pre code {
+      max-height: none;
+      overflow: visible;
+    }
+
+    // Auto-generated filenames display in simulated small caps (uppercase, smaller)
+    &.code-window-auto {
+      .code-with-filename-file pre strong {
+        text-transform: uppercase;
+        font-size: 0.8em;
+      }
+    }
+  }
+}
+
+// ===========================
 // MCANOUIL COMPONENTS
 // ===========================
 // Components are now provided by the shared partial (../scss/_components.scss)

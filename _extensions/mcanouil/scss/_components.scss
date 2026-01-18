@@ -627,6 +627,99 @@ $mc-breakpoint-sm: 576px !default;
   }
 }
 
+/// Code window component mixin (macOS-style)
+/// Styles code blocks with filename attribute as macOS terminal windows
+@mixin code-window {
+  // macOS traffic light button colours (consistent across light/dark modes)
+  $traffic-light-close: #ff5f56;
+  $traffic-light-minimise: #ffbd2e;
+  $traffic-light-maximise: #27c93f;
+  $traffic-light-size: 12px;
+  $traffic-light-gap: 6px;
+
+  .code-with-filename {
+    margin: $mc-margin;
+    border-radius: $mc-radius;
+    border: 1px solid var(--mc-border);
+    overflow: hidden;
+
+    // Title bar with traffic lights and filename
+    .code-with-filename-file {
+      display: flex;
+      align-items: center;
+      gap: 0.75em;
+      background-color: var(--mc-surface);
+      border: none;
+      border-bottom: 1px solid var(--mc-border);
+      border-radius: 0;
+      padding: 0.6em 1em;
+      margin: 0;
+
+      // Traffic light buttons via pseudo-element
+      &::before {
+        content: '';
+        display: inline-flex;
+        flex-shrink: 0;
+        width: calc(#{$traffic-light-size} * 3 + #{$traffic-light-gap} * 2);
+        height: $traffic-light-size;
+        background:
+          radial-gradient(
+            circle at calc(#{$traffic-light-size} / 2) calc(#{$traffic-light-size} / 2),
+            #{$traffic-light-close} calc(#{$traffic-light-size} / 2 - 1px),
+            transparent calc(#{$traffic-light-size} / 2)
+          ),
+          radial-gradient(
+            circle at calc(#{$traffic-light-size} * 1.5 + #{$traffic-light-gap}) calc(#{$traffic-light-size} / 2),
+            #{$traffic-light-minimise} calc(#{$traffic-light-size} / 2 - 1px),
+            transparent calc(#{$traffic-light-size} / 2)
+          ),
+          radial-gradient(
+            circle at calc(#{$traffic-light-size} * 2.5 + #{$traffic-light-gap} * 2) calc(#{$traffic-light-size} / 2),
+            #{$traffic-light-maximise} calc(#{$traffic-light-size} / 2 - 1px),
+            transparent calc(#{$traffic-light-size} / 2)
+          );
+      }
+
+      // Filename styling
+      pre {
+        flex: 1;
+        margin: 0;
+        padding: 0;
+        background-color: transparent;
+        border: none;
+        text-align: center;
+        font-size: 0.85em;
+        font-weight: 500;
+        color: var(--mc-muted);
+      }
+
+      // Spacer for visual balance (matches traffic light width)
+      &::after {
+        content: '';
+        display: inline-flex;
+        flex-shrink: 0;
+        width: calc(#{$traffic-light-size} * 3 + #{$traffic-light-gap} * 2);
+        height: $traffic-light-size;
+      }
+    }
+
+    // Code block content area
+    .sourceCode,
+    div.sourceCode,
+    .code-copy-outer-scaffold {
+      margin: 0;
+      border: none;
+      border-radius: 0;
+
+      pre {
+        margin: 0;
+        border: none;
+        border-radius: 0;
+      }
+    }
+  }
+}
+
 /// All components mixin - includes all component styles
 /// Call this at root level (HTML) or inside .reveal (Reveal.js)
 @mixin all {
@@ -637,4 +730,5 @@ $mc-breakpoint-sm: 576px !default;
   @include value-box;
   @include card-grid;
   @include executive-summary;
+  @include code-window;
 }

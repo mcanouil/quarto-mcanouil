@@ -404,6 +404,14 @@ $endif$
   render-card-grid(cards, mcanouil-colours(mode: effective-brand-mode), ..args)
 }
 
+// Wrapper for code windows with filename
+// Sets state for apply-code-block-style to render as code window
+// is-auto: true when filename is auto-generated from language (applies smallcaps)
+#let mcanouil-code-window(content, filename: none, is-auto: false) = {
+  code-window-filename.update((filename: filename, is-auto: is-auto))
+  content
+}
+
 // Outlines section (TOC, List of X) on own page(s) when any are enabled
 // These sections are rendered in single column mode
 $if(toc)$

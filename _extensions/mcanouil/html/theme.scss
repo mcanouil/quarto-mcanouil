@@ -1592,32 +1592,56 @@ div.sourceCode {
   }
 }
 
-// Code with filename wrapper
+// Code with filename wrapper (macOS-style code window)
 .code-with-filename {
   margin: 1em 0;
+  border: 1px solid rgba($foreground, 0.5);
+  border-radius: 8px;
+  overflow: hidden;
 
-  // Filename header
+  // Filename header (title bar)
   .code-with-filename-file {
-    background-color: rgba($foreground, 0.05);
-    border: 1px solid rgba($foreground, 0.5);
-    border-bottom: none;
-    border-radius: 6px 6px 0 0;
-    padding: 0.5em 1em;
+    background-color: rgba($foreground, 0.08);
+    border-bottom: 1px solid rgba($foreground, 0.5);
+    padding: 0.6em 1em;
     margin: 0;
+    display: flex;
+    align-items: center;
     transition: all 0.3s ease;
+
+    // Traffic light buttons (macOS style)
+    &::before {
+      content: "";
+      display: inline-flex;
+      flex-shrink: 0;
+      width: 52px;
+      height: 12px;
+      margin-right: 8px;
+      background-image: radial-gradient(circle at 6px 6px, #ff5f56 5px, transparent 5px),
+        radial-gradient(circle at 21px 6px, #ffbd2e 5px, transparent 5px),
+        radial-gradient(circle at 36px 6px, #27c93f 5px, transparent 5px);
+    }
+
+    // Remove Quarto's default ::after pseudo-element
+    &::after {
+      content: none !important;
+      display: none !important;
+    }
 
     pre {
       margin: 0;
       padding: 0;
       background-color: transparent;
       border: none;
-      font-size: 0.9em;
-      font-weight: 600;
-      color: rgba($foreground, 0.85);
+      font-size: 0.85em;
+      font-weight: 500;
+      color: rgba($foreground, 0.6);
+      font-family: "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
+      flex-grow: 1;
+      text-align: right;
 
       strong {
-        font-weight: 600;
-        color: $foreground;
+        font-weight: 500;
       }
     }
   }
@@ -1626,18 +1650,27 @@ div.sourceCode {
   .code-copy-outer-scaffold,
   div.sourceCode {
     margin-top: 0;
-    border-radius: 0 0 6px 6px;
+    border-radius: 0;
+    border: none;
+  }
+
+  // Remove top border from nested code block
+  div.sourceCode {
+    border-top: none;
   }
 
   // Hover effect for the entire wrapper
   &:hover {
     .code-with-filename-file {
-      background-color: rgba($foreground, 0.08);
-      border-color: rgba($foreground, 0.6);
+      background-color: rgba($foreground, 0.1);
     }
+  }
 
-    div.sourceCode {
-      box-shadow: 0 4px 12px rgba($foreground, 0.08);
+  // Auto-generated filenames display in simulated small caps (uppercase, smaller)
+  &.code-window-auto {
+    .code-with-filename-file pre strong {
+      text-transform: uppercase;
+      font-size: 0.8em;
     }
   }
 }

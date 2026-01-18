@@ -702,7 +702,6 @@ window.RevealJsMCanouil = function () {
       if (parent) {
         const needsAtPrefix =
           parent.classList.contains("github") ||
-          parent.classList.contains("twitter") ||
           parent.classList.contains("bluesky") ||
           parent.classList.contains("mastodon");
         if (needsAtPrefix && !text.startsWith("@")) {
