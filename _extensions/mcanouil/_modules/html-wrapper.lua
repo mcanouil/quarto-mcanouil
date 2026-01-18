@@ -22,7 +22,7 @@
 # SOFTWARE.
 ]]
 
---- @module wrapper
+--- @module html-wrapper
 --- @author Mickaël Canouil
 --- @version 1.0.0
 --- @brief Wrapper generation utilities for HTML component rendering

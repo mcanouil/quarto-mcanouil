@@ -43,14 +43,25 @@ extensions:
     auto-filename: true
 format:
   mcanouil-html: default
-  mcanouil-revealjs:
+  mcanouil-revealjs+dark:
+    brand-mode: dark
     scrollable: true
     smaller: true
-    output-ext: revealjs.html
-  mcanouil-typst:
+    output-ext: dark-revealjs.html
+  mcanouil-revealjs+light:
+    brand-mode: light
+    scrollable: true
+    smaller: true
+    output-ext: light-revealjs.html
+  mcanouil-typst+dark:
+    header-footer-style: "academic"
+    brand-mode: dark
+    output-ext: dark.pdf
+  mcanouil-typst+light:
     header-footer-style: "professional"  # Header and footer style
     # Colour Mode (light or dark)
     brand-mode: light
+    output-ext: light.pdf
 
     # Optional Colour Overrides
     # colour-background: "#fafafa"  # Custom background colour
