@@ -916,6 +916,23 @@ $mc-value-box-height: 100px;
 }
 
 // ===========================
+// ASIDE FOOTNOTES
+// ===========================
+
+.reveal .aside-footnotes {
+  font-style: italic;
+  font-size: 0.75em;
+}
+
+// ===========================
+// STACK LAYOUT
+// ===========================
+
+.reveal .r-stack > * {
+  margin: 0;
+}
+
+// ===========================
 // MCANOUIL COMPONENTS
 // ===========================
 // Components are now provided by the shared partial (../scss/_components.scss)
