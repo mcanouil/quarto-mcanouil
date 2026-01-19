@@ -300,7 +300,7 @@ Panels support any content type:
 
 - Unordered and ordered lists.
 - Code blocks and inline code like `function()`.
-- Mathematical notation: $E = mc^2$.
+- Mathematical notation: [$E = mc^2$]{alt="Energy-mass equivalence"}.
 - **Bold text**, *italic text*, and ***bold italic text***.
 
 This versatility makes panels ideal for technical documentation and reports.
@@ -652,9 +652,12 @@ Detailed colour information is available in @tbl-colours.
 
 #### Inline Mathematics
 
-Inline mathematical expressions like $\alpha + \beta = \gamma$, $\int_0^1 f(x) \, dx$, and $\sum_{i=1}^{n} i = \frac{n(n+1)}{2}$ integrate seamlessly with text.
+Inline mathematical expressions like [$\alpha + \beta = \gamma$]{alt="Alpha plus beta equals gamma"},
+[$\int_0^1 f(x) \, dx$]{alt="Integral of f of x from 0 to 1"},
+and [$\sum_{i=1}^{n} i = \frac{n(n+1)}{2}$]{alt="Sum of i from 1 to n equals n times n plus 1 over 2"} integrate seamlessly with text.
 
-The quadratic formula $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$ and Euler's identity $e^{i\pi} + 1 = 0$ demonstrate mathematical typesetting quality.
+The quadratic formula [$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$]{alt="Quadratic formula"} and
+Euler's identity [$e^{i\pi} + 1 = 0$]{alt="Euler's identity"} demonstrate mathematical typesetting quality.
 
 #### Display Mathematics
 
@@ -664,7 +667,7 @@ $$
 E = mc^2
 $$ {#eq-einstein alt="Einstein's mass-energy equivalence equation"}
 
-The quadratic formula for solving $ax^2 + bx + c = 0$:
+The quadratic formula for solving [$ax^2 + bx + c = 0$]{alt="Quadratic equation"}:
 
 $$
 x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}

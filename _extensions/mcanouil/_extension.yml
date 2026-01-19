@@ -41,6 +41,8 @@ contributes:
       filters:
         - at: pre-quarto
           path: filters/components.lua
+        - at: pre-quarto
+          path: filters/math-alt-text.lua
     html:
       # Theme
       theme:
