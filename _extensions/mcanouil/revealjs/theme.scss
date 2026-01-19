@@ -744,7 +744,7 @@ $mc-value-box-height: 100px;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 1em;
+    gap: 0.5em;
     margin-top: 1em;
 
     .social-link {
@@ -928,8 +928,45 @@ $mc-value-box-height: 100px;
 // STACK LAYOUT
 // ===========================
 
-.reveal .r-stack > * {
+.reveal .r-stack>* {
   margin: 0;
+}
+
+// ===========================
+// FRAGMENT LIST MARKERS
+// ===========================
+// Hide list markers until fragment content is revealed
+
+.reveal ul li:has(.fragment)::marker,
+.reveal ol li:has(.fragment)::marker {
+  color: transparent;
+  transition: color 0.3s ease;
+}
+
+.reveal li.visible::marker,
+.reveal li.fragment.visible::marker,
+.reveal li:has(.fragment.visible)::marker {
+  color: inherit;
+}
+
+// ===========================
+// ICONIFY ICONS
+// ===========================
+
+.reveal iconify-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}
+
+// ===========================
+// PANEL TABSET
+// ===========================
+
+.reveal .panel-tabset ul li a:focus,
+.reveal .panel-tabset ul li a:active {
+  outline: none;
+  box-shadow: none;
 }
 
 // ===========================
