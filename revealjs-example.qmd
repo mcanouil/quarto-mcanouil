@@ -258,6 +258,42 @@ This appears second.
 This appears third.
 :::
 
+## Line Highlighting with Fragments
+
+:::: {.fragment fragment-index="3"}
+Step 3
+:::
+
+:::: {.columns}
+
+:::: {.column width="50%"}
+
+```{.r code-line-numbers="|2|3" code-line-fragment-indices="1,2,4"}
+par(mfrow = c(1, 2))
+plot(cars)
+plot(cars, col = "red")
+par(mfrow = c(1, 1))
+```
+
+:::
+
+:::: {.column width="50%"}
+
+```{.r code-line-numbers="|2|3" code-line-fragment-indices="1,2,4"}
+par(mfrow = c(1, 2))
+plot(cars)
+plot(cars, col = "red")
+par(mfrow = c(1, 1))
+```
+
+:::
+
+:::
+
+:::: {.fragment fragment-index="1"}
+First step
+:::
+
 # Background Variations
 
 ## Testing Section Styles
