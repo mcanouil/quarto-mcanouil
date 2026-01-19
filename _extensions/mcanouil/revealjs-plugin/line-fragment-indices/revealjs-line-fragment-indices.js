@@ -107,10 +107,10 @@ window.RevealJsLineFragmentIndices = function () {
           if (indices.length !== expectedIndices) {
             console.warn(
               "[line-fragment-indices] Code block has " +
-                expectedIndices +
-                " highlight steps but " +
-                indices.length +
-                " fragment indices specified.",
+              expectedIndices +
+              " highlight steps but " +
+              indices.length +
+              " fragment indices specified.",
               sourceCodeDiv
             );
           }
