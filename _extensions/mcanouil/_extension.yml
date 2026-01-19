@@ -134,7 +134,8 @@ contributes:
         - typst/partials/typst-show.typ
       # Typst-specific filters
       filters:
-        - filters/special-sections.lua
+        - path: filters/special-sections.lua
+          at: pre-quarto
       # Typography
       mainfont: "Alegreya Sans"
       fontsize: 11pt

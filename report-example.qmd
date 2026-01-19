@@ -57,11 +57,11 @@ format:
     header-footer-style: "academic"
     brand-mode: dark
     output-ext: dark.pdf
-  mcanouil-typst+light:
+  mcanouil-typst:
+    keep-typ: true
     header-footer-style: "professional"  # Header and footer style
     # Colour Mode (light or dark)
     brand-mode: light
-    output-ext: light.pdf
 
     # Optional Colour Overrides
     # colour-background: "#fafafa"  # Custom background colour
@@ -142,7 +142,6 @@ format:
     # link-underline-opacity: 50%       # Underline opacity
     # link-colour: auto                 # Optional custom link colour
 
-keep-typ: true                          # Keep intermediate Typst file for debugging
 bibliographystyle: apa                  # Bibliography style
 citeproc: true                          # Enable citation processing
 crossref:
@@ -541,7 +540,7 @@ The template supports all standard Quarto features with enhanced styling.
 
 #### Simple Figure
 
-::: {#fig-example}
+::: {#fig-example alt="Placeholder image of 600x400 pixels"}
 
 {{< placeholder 600 400 >}}
 
@@ -553,7 +552,7 @@ Reference the figure using @fig-example in your text.
 
 #### Figure with Custom Width
 
-::: {#fig-wide width=100%}
+::: {#fig-wide width=100% alt="Wide placeholder image of 800x300 pixels"}
 
 {{< placeholder 800 300 >}}
 
@@ -567,7 +566,7 @@ See @fig-wide for the wider figure example.
 
 ::: {#fig-multiple layout-ncol=2}
 
-::: {#fig-sub1}
+::: {#fig-sub1 alt="Placeholder image of 400x300 pixels"}
 
 {{< placeholder 400 300 >}}
 
@@ -575,7 +574,7 @@ First subfigure showing left panel.
 
 :::
 
-::: {#fig-sub2}
+::: {#fig-sub2 alt="Placeholder image of 400x300 pixels"}
 
 {{< placeholder 400 300 >}}
 
@@ -663,13 +662,13 @@ Einstein's famous mass-energy equivalence relation:
 
 $$
 E = mc^2
-$$ {#eq-einstein}
+$$ {#eq-einstein alt="Einstein's mass-energy equivalence equation"}
 
 The quadratic formula for solving $ax^2 + bx + c = 0$:
 
 $$
 x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
-$$ {#eq-quadratic}
+$$ {#eq-quadratic alt="Quadratic formula for solving ax^2 + bx + c = 0"}
 
 Maxwell's equations governing electromagnetic fields:
 
@@ -680,7 +679,7 @@ $$
 \nabla \times \mathbf{E} &= -\frac{\partial \mathbf{B}}{\partial t} \\
 \nabla \times \mathbf{B} &= \mu_0 \mathbf{J} + \mu_0 \epsilon_0 \frac{\partial \mathbf{E}}{\partial t}
 \end{aligned}
-$$ {#eq-maxwell}
+$$ {#eq-maxwell alt="Maxwell's equations for electromagnetism"}
 
 Matrix equation demonstrating linear algebra:
 
@@ -701,7 +700,7 @@ b_1 \\
 b_2 \\
 b_3
 \end{bmatrix}
-$$ {#eq-matrix}
+$$ {#eq-matrix alt="Matrix equation Ax = b"}
 
 Cross-reference equations using @eq-einstein, @eq-quadratic, @eq-maxwell, or @eq-matrix.
 
