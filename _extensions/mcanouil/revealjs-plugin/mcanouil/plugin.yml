@@ -7,21 +7,11 @@ config:
     section-outline: true
     date-superscript: true
     favicon-from-logo: true
-    code-annotations: true
     menu-logo-visibility: true
     debug-borders: false
-    section-slide-style: banner
-    section-background: null
-    section-foreground: null
-    outline-border-color: null
   # Top-level aliases (for convenience - users can specify directly under format)
-  debug-borders: false
   section-outline: true
   date-superscript: true
   favicon-from-logo: true
-  code-annotations: true
   menu-logo-visibility: true
-  section-slide-style: banner
-  section-background: null
-  section-foreground: null
-  outline-border-color: null
+  debug-borders: false

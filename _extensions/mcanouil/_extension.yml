@@ -195,6 +195,7 @@ contributes:
         - revealjs-plugin/mcanouil
         - revealjs-plugin/tabset
         - revealjs-plugin/line-fragment-indices
+        - revealjs-plugin/code-annotation-fragments
       # Plugin options (handled by mcanouil-revealjs plugin)
       # Section slide colours are derived from brand.yml via SCSS
       section-outline: true

@@ -5,7 +5,6 @@
  * - Section slide detection and outline generation
  * - Date superscript formatting (1st, 2nd, 3rd)
  * - Favicon generation from slide logo
- * - Code annotation fragment synchronisation
  * - Title slide chrome visibility (menu/logo/footer/slide-number)
  *
  * @author Mickaël Canouil
@@ -22,14 +21,8 @@ window.RevealJsMCanouil = function () {
     sectionOutline: true,
     dateSuperscript: true,
     faviconFromLogo: true,
-    codeAnnotationFragments: true, // Enable fragment navigation through code annotations
     hideTitleSlideChrome: true, // Hide menu/logo/footer/slide-number on title slide
     debugBorders: false, // Show coloured borders on slides for overflow debugging
-    // Colour customisation (null = use brand.yml colours via CSS custom properties)
-    // Override these to use custom colours instead of brand-derived values
-    sectionBackground: null,
-    sectionForeground: null,
-    outlineBorderColor: null,
   };
 
   let config = {};
@@ -70,11 +63,6 @@ window.RevealJsMCanouil = function () {
       //   format:
       //     mcanouil-revealjs:
       //       debug-borders: true
-      // Or under the plugin namespace:
-      //   format:
-      //     mcanouil-revealjs:
-      //       mcanouil-revealjs:
-      //         debug-borders: true
       const deckConfig = deck.getConfig();
       const pluginConfig = normaliseConfig(deckConfig["mcanouil-revealjs"] || {});
 
@@ -98,8 +86,6 @@ window.RevealJsMCanouil = function () {
       // Top-level options take precedence (what user writes directly under format)
       config = { ...defaults, ...pluginConfig, ...topLevelConfig };
 
-      // Apply colour customisations via CSS custom properties
-      applyColourCustomisation(config);
 
       // Set up event listeners
       deck.on("ready", function () {
@@ -115,23 +101,11 @@ window.RevealJsMCanouil = function () {
         if (config.hideTitleSlideChrome) {
           updateTitleSlideChrome(deck.getIndices());
         }
-        if (config.codeAnnotationFragments) {
-          setupCodeAnnotationFragments();
-        }
         if (config.debugBorders) {
           applyDebugBorders();
         }
         processSocialHandles();
       });
-
-      if (config.codeAnnotationFragments) {
-        deck.on("fragmentshown", function (event) {
-          onAnnotationFragmentShown(event);
-        });
-        deck.on("fragmenthidden", function (event) {
-          onAnnotationFragmentHidden(event);
-        });
-      }
 
       if (config.hideTitleSlideChrome) {
         deck.on("slidechanged", function (event) {
@@ -140,30 +114,6 @@ window.RevealJsMCanouil = function () {
       }
     },
   };
-
-  // =========================================================================
-  // COLOUR CUSTOMISATION
-  // =========================================================================
-
-  /**
-   * Apply colour configuration as CSS custom properties on :root
-   * @param {Object} config - Plugin configuration
-   */
-  function applyColourCustomisation(config) {
-    const root = document.documentElement;
-    if (config.sectionBackground) {
-      root.style.setProperty("--mcanouil-section-bg", config.sectionBackground);
-    }
-    if (config.sectionForeground) {
-      root.style.setProperty("--mcanouil-section-fg", config.sectionForeground);
-    }
-    if (config.outlineBorderColor) {
-      root.style.setProperty(
-        "--mcanouil-outline-border",
-        config.outlineBorderColor
-      );
-    }
-  }
 
   // =========================================================================
   // SECTION SLIDES
@@ -431,153 +381,6 @@ window.RevealJsMCanouil = function () {
     }
     link.type = type;
     link.href = href;
-  }
-
-  // =========================================================================
-  // CODE ANNOTATION FRAGMENTS
-  // =========================================================================
-
-  /**
-   * Get the next available fragment index for a slide.
-   * Finds the maximum existing fragment index and returns the next one.
-   * @param {Element} slide - The slide element
-   * @returns {number} The next available fragment index
-   */
-  function getNextFragmentIndex(slide) {
-    const allFragments = slide.querySelectorAll(".fragment[data-fragment-index]");
-    let maxIndex = -1;
-    allFragments.forEach(function (fragment) {
-      const idx = parseInt(fragment.getAttribute("data-fragment-index"), 10);
-      if (!isNaN(idx) && idx > maxIndex) {
-        maxIndex = idx;
-      }
-    });
-    return maxIndex + 1;
-  }
-
-  /**
-   * Set up fragment triggers for code annotations.
-   * Creates invisible fragment elements for each annotation anchor,
-   * allowing navigation through annotations with arrow keys.
-   */
-  function setupCodeAnnotationFragments() {
-    // Find all code blocks with annotations (directly, not per-slide to avoid duplicates)
-    const annotatedCells = document.querySelectorAll(".reveal .slides .code-annotation-code");
-
-    annotatedCells.forEach(function (codeBlock) {
-      // Skip if already processed
-      if (codeBlock.dataset.annotationFragmentsCreated) return;
-      codeBlock.dataset.annotationFragmentsCreated = "true";
-
-      const anchors = codeBlock.querySelectorAll(".code-annotation-anchor");
-      if (anchors.length === 0) return;
-
-      // Get the parent slide section
-      const slide = codeBlock.closest("section");
-      if (!slide) return;
-
-      // Get the parent container to append fragments
-      const parentNode = codeBlock.closest(".cell") || codeBlock.parentNode;
-
-      // Find the next available fragment index (robust: checks existing indices)
-      let currentIndex = getNextFragmentIndex(slide);
-
-      // Create invisible fragment triggers for each annotation
-      anchors.forEach(function (anchor, i) {
-        const targetCell = anchor.dataset.targetCell;
-        const targetAnnotation = anchor.dataset.targetAnnotation;
-
-        const fragmentDiv = document.createElement("div");
-        fragmentDiv.className = "code-annotation-fragment fragment";
-        fragmentDiv.dataset.targetCell = targetCell;
-        fragmentDiv.dataset.targetAnnotation = targetAnnotation;
-        fragmentDiv.dataset.anchorIndex = i;
-        fragmentDiv.setAttribute("data-fragment-index", currentIndex);
-        fragmentDiv.style.display = "none";
-        parentNode.appendChild(fragmentDiv);
-        currentIndex++;
-      });
-    });
-  }
-
-  /**
-   * Hide all annotation tooltips
-   */
-  function hideAllAnnotationTooltips() {
-    const allAnchors = document.querySelectorAll(".code-annotation-anchor");
-    allAnchors.forEach(function (anchor) {
-      if (anchor._tippy) {
-        anchor._tippy.hide();
-      }
-    });
-  }
-
-  /**
-   * Show annotation tooltip for a specific anchor using tippy directly
-   * @param {string} targetCell - The target cell ID
-   * @param {string} targetAnnotation - The annotation number
-   */
-  function showAnnotationTooltip(targetCell, targetAnnotation) {
-    const anchor = document.querySelector(
-      '.code-annotation-anchor[data-target-cell="' + targetCell +
-      '"][data-target-annotation="' + targetAnnotation + '"]'
-    );
-
-    if (anchor && anchor._tippy) {
-      anchor._tippy.show();
-    }
-  }
-
-  /**
-   * Handle annotation fragment shown events.
-   * Shows the corresponding annotation tooltip when fragment is revealed.
-   * @param {Object} event - Reveal.js fragment event
-   */
-  function onAnnotationFragmentShown(event) {
-    const fragment = event.fragment;
-    if (!fragment || !fragment.classList.contains("code-annotation-fragment")) {
-      return;
-    }
-
-    // Hide all tooltips first to ensure clean state
-    hideAllAnnotationTooltips();
-
-    // Show the target tooltip
-    const targetCell = fragment.dataset.targetCell;
-    const targetAnnotation = fragment.dataset.targetAnnotation;
-    showAnnotationTooltip(targetCell, targetAnnotation);
-  }
-
-  /**
-   * Handle annotation fragment hidden events.
-   * Shows the previous annotation tooltip when navigating backwards.
-   * @param {Object} event - Reveal.js fragment event
-   */
-  function onAnnotationFragmentHidden(event) {
-    const fragment = event.fragment;
-    if (!fragment || !fragment.classList.contains("code-annotation-fragment")) {
-      return;
-    }
-
-    // Hide all tooltips first
-    hideAllAnnotationTooltips();
-
-    // Find the previous annotation fragment and show its tooltip
-    const anchorIndex = parseInt(fragment.dataset.anchorIndex, 10);
-    if (anchorIndex > 0) {
-      // Get the previous fragment's target info
-      const slide = fragment.closest("section");
-      if (slide) {
-        const prevFragment = slide.querySelector(
-          '.code-annotation-fragment[data-anchor-index="' + (anchorIndex - 1) + '"]'
-        );
-        if (prevFragment) {
-          const targetCell = prevFragment.dataset.targetCell;
-          const targetAnnotation = prevFragment.dataset.targetAnnotation;
-          showAnnotationTooltip(targetCell, targetAnnotation);
-        }
-      }
-    }
   }
 
   // =========================================================================

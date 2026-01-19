@@ -24,12 +24,16 @@ format:
 
 ## About This Test
 
+:::: {.fragment fragment-index="1"}
+
 This presentation tests all components of the mcanouil Reveal.js format.
 
-- Title slide styling with corner brackets.
-- Section slides with banner style.
-- Gradient underlines on headings.
-- Code blocks and annotations.
+:::
+
+- [Title slide styling with corner brackets.]{.fragment fragment-index="2"}
+- [Section slides with banner style.]{.fragment fragment-index="3"}
+- [Gradient underlines on headings.]{.fragment fragment-index="4"}
+- [Code blocks and annotations.]{.fragment fragment-index="5"}
 
 ## Features Being Tested
 
