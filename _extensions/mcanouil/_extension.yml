@@ -13,6 +13,11 @@ contributes:
       favicon: logos/logo-light-path.svg
       back-to-top-navigation: true
       page-navigation: true
+      open-graph: true
+      twitter-card: true
+      repo-actions: [source, issue]
+      repo-link-target: _blank
+      repo-link-rel: noopener noreferrer
       navbar:
         background: dark
         search: true
@@ -31,6 +36,7 @@ contributes:
     format: mcanouil-html
   formats:
     common:
+      lang: en
       code-window: true
       code-window-auto-filename: true
       shortcodes:

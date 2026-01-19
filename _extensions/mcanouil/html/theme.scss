@@ -276,6 +276,13 @@ td code.sourceCode {
   .callout-title-container {
     font-weight: 600;
   }
+
+  // Remove bottom spacing from last element in callout body (except code blocks)
+  &.callout-titled .callout-body > :last-child:not(.sourceCode),
+  &.callout-titled .callout-body > div > :last-child:not(.sourceCode) {
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
 }
 
 // ===========================
