@@ -42,7 +42,7 @@
  * ```
  */
 
-window.RevealJsCodeAnnotationFragments = () => {
+window.RevealJsCodeAnnotationFragments = function () {
   "use strict";
 
   /**
@@ -50,10 +50,13 @@ window.RevealJsCodeAnnotationFragments = () => {
    * @param {Element} fragment - The fragment element to check.
    * @returns {boolean} True if line highlight fragment.
    */
-  const isLineHighlightFragment = (fragment) =>
-    fragment.tagName === "CODE" &&
-    fragment.classList.contains("fragment") &&
-    fragment.closest("pre") !== null;
+  function isLineHighlightFragment(fragment) {
+    return (
+      fragment.tagName === "CODE" &&
+      fragment.classList.contains("fragment") &&
+      fragment.closest("pre") !== null
+    );
+  }
 
   /**
    * Build CSS selector for an annotation anchor.
@@ -61,33 +64,36 @@ window.RevealJsCodeAnnotationFragments = () => {
    * @param {string} targetAnnotation - The annotation number.
    * @returns {string} CSS selector string.
    */
-  const buildAnchorSelector = (targetCell, targetAnnotation) =>
-    `.code-annotation-anchor[data-target-cell="${targetCell}"][data-target-annotation="${targetAnnotation}"]`;
+  function buildAnchorSelector(targetCell, targetAnnotation) {
+    return `.code-annotation-anchor[data-target-cell="${targetCell}"][data-target-annotation="${targetAnnotation}"]`;
+  }
 
   /**
    * Convert kebab-case to camelCase.
    * @param {string} str - Kebab-case string.
    * @returns {string} CamelCase string.
    */
-  const kebabToCamel = (str) =>
-    str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+  function kebabToCamel(str) {
+    return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+  }
 
   /**
    * Normalise config keys from kebab-case to camelCase.
    * @param {Object} obj - Config object.
    * @returns {Object} Normalised config.
    */
-  const normaliseConfig = (obj) =>
-    Object.fromEntries(
+  function normaliseConfig(obj) {
+    return Object.fromEntries(
       Object.entries(obj).map(([key, value]) => [kebabToCamel(key), value])
     );
+  }
 
   /**
    * Check if the plugin is enabled in config.
    * @param {Object} config - Reveal.js deck config.
    * @returns {boolean} True if enabled.
    */
-  const getEnabled = (config) => {
+  function getEnabled(config) {
     const kebab = config["code-annotation-fragments"];
     const camel = config["codeAnnotationFragments"];
 
@@ -100,14 +106,14 @@ window.RevealJsCodeAnnotationFragments = () => {
     }
 
     return true;
-  };
+  }
 
   /**
    * Get the next available fragment index for a slide.
    * @param {Element} slide - The slide element.
    * @returns {number} Next available fragment index.
    */
-  const getNextFragmentIndex = (slide) => {
+  function getNextFragmentIndex(slide) {
     const fragments = slide.querySelectorAll(".fragment[data-fragment-index]");
     let maxIndex = -1;
 
@@ -119,19 +125,19 @@ window.RevealJsCodeAnnotationFragments = () => {
     }
 
     return maxIndex + 1;
-  };
+  }
 
   /**
    * Hide all annotation tooltips.
    */
-  const hideAllAnnotationTooltips = () => {
+  function hideAllAnnotationTooltips() {
     const anchors = document.querySelectorAll(".code-annotation-anchor");
     for (const anchor of anchors) {
       if (anchor._tippy) {
         anchor._tippy.hide();
       }
     }
-  };
+  }
 
   /**
    * Show annotation tooltip for a specific anchor.
@@ -139,11 +145,7 @@ window.RevealJsCodeAnnotationFragments = () => {
    * @param {string} targetAnnotation - The annotation number.
    * @param {Element} [visibleFragment] - Currently visible fragment (optional).
    */
-  const showAnnotationTooltip = (
-    targetCell,
-    targetAnnotation,
-    visibleFragment
-  ) => {
+  function showAnnotationTooltip(targetCell, targetAnnotation, visibleFragment) {
     const selector = buildAnchorSelector(targetCell, targetAnnotation);
 
     // Try to find anchor within visible fragment first (for correct positioning)
@@ -162,39 +164,7 @@ window.RevealJsCodeAnnotationFragments = () => {
     } else {
       anchor.click();
     }
-  };
-
-  /**
-   * Set up fragment triggers for code annotations.
-   * Creates invisible fragment elements or syncs with line highlighting.
-   */
-  const setupCodeAnnotationFragments = () => {
-    const annotatedCells = document.querySelectorAll(
-      ".reveal .slides .code-annotation-code"
-    );
-
-    for (const codeBlock of annotatedCells) {
-      if (codeBlock.dataset.annotationFragmentsCreated) continue;
-      codeBlock.dataset.annotationFragmentsCreated = "true";
-
-      const anchors = codeBlock.querySelectorAll(".code-annotation-anchor");
-      if (anchors.length === 0) continue;
-
-      const slide = codeBlock.closest("section");
-      if (!slide) continue;
-
-      const parentNode = codeBlock.closest(".cell") || codeBlock.parentNode;
-      const sourceCodeDiv = codeBlock.closest("div.sourceCode");
-      const hasLineHighlighting =
-        codeBlock.querySelector("code.fragment.has-line-highlights") !== null;
-
-      if (hasLineHighlighting && sourceCodeDiv) {
-        setupLineHighlightSync(codeBlock, sourceCodeDiv, anchors);
-      } else {
-        setupSequentialFragments(slide, parentNode, anchors);
-      }
-    }
-  };
+  }
 
   /**
    * Set up synchronisation between line highlights and annotations.
@@ -202,7 +172,7 @@ window.RevealJsCodeAnnotationFragments = () => {
    * @param {Element} sourceCodeDiv - The source code div container.
    * @param {NodeList} anchors - The annotation anchors.
    */
-  const setupLineHighlightSync = (codeBlock, sourceCodeDiv, anchors) => {
+  function setupLineHighlightSync(codeBlock, sourceCodeDiv, anchors) {
     const targetCell = sourceCodeDiv.id;
     const lineHighlightFragments = codeBlock.querySelectorAll(
       "code.fragment.has-line-highlights"
@@ -234,7 +204,7 @@ window.RevealJsCodeAnnotationFragments = () => {
     }
 
     codeBlock.dataset.stepToAnnotations = JSON.stringify(stepToAnnotations);
-  };
+  }
 
   /**
    * Set up sequential fragment triggers for annotations.
@@ -242,7 +212,7 @@ window.RevealJsCodeAnnotationFragments = () => {
    * @param {Element} parentNode - The parent node for fragment insertion.
    * @param {NodeList} anchors - The annotation anchors.
    */
-  const setupSequentialFragments = (slide, parentNode, anchors) => {
+  function setupSequentialFragments(slide, parentNode, anchors) {
     let currentIndex = getNextFragmentIndex(slide);
 
     for (const [i, anchor] of [...anchors].entries()) {
@@ -259,14 +229,46 @@ window.RevealJsCodeAnnotationFragments = () => {
       parentNode.appendChild(fragmentDiv);
       currentIndex++;
     }
-  };
+  }
+
+  /**
+   * Set up fragment triggers for code annotations.
+   * Creates invisible fragment elements or syncs with line highlighting.
+   */
+  function setupCodeAnnotationFragments() {
+    const annotatedCells = document.querySelectorAll(
+      ".reveal .slides .code-annotation-code"
+    );
+
+    for (const codeBlock of annotatedCells) {
+      if (codeBlock.dataset.annotationFragmentsCreated) continue;
+      codeBlock.dataset.annotationFragmentsCreated = "true";
+
+      const anchors = codeBlock.querySelectorAll(".code-annotation-anchor");
+      if (anchors.length === 0) continue;
+
+      const slide = codeBlock.closest("section");
+      if (!slide) continue;
+
+      const parentNode = codeBlock.closest(".cell") || codeBlock.parentNode;
+      const sourceCodeDiv = codeBlock.closest("div.sourceCode");
+      const hasLineHighlighting =
+        codeBlock.querySelector("code.fragment.has-line-highlights") !== null;
+
+      if (hasLineHighlighting && sourceCodeDiv) {
+        setupLineHighlightSync(codeBlock, sourceCodeDiv, anchors);
+      } else {
+        setupSequentialFragments(slide, parentNode, anchors);
+      }
+    }
+  }
 
   /**
    * Handle line highlight fragment events for synced annotations.
    * @param {Element} fragment - The line highlight fragment.
    * @param {boolean} isShown - True if shown, false if hidden.
    */
-  const handleLineHighlightFragment = (fragment, isShown) => {
+  function handleLineHighlightFragment(fragment, isShown) {
     const fragmentIndex = parseInt(
       fragment.getAttribute("data-fragment-index"),
       10
@@ -312,13 +314,13 @@ window.RevealJsCodeAnnotationFragments = () => {
         }
       }
     }
-  };
+  }
 
   /**
    * Handle annotation fragment shown events.
    * @param {Object} event - Reveal.js fragment event.
    */
-  const onAnnotationFragmentShown = (event) => {
+  function onAnnotationFragmentShown(event) {
     const { fragment } = event;
     if (!fragment) return;
 
@@ -333,13 +335,13 @@ window.RevealJsCodeAnnotationFragments = () => {
 
     const { targetCell, targetAnnotation } = fragment.dataset;
     showAnnotationTooltip(targetCell, targetAnnotation);
-  };
+  }
 
   /**
    * Handle annotation fragment hidden events.
    * @param {Object} event - Reveal.js fragment event.
    */
-  const onAnnotationFragmentHidden = (event) => {
+  function onAnnotationFragmentHidden(event) {
     const { fragment } = event;
     if (!fragment) return;
 
@@ -365,12 +367,12 @@ window.RevealJsCodeAnnotationFragments = () => {
         }
       }
     }
-  };
+  }
 
   return {
     id: "RevealJsCodeAnnotationFragments",
 
-    init: (deck) => {
+    init: function (deck) {
       const config = deck.getConfig();
 
       if (!getEnabled(config)) return;

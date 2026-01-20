@@ -18,7 +18,7 @@ date: today
 format:
   mcanouil-revealjs:
     debug-borders: false
-engine: markdown
+engine: knitr
 ---
 
 # Introduction
