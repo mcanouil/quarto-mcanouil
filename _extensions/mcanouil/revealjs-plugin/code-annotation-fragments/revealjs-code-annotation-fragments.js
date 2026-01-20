@@ -38,6 +38,7 @@
  * - Creates hidden fragment triggers for each annotation.
  * - Shows annotation tooltips (via tippy.js) when fragments are revealed.
  * - Supports forward and backward navigation through annotations.
+ * - Synchronises annotations with line highlighting when both are present.
  *
  * Configuration:
  * ```yaml
@@ -98,6 +99,10 @@ window.RevealJsCodeAnnotationFragments = function () {
    * Set up fragment triggers for code annotations.
    * Creates invisible fragment elements for each annotation anchor,
    * allowing navigation through annotations with arrow keys.
+   *
+   * When code blocks have line highlighting, annotations are synchronised
+   * with the corresponding line highlight steps instead of creating
+   * separate sequential fragments.
    */
   function setupCodeAnnotationFragments() {
     // Find all code blocks with annotations (directly, not per-slide to avoid duplicates)
@@ -120,24 +125,84 @@ window.RevealJsCodeAnnotationFragments = function () {
       // Get the parent container to append fragments
       var parentNode = codeBlock.closest(".cell") || codeBlock.parentNode;
 
-      // Find the next available fragment index (robust: checks existing indices)
-      var currentIndex = getNextFragmentIndex(slide);
+      // Check if this code block has line highlighting
+      // Note: quarto-line-highlight removes data-code-line-numbers after processing,
+      // so we detect line highlighting by checking for fragment clones with has-line-highlights
+      var sourceCodeDiv = codeBlock.closest("div.sourceCode");
+      var hasLineHighlighting =
+        codeBlock.querySelector("code.fragment.has-line-highlights") !== null;
 
-      // Create invisible fragment triggers for each annotation
-      anchors.forEach(function (anchor, i) {
-        var targetCell = anchor.dataset.targetCell;
-        var targetAnnotation = anchor.dataset.targetAnnotation;
+      if (hasLineHighlighting && sourceCodeDiv) {
+        // Line highlighting is enabled - sync annotations with highlight steps
+        var targetCell = sourceCodeDiv.id;
+        var lineHighlightFragments = codeBlock.querySelectorAll(
+          "code.fragment.has-line-highlights"
+        );
 
-        var fragmentDiv = document.createElement("div");
-        fragmentDiv.className = "code-annotation-fragment fragment";
-        fragmentDiv.dataset.targetCell = targetCell;
-        fragmentDiv.dataset.targetAnnotation = targetAnnotation;
-        fragmentDiv.dataset.anchorIndex = i;
-        fragmentDiv.setAttribute("data-fragment-index", currentIndex);
-        fragmentDiv.style.display = "none";
-        parentNode.appendChild(fragmentDiv);
-        currentIndex++;
-      });
+        // Store mapping for fragment event handling
+        codeBlock.dataset.annotationSyncMode = "line-highlight";
+        codeBlock.dataset.targetCell = targetCell;
+
+        // Build map of fragment index -> annotation numbers
+        // Strategy: Map fragments to annotations by position
+        // Fragment 0 -> Annotation 1, Fragment 1 -> Annotation 2, etc.
+        var stepToAnnotations = {};
+
+        // Get sorted fragment indices
+        var fragmentIndices = [];
+        lineHighlightFragments.forEach(function (fragment, i) {
+          var fragIdx = parseInt(
+            fragment.getAttribute("data-fragment-index"),
+            10
+          );
+          if (isNaN(fragIdx)) fragIdx = i;
+          fragmentIndices.push(fragIdx);
+        });
+        fragmentIndices.sort(function (a, b) {
+          return a - b;
+        });
+
+        // Map each fragment to the corresponding annotation by position
+        fragmentIndices.forEach(function (fragIdx, position) {
+          // Position 0 maps to annotation 1, position 1 to annotation 2, etc.
+          var annotationNum = String(position + 1);
+
+          // Check if this annotation exists
+          var annotationExists = Array.prototype.some.call(
+            anchors,
+            function (anchor) {
+              return anchor.dataset.targetAnnotation === annotationNum;
+            }
+          );
+
+          if (annotationExists) {
+            // Map fragment index directly to annotation
+            stepToAnnotations[fragIdx] = [annotationNum];
+          }
+        });
+
+        // Store the mapping on the code block for event handlers
+        codeBlock.dataset.stepToAnnotations = JSON.stringify(stepToAnnotations);
+      } else {
+        // No line highlighting - use original behaviour with sequential fragments
+        var currentIndex = getNextFragmentIndex(slide);
+
+        // Create invisible fragment triggers for each annotation
+        anchors.forEach(function (anchor, i) {
+          var targetCell = anchor.dataset.targetCell;
+          var targetAnnotation = anchor.dataset.targetAnnotation;
+
+          var fragmentDiv = document.createElement("div");
+          fragmentDiv.className = "code-annotation-fragment fragment";
+          fragmentDiv.dataset.targetCell = targetCell;
+          fragmentDiv.dataset.targetAnnotation = targetAnnotation;
+          fragmentDiv.dataset.anchorIndex = i;
+          fragmentDiv.setAttribute("data-fragment-index", currentIndex);
+          fragmentDiv.style.display = "none";
+          parentNode.appendChild(fragmentDiv);
+          currentIndex++;
+        });
+      }
     });
   }
 
@@ -157,18 +222,103 @@ window.RevealJsCodeAnnotationFragments = function () {
    * Show annotation tooltip for a specific anchor using tippy directly.
    * @param {string} targetCell - The target cell ID
    * @param {string} targetAnnotation - The annotation number
+   * @param {Element} [visibleFragment] - The currently visible fragment element (optional)
    */
-  function showAnnotationTooltip(targetCell, targetAnnotation) {
-    var anchor = document.querySelector(
-      '.code-annotation-anchor[data-target-cell="' +
-        targetCell +
-        '"][data-target-annotation="' +
-        targetAnnotation +
-        '"]'
-    );
+  function showAnnotationTooltip(targetCell, targetAnnotation, visibleFragment) {
+    var anchor = null;
+
+    // If we have a visible fragment, look for the anchor within it first
+    // This ensures correct positioning when line highlighting creates fragment clones
+    if (visibleFragment) {
+      anchor = visibleFragment.querySelector(
+        '.code-annotation-anchor[data-target-cell="' +
+          targetCell +
+          '"][data-target-annotation="' +
+          targetAnnotation +
+          '"]'
+      );
+    }
+
+    // Fallback to global search if not found in fragment
+    if (!anchor) {
+      anchor = document.querySelector(
+        '.code-annotation-anchor[data-target-cell="' +
+          targetCell +
+          '"][data-target-annotation="' +
+          targetAnnotation +
+          '"]'
+      );
+    }
 
     if (anchor && anchor._tippy) {
+      // Force position recalculation before showing
+      if (anchor._tippy.popperInstance) {
+        anchor._tippy.popperInstance.update();
+      }
       anchor._tippy.show();
+    } else if (anchor) {
+      // If no tippy instance, trigger click to show annotation
+      anchor.click();
+    }
+  }
+
+  /**
+   * Handle line highlight fragment events for synced annotations.
+   * @param {Element} fragment - The line highlight fragment (code.fragment)
+   * @param {boolean} isShown - True if fragment shown, false if hidden
+   */
+  function handleLineHighlightFragment(fragment, isShown) {
+    // Get the fragment index
+    var fragmentIndex = parseInt(
+      fragment.getAttribute("data-fragment-index"),
+      10
+    );
+
+    // Find the code block with annotation sync mode
+    // Note: Both <div> and <pre> may have class "sourceCode", so use "div.sourceCode"
+    var pre = fragment.closest("pre");
+    var sourceCodeDiv = pre ? pre.closest("div.sourceCode") : null;
+    if (!sourceCodeDiv) return;
+
+    var codeBlock = sourceCodeDiv.querySelector(".code-annotation-code");
+    if (!codeBlock || codeBlock.dataset.annotationSyncMode !== "line-highlight")
+      return;
+
+    var targetCell = codeBlock.dataset.targetCell;
+    var stepToAnnotations;
+    try {
+      stepToAnnotations = JSON.parse(
+        codeBlock.dataset.stepToAnnotations || "{}"
+      );
+    } catch (e) {
+      return;
+    }
+
+    // Hide all tooltips first
+    hideAllAnnotationTooltips();
+
+    if (isShown) {
+      // Fragment index maps directly to annotations
+      var annotations = stepToAnnotations[fragmentIndex];
+      if (annotations && annotations.length > 0) {
+        // Show all matching annotation tooltips, passing the visible fragment
+        annotations.forEach(function (annotationNum) {
+          showAnnotationTooltip(targetCell, annotationNum, fragment);
+        });
+      }
+    } else {
+      // Fragment hidden - show previous fragment's annotations
+      var prevFragmentIndex = fragmentIndex - 1;
+      var prevAnnotations = stepToAnnotations[prevFragmentIndex];
+      if (prevAnnotations && prevAnnotations.length > 0) {
+        // Find the previous fragment element
+        var prevFragment = pre.querySelector(
+          'code.fragment[data-fragment-index="' + prevFragmentIndex + '"]'
+        );
+        prevAnnotations.forEach(function (annotationNum) {
+          showAnnotationTooltip(targetCell, annotationNum, prevFragment);
+        });
+      }
     }
   }
 
@@ -179,7 +329,20 @@ window.RevealJsCodeAnnotationFragments = function () {
    */
   function onAnnotationFragmentShown(event) {
     var fragment = event.fragment;
-    if (!fragment || !fragment.classList.contains("code-annotation-fragment")) {
+    if (!fragment) return;
+
+    // Check if this is a line highlight fragment (code.fragment inside pre)
+    if (
+      fragment.tagName === "CODE" &&
+      fragment.classList.contains("fragment") &&
+      fragment.closest("pre")
+    ) {
+      handleLineHighlightFragment(fragment, true);
+      return;
+    }
+
+    // Original behaviour for annotation fragments
+    if (!fragment.classList.contains("code-annotation-fragment")) {
       return;
     }
 
@@ -199,7 +362,20 @@ window.RevealJsCodeAnnotationFragments = function () {
    */
   function onAnnotationFragmentHidden(event) {
     var fragment = event.fragment;
-    if (!fragment || !fragment.classList.contains("code-annotation-fragment")) {
+    if (!fragment) return;
+
+    // Check if this is a line highlight fragment (code.fragment inside pre)
+    if (
+      fragment.tagName === "CODE" &&
+      fragment.classList.contains("fragment") &&
+      fragment.closest("pre")
+    ) {
+      handleLineHighlightFragment(fragment, false);
+      return;
+    }
+
+    // Original behaviour for annotation fragments
+    if (!fragment.classList.contains("code-annotation-fragment")) {
       return;
     }
 
@@ -272,6 +448,11 @@ window.RevealJsCodeAnnotationFragments = function () {
 
       deck.on("fragmenthidden", function (event) {
         onAnnotationFragmentHidden(event);
+      });
+
+      // Hide tooltips when changing slides
+      deck.on("slidechanged", function () {
+        hideAllAnnotationTooltips();
       });
     },
   };
