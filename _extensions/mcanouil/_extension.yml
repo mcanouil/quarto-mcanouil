@@ -179,6 +179,7 @@ contributes:
       header-footer-style: "academic"
       pdf-standard: ua-1
     revealjs:
+      embed-resources: true
       # Brand
       brand-mode: dark
       # Logo/Visual assets
