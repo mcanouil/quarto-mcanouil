@@ -115,6 +115,7 @@ contributes:
       template: typst/template.typ
       template-partials:
         - typst/partials/libs/utilities.typ
+        - typst/partials/libs/marginalia.typ
         - typst/partials/libs/definitions.typ
         - typst/partials/libs/page.typ
         - typst/partials/libs/colours.typ
