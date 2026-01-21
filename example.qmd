@@ -752,6 +752,41 @@ Caution callouts warn about significant risks, dangers, or problematic scenarios
 They demand attention to prevent errors or adverse consequences.
 :::
 
+### Panel Tabsets {#sec-tabsets}
+
+Panel tabsets organise content into tabs in HTML-based formats.
+In Typst (PDF), tabs are converted to a hierarchical heading structure since Typst does not support tabs.
+
+::: {.panel-tabset}
+
+#### Overview
+
+This tab contains introductory content.
+In Typst, this becomes a subsection under "Overview" as a heading.
+
+#### Details
+
+This tab provides more detailed information.
+
+- First detail item.
+- Second detail item.
+- Third detail item.
+
+#### Examples
+
+```python
+# Example code in a tab
+def greet(name: str) -> str:
+    return f"Hello, {name}!"
+```
+
+:::
+
+**Tabset Behaviour:**
+
+- **HTML/Reveal.js**: Renders as interactive tabs.
+- **Typst**: Tab titles become headings; content headings are nested appropriately.
+
 ### Code Blocks {#sec-code}
 
 #### Inline Code

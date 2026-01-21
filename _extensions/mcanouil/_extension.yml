@@ -53,6 +53,8 @@ contributes:
         - shortcodes/progress.lua
         - shortcodes/badge.lua
       filters:
+        - at: pre-ast
+          path: filters/panel-tabset.lua
         - at: pre-quarto
           path: filters/components.lua
         - at: pre-quarto
