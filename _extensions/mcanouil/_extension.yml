@@ -1,7 +1,7 @@
 title: Mickaël Canouil's Brand
 author: Mickaël Canouil
 version: 0.3.0
-quarto-required: ">=1.8.20"
+quarto-required: ">=1.9.17"
 contributes:
   metadata:
     project:
@@ -44,9 +44,9 @@ contributes:
         mcanouil:
           # Code-window styling (all formats)
           code-window:
-            enabled: true              # Enable macOS-style code windows
-            auto-filename: true        # Auto-generate filename from language
-            wrapper: mcanouil-code-window  # Typst wrapper function name
+            enabled: true # Enable macOS-style code windows
+            auto-filename: true # Auto-generate filename from language
+            wrapper: mcanouil-code-window # Typst wrapper function name
       shortcodes:
         - shortcodes/divider.lua
         - shortcodes/value-box.lua
@@ -214,17 +214,17 @@ contributes:
       extensions:
         mcanouil:
           # Section slide features
-          section-outline: true            # Show subsection outline on section slides
+          section-outline: true # Show subsection outline on section slides
           # Date formatting
-          date-superscript: true           # Format ordinal dates (1st, 2nd, 3rd)
+          date-superscript: true # Format ordinal dates (1st, 2nd, 3rd)
           # Title slide behaviour
-          hide-title-slide-chrome: true    # Hide menu/logo/footer on title slide
+          hide-title-slide-chrome: true # Hide menu/logo/footer on title slide
           # Favicon
-          favicon-from-logo: true          # Generate favicon from slide logo
+          favicon-from-logo: true # Generate favicon from slide logo
           # Code annotations
-          code-annotation-fragments: true  # Enable annotation fragment navigation
+          code-annotation-fragments: true # Enable annotation fragment navigation
           # Debugging
-          debug-borders: false             # Show debug borders on slides
+          debug-borders: false # Show debug borders on slides
       # Standard Reveal.js options
       transition: slide
       slide-number: c
