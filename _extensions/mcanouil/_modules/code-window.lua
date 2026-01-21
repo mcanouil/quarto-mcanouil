@@ -31,8 +31,8 @@
 
 local M = {}
 
--- Extension name for config namespace
-local EXTENSION_NAME = 'code-window'
+-- Extension namespace section name
+local SECTION_NAME = 'code-window'
 
 -- ============================================================================
 -- DEFAULT CONFIGURATION
@@ -55,7 +55,7 @@ M.DEFAULT_CONFIG = {
 -- ============================================================================
 
 --- Load configuration from document metadata.
---- Reads from extensions.code-window.* namespace.
+--- Reads from extensions.mcanouil.code-window namespace.
 --- @param meta pandoc.Meta Document metadata
 --- @return CodeWindowConfig Configuration table
 function M.get_config(meta)
@@ -65,7 +65,8 @@ function M.get_config(meta)
     typst_wrapper = M.DEFAULT_CONFIG.typst_wrapper,
   }
 
-  local ext_config = meta.extensions and meta.extensions[EXTENSION_NAME]
+  local ext_config = meta.extensions and meta.extensions.mcanouil
+                     and meta.extensions.mcanouil[SECTION_NAME]
   if not ext_config then
     return config
   end

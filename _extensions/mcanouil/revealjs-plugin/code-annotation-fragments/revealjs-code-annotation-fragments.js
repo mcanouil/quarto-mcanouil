@@ -36,8 +36,8 @@
  *
  * Configuration:
  * ```yaml
- * format:
- *   revealjs:
+ * extensions:
+ *   mcanouil:
  *     code-annotation-fragments: true  # enabled by default
  * ```
  */
@@ -69,43 +69,18 @@ window.RevealJsCodeAnnotationFragments = function () {
   }
 
   /**
-   * Convert kebab-case to camelCase.
-   * @param {string} str - Kebab-case string.
-   * @returns {string} CamelCase string.
-   */
-  function kebabToCamel(str) {
-    return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-  }
-
-  /**
-   * Normalise config keys from kebab-case to camelCase.
-   * @param {Object} obj - Config object.
-   * @returns {Object} Normalised config.
-   */
-  function normaliseConfig(obj) {
-    return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => [kebabToCamel(key), value])
-    );
-  }
-
-  /**
    * Check if the plugin is enabled in config.
+   * Reads from extensions.mcanouil.code-annotation-fragments.
    * @param {Object} config - Reveal.js deck config.
    * @returns {boolean} True if enabled.
    */
   function getEnabled(config) {
-    const kebab = config["code-annotation-fragments"];
-    const camel = config["codeAnnotationFragments"];
+    const mcanouil = config["extensions"]?.["mcanouil"];
+    const value = mcanouil?.["code-annotation-fragments"];
 
-    if (typeof kebab === "boolean") return kebab;
-    if (typeof camel === "boolean") return camel;
+    if (typeof value === "boolean") return value;
 
-    if (typeof kebab === "object" && kebab !== null) {
-      const normalised = normaliseConfig(kebab);
-      return normalised.enabled !== false;
-    }
-
-    return true;
+    return true; // default enabled
   }
 
   /**

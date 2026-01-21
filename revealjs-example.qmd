@@ -16,7 +16,9 @@ author:
         country: France
 date: today
 format:
-  mcanouil-revealjs:
+  mcanouil-revealjs: default
+extensions:
+  mcanouil:
     debug-borders: false
 engine: knitr
 ---

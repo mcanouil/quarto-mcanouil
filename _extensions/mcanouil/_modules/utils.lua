@@ -154,8 +154,30 @@ end
 -- METADATA UTILITIES
 -- ============================================================================
 
---- Extract metadata value from document meta using nested structure
---- Supports the extensions.{extension-name}.{key} pattern
+--- Get configuration from extensions.mcanouil namespace.
+--- @param meta table Document metadata
+--- @param key string The key to retrieve
+--- @return any The value or nil
+--- @usage local value = utils_module.get_mcanouil_config(meta, 'section-outline')
+function utils_module.get_mcanouil_config(meta, key)
+  local mcanouil_ext = meta.extensions and meta.extensions.mcanouil
+  if not mcanouil_ext then return nil end
+  return mcanouil_ext[key]
+end
+
+--- Get a section config table from extensions.mcanouil.{section}.
+--- @param meta table Document metadata
+--- @param section string The section name (e.g., 'code-window', 'typst-markdown')
+--- @return table|nil The section config table or nil
+--- @usage local config = utils_module.get_mcanouil_section(meta, 'code-window')
+function utils_module.get_mcanouil_section(meta, section)
+  local mcanouil_ext = meta.extensions and meta.extensions.mcanouil
+  if not mcanouil_ext then return nil end
+  return mcanouil_ext[section]
+end
+
+--- Extract metadata value from document meta using nested structure.
+--- Supports the extensions.{extension-name}.{key} pattern.
 --- @param meta table The document metadata table
 --- @param extension_name string The extension name (e.g., "github", "iconify")
 --- @param key string The metadata key to retrieve

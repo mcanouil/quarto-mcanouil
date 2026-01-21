@@ -43,6 +43,9 @@ local utils = require(
 --- @type string Extension name for logging
 local EXTENSION_NAME = 'typst-markdown'
 
+--- @type string Section name under extensions.mcanouil
+local SECTION_NAME = 'typst-markdown'
+
 -- ============================================================================
 -- BUILT-IN MAPPINGS
 -- ============================================================================
@@ -153,7 +156,7 @@ local function parse_and_validate_config(config, class)
 end
 
 --- Load element mappings from user configuration.
---- Reads configuration from document metadata under extensions.typst-markdown.
+--- Reads configuration from document metadata under extensions.mcanouil.typst-markdown.
 --- @param meta pandoc.Meta Document metadata containing extension configuration
 --- @return table<string, table<string, table>> User mappings with div, span, table, image categories
 local function load_element_mappings(meta)
@@ -164,8 +167,9 @@ local function load_element_mappings(meta)
     image = {}
   }
 
-  -- Read configuration from extensions.typst-markdown
-  local extension_config = meta.extensions and meta.extensions[EXTENSION_NAME]
+  -- Read configuration from extensions.mcanouil.typst-markdown
+  local extension_config = meta.extensions and meta.extensions.mcanouil
+                           and meta.extensions.mcanouil[SECTION_NAME]
   if not extension_config then
     return user_mappings
   end

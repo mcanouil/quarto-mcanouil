@@ -26,35 +26,6 @@ window.RevealJsMCanouil = function () {
 
   let config = {};
 
-  /**
-   * Convert kebab-case to camelCase.
-   * @param {string} str - Kebab-case string.
-   * @returns {string} CamelCase string.
-   */
-  function kebabToCamel(str) {
-    return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-  }
-
-  /**
-   * Convert camelCase to kebab-case.
-   * @param {string} str - CamelCase string.
-   * @returns {string} Kebab-case string.
-   */
-  function camelToKebab(str) {
-    return str.replace(/([A-Z])/g, (match) => `-${match.toLowerCase()}`);
-  }
-
-  /**
-   * Normalise config keys from kebab-case to camelCase.
-   * @param {Object} obj - Config object.
-   * @returns {Object} Normalised config.
-   */
-  function normaliseConfig(obj) {
-    return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => [kebabToCamel(key), value])
-    );
-  }
-
   // =========================================================================
   // SECTION SLIDES
   // =========================================================================
@@ -407,22 +378,20 @@ window.RevealJsMCanouil = function () {
 
     init: function (deck) {
       const deckConfig = deck.getConfig();
-      const pluginConfig = normaliseConfig(deckConfig["mcanouil-revealjs"] || {});
 
-      // Extract relevant top-level options
-      const topLevelConfig = {};
-      for (const key of Object.keys(defaults)) {
-        if (deckConfig[key] !== undefined) {
-          topLevelConfig[key] = deckConfig[key];
-        }
-        const kebabKey = camelToKebab(key);
-        if (deckConfig[kebabKey] !== undefined) {
-          topLevelConfig[key] = deckConfig[kebabKey];
-        }
-      }
+      // Read from extensions.mcanouil namespace
+      const mcanouil = deckConfig["extensions"]?.["mcanouil"] || {};
 
-      // Merge: defaults < plugin namespace < top-level
-      config = { ...defaults, ...pluginConfig, ...topLevelConfig };
+      // Build config from extensions.mcanouil.* options
+      config = {
+        ...defaults,
+        sectionOutline: mcanouil["section-outline"] ?? defaults.sectionOutline,
+        dateSuperscript: mcanouil["date-superscript"] ?? defaults.dateSuperscript,
+        faviconFromLogo: mcanouil["favicon-from-logo"] ?? defaults.faviconFromLogo,
+        hideTitleSlideChrome:
+          mcanouil["hide-title-slide-chrome"] ?? defaults.hideTitleSlideChrome,
+        debugBorders: mcanouil["debug-borders"] ?? defaults.debugBorders,
+      };
 
       deck.on("ready", function () {
         if (config.sectionOutline) {

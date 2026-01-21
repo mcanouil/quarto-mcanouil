@@ -39,9 +39,10 @@ keywords:
 lang: en-GB
 copyright: "© 2026 Mickaël CANOUIL"
 extensions:
-  code-window:
-    enabled: true
-    auto-filename: true
+  mcanouil:
+    code-window:
+      enabled: true
+      auto-filename: true
 format:
   mcanouil-html:
     output-file: index

@@ -37,8 +37,16 @@ contributes:
   formats:
     common:
       lang: en
-      code-window: true
-      code-window-auto-filename: true
+      code-copy: true
+      code-overflow: wrap
+      date-format: "dddd[, the] Do [of] MMMM, YYYY"
+      extensions:
+        mcanouil:
+          # Code-window styling (all formats)
+          code-window:
+            enabled: true              # Enable macOS-style code windows
+            auto-filename: true        # Auto-generate filename from language
+            wrapper: mcanouil-code-window  # Typst wrapper function name
       shortcodes:
         - shortcodes/divider.lua
         - shortcodes/value-box.lua
@@ -70,9 +78,6 @@ contributes:
       # Table of contents
       toc: true
       toc-depth: 4
-      # Code
-      code-copy: true
-      code-overflow: wrap
       # Navigation
       anchor-sections: true
       link-external-newwindow: true
@@ -157,7 +162,8 @@ contributes:
       # Section/Numbering
       number-sections: true
       section-numbering: "1.1.1."
-      section-pagebreak: true
+      section-page: false
+      section-pagebreak: false
       special-sections:
         references:
           name: "References"
@@ -176,7 +182,7 @@ contributes:
       list-of: true
       # Other
       bibliographystyle: apa
-      header-footer-style: "academic"
+      header-footer-style: "professional"
       pdf-standard: ua-1
     revealjs:
       embed-resources: true
@@ -186,7 +192,6 @@ contributes:
       logo:
         light: logos/logo-dark-path.svg
         dark: logos/logo-light-path.svg
-      favicon-from-logo: true
       # Theme
       theme:
         - default
@@ -203,18 +208,26 @@ contributes:
         - revealjs-plugin/tabset
         - revealjs-plugin/line-fragment-indices
         - revealjs-plugin/code-annotation-fragments
-      # Plugin options (handled by mcanouil-revealjs plugin)
-      # Section slide colours are derived from brand.yml via SCSS
-      section-outline: true
-      date-superscript: true
-      code-annotation-fragments: true
-      hide-title-slide-chrome: true
+      # Plugin options under extensions.mcanouil namespace
+      extensions:
+        mcanouil:
+          # Section slide features
+          section-outline: true            # Show subsection outline on section slides
+          # Date formatting
+          date-superscript: true           # Format ordinal dates (1st, 2nd, 3rd)
+          # Title slide behaviour
+          hide-title-slide-chrome: true    # Hide menu/logo/footer on title slide
+          # Favicon
+          favicon-from-logo: true          # Generate favicon from slide logo
+          # Code annotations
+          code-annotation-fragments: true  # Enable annotation fragment navigation
+          # Debugging
+          debug-borders: false             # Show debug borders on slides
       # Standard Reveal.js options
       transition: slide
       slide-number: c
       hash: true
       center: false
-      date-format: "dddd[, the] Do [of] MMMM, YYYY"
       code-annotations: select
       # Footer/Closing
       footer: |

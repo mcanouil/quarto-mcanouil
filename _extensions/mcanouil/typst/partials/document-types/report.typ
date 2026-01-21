@@ -184,7 +184,7 @@
   region: "GB",
   // Document Structure
   section-numbering: none,
-  section-pagebreak: true,
+  section-pagebreak: false,
   section-page: false,
   toc-depth: 3,
   has-outlines: false,
