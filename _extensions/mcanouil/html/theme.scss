@@ -235,6 +235,23 @@ td code.sourceCode {
 }
 
 // ===========================
+// PRINT PAGINATION STYLES
+// ===========================
+// Ensure proper pagination for print and PDF output
+@media print {
+  // Keep code windows together when possible
+  .code-with-filename {
+    page-break-inside: avoid;
+    break-inside: avoid;
+
+    .code-with-filename-file {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+  }
+}
+
+// ===========================
 // CALLOUT STYLING
 // ===========================
 // Callout styling matching Typst: left border in callout colour, subtle background

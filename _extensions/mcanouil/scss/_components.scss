@@ -647,6 +647,11 @@ $mc-breakpoint-sm: 576px !default;
     border: 1px solid var(--mc-border);
     overflow: hidden;
 
+    // Pagination control for print/PDF output
+    // Prevents page breaks inside the code window where possible
+    page-break-inside: avoid;
+    break-inside: avoid;
+
     // Title bar with traffic lights and filename
     .code-with-filename-file {
       display: flex;
@@ -658,6 +663,11 @@ $mc-breakpoint-sm: 576px !default;
       border-radius: 0;
       padding: 0.6em 1em;
       margin: 0;
+
+      // Prevent title bar from being orphaned at page bottom
+      // Ensures title stays with following code content
+      page-break-after: avoid;
+      break-after: avoid;
 
       // Traffic light buttons via pseudo-element
       &::before {

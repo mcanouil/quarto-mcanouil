@@ -221,6 +221,7 @@
     clip: true,
     {
       // Title bar with bottom border separator
+      // sticky: true prevents orphan title bar at page bottom
       block(
         width: 100%,
         fill: titlebar-bg,
@@ -228,6 +229,7 @@
         below: 0pt,
         radius: 0pt,
         stroke: (bottom: CODE-WINDOW-BORDER-WIDTH + border-colour),
+        sticky: true,
         {
           grid(
             columns: (auto, 1fr),
