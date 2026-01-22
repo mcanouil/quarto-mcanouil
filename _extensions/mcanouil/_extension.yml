@@ -36,6 +36,19 @@ contributes:
     format: mcanouil-html
   formats:
     common:
+      author:
+        - name:
+            given: Mickaël
+            family: CANOUIL
+          email: pro@mickael.canouil.dev
+          orcid: 0000-0002-3396-4549
+          url: https://mickael.canouil.fr
+          attributes:
+            corresponding: true
+          affiliations:
+            - name: Independent Consultant
+              city: Lille
+              country: France
       lang: en
       code-copy: true
       code-overflow: wrap
@@ -239,7 +252,6 @@ contributes:
         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">License: CC BY NC SA 4.0</a>
       closing-slide:
         photo: "https://github.com/mcanouil.png"
-        title: "Independent Consultant"
         social:
           website: https://mickael.canouil.fr
           github: mcanouil
