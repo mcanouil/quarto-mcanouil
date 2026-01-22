@@ -30,7 +30,7 @@ contributes:
         left: |
           Powered by [Quarto](https://quarto.org){target="_blank" rel="noopener noreferrer"}.
         center: |
-          &copy; []{#current-year} Mickaël CANOUIL.
+          &copy; []{#current-year} [Mickaël CANOUIL](https://mickael.canouil.fr){target="_blank" rel="noopener noreferrer"}.
         right: |
           [CC BY NC SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/){target="_blank" rel="noopener noreferrer"}.
     format: mcanouil-html
@@ -236,7 +236,7 @@ contributes:
       footer: |
         <a href="https://mickael.canouil.fr/" target="_blank" rel="noopener noreferrer">mickael.canouil.fr</a>
         |
-        <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">License: CC-BY-SA-4.0</a>
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">License: CC BY NC SA 4.0</a>
       closing-slide:
         photo: "https://github.com/mcanouil.png"
         title: "Independent Consultant"
