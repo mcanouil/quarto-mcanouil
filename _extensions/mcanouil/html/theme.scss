@@ -249,6 +249,45 @@ td code.sourceCode {
       break-after: avoid;
     }
   }
+
+  // Keep callouts together
+  .callout {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  // Keep panels together
+  .mc-panel {
+    page-break-inside: avoid;
+    break-inside: avoid;
+
+    .mc-panel__header {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+  }
+
+  // Keep cards together
+  .mc-card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+
+    .mc-card__header {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+  }
+
+  // Keep executive summaries together
+  .mc-executive-summary {
+    page-break-inside: avoid;
+    break-inside: avoid;
+
+    .mc-executive-summary__title {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+  }
 }
 
 // ===========================
@@ -262,6 +301,10 @@ td code.sourceCode {
   border: none !important;
   border-left: 4px solid !important;
   border-radius: 4px !important;
+
+  // Pagination control for print/PDF output
+  page-break-inside: avoid;
+  break-inside: avoid;
 
   // Subtle background using colour mix
   &.callout-note {

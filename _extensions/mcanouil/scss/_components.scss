@@ -58,7 +58,14 @@ $mc-breakpoint-sm: 576px !default;
     margin: $mc-margin;
     padding: $mc-padding;
 
+    // Pagination control for print/PDF output
+    page-break-inside: avoid;
+    break-inside: avoid;
+
     &__header {
+      // Prevent header from being orphaned at page bottom
+      page-break-after: avoid;
+      break-after: avoid;
       display: flex;
       align-items: center;
       gap: 0.5em;
@@ -397,6 +404,18 @@ $mc-breakpoint-sm: 576px !default;
     text-align: center;
     min-height: $mc-value-box-height;
 
+    // Vertical spacing for standalone value boxes (similar to paragraphs)
+    margin: $mc-margin;
+
+    // Pagination control for print/PDF output
+    page-break-inside: avoid;
+    break-inside: avoid;
+
+    // Remove margin when inside a card grid
+    .mc-card-grid > & {
+      margin: 0;
+    }
+
     &__value {
       display: flex;
       align-items: baseline;
@@ -524,6 +543,18 @@ $mc-breakpoint-sm: 576px !default;
     overflow: hidden;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 
+    // Vertical spacing for standalone cards (similar to paragraphs)
+    margin: $mc-margin;
+
+    // Pagination control for print/PDF output
+    page-break-inside: avoid;
+    break-inside: avoid;
+
+    // Remove margin when inside a card grid
+    .mc-card-grid > & {
+      margin: 0;
+    }
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px color-mix(in srgb, var(--mc-fg) 10%, transparent);
@@ -533,6 +564,10 @@ $mc-breakpoint-sm: 576px !default;
       padding: 0.8em 1em;
       background-color: var(--mc-surface);
       border-bottom: 1px solid var(--mc-border);
+
+      // Prevent header from being orphaned at page bottom
+      page-break-after: avoid;
+      break-after: avoid;
     }
 
     &__title {
@@ -600,7 +635,14 @@ $mc-breakpoint-sm: 576px !default;
     border-left: 6px solid var(--mc-border-strong, var(--mc-muted));
     border-radius: $mc-radius;
 
+    // Pagination control for print/PDF output
+    page-break-inside: avoid;
+    break-inside: avoid;
+
     &__title {
+      // Prevent title from being orphaned at page bottom
+      page-break-after: avoid;
+      break-after: avoid;
       margin: 0 0 1em 0;
       font-size: 1.3em;
       font-weight: 700;
