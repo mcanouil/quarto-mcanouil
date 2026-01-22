@@ -49,6 +49,8 @@ contributes:
             - name: Independent Consultant
               city: Lille
               country: France
+      copyright: "© 2026 Mickaël CANOUIL"
+      license: CC BY-NC-SA
       lang: en
       code-copy: true
       code-overflow: wrap
@@ -110,6 +112,12 @@ contributes:
       document-type: report
       # Brand
       brand-mode: light
+      header-footer-style: "professional"
+      show-corner-brackets: true # Signature corner bracket decorations
+      show-margin-decoration: true # Coloured bars along page margins
+      show-title-page-background: true # Geometric background on title page
+      show-heading-underlines: true # Gradient underlines below headings
+      show-logo: true # Display logo in header
       highlight-style: none
       # Logo/Visual assets
       logo:
@@ -167,6 +175,7 @@ contributes:
           at: pre-quarto
       # Typography
       mainfont: "Alegreya Sans"
+      sansfont: "Alegreya Sans"
       fontsize: 11pt
       # Page/Layout
       papersize: a4
@@ -175,30 +184,32 @@ contributes:
         bottom: 2.5cm
         left: 2.5cm
         right: 2.5cm
+      columns: 1
+      title-page: true
       # Section/Numbering
       number-sections: true
       section-numbering: "1.1.1."
-      section-page: false
-      section-pagebreak: false
+      section-page: true
+      section-pagebreak: true
       special-sections:
         references:
-          name: "References"
-          numbering: "none"
-          prefix: false
+          name: "References" # References section name
+          numbering: "none" # References numbering (use "none" for unnumbered)
+          prefix: false # Do not include "References" prefix in headings
         appendix:
-          name: "Appendix"
-          numbering: "A.a.1."
-          prefix: true
+          name: "Appendix" # Appendix section name
+          numbering: "A.a." # Appendix numbering pattern (A.1, A.2, etc)
+          prefix: true # Include "Appendix" prefix
         supplementary:
-          name: "Supplementary"
-          numbering: "I.i.1."
-          prefix: true
+          name: "Supplementary" # Supplementary section name
+          numbering: "I.i." # Supplementary numbering pattern (I.1, I.2, etc)
+          prefix: true # Include "Supplementary" prefix
       # Table of contents
       toc: true
       list-of: true
       # Other
       bibliographystyle: apa
-      header-footer-style: "professional"
+      citeproc: true
       pdf-standard: ua-1
     revealjs:
       embed-resources: true

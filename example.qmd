@@ -66,92 +66,11 @@ format:
     output-ext: dark.pdf
   mcanouil-typst+light:
     # keep-typ: true
-    header-footer-style: "professional"  # Header and footer style
-    # Colour Mode (light or dark)
-    brand-mode: light
     output-ext: light.pdf
-
-    # Optional Colour Overrides
-    # colour-background: "#fafafa"  # Custom background colour
-    # colour-foreground: "#333333"  # Custom text colour
-    # colour-muted: "#666666"       # Custom muted text colour
-
-    # Decorative Elements
-    show-corner-brackets: true          # Signature corner bracket decorations
-    show-margin-decoration: true        # Coloured bars along page margins
-    show-title-page-background: true    # Geometric background on title page
-    show-heading-underlines: true       # Gradient underlines below headings
-
-    # Logo Configuration
-    show-logo: true                     # Display logo in header
-    # logo-width: 5cm                   # Logo width (optional)
-    # logo-height: 5cm                  # Logo height (optional)
-    # logo-inset: 4pt                   # Logo padding
-    # logo-alt: "Mickaël CANOUIL Logo"  # Logo alternative text
-
-    # Title Page and Section Pages
-    title-page: true                   # Use dedicated title page with special styling
-    section-page: true                 # Use dedicated section pages for level-1 headings
-
-    # Watermark
     watermark-text: "DEMO"              # Text watermark content
-    # watermark-image: "path/image.png" # Alternative: image watermark path
-    watermark-opacity: 10%              # Watermark transparency (0-100%)
-    watermark-angle: -45deg             # Watermark rotation angle
-    watermark-size: 4em                 # Size for text watermarks
-    watermark-colour: gray              # Colour for text watermarks
-
-    # Typography
-    font-body: "Alegreya Sans"          # Body text font family
-    font-headings: "Alegreya Sans"      # Heading font family
-    font-size: 11pt                     # Base font size
-    heading-weight: "bold"              # Heading font weight
-    heading-style: "normal"             # Heading font style
-    # heading-colour: "#333333"          # Optional heading colour override
-    heading-line-height: 0.65em         # Heading line height
-    title-size: 24pt                    # Title font size
-    subtitle-size: 14pt                 # Subtitle font size
-
-    # Page Layout
-    papersize: a4                       # Paper size (a4, letter, etc)
-    columns: 1                          # Number of columns
-
-    # Document Structure
-    toc: true                           # Include table of contents
-    list-of: true                       # Include list of figures/tables/X
-    number-sections: true               # Number sections
-    section-numbering: "1.1.1."         # Section numbering pattern
-    section-pagebreak: true             # Page break before level 1 headings
-
-    # Special Sections Configuration
-    special-sections:
-      references:
-        name: "References"              # References section name
-        numbering: "none"               # References numbering (use "none" for unnumbered)
-        prefix: false                   # Do not include "References" prefix in headings
-      appendix:
-        name: "Appendix"                # Appendix section name
-        numbering: "A.a."               # Appendix numbering pattern (A.1, A.2, etc)
-        prefix: true                    # Include "Appendix" prefix
-      supplementary:
-        name: "Supplementary"           # Supplementary section name
-        numbering: "I.i."               # Supplementary numbering pattern (I.1, I.2, etc)
-        prefix: true                    # Include "Supplementary" prefix
-
-    # Table Styling
-    # table-stroke: auto                # Border style (auto uses 0.5pt + foreground)
-    # table-inset: 6pt                  # Internal padding
-    # table-fill: alternating           # Fill style (alternating for striped rows, none for solid)
-
-    # Quote and Link Styling
-    # quote-width: 90%                  # Blockquote width percentage
-    # quote-align: center               # Blockquote alignment
     # link-underline: true              # Underline links
     # link-underline-opacity: 50%       # Underline opacity
     # link-colour: auto                 # Optional custom link colour
-
-bibliographystyle: apa                  # Bibliography style
-citeproc: true                          # Enable citation processing
 crossref:
   custom:
     - kind: float                       # Define custom cross-reference type
