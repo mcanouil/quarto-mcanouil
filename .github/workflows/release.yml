@@ -37,6 +37,6 @@ jobs:
       formats: "mcanouil-html"
       quarto: "${{ github.event.inputs.quarto }}"
       tinytex: false
-      r: false
+      r: true
       python: false
       julia: false
