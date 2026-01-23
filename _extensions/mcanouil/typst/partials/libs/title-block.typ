@@ -83,13 +83,18 @@
   // For title page: invert logo selection based on brand-mode
   // Dark mode (dark background) -> use light logo (visible on dark)
   // Light mode (light background) -> use dark logo (visible on light)
-  // Note: .replace("\\", "") removes backslash escapes from paths (Quarto escaping workaround)
   let title-page-logo = if brand-mode == "dark" and logo-light != none {
-    logo-light.replace("\\", "")
+    logo-light
   } else if brand-mode == "light" and logo-dark != none {
-    logo-dark.replace("\\", "")
+    logo-dark
   } else {
     logo // fallback to standard logo
+  }
+  // Note: .replace("\\", "") removes backslash escapes from paths (Quarto escaping workaround)
+  title-page-logo = if title-page-logo != none {
+    title-page-logo.replace("\\", "")
+  } else {
+    none
   }
 
   // Shared content blocks (defined at function level for use in both modes)

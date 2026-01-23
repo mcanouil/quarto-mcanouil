@@ -25,11 +25,26 @@ $semantic-color-caution-dark: #ddcc66 !default; // 8.5:1 contrast
 /*-- scss:rules --*/
 
 // ===========================
+// INTERNAL COLOUR VARIABLES
+// ===========================
+// These provide fallbacks when $foreground/$background are not defined externally
+$_fg: #333333;
+$_bg: #fafafa;
+
+@if variable-exists(foreground) {
+  $_fg: $foreground !global;
+}
+
+@if variable-exists(background) {
+  $_bg: $background !global;
+}
+
+// ===========================
 // UTILITY FUNCTIONS
 // ===========================
 // Helper function to mix background and foreground colors
 @function body-mix($weight) {
-  @return mix($background, $foreground, $weight);
+  @return mix($_bg, $_fg, $weight);
 }
 
 // ===========================
@@ -45,12 +60,12 @@ $semantic-color-caution-dark: #ddcc66 !default; // 8.5:1 contrast
 // Light mode (default)
 body {
   // Core colours
-  --mc-fg: #{$foreground};
-  --mc-bg: #{$background};
-  --mc-muted: #{mix($background, $foreground, 35%)};
-  --mc-border: #{mix($background, $foreground, 80%)};
-  --mc-border-strong: #{mix($background, $foreground, 50%)};
-  --mc-surface: #{mix($background, $foreground, 98%)};
+  --mc-fg: #{$_fg};
+  --mc-bg: #{$_bg};
+  --mc-muted: #{mix($_bg, $_fg, 35%)};
+  --mc-border: #{mix($_bg, $_fg, 80%)};
+  --mc-border-strong: #{mix($_bg, $_fg, 50%)};
+  --mc-surface: #{mix($_bg, $_fg, 98%)};
 
   // Semantic colours
   --mc-info: #{$semantic-color-info};
@@ -58,18 +73,18 @@ body {
   --mc-warning: #{$semantic-color-warning};
   --mc-danger: #{$semantic-color-danger};
   --mc-caution: #{$callout-color-caution};
-  --mc-neutral: #{mix($background, $foreground, 50%)};
+  --mc-neutral: #{mix($_bg, $_fg, 50%)};
 }
 
 // Dark mode overrides
 [data-bs-theme="dark"],
 .quarto-dark {
-  --mc-fg: #{$foreground};
-  --mc-bg: #{$background};
-  --mc-muted: #{mix($background, $foreground, 35%)};
-  --mc-border: #{mix($background, $foreground, 80%)};
-  --mc-border-strong: #{mix($background, $foreground, 50%)};
-  --mc-surface: #{mix($background, $foreground, 98%)};
+  --mc-fg: #{$_fg};
+  --mc-bg: #{$_bg};
+  --mc-muted: #{mix($_bg, $_fg, 35%)};
+  --mc-border: #{mix($_bg, $_fg, 80%)};
+  --mc-border-strong: #{mix($_bg, $_fg, 50%)};
+  --mc-surface: #{mix($_bg, $_fg, 98%)};
 
   // Dark mode semantic colours (WCAG compliant)
   --mc-info: #{$semantic-color-info-dark};
@@ -77,7 +92,7 @@ body {
   --mc-warning: #{$semantic-color-warning-dark};
   --mc-danger: #{$semantic-color-danger-dark};
   --mc-caution: #{$semantic-color-caution-dark};
-  --mc-neutral: #{mix($background, $foreground, 50%)};
+  --mc-neutral: #{mix($_bg, $_fg, 50%)};
 }
 
 // Include all shared component styles at root level
@@ -110,7 +125,7 @@ body {
 a:focus-visible,
 button:focus-visible,
 .btn:focus-visible {
-  outline: 2px solid $foreground;
+  outline: 2px solid $_fg;
   outline-offset: 2px;
   transition: outline-offset 0.2s ease;
 }
@@ -135,19 +150,19 @@ p:empty {
 // Title banner styling
 .quarto-title-banner {
   margin-bottom: 1em;
-  color: $foreground;
+  color: $_fg;
   background-color: body-mix(99%);
 
   a {
     color: body-mix(50%);
 
     &:hover {
-      color: $foreground;
+      color: $_fg;
     }
   }
 
   .quarto-title .title {
-    color: $foreground;
+    color: $_fg;
   }
 }
 
@@ -165,26 +180,26 @@ p:empty {
 
   &.active .page-link,
   .page-link:hover {
-    color: $background;
-    background-color: $foreground;
-    border-color: $background;
+    color: $_bg;
+    background-color: $_fg;
+    border-color: $_bg;
   }
 
   &.disabled .page-link {
-    color: $foreground;
-    background-color: $background;
+    color: $_fg;
+    background-color: $_bg;
   }
 }
 
 .page-link:hover {
-  color: $background;
-  background-color: $foreground;
-  border-color: $background;
+  color: $_bg;
+  background-color: $_fg;
+  border-color: $_bg;
 }
 
 .input-group-text {
-  color: $background;
-  background-color: $foreground;
+  color: $_bg;
+  background-color: $_fg;
 }
 
 // ===========================
@@ -194,7 +209,7 @@ p:empty {
 // Uses body-mix(90%) for background (90% background, 10% foreground)
 code,
 a>code {
-  color: $foreground;
+  color: $_fg;
   background-color: body-mix(90%);
 }
 
@@ -239,6 +254,7 @@ td code.sourceCode {
 // ===========================
 // Ensure proper pagination for print and PDF output
 @media print {
+
   // Keep code windows together when possible
   .code-with-filename {
     page-break-inside: avoid;
@@ -308,27 +324,27 @@ td code.sourceCode {
 
   // Subtle background using colour mix
   &.callout-note {
-    background-color: color-mix(in srgb, $callout-color-note 8%, $background) !important;
+    background-color: color-mix(in srgb, $callout-color-note 8%, $_bg) !important;
     border-left-color: $callout-color-note !important;
   }
 
   &.callout-tip {
-    background-color: color-mix(in srgb, $callout-color-tip 8%, $background) !important;
+    background-color: color-mix(in srgb, $callout-color-tip 8%, $_bg) !important;
     border-left-color: $callout-color-tip !important;
   }
 
   &.callout-warning {
-    background-color: color-mix(in srgb, $callout-color-warning 8%, $background) !important;
+    background-color: color-mix(in srgb, $callout-color-warning 8%, $_bg) !important;
     border-left-color: $callout-color-warning !important;
   }
 
   &.callout-important {
-    background-color: color-mix(in srgb, $callout-color-important 8%, $background) !important;
+    background-color: color-mix(in srgb, $callout-color-important 8%, $_bg) !important;
     border-left-color: $callout-color-important !important;
   }
 
   &.callout-caution {
-    background-color: color-mix(in srgb, $callout-color-caution 8%, $background) !important;
+    background-color: color-mix(in srgb, $callout-color-caution 8%, $_bg) !important;
     border-left-color: $callout-color-caution !important;
   }
 
@@ -338,8 +354,8 @@ td code.sourceCode {
   }
 
   // Remove bottom spacing from last element in callout body (except code blocks)
-  &.callout-titled .callout-body > :last-child:not(.sourceCode),
-  &.callout-titled .callout-body > div > :last-child:not(.sourceCode) {
+  &.callout-titled .callout-body> :last-child:not(.sourceCode),
+  &.callout-titled .callout-body>div> :last-child:not(.sourceCode) {
     padding-bottom: 0;
     margin-bottom: 0;
   }
@@ -361,18 +377,18 @@ td code.sourceCode {
 
 // Navigation Tabs
 .nav-tabs {
-  border-bottom: 1px solid $foreground;
+  border-bottom: 1px solid $_fg;
 
   .nav-link.active,
   .nav-item.show .nav-link {
-    color: $foreground;
-    background-color: $background;
-    border-color: $foreground;
+    color: $_fg;
+    background-color: $_bg;
+    border-color: $_fg;
   }
 
   .nav-link,
   .nav-pills .nav-link {
-    color: $foreground;
+    color: $_fg;
   }
 }
 
@@ -390,7 +406,7 @@ img.about-image {
   border-radius: 50%;
   border-style: solid;
   border-width: 2pt;
-  border-color: $foreground;
+  border-color: $_fg;
   padding: 5pt;
 
   &::before {
@@ -401,20 +417,20 @@ img.about-image {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: $foreground;
+    background: $_fg;
     transition: .5s;
     transform: scale(.9);
     z-index: -1;
   }
 
   &:hover {
-    color: $foreground;
-    box-shadow: 0 0 10px $foreground;
-    text-shadow: 0 0 10px $foreground;
+    color: $_fg;
+    box-shadow: 0 0 10px $_fg;
+    text-shadow: 0 0 10px $_fg;
 
     &::before {
       transform: scale(1.1);
-      box-shadow: 0 0 30px $foreground;
+      box-shadow: 0 0 30px $_fg;
     }
   }
 }
@@ -422,8 +438,8 @@ img.about-image {
 // About entity title hover effect
 .about-entity {
   #title-block-header.quarto-title-block.default .quarto-title .title:hover {
-    color: $foreground;
-    text-shadow: 0 0 10px $foreground;
+    color: $_fg;
+    text-shadow: 0 0 10px $_fg;
   }
 }
 
@@ -453,8 +469,8 @@ img.about-image {
 // Trestles template about links
 .quarto-about-trestles .about-entity {
   .about-link {
-    color: mix($link-color, $background, 50%);
-    border: solid 1px $foreground;
+    color: mix($link-color, $_bg, 50%);
+    border: solid 1px $_fg;
 
     &:hover {
       color: $link-color;
@@ -471,7 +487,7 @@ img.about-image {
 .navbar {
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  background-color: $background;
+  background-color: $_bg;
   border-bottom: 1px solid body-mix(50%);
 
   &.bg-primary {
@@ -479,7 +495,7 @@ img.about-image {
   }
 
   &.bg-dark {
-    background-color: $background;
+    background-color: $_bg;
     border: 1px solid body-mix(50%);
   }
 
@@ -501,7 +517,7 @@ img.about-image {
   border-top: 1px solid body-mix(50%);
 
   a:hover {
-    color: $foreground;
+    color: $_fg;
   }
 }
 
@@ -534,12 +550,12 @@ img.about-image {
   .show>.nav-link,
   .active>.nav-link,
   .nav-link.active {
-    color: $foreground;
+    color: $_fg;
   }
 
   .nav-link:hover,
   .nav-link:focus {
-    color: $foreground;
+    color: $_fg;
   }
 
   .nav-link {
@@ -562,12 +578,12 @@ img.about-image {
 
   a.nav-link.active:after,
   a.nav-link.active:hover:after {
-    border-top: .2em solid $foreground;
+    border-top: .2em solid $_fg;
   }
 
   a.nav-link:hover:after,
   a.nav-link:after {
-    border-top: .1em solid $foreground;
+    border-top: .1em solid $_fg;
   }
 
   a.nav-link:after {
@@ -589,7 +605,7 @@ img.about-image {
 
   .nav-link:hover,
   .nav-link:focus {
-    color: $foreground;
+    color: $_fg;
   }
 }
 
@@ -601,13 +617,13 @@ img.about-image {
     a.nav-link.active:hover:after,
     a.nav-link:hover:after,
     a.nav-link:after {
-      border-top: 0 solid $foreground;
+      border-top: 0 solid $_fg;
     }
   }
 }
 
 .navbar-brand {
-  color: $foreground;
+  color: $_fg;
 }
 
 .navbar-logo {
@@ -636,8 +652,8 @@ img.about-image {
     content: '';
     right: 0;
     top: 0;
-    border-top: 3px solid $foreground;
-    border-right: 3px solid $foreground;
+    border-top: 3px solid $_fg;
+    border-right: 3px solid $_fg;
     transform: translate(-100%, 50%);
   }
 
@@ -645,8 +661,8 @@ img.about-image {
     content: '';
     left: 0;
     bottom: 0;
-    border-bottom: 3px solid $foreground;
-    border-left: 3px solid $foreground;
+    border-bottom: 3px solid $_fg;
+    border-left: 3px solid $_fg;
     transform: translate(100%, -50%);
   }
 
@@ -681,21 +697,21 @@ img.about-image {
 
 .sidebar-navigation .quarto-color-scheme-toggle {
   &:not(.alternate) .bi::before {
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#{colorToRGBA(theme-dim($foreground, 10%))}" class="bi bi-sun-fill" viewBox="0 0 16 16"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>');
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#{colorToRGBA(theme-dim($_fg, 10%))}" class="bi bi-sun-fill" viewBox="0 0 16 16"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>');
   }
 
   &.alternate .bi::before {
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#{colorToRGBA(theme-dim($foreground, 10%))}" class="bi bi-moon-stars-fill" viewBox="0 0 16 16"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>');
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#{colorToRGBA(theme-dim($_fg, 10%))}" class="bi bi-moon-stars-fill" viewBox="0 0 16 16"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>');
   }
 }
 
 .top-right.quarto-color-scheme-toggle {
   &:not(.alternate) .bi::before {
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#{colorToRGBA(theme-dim($foreground, 35%))}" class="bi bi-sun-fill" viewBox="0 0 16 16"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>');
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#{colorToRGBA(theme-dim($_fg, 35%))}" class="bi bi-sun-fill" viewBox="0 0 16 16"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>');
   }
 
   &.alternate .bi::before {
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#{colorToRGBA(theme-dim($foreground, 20%))}" class="bi bi-moon-stars-fill" viewBox="0 0 16 16"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>');
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#{colorToRGBA(theme-dim($_fg, 20%))}" class="bi bi-moon-stars-fill" viewBox="0 0 16 16"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>');
   }
 }
 
@@ -705,17 +721,17 @@ img.about-image {
 
 // Listing category tags
 .quarto-post .listing-categories .listing-category {
-  border: solid 1px $foreground;
+  border: solid 1px $_fg;
 
   &:hover {
-    color: $foreground;
+    color: $_fg;
   }
 }
 
 .quarto-grid-item .listing-categories .listing-category:hover,
 .quarto-listing-category .category:hover,
 .quarto-title .quarto-categories .quarto-category a:hover {
-  color: $foreground;
+  color: $_fg;
 }
 
 .quarto-listing-category .category {
@@ -723,7 +739,7 @@ img.about-image {
 }
 
 .listing-description {
-  color: $foreground;
+  color: $_fg;
 }
 
 // Footer link hover
@@ -739,7 +755,7 @@ img.about-image {
 .picture {
   border-style: solid;
   border-width: 3pt;
-  border-color: $foreground;
+  border-color: $_fg;
   border-radius: 50%;
   padding: 5pt;
   height: 50%;
@@ -783,13 +799,13 @@ img.about-image {
 main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.quarto-grid-link):not(:has(img)):not(.code-annotation-anchor):not(.anchor-section):not(.anchorjs-link):not(.toc-action):not(#quarto-back-to-top) {
   position: relative;
   text-decoration: underline;
-  text-decoration-color: rgba($foreground, 0.3);
+  text-decoration-color: rgba($_fg, 0.3);
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
   transition: all 0.3s ease;
 
   &:hover {
-    text-decoration-color: $foreground;
+    text-decoration-color: $_fg;
     text-decoration-thickness: 2px;
   }
 }
@@ -807,7 +823,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba($foreground, 0.1);
+    box-shadow: 0 8px 16px rgba($_fg, 0.1);
   }
 
   .listing-title {
@@ -832,13 +848,13 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 // Thumbnail images in listings - match featured image styling
 .quarto-listing .thumbnail-image {
   border-radius: 1.5rem;
-  box-shadow: 0 4px 24px rgba($foreground, 0.25);
+  box-shadow: 0 4px 24px rgba($_fg, 0.25);
 }
 
 // Featured images
 .img-featured {
   border-radius: 1.5rem;
-  box-shadow: 0 4px 24px rgba($foreground, 0.25);
+  box-shadow: 0 4px 24px rgba($_fg, 0.25);
   margin-bottom: 2rem;
 }
 
@@ -848,7 +864,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba($foreground, 0.1);
+    box-shadow: 0 8px 16px rgba($_fg, 0.1);
   }
 
   .card-img-top {
@@ -865,7 +881,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 }
 
 .card {
-  border-color: $foreground !important;
+  border-color: $_fg !important;
 }
 
 // ===========================
@@ -886,7 +902,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba($foreground, 0.15);
+    box-shadow: 0 4px 8px rgba($_fg, 0.15);
     text-decoration: none;
   }
 
@@ -905,7 +921,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba($foreground, 0.1);
+    box-shadow: 0 2px 8px rgba($_fg, 0.1);
   }
 }
 
@@ -922,11 +938,11 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
   margin-top: -2rem;
   margin-bottom: 2rem;
   background:
-    radial-gradient(ellipse at top left, rgba($foreground, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at bottom right, rgba($foreground, 0.06) 0%, transparent 50%),
-    linear-gradient(135deg, rgba($foreground, 0.02) 0%, rgba($foreground, 0.05) 100%);
+    radial-gradient(ellipse at top left, rgba($_fg, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba($_fg, 0.06) 0%, transparent 50%),
+    linear-gradient(135deg, rgba($_fg, 0.02) 0%, rgba($_fg, 0.05) 100%);
   border-radius: 0;
-  box-shadow: 0 4px 16px rgba($foreground, 0.08);
+  box-shadow: 0 4px 16px rgba($_fg, 0.08);
   overflow: hidden;
 
   // Gradient orbs overlay
@@ -938,9 +954,9 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
     right: -50%;
     bottom: -50%;
     background:
-      radial-gradient(circle at 30% 40%, rgba($foreground, 0.12) 0%, transparent 30%),
-      radial-gradient(circle at 70% 60%, rgba($foreground, 0.1) 0%, transparent 30%),
-      radial-gradient(circle at 50% 20%, rgba($foreground, 0.08) 0%, transparent 20%);
+      radial-gradient(circle at 30% 40%, rgba($_fg, 0.12) 0%, transparent 30%),
+      radial-gradient(circle at 70% 60%, rgba($_fg, 0.1) 0%, transparent 30%),
+      radial-gradient(circle at 50% 20%, rgba($_fg, 0.08) 0%, transparent 20%);
     pointer-events: none;
     opacity: 0.6;
     animation: orbsMove 20s ease-in-out infinite alternate;
@@ -963,7 +979,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, $foreground 0%, rgba($foreground, 0.7) 100%);
+            background: linear-gradient(135deg, $_fg 0%, rgba($_fg, 0.7) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -975,7 +991,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 
           .subtitle {
             font-size: 1.2rem;
-            color: rgba($foreground, 0.8);
+            color: rgba($_fg, 0.8);
             font-weight: 400;
             margin-bottom: 1.5rem;
 
@@ -998,10 +1014,10 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
           align-items: center;
           justify-content: center;
           padding: 0.6rem 1rem;
-          background-color: rgba($foreground, 0.08);
-          border: 1px solid rgba($foreground, 0.15);
+          background-color: rgba($_fg, 0.08);
+          border: 1px solid rgba($_fg, 0.15);
           border-radius: 8px;
-          color: rgba($foreground, 0.85);
+          color: rgba($_fg, 0.85);
           text-decoration: none;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-size: 1.1rem;
@@ -1014,11 +1030,11 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
           }
 
           &:hover {
-            background-color: rgba($foreground, 0.12);
-            border-color: rgba($foreground, 0.3);
+            background-color: rgba($_fg, 0.12);
+            border-color: rgba($_fg, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba($foreground, 0.15);
-            color: $foreground;
+            box-shadow: 0 4px 12px rgba($_fg, 0.15);
+            color: $_fg;
           }
 
           &:active {
@@ -1043,14 +1059,14 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 
     // Profile image styling (override existing)
     .about-image {
-      border: 4px solid rgba($foreground, 0.1);
-      box-shadow: 0 8px 24px rgba($foreground, 0.15);
+      border: 4px solid rgba($_fg, 0.1);
+      box-shadow: 0 8px 24px rgba($_fg, 0.15);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
       &:hover {
         transform: scale(1.05);
-        box-shadow: 0 12px 32px rgba($foreground, 0.2);
-        border-color: rgba($foreground, 0.2);
+        box-shadow: 0 12px 32px rgba($_fg, 0.2);
+        border-color: rgba($_fg, 0.2);
       }
     }
   }
@@ -1091,7 +1107,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
     font-size: 1.1rem;
     line-height: 1.75;
     margin-bottom: 1.5rem;
-    color: rgba($foreground, 0.85);
+    color: rgba($_fg, 0.85);
 
     @media (max-width: 768px) {
       font-size: 1.05rem;
@@ -1099,12 +1115,12 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
     }
 
     strong {
-      color: $foreground;
+      color: $_fg;
       font-weight: 600;
     }
 
     em {
-      color: rgba($foreground, 0.75);
+      color: rgba($_fg, 0.75);
     }
   }
 }
@@ -1116,11 +1132,11 @@ figure:has(img.img-styled) {
   margin: 2rem auto;
   padding: 1rem;
   background: linear-gradient(135deg,
-      rgba($foreground, 0.02) 0%,
-      rgba($foreground, 0.04) 100%);
-  border: 1px solid rgba($foreground, 0.08);
+      rgba($_fg, 0.02) 0%,
+      rgba($_fg, 0.04) 100%);
+  border: 1px solid rgba($_fg, 0.08);
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba($foreground, 0.06);
+  box-shadow: 0 2px 6px rgba($_fg, 0.06);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible;
   position: relative;
@@ -1146,7 +1162,7 @@ figure:has(img.img-styled) {
     margin-top: 0;
     padding-right: 0;
     font-size: 0.8em;
-    color: rgba($foreground, 0.6);
+    color: rgba($_fg, 0.6);
     text-align: right;
     opacity: 0;
     overflow: hidden;
@@ -1155,21 +1171,21 @@ figure:has(img.img-styled) {
     font-style: italic;
 
     a {
-      color: rgba($foreground, 0.7);
+      color: rgba($_fg, 0.7);
       text-decoration: underline;
 
       &:hover {
-        color: $foreground;
+        color: $_fg;
       }
     }
   }
 
   &:hover {
     background: linear-gradient(135deg,
-        rgba($foreground, 0.04) 0%,
-        rgba($foreground, 0.06) 100%);
-    border-color: rgba($foreground, 0.12);
-    box-shadow: 0 4px 12px rgba($foreground, 0.1);
+        rgba($_fg, 0.04) 0%,
+        rgba($_fg, 0.06) 100%);
+    border-color: rgba($_fg, 0.12);
+    box-shadow: 0 4px 12px rgba($_fg, 0.1);
 
     // Show and expand figcaption on hover
     figcaption {
@@ -1202,7 +1218,7 @@ figure:has(img.img-styled) {
   padding: 1.5rem 2rem;
   width: 65%;
   background: transparent;
-  border: 2px dashed rgba($foreground, 0.25);
+  border: 2px dashed rgba($_fg, 0.25);
   border-radius: 8px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -1213,7 +1229,7 @@ figure:has(img.img-styled) {
     position: absolute;
     width: 12px;
     height: 12px;
-    border: 2px solid $foreground;
+    border: 2px solid $_fg;
     transition: all 0.3s ease;
   }
 
@@ -1236,8 +1252,8 @@ figure:has(img.img-styled) {
   }
 
   &:hover {
-    border-color: rgba($foreground, 0.4);
-    background: rgba($foreground, 0.02);
+    border-color: rgba($_fg, 0.4);
+    background: rgba($_fg, 0.02);
 
     &::before,
     &::after {
@@ -1250,14 +1266,14 @@ figure:has(img.img-styled) {
     margin: 0;
     font-size: 1.05rem;
     line-height: 1.8;
-    color: $foreground;
+    color: $_fg;
 
     @media (max-width: 768px) {
       font-size: 1rem;
     }
 
     strong {
-      color: $foreground;
+      color: $_fg;
       position: relative;
       padding: 0 0.2em;
 
@@ -1268,7 +1284,7 @@ figure:has(img.img-styled) {
         left: 0;
         right: 0;
         height: 0.35em;
-        background: rgba($foreground, 0.12);
+        background: rgba($_fg, 0.12);
         z-index: -1;
         transition: background 0.3s ease;
       }
@@ -1276,12 +1292,12 @@ figure:has(img.img-styled) {
 
     em {
       font-style: italic;
-      color: $foreground;
+      color: $_fg;
     }
   }
 
   &:hover p strong::after {
-    background: rgba($foreground, 0.2);
+    background: rgba($_fg, 0.2);
   }
 
   // Multiple paragraphs in highlight
@@ -1311,12 +1327,12 @@ figure:has(img.img-styled) {
   padding: 1.5rem 2rem;
   width: 90%;
   background: linear-gradient(135deg,
-      rgba($foreground, 0.03) 0%,
-      rgba($foreground, 0.05) 100%);
-  border: 2px solid rgba($foreground, 0.2);
+      rgba($_fg, 0.03) 0%,
+      rgba($_fg, 0.05) 100%);
+  border: 2px solid rgba($_fg, 0.2);
   border-radius: 8px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 6px rgba($foreground, 0.06);
+  box-shadow: 0 2px 6px rgba($_fg, 0.06);
 
   // Corner accents - filled style
   &::before,
@@ -1325,7 +1341,7 @@ figure:has(img.img-styled) {
     position: absolute;
     width: 10px;
     height: 10px;
-    background: $foreground;
+    background: $_fg;
     transition: all 0.3s ease;
     opacity: 0.3;
   }
@@ -1345,11 +1361,11 @@ figure:has(img.img-styled) {
   }
 
   &:hover {
-    border-color: rgba($foreground, 0.35);
+    border-color: rgba($_fg, 0.35);
     background: linear-gradient(135deg,
-        rgba($foreground, 0.05) 0%,
-        rgba($foreground, 0.08) 100%);
-    box-shadow: 0 4px 12px rgba($foreground, 0.1);
+        rgba($_fg, 0.05) 0%,
+        rgba($_fg, 0.08) 100%);
+    box-shadow: 0 4px 12px rgba($_fg, 0.1);
 
     &::before,
     &::after {
@@ -1363,7 +1379,7 @@ figure:has(img.img-styled) {
     margin: 0;
     font-size: 1.08rem;
     line-height: 1.8;
-    color: $foreground;
+    color: $_fg;
     font-weight: 500;
     font-style: italic;
     letter-spacing: 0.01em;
@@ -1373,7 +1389,7 @@ figure:has(img.img-styled) {
     }
 
     strong {
-      color: $foreground;
+      color: $_fg;
       font-weight: 700;
       font-style: normal;
       position: relative;
@@ -1386,7 +1402,7 @@ figure:has(img.img-styled) {
         left: 0;
         right: 0;
         height: 0.4em;
-        background: rgba($foreground, 0.15);
+        background: rgba($_fg, 0.15);
         z-index: -1;
         border-radius: 2px;
         transition: all 0.3s ease;
@@ -1395,27 +1411,27 @@ figure:has(img.img-styled) {
 
     em {
       font-style: italic;
-      color: rgba($foreground, 0.85);
+      color: rgba($_fg, 0.85);
       font-weight: 600;
     }
 
     // Links inside thanks box
     a {
-      color: $foreground;
+      color: $_fg;
       font-weight: 600;
       text-decoration-thickness: 2px;
-      text-decoration-color: rgba($foreground, 0.4);
+      text-decoration-color: rgba($_fg, 0.4);
       transition: all 0.3s ease;
 
       &:hover {
-        text-decoration-color: $foreground;
+        text-decoration-color: $_fg;
         text-decoration-thickness: 2.5px;
       }
     }
   }
 
   &:hover p strong::after {
-    background: rgba($foreground, 0.25);
+    background: rgba($_fg, 0.25);
     height: 0.45em;
   }
 
@@ -1451,10 +1467,10 @@ body.quarto-about-solana,
       font-size: 1.05rem;
       line-height: 1.7;
       margin-bottom: 1.25rem;
-      color: rgba($foreground, 0.85);
+      color: rgba($_fg, 0.85);
 
       strong {
-        color: $foreground;
+        color: $_fg;
         font-weight: 600;
       }
     }
@@ -1468,7 +1484,7 @@ body.quarto-about-solana,
       font-size: 1.75rem;
       font-weight: 700;
       margin-bottom: 1.5rem;
-      color: $foreground;
+      color: $_fg;
       position: relative;
       padding-bottom: 0.75rem;
 
@@ -1479,7 +1495,7 @@ body.quarto-about-solana,
         left: 0;
         width: 60px;
         height: 3px;
-        background: linear-gradient(90deg, $foreground 0%, rgba($foreground, 0.3) 100%);
+        background: linear-gradient(90deg, $_fg 0%, rgba($_fg, 0.3) 100%);
         transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
@@ -1503,17 +1519,17 @@ body.quarto-about-solana,
           content: '▸';
           position: absolute;
           left: 0.5rem;
-          color: rgba($foreground, 0.5);
+          color: rgba($_fg, 0.5);
           font-size: 1rem;
           transition: all 0.3s ease;
         }
 
         &:hover {
           padding-left: 2.25rem;
-          color: $foreground;
+          color: $_fg;
 
           &::before {
-            color: $foreground;
+            color: $_fg;
             left: 0.25rem;
           }
         }
@@ -1522,12 +1538,12 @@ body.quarto-about-solana,
           margin: 0;
 
           strong {
-            color: $foreground;
+            color: $_fg;
             font-weight: 600;
           }
 
           em {
-            color: rgba($foreground, 0.7);
+            color: rgba($_fg, 0.7);
           }
         }
       }
@@ -1537,18 +1553,18 @@ body.quarto-about-solana,
   // Education section specific styling
   .education {
     ul li {
-      background-color: rgba($foreground, 0.02);
-      border-left: 2px solid rgba($foreground, 0.15);
+      background-color: rgba($_fg, 0.02);
+      border-left: 2px solid rgba($_fg, 0.15);
       border-radius: 0 6px 6px 0;
       padding: 1rem 1rem 1rem 2rem;
 
       &:hover {
-        background-color: rgba($foreground, 0.05);
-        border-left-color: rgba($foreground, 0.3);
+        background-color: rgba($_fg, 0.05);
+        border-left-color: rgba($_fg, 0.3);
       }
 
       strong:last-of-type {
-        color: rgba($foreground, 0.7);
+        color: rgba($_fg, 0.7);
         font-size: 0.95em;
       }
     }
@@ -1567,7 +1583,7 @@ body.quarto-about-solana,
 
       li {
         padding: 0.5rem 1rem 0.5rem 1.75rem;
-        background-color: rgba($foreground, 0.04);
+        background-color: rgba($_fg, 0.04);
         border-radius: 6px;
         font-size: 0.95rem;
 
@@ -1577,7 +1593,7 @@ body.quarto-about-solana,
         }
 
         &:hover {
-          background-color: rgba($foreground, 0.08);
+          background-color: rgba($_fg, 0.08);
           padding-left: 2rem;
         }
       }
@@ -1610,7 +1626,7 @@ body.quarto-about-solana,
 // ===========================
 
 code:not(.sourceCode) {
-  color: $foreground !important;
+  color: $_fg !important;
   background-color: body-mix(90%) !important;
 }
 
@@ -1637,7 +1653,7 @@ h6 code:not(.sourceCode) {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   // Subtle border for definition
-  border: 1px solid rgba($foreground, 0.12);
+  border: 1px solid rgba($_fg, 0.12);
 
   // Font styling
   font-size: 0.9em;
@@ -1645,12 +1661,12 @@ h6 code:not(.sourceCode) {
   letter-spacing: 0.01em;
 
   // Subtle shadow for depth
-  box-shadow: 0 1px 2px rgba($foreground, 0.05);
+  box-shadow: 0 1px 2px rgba($_fg, 0.05);
 
   // Hover effect
   &:hover {
-    border-color: rgba($foreground, 0.25);
-    box-shadow: 0 2px 4px rgba($foreground, 0.1);
+    border-color: rgba($_fg, 0.25);
+    box-shadow: 0 2px 4px rgba($_fg, 0.1);
     transform: translateY(-1px);
   }
 }
@@ -1662,7 +1678,7 @@ a>code:not(.sourceCode) {
   transition: all 0.2s ease;
 
   &:hover {
-    box-shadow: 0 2px 6px rgba($foreground, 0.15);
+    box-shadow: 0 2px 6px rgba($_fg, 0.15);
   }
 }
 
@@ -1692,7 +1708,7 @@ nav div code:not(.sourceCode),
 nav span code:not(.sourceCode) {
   padding: 0.15em 0.4em;
   border-radius: 4px;
-  border: 1px solid rgba($foreground, 0.12);
+  border: 1px solid rgba($_fg, 0.12);
 }
 
 // Code blocks with hover shadow
@@ -1701,21 +1717,21 @@ div.sourceCode {
   border-radius: 6px;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba($foreground, 0.08);
+    box-shadow: 0 4px 12px rgba($_fg, 0.08);
   }
 }
 
 // Code with filename wrapper (macOS-style code window)
 .code-with-filename {
   margin: 1em 0;
-  border: 1px solid rgba($foreground, 0.5);
+  border: 1px solid rgba($_fg, 0.5);
   border-radius: 8px;
   overflow: hidden;
 
   // Filename header (title bar)
   .code-with-filename-file {
-    background-color: rgba($foreground, 0.08);
-    border-bottom: 1px solid rgba($foreground, 0.5);
+    background-color: rgba($_fg, 0.08);
+    border-bottom: 1px solid rgba($_fg, 0.5);
     padding: 0.6em 1em;
     margin: 0;
     display: flex;
@@ -1748,7 +1764,7 @@ div.sourceCode {
       border: none;
       font-size: 0.85em;
       font-weight: 500;
-      color: rgba($foreground, 0.6);
+      color: rgba($_fg, 0.6);
       font-family: "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
       flex-grow: 1;
       text-align: right;
@@ -1775,7 +1791,7 @@ div.sourceCode {
   // Hover effect for the entire wrapper
   &:hover {
     .code-with-filename-file {
-      background-color: rgba($foreground, 0.1);
+      background-color: rgba($_fg, 0.1);
     }
   }
 
@@ -1815,7 +1831,7 @@ div.sourceCode {
     transition: all 0.3s ease;
 
     &:focus-within {
-      box-shadow: 0 4px 12px rgba($foreground, 0.1);
+      box-shadow: 0 4px 12px rgba($_fg, 0.1);
     }
   }
 }
@@ -1854,19 +1870,19 @@ div.sourceCode {
   margin: 1.5em 0;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba($foreground, 0.08);
+  box-shadow: 0 2px 8px rgba($_fg, 0.08);
   transition: box-shadow 0.3s ease;
 
   &:hover {
-    box-shadow: 0 4px 16px rgba($foreground, 0.12);
+    box-shadow: 0 4px 16px rgba($_fg, 0.12);
   }
 
   // Table header
   thead {
     background: linear-gradient(180deg,
-        rgba($foreground, 0.08) 0%,
-        rgba($foreground, 0.05) 100%);
-    border-bottom: 2px solid rgba($foreground, 0.15);
+        rgba($_fg, 0.08) 0%,
+        rgba($_fg, 0.05) 100%);
+    border-bottom: 2px solid rgba($_fg, 0.15);
 
     tr {
       transition: background-color 0.3s ease;
@@ -1878,9 +1894,9 @@ div.sourceCode {
       text-transform: uppercase;
       font-size: 0.8rem;
       letter-spacing: 0.08em;
-      color: rgba($foreground, 0.85);
+      color: rgba($_fg, 0.85);
       text-align: left;
-      border-bottom: 2px solid rgba($foreground, 0.15);
+      border-bottom: 2px solid rgba($_fg, 0.15);
       position: relative;
       transition: all 0.3s ease;
 
@@ -1898,7 +1914,7 @@ div.sourceCode {
 
       // Sort links
       a.sort {
-        color: rgba($foreground, 0.85);
+        color: rgba($_fg, 0.85);
         text-decoration: none;
         display: inline-flex;
         align-items: center;
@@ -1923,7 +1939,7 @@ div.sourceCode {
         }
 
         &:hover {
-          color: $foreground;
+          color: $_fg;
 
           &::after {
             opacity: 1;
@@ -1935,18 +1951,18 @@ div.sourceCode {
         &.sort-asc::after {
           content: '↑';
           opacity: 1;
-          color: $foreground;
+          color: $_fg;
         }
 
         &.sort-desc::after {
           content: '↓';
           opacity: 1;
-          color: $foreground;
+          color: $_fg;
         }
       }
 
       &:hover {
-        background-color: rgba($foreground, 0.06);
+        background-color: rgba($_fg, 0.06);
       }
     }
   }
@@ -1954,14 +1970,14 @@ div.sourceCode {
   // Table body
   tbody {
     tr {
-      border-bottom: 1px solid rgba($foreground, 0.08);
+      border-bottom: 1px solid rgba($_fg, 0.08);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       background-color: transparent;
 
       &:hover {
-        background-color: rgba($foreground, 0.04);
+        background-color: rgba($_fg, 0.04);
         transform: scale(1.005);
-        box-shadow: 0 2px 8px rgba($foreground, 0.08);
+        box-shadow: 0 2px 8px rgba($_fg, 0.08);
         position: relative;
         z-index: 1;
       }
@@ -2002,14 +2018,14 @@ div.sourceCode {
   // Listing-specific elements
   .listing-date {
     font-size: 0.9em;
-    color: rgba($foreground, 0.75);
+    color: rgba($_fg, 0.75);
     font-weight: 600;
     display: inline-block;
     white-space: nowrap;
   }
 
   .listing-title {
-    color: $foreground;
+    color: $_fg;
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s ease;
@@ -2024,14 +2040,14 @@ div.sourceCode {
       width: 0;
       height: 2px;
       background: linear-gradient(90deg,
-          $foreground 0%,
-          rgba($foreground, 0.4) 100%);
+          $_fg 0%,
+          rgba($_fg, 0.4) 100%);
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 1px;
     }
 
     &:hover {
-      color: $foreground;
+      color: $_fg;
       transform: translateX(2px);
 
       &::after {
@@ -2041,7 +2057,7 @@ div.sourceCode {
   }
 
   .listing-journal-title {
-    color: rgba($foreground, 0.8);
+    color: rgba($_fg, 0.8);
     font-size: 0.95em;
     font-style: italic;
 
@@ -2053,7 +2069,7 @@ div.sourceCode {
   .listing-first,
   .listing-last {
     font-size: 0.9em;
-    color: rgba($foreground, 0.7);
+    color: rgba($_fg, 0.7);
     font-weight: 500;
     text-align: center;
     display: inline-block;
@@ -2061,13 +2077,13 @@ div.sourceCode {
 
     &:not(:empty) {
       padding: 0.25em 0.75em;
-      background-color: rgba($foreground, 0.05);
+      background-color: rgba($_fg, 0.05);
       border-radius: 4px;
-      border: 1px solid rgba($foreground, 0.12);
+      border: 1px solid rgba($_fg, 0.12);
 
       &:hover {
-        background-color: rgba($foreground, 0.08);
-        border-color: rgba($foreground, 0.2);
+        background-color: rgba($_fg, 0.08);
+        border-color: rgba($_fg, 0.2);
         transform: scale(1.05);
       }
     }
@@ -2097,10 +2113,10 @@ div.sourceCode {
   }
 
   .input-group-text {
-    background-color: rgba($foreground, 0.08);
-    border: 1px solid rgba($foreground, 0.15);
+    background-color: rgba($_fg, 0.08);
+    border: 1px solid rgba($_fg, 0.15);
     border-right: none;
-    color: rgba($foreground, 0.7);
+    color: rgba($_fg, 0.7);
     border-radius: 6px 0 0 6px;
     padding: 0.5rem 0.75rem;
     transition: all 0.3s ease;
@@ -2113,12 +2129,12 @@ div.sourceCode {
   // Sort dropdown
   .quarto-listing-sort {
     .form-select {
-      border: 1px solid rgba($foreground, 0.15);
+      border: 1px solid rgba($_fg, 0.15);
       border-left: none;
       border-radius: 0 6px 6px 0;
       padding: 0.5rem 2.5rem 0.5rem 1rem;
-      background-color: $background;
-      color: rgba($foreground, 0.85);
+      background-color: $_bg;
+      color: rgba($_fg, 0.85);
       font-size: 0.95em;
       transition: all 0.3s ease;
       cursor: pointer;
@@ -2129,24 +2145,24 @@ div.sourceCode {
       background-size: 16px 12px;
 
       &:hover {
-        border-color: rgba($foreground, 0.3);
-        background-color: rgba($foreground, 0.02);
-        box-shadow: 0 2px 4px rgba($foreground, 0.05);
+        border-color: rgba($_fg, 0.3);
+        background-color: rgba($_fg, 0.02);
+        box-shadow: 0 2px 4px rgba($_fg, 0.05);
       }
 
       &:focus {
-        border-color: rgba($foreground, 0.4);
-        box-shadow: 0 0 0 3px rgba($foreground, 0.08);
+        border-color: rgba($_fg, 0.4);
+        box-shadow: 0 0 0 3px rgba($_fg, 0.08);
         outline: none;
       }
 
       option {
         padding: 0.5rem;
-        background-color: $background;
-        color: $foreground;
+        background-color: $_bg;
+        color: $_fg;
 
         &:hover {
-          background-color: rgba($foreground, 0.08);
+          background-color: rgba($_fg, 0.08);
         }
       }
     }
@@ -2156,30 +2172,30 @@ div.sourceCode {
 // Listing filter input
 .quarto-listing-filter {
   .form-control {
-    border: 1px solid rgba($foreground, 0.15);
+    border: 1px solid rgba($_fg, 0.15);
     border-left: none;
     border-radius: 0 6px 6px 0;
     padding: 0.5rem 1rem;
-    background-color: $background;
-    color: rgba($foreground, 0.85);
+    background-color: $_bg;
+    color: rgba($_fg, 0.85);
     transition: all 0.3s ease;
 
     &::placeholder {
-      color: rgba($foreground, 0.4);
+      color: rgba($_fg, 0.4);
       font-style: italic;
     }
 
     &:hover {
-      border-color: rgba($foreground, 0.3);
-      background-color: rgba($foreground, 0.02);
-      box-shadow: 0 2px 4px rgba($foreground, 0.05);
+      border-color: rgba($_fg, 0.3);
+      background-color: rgba($_fg, 0.02);
+      box-shadow: 0 2px 4px rgba($_fg, 0.05);
     }
 
     &:focus {
-      border-color: rgba($foreground, 0.4);
-      box-shadow: 0 0 0 3px rgba($foreground, 0.08);
+      border-color: rgba($_fg, 0.4);
+      box-shadow: 0 0 0 3px rgba($_fg, 0.08);
       outline: none;
-      background-color: $background;
+      background-color: $_bg;
     }
   }
 }
@@ -2193,11 +2209,11 @@ div.sourceCode {
   gap: 0.5rem;
 
   .page-link {
-    border: 1px solid rgba($foreground, 0.15);
+    border: 1px solid rgba($_fg, 0.15);
     border-radius: 6px;
     padding: 0.5rem 1rem;
-    color: rgba($foreground, 0.85);
-    background-color: $background;
+    color: rgba($_fg, 0.85);
+    background-color: $_bg;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     position: relative;
@@ -2210,29 +2226,29 @@ div.sourceCode {
     }
 
     &:hover {
-      background-color: rgba($foreground, 0.08);
-      border-color: rgba($foreground, 0.25);
+      background-color: rgba($_fg, 0.08);
+      border-color: rgba($_fg, 0.25);
       transform: translateY(-2px);
       text-decoration: none;
-      color: $foreground;
+      color: $_fg;
     }
 
     &:focus {
-      outline: 2px solid $foreground;
+      outline: 2px solid $_fg;
       outline-offset: 2px;
       text-decoration: none;
     }
 
     &.active {
-      background-color: $foreground;
-      color: $background;
-      border-color: $foreground;
+      background-color: $_fg;
+      color: $_bg;
+      border-color: $_fg;
       font-weight: 600;
       text-decoration: none;
 
       &:hover {
-        color: $background;
-        background-color: rgba($foreground, 0.9);
+        color: $_bg;
+        background-color: rgba($_fg, 0.9);
       }
     }
 
@@ -2244,8 +2260,8 @@ div.sourceCode {
 
       &:hover {
         transform: none;
-        background-color: $background;
-        border-color: rgba($foreground, 0.15);
+        background-color: $_bg;
+        border-color: rgba($_fg, 0.15);
       }
     }
   }
@@ -2253,9 +2269,9 @@ div.sourceCode {
   // Page item wrapper
   .page-item {
     &.active .page-link {
-      background-color: $foreground;
-      color: $background;
-      border-color: $foreground;
+      background-color: $_fg;
+      color: $_bg;
+      border-color: $_fg;
     }
 
     &.disabled .page-link {
@@ -2284,7 +2300,7 @@ div.sourceCode {
     left: 0;
     width: 0;
     height: 2px;
-    background: linear-gradient(90deg, $foreground 0%, rgba($foreground, 0.4) 100%);
+    background: linear-gradient(90deg, $_fg 0%, rgba($_fg, 0.4) 100%);
     transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -2322,7 +2338,7 @@ div.sourceCode {
     border: none;
     border-radius: 4px;
     font-size: 0.85em;
-    color: rgba($foreground, 0.75);
+    color: rgba($_fg, 0.75);
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
@@ -2332,49 +2348,49 @@ div.sourceCode {
     gap: 0.5em;
 
     &:hover {
-      background-color: rgba($foreground, 0.05);
-      color: rgba($foreground, 0.9);
+      background-color: rgba($_fg, 0.05);
+      color: rgba($_fg, 0.9);
 
       .quarto-category-count {
-        background-color: rgba($foreground, 0.1);
-        color: rgba($foreground, 0.8);
+        background-color: rgba($_fg, 0.1);
+        color: rgba($_fg, 0.8);
       }
     }
 
     &:active {
-      background-color: rgba($foreground, 0.08);
+      background-color: rgba($_fg, 0.08);
     }
 
     // Active/selected state
     &.active,
     &[aria-current="true"] {
-      background-color: rgba($foreground, 0.1);
-      color: $foreground;
+      background-color: rgba($_fg, 0.1);
+      color: $_fg;
       font-weight: 600;
 
       .quarto-category-count {
-        background-color: rgba($foreground, 0.15);
-        color: $foreground;
+        background-color: rgba($_fg, 0.15);
+        color: $_fg;
       }
 
       &:hover {
-        background-color: rgba($foreground, 0.12);
+        background-color: rgba($_fg, 0.12);
       }
     }
 
     // Focus state for accessibility
     &:focus {
-      outline: 2px solid rgba($foreground, 0.3);
+      outline: 2px solid rgba($_fg, 0.3);
       outline-offset: 2px;
     }
 
     .quarto-category-count {
       padding: 0.1em 0.4em;
-      background-color: rgba($foreground, 0.08);
+      background-color: rgba($_fg, 0.08);
       border-radius: 8px;
       font-size: 0.8em;
       font-weight: 500;
-      color: rgba($foreground, 0.6);
+      color: rgba($_fg, 0.6);
       transition: all 0.2s ease;
       min-width: 1.8em;
       text-align: center;
@@ -2384,7 +2400,7 @@ div.sourceCode {
   // Special styling for "All" category
   .category[data-category=""] {
     font-weight: 600;
-    color: rgba($foreground, 0.8);
+    color: rgba($_fg, 0.8);
   }
 
   // Reduced motion support
@@ -2489,7 +2505,7 @@ div.sourceCode {
       left: 50%;
       width: 0;
       height: 1px;
-      background: $foreground;
+      background: $_fg;
       transition: all 0.3s ease;
       transform: translateX(-50%);
     }
@@ -2507,7 +2523,7 @@ figure {
 
     &:hover {
       transform: scale(1.02);
-      box-shadow: 0 8px 16px rgba($foreground, 0.1);
+      box-shadow: 0 8px 16px rgba($_fg, 0.1);
     }
   }
 }
@@ -2530,7 +2546,7 @@ nav#TOC {
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
     position: relative;
-    color: rgba($foreground, 0.85);
+    color: rgba($_fg, 0.85);
 
     // Animated underline
     &::after {
@@ -2541,8 +2557,8 @@ nav#TOC {
       width: 40px;
       height: 2px;
       background: linear-gradient(90deg,
-          $foreground 0%,
-          rgba($foreground, 0.3) 100%);
+          $_fg 0%,
+          rgba($_fg, 0.3) 100%);
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 2px;
     }
@@ -2574,8 +2590,8 @@ nav#TOC {
         bottom: 0;
         width: 1px;
         background: linear-gradient(180deg,
-            rgba($foreground, 0.15) 0%,
-            rgba($foreground, 0.05) 100%);
+            rgba($_fg, 0.15) 0%,
+            rgba($_fg, 0.05) 100%);
         opacity: 0;
         transition: opacity 0.3s ease;
       }
@@ -2597,7 +2613,7 @@ nav#TOC {
     border-radius: 6px;
     font-size: 0.875rem;
     line-height: 1.5;
-    color: rgba($foreground, 0.75);
+    color: rgba($_fg, 0.75);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     display: block;
     text-decoration: none;
@@ -2621,7 +2637,7 @@ nav#TOC {
       top: 0;
       bottom: 0;
       width: 3px;
-      background: $foreground;
+      background: $_fg;
       transform: scaleY(0);
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 0 2px 2px 0;
@@ -2629,8 +2645,8 @@ nav#TOC {
 
     // Hover state
     &:hover {
-      color: rgba($foreground, 0.95);
-      background-color: rgba($foreground, 0.04);
+      color: rgba($_fg, 0.95);
+      background-color: rgba($_fg, 0.04);
       transform: translateX(2px);
       padding-left: 0.85rem;
 
@@ -2645,8 +2661,8 @@ nav#TOC {
 
     // Active state
     &.active {
-      color: $foreground;
-      background-color: rgba($foreground, 0.08);
+      color: $_fg;
+      background-color: rgba($_fg, 0.08);
       font-weight: 600;
       padding-left: 0.85rem;
 
@@ -2668,7 +2684,7 @@ nav#TOC {
         top: 50%;
         width: 4px;
         height: 4px;
-        background: $foreground;
+        background: $_fg;
         border-radius: 50%;
         transform: translateY(-50%);
         opacity: 0;
@@ -2678,9 +2694,9 @@ nav#TOC {
 
     // Focus state for accessibility
     &:focus-visible {
-      outline: 2px solid $foreground;
+      outline: 2px solid $_fg;
       outline-offset: 2px;
-      background-color: rgba($foreground, 0.06);
+      background-color: rgba($_fg, 0.06);
     }
   }
 
@@ -2689,10 +2705,10 @@ nav#TOC {
     .nav-link {
       font-size: 0.8125rem;
       padding: 0.3rem 0.75rem;
-      color: rgba($foreground, 0.65);
+      color: rgba($_fg, 0.65);
 
       &:hover {
-        color: rgba($foreground, 0.9);
+        color: rgba($_fg, 0.9);
       }
     }
   }
@@ -2701,7 +2717,7 @@ nav#TOC {
   .toc-actions {
     margin-top: 1.5rem;
     padding-top: 1rem;
-    border-top: 1px solid rgba($foreground, 0.1);
+    border-top: 1px solid rgba($_fg, 0.1);
 
     ul {
       padding-left: 0;
@@ -2718,11 +2734,11 @@ nav#TOC {
       padding: 0.5rem 0.75rem;
       border-radius: 6px;
       font-size: 0.875rem;
-      color: rgba($foreground, 0.7);
+      color: rgba($_fg, 0.7);
       text-decoration: none;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      background-color: rgba($foreground, 0.02);
-      border: 1px solid rgba($foreground, 0.08);
+      background-color: rgba($_fg, 0.02);
+      border: 1px solid rgba($_fg, 0.08);
 
       i,
       .bi {
@@ -2732,11 +2748,11 @@ nav#TOC {
       }
 
       &:hover {
-        color: $foreground;
-        background-color: rgba($foreground, 0.06);
-        border-color: rgba($foreground, 0.15);
+        color: $_fg;
+        background-color: rgba($_fg, 0.06);
+        border-color: rgba($_fg, 0.15);
         transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba($foreground, 0.08);
+        box-shadow: 0 2px 8px rgba($_fg, 0.08);
 
         i,
         .bi {
@@ -2762,7 +2778,7 @@ nav#TOC {
       right: 0;
       height: 10px;
       background: linear-gradient(180deg,
-          rgba($foreground, 0.03) 0%,
+          rgba($_fg, 0.03) 0%,
           transparent 100%);
       pointer-events: none;
       opacity: 0;
@@ -2848,15 +2864,15 @@ body>header#title-block-header {
     right: 0;
     bottom: 0;
     background: linear-gradient(135deg,
-        rgba($foreground, 0.02) 0%,
-        rgba($foreground, 0.01) 50%,
-        rgba($foreground, 0.02) 100%);
+        rgba($_fg, 0.02) 0%,
+        rgba($_fg, 0.01) 50%,
+        rgba($_fg, 0.02) 100%);
     pointer-events: none;
     z-index: -1;
   }
 
   // Animated accent line
-  /* border-bottom: 2px solid rgba($foreground, 0.1);
+  /* border-bottom: 2px solid rgba($_fg, 0.1);
   &::after {
     content: '';
     position: absolute;
@@ -2867,8 +2883,8 @@ body>header#title-block-header {
     background: linear-gradient(
       90deg,
       transparent 0%,
-      $foreground 20%,
-      $foreground 80%,
+      $_fg 20%,
+      $_fg 80%,
       transparent 100%
     );
     opacity: 0.3;
@@ -2884,7 +2900,7 @@ body>header#title-block-header {
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    text-shadow: 0 1px 2px rgba($background, 0.1);
+    text-shadow: 0 1px 2px rgba($_bg, 0.1);
 
     // Animated underline effect on hover
     &::after {
@@ -2895,8 +2911,8 @@ body>header#title-block-header {
       width: 0;
       height: 3px;
       background: linear-gradient(90deg,
-          $foreground 0%,
-          rgba($foreground, 0.5) 100%);
+          $_fg 0%,
+          rgba($_fg, 0.5) 100%);
       transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 2px;
     }
@@ -2910,7 +2926,7 @@ body>header#title-block-header {
   .quarto-title .subtitle {
     font-size: 1.15rem;
     line-height: 1.5;
-    color: rgba($foreground, 0.85);
+    color: rgba($_fg, 0.85);
     font-weight: 400;
     margin-top: 0;
     margin-bottom: 0.75rem;
@@ -2922,7 +2938,7 @@ body>header#title-block-header {
       border-bottom: 1px solid transparent;
 
       &:hover {
-        border-bottom-color: rgba($foreground, 0.85);
+        border-bottom-color: rgba($_fg, 0.85);
         transform: translateY(-1px);
       }
     }
@@ -2941,12 +2957,12 @@ body>header#title-block-header {
       text-transform: uppercase;
       letter-spacing: 0.05em;
       font-size: 0.75rem;
-      color: rgba($foreground, 0.7);
+      color: rgba($_fg, 0.7);
     }
 
     .quarto-title-meta-contents {
       font-size: 0.95rem;
-      color: rgba($foreground, 0.9);
+      color: rgba($_fg, 0.9);
     }
   }
 
@@ -2956,9 +2972,9 @@ body>header#title-block-header {
     // Enhanced gradient overlay for banners
     &::before {
       background: linear-gradient(135deg,
-          rgba($foreground, 0.03) 0%,
-          rgba($foreground, 0.01) 50%,
-          rgba($foreground, 0.03) 100%);
+          rgba($_fg, 0.03) 0%,
+          rgba($_fg, 0.01) 50%,
+          rgba($_fg, 0.03) 100%);
     }
   }
 
@@ -2978,9 +2994,9 @@ body>header#title-block-header {
       height: 1px;
       background: linear-gradient(90deg,
           transparent 0%,
-          rgba($foreground, 0.2) 10%,
-          rgba($foreground, 0.3) 50%,
-          rgba($foreground, 0.2) 90%,
+          rgba($_fg, 0.2) 10%,
+          rgba($_fg, 0.3) 50%,
+          rgba($_fg, 0.2) 90%,
           transparent 100%);
       opacity: 0;
       animation: fadeInBorder 1s ease-out 0.3s forwards, pulseBorder 4s ease-in-out 1.3s infinite;
@@ -3045,7 +3061,7 @@ h6,
   // Override any default border colors with theme variables
   &[style*="border-bottom"],
   &:not(:where(.nav-footer *, .navbar *, .sidebar *, nav#TOC *)) {
-    border-bottom-color: rgba($foreground, 0.15) !important;
+    border-bottom-color: rgba($_fg, 0.15) !important;
   }
 }
 
@@ -3053,7 +3069,7 @@ h6,
 h2,
 .h2 {
   &:not(:where(.nav-footer *, .navbar *, .sidebar *, nav#TOC *, .card-title)) {
-    border-bottom-color: rgba($foreground, 0.15);
+    border-bottom-color: rgba($_fg, 0.15);
   }
 }
 
@@ -3080,8 +3096,8 @@ main {
       width: 0;
       height: 2px;
       background: linear-gradient(90deg,
-          $foreground 0%,
-          rgba($foreground, 0.4) 100%);
+          $_fg 0%,
+          rgba($_fg, 0.4) 100%);
       transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 1px;
     }

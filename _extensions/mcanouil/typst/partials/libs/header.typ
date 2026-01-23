@@ -177,6 +177,8 @@
 /// @param title Document title
 /// @param subtitle Document subtitle (used in professional style)
 /// @param logo Path to logo image file
+/// @param logo-light Path to light version of logo image file (for dark mode)
+/// @param logo-dark Path to dark version of logo image file (for light mode)
 /// @param logo-alt Alternative text for logo image
 /// @param colours Colour dictionary
 /// @param show-logo Whether to display the logo
@@ -186,23 +188,52 @@
   title: none,
   subtitle: none,
   logo: none,
+  logo-light: none,
+  logo-dark: none,
   logo-alt: none,
+  brand-mode: "light",
   colours: none,
   show-logo: true,
 ) = {
   if style == "professional" {
+    let header-logo = if brand-mode == "dark" and logo-dark != none {
+      logo-dark
+    } else if brand-mode == "light" and logo-light != none {
+      logo-light
+    } else {
+      logo // fallback to standard logo
+    }
+    // Note: .replace("\\", "") removes backslash escapes from paths (Quarto escaping workaround)
+    header-logo = if header-logo != none {
+      header-logo.replace("\\", "")
+    } else {
+      none
+    }
     mcanouil-header-professional(
       title: title,
       subtitle: subtitle,
-      logo: logo,
+      logo: header-logo,
       logo-alt: logo-alt,
       colours: colours,
       show-logo: show-logo,
     )
   } else {
+    let header-logo = if brand-mode == "dark" and logo-light != none {
+      logo-light
+    } else if brand-mode == "light" and logo-dark != none {
+      logo-dark
+    } else {
+      logo // fallback to standard logo
+    }
+    // Note: .replace("\\", "") removes backslash escapes from paths (Quarto escaping workaround)
+    header-logo = if header-logo != none {
+      header-logo.replace("\\", "")
+    } else {
+      none
+    }
     mcanouil-header-academic(
       title: title,
-      logo: logo,
+      logo: header-logo,
       logo-alt: logo-alt,
       colours: colours,
       show-logo: show-logo,

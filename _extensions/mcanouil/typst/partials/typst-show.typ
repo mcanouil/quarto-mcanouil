@@ -123,12 +123,12 @@ $elseif(logo)$
   logo: "$logo$",
 $endif$
 $if(logo-light)$
-  logo-light: "$logo-light$",
+  logo-light: "$logo-light.path$",
 $elseif(logo.light)$
   logo-light: "$logo.light$",
 $endif$
 $if(logo-dark)$
-  logo-dark: "$logo-dark$",
+  logo-dark: "$logo-dark.path$",
 $elseif(logo.dark)$
   logo-dark: "$logo.dark$",
 $endif$

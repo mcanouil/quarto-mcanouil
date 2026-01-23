@@ -122,15 +122,13 @@ contributes:
       # Logo/Visual assets
       logo:
         light:
-          path: logos/logo-light-path.svg
+          path: dark
           alt: "Mickaël CANOUIL Logo"
           width: 7cm
         dark:
-          path: logos/logo-dark-path.svg
+          path: light
           alt: "Mickaël CANOUIL Logo"
           width: 7cm
-      logo-light: logos/logo-light-path.svg
-      logo-dark: logos/logo-dark-path.svg
       orcid-icon: typst/assets/orcid.svg
       # Template
       template: typst/template.typ
@@ -171,6 +169,8 @@ contributes:
         - typst/partials/typst-show.typ
       # Typst-specific filters
       filters:
+        - path: filters/logo-metadata.lua
+          at: pre-quarto
         - path: filters/special-sections.lua
           at: pre-quarto
       # Typography
@@ -217,8 +217,8 @@ contributes:
       brand-mode: dark
       # Logo/Visual assets
       logo:
-        light: logos/logo-dark-path.svg
-        dark: logos/logo-light-path.svg
+        light: light
+        dark: dark
       # Theme
       theme:
         - default

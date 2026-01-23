@@ -48,21 +48,15 @@ format:
     output-file: index
     toc: true
     toc-depth: 3
-  mcanouil-revealjs+dark:
+  mcanouil-revealjs:
     brand-mode: dark
     scrollable: true
     smaller: true
     embed-resources: true
-    output-ext: dark-revealjs.html
-  mcanouil-revealjs+light:
-    brand-mode: light
-    scrollable: true
-    smaller: true
-    embed-resources: true
-    output-ext: light-revealjs.html
+    output-ext: revealjs.html
   mcanouil-typst+dark:
     header-footer-style: "academic"
-    brand-mode: dark
+    brand-mode: light
     output-ext: dark.pdf
   mcanouil-typst+light:
     # keep-typ: true
