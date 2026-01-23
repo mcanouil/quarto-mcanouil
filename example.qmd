@@ -56,10 +56,11 @@ format:
     output-ext: revealjs.html
   mcanouil-typst+dark:
     header-footer-style: "academic"
-    brand-mode: light
+    brand-mode: dark
     output-ext: dark.pdf
   mcanouil-typst+light:
     # keep-typ: true
+    brand-mode: light
     output-ext: light.pdf
     watermark-text: "DEMO"              # Text watermark content
     # link-underline: true              # Underline links
