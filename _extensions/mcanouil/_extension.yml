@@ -74,8 +74,8 @@ contributes:
           path: filters/components.lua
         - at: pre-quarto
           path: filters/math-alt-text.lua
-        # - at: post-render
-        #   path: filters/normalise-extension-paths.lua
+        - at: post-render
+          path: filters/normalise-extension-paths.lua
     html:
       # Theme
       theme:
