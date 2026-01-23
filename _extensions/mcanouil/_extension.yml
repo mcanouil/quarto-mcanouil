@@ -22,8 +22,8 @@ contributes:
         background: dark
         search: true
         logo:
-          light: logos/logo-dark-path.svg
-          dark: logos/logo-light-path.svg
+          light: dark
+          dark: light
         logo-alt: "Mickaël CANOUIL logo"
       page-footer:
         border: true
