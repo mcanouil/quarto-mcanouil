@@ -5,7 +5,7 @@ author:
   - name:
       given: Mickaël
       family: CANOUIL
-    degree: "Ph.D."
+    degrees: "Ph.D."
     email: pro@mickael.canouil.dev
     orcid: 0000-0002-3396-4549
     url: https://mickael.canouil.fr
