@@ -37,7 +37,7 @@
 /// @param author Author dictionary from Quarto normalised schema
 /// @return Formatted author name as content
 #let format-author-name(author) = {
-  if has-content(author.name.literal) {
+  let name-content = if has-content(author.name.literal) {
     author.name.literal
   } else {
     let parts = ()
@@ -52,6 +52,20 @@
     } else {
       [Unknown Author]
     }
+  }
+
+  // Append degrees in italics if present
+  let degrees = author.at("degrees", default: none)
+  if degrees != none {
+    let degrees-list = if type(degrees) == array { degrees } else { (degrees,) }
+    if degrees-list.len() > 0 {
+      let degrees-str = degrees-list.map(d => content-to-string(d)).join(", ")
+      [#name-content, #emph[#degrees-str]]
+    } else {
+      name-content
+    }
+  } else {
+    name-content
   }
 }
 

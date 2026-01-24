@@ -59,7 +59,7 @@ format:
     brand-mode: dark
     output-ext: dark.pdf
   mcanouil-typst+light:
-    # keep-typ: true
+    keep-typ: true
     brand-mode: light
     output-ext: light.pdf
     watermark-text: "DEMO"              # Text watermark content

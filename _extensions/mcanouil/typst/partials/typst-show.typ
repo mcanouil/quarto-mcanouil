@@ -46,6 +46,7 @@ $for(by-author)$
         given: $if(it.name.given)$[$it.name.given$]$else$none$endif$,
         family: $if(it.name.family)$[$it.name.family$]$else$none$endif$,
       ),
+      degrees: $if(it.degrees)$($for(it.degrees)$"$it$",$endfor$)$else$none$endif$,
       email: $if(it.email)$"$it.email$"$else$none$endif$,
       orcid: $if(it.orcid)$"$it.orcid$"$else$none$endif$,
       url: $if(it.url)$"$it.url$"$else$none$endif$,

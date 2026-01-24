@@ -470,6 +470,9 @@ $mc-value-box-height: 100px;
         text-align: center;
 
         .quarto-title-author-name {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           font-weight: 500;
           margin-bottom: 0.2em;
 
@@ -481,14 +484,23 @@ $mc-value-box-height: 100px;
               text-decoration: underline;
             }
           }
-        }
 
-        .quarto-title-author-orcid {
-          img {
-            width: 16px;
-            height: 16px;
-            vertical-align: middle;
-            margin-left: 0.3em;
+          .quarto-title-author-orcid {
+            display: inline-flex;
+            align-items: center;
+
+            img {
+              width: 16px;
+              height: 16px;
+              margin-left: 0.3em;
+              position: relative;
+              top: -0.1em;
+            }
+          }
+
+          .quarto-title-author-degree {
+            font-style: italic;
+            font-weight: normal;
           }
         }
 
@@ -702,6 +714,12 @@ $mc-value-box-height: 100px;
       margin: 0;
       margin-bottom: 0.2em;
       color: $body-color;
+      white-space: nowrap;
+
+      a,
+      em {
+        vertical-align: middle;
+      }
 
       a {
         color: inherit;
@@ -711,14 +729,24 @@ $mc-value-box-height: 100px;
           text-decoration: underline;
         }
       }
-    }
 
-    .speaker-orcid {
-      img {
-        width: 16px;
-        height: 16px;
+      .speaker-orcid {
+        display: inline;
         vertical-align: middle;
-        margin-left: 0.3em;
+
+        img {
+          display: inline;
+          width: 16px;
+          height: 16px;
+          vertical-align: middle;
+          margin-left: 0.3em;
+        }
+      }
+
+      .speaker-degree {
+        font-style: italic;
+        font-weight: normal;
+        vertical-align: middle;
       }
     }
 

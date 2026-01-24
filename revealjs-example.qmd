@@ -1,20 +1,6 @@
 ---
 title: "Reveal.js Format Test"
 subtitle: "Comprehensive Component Testing"
-author:
-  - name:
-      given: Mickaël
-      family: CANOUIL
-    email: pro@mickael.canouil.dev
-    orcid: 0000-0002-3396-4549
-    url: https://mickael.canouil.fr
-    attributes:
-      corresponding: true
-    affiliations:
-      - name: Independent Consultant
-        city: Lille
-        country: France
-date: today
 format:
   mcanouil-revealjs: default
 extensions:
