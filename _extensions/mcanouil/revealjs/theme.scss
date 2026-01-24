@@ -294,6 +294,11 @@ $mc-value-box-height: 100px;
     }
   }
 
+  h2,
+  h3 {
+    margin-bottom: 0.5em;
+  }
+
   h2::after {
     width: 120pt;
     height: 3pt;
