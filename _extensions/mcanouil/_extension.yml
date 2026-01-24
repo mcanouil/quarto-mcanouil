@@ -22,9 +22,20 @@ contributes:
         background: dark
         search: true
         logo:
-          light: dark
-          dark: light
+          light: light
+          dark: dark
         logo-alt: "Mickaël CANOUIL logo"
+      sidebar:
+        background: dark
+        search: true
+        logo:
+          light: light
+          dark: dark
+        logo-alt: "Mickaël CANOUIL logo"
+        pinned: true
+        align: center
+        style: docked
+        collapse-level: 2
       page-footer:
         border: true
         left: |
