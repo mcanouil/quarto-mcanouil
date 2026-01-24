@@ -65,7 +65,10 @@ contributes:
       lang: en
       code-copy: true
       code-overflow: wrap
+      date: today
       date-format: "dddd[, the] Do [of] MMMM, YYYY"
+      mermaid:
+        theme: dark
       extensions:
         mcanouil:
           # Code-window styling (all formats)
