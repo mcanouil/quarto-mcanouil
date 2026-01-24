@@ -92,6 +92,9 @@ contributes:
         - at: post-render
           path: filters/normalise-extension-paths.lua
     html:
+      # Template
+      template-partials:
+        - html/partials/_title-meta-author.html
       # Theme
       theme:
         light:

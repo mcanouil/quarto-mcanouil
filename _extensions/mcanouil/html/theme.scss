@@ -2966,6 +2966,29 @@ body>header#title-block-header {
     }
   }
 
+  // Author styling with degrees and ORCID
+  .quarto-title-authors {
+    .quarto-title-author {
+      .quarto-title-author-degree {
+        font-style: italic;
+        font-weight: normal;
+      }
+
+      .quarto-title-author-orcid {
+        display: inline-flex;
+        align-items: center;
+        vertical-align: middle;
+        margin-left: 0.25em;
+
+        img {
+          width: 16px;
+          height: 16px;
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+
   // Banner-specific enhancements (when .quarto-title-banner exists)
   &:has(.quarto-title-banner) {
 
