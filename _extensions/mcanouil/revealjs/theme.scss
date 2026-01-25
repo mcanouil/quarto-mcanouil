@@ -1,5 +1,10 @@
 /*-- scss:defaults --*/
 
+// Unit conventions:
+// - px: Fixed pixel dimensions (decorative shapes, images)
+// - em: Scalable sizes relative to font (padding, margins, gaps)
+// - pt: Print-friendly units for borders and line widths
+
 // Brand colours (from brand.yml via Quarto's brand integration)
 // Use !default so brand values take precedence
 $body-bg: #fafafa !default;
@@ -33,6 +38,100 @@ $section-slide-fg: $body-bg !default;
 // Helper function to mix background and foreground colours
 @function body-mix($weight) {
   @return mix($body-bg, $body-color, $weight);
+}
+
+// Mixin for geometric background shapes (used in title and closing slides)
+@mixin geometric-bg-shapes {
+  .bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    background-color: body-mix(85%);
+    z-index: 0;
+  }
+
+  .circle-1 {
+    width: 400px;
+    height: 400px;
+    top: -150px;
+    right: -100px;
+  }
+
+  .circle-2 {
+    width: 300px;
+    height: 300px;
+    bottom: -100px;
+    left: -80px;
+  }
+
+  .circle-3 {
+    width: 200px;
+    height: 200px;
+    top: 40%;
+    right: 10%;
+  }
+
+  .circle-4 {
+    width: 150px;
+    height: 150px;
+    bottom: 20%;
+    left: 15%;
+  }
+
+  .circle-5 {
+    width: 100px;
+    height: 100px;
+    top: -30px;
+    left: -25px;
+  }
+}
+
+// Mixin for corner bracket base styles
+@mixin corner-bracket-base {
+  .corner-bracket {
+    position: absolute;
+    border-color: $body-color;
+    border-style: solid;
+  }
+}
+
+// Mixin for outer corner brackets (around entire content area)
+@mixin corner-brackets-outer {
+  .corner-bracket.outer {
+    width: 28pt;
+    height: 28pt;
+
+    &.top-right {
+      top: 0;
+      right: 0;
+      border-width: 6pt 6pt 0 0;
+    }
+
+    &.bottom-left {
+      bottom: 0;
+      left: 0;
+      border-width: 0 0 6pt 6pt;
+    }
+  }
+}
+
+// Mixin for inner corner brackets (around title block/speaker card)
+@mixin corner-brackets-inner {
+  .corner-bracket.inner {
+    width: 16pt;
+    height: 16pt;
+
+    &.top-left {
+      top: 0;
+      left: 0;
+      border-width: 3pt 0 0 3pt;
+    }
+
+    &.bottom-right {
+      bottom: 0;
+      right: 0;
+      border-width: 0 3pt 3pt 0;
+    }
+  }
 }
 
 /*-- scss:rules --*/
@@ -325,47 +424,7 @@ $mc-value-box-height: 100px;
   justify-content: center;
 
   // Geometric background shapes (circles)
-  .bg-shape {
-    position: absolute;
-    border-radius: 50%;
-    background-color: body-mix(85%);
-    z-index: 0;
-  }
-
-  .circle-1 {
-    width: 400px;
-    height: 400px;
-    top: -150px;
-    right: -100px;
-  }
-
-  .circle-2 {
-    width: 300px;
-    height: 300px;
-    bottom: -100px;
-    left: -80px;
-  }
-
-  .circle-3 {
-    width: 200px;
-    height: 200px;
-    top: 40%;
-    right: 10%;
-  }
-
-  .circle-4 {
-    width: 150px;
-    height: 150px;
-    bottom: 20%;
-    left: 15%;
-  }
-
-  .circle-5 {
-    width: 100px;
-    height: 100px;
-    top: -30px;
-    left: -25px;
-  }
+  @include geometric-bg-shapes;
 
   .title-content {
     position: relative;
@@ -380,30 +439,9 @@ $mc-value-box-height: 100px;
     justify-content: center;
     box-sizing: border-box;
 
-    // Corner bracket base styles
-    .corner-bracket {
-      position: absolute;
-      border-color: $body-color;
-      border-style: solid;
-    }
-
-    // Outer corner brackets (around entire content area)
-    .corner-bracket.outer {
-      width: 28pt;
-      height: 28pt;
-
-      &.top-right {
-        top: 0;
-        right: 0;
-        border-width: 6pt 6pt 0 0;
-      }
-
-      &.bottom-left {
-        bottom: 0;
-        left: 0;
-        border-width: 0 0 6pt 6pt;
-      }
-    }
+    // Corner bracket styles
+    @include corner-bracket-base;
+    @include corner-brackets-outer;
 
     // Title block container with inner corner brackets
     .title-block {
@@ -412,23 +450,7 @@ $mc-value-box-height: 100px;
       padding: 1em 1.5em;
       margin-bottom: 0;
 
-      // Inner corner brackets (smaller, around title/subtitle only)
-      .corner-bracket.inner {
-        width: 16pt;
-        height: 16pt;
-
-        &.top-left {
-          top: 0;
-          left: 0;
-          border-width: 3pt 0 0 3pt;
-        }
-
-        &.bottom-right {
-          bottom: 0;
-          right: 0;
-          border-width: 0 3pt 3pt 0;
-        }
-      }
+      @include corner-brackets-inner;
 
       .title {
         font-size: 2em;
@@ -583,47 +605,7 @@ $mc-value-box-height: 100px;
   justify-content: center;
 
   // Geometric background shapes (matching title slide)
-  .bg-shape {
-    position: absolute;
-    border-radius: 50%;
-    background-color: body-mix(85%);
-    z-index: 0;
-  }
-
-  .circle-1 {
-    width: 400px;
-    height: 400px;
-    top: -150px;
-    right: -100px;
-  }
-
-  .circle-2 {
-    width: 300px;
-    height: 300px;
-    bottom: -100px;
-    left: -80px;
-  }
-
-  .circle-3 {
-    width: 200px;
-    height: 200px;
-    top: 40%;
-    right: 10%;
-  }
-
-  .circle-4 {
-    width: 150px;
-    height: 150px;
-    bottom: 20%;
-    left: 15%;
-  }
-
-  .circle-5 {
-    width: 100px;
-    height: 100px;
-    top: -30px;
-    left: -25px;
-  }
+  @include geometric-bg-shapes;
 
   .closing-content {
     position: relative;
@@ -638,30 +620,9 @@ $mc-value-box-height: 100px;
     justify-content: center;
     box-sizing: border-box;
 
-    // Corner bracket base styles (matching title slide)
-    .corner-bracket {
-      position: absolute;
-      border-color: $body-color;
-      border-style: solid;
-    }
-
-    // Outer corner brackets
-    .corner-bracket.outer {
-      width: 28pt;
-      height: 28pt;
-
-      &.top-right {
-        top: 0;
-        right: 0;
-        border-width: 6pt 6pt 0 0;
-      }
-
-      &.bottom-left {
-        bottom: 0;
-        left: 0;
-        border-width: 0 0 6pt 6pt;
-      }
-    }
+    // Corner bracket styles (matching title slide)
+    @include corner-bracket-base;
+    @include corner-brackets-outer;
   }
 
   .speaker-card {
@@ -669,23 +630,7 @@ $mc-value-box-height: 100px;
     display: inline-block;
     padding: 1.5em 2em;
 
-    // Inner corner brackets
-    .corner-bracket.inner {
-      width: 16pt;
-      height: 16pt;
-
-      &.top-left {
-        top: 0;
-        left: 0;
-        border-width: 3pt 0 0 3pt;
-      }
-
-      &.bottom-right {
-        bottom: 0;
-        right: 0;
-        border-width: 0 3pt 3pt 0;
-      }
-    }
+    @include corner-brackets-inner;
 
     // T-shape layout: photo left, details right
     .speaker-header {
@@ -912,6 +857,8 @@ $mc-value-box-height: 100px;
 // CALLOUT STYLING
 // ===========================
 // Callout styling matching Typst: left border in callout colour, subtle background
+// Note: Using CSS color-mix() here for sRGB colour space control
+// SCSS mix() is used elsewhere for build-time variable mixing
 
 .reveal .callout {
   // Override Quarto defaults - only left border in callout colour
