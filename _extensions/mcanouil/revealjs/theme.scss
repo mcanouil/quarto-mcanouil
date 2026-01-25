@@ -1,5 +1,9 @@
 /*-- scss:defaults --*/
 
+// Browser requirements:
+// - :has() selector: Chrome 105+, Firefox 121+, Safari 15.4+
+// - color-mix(): Chrome 111+, Firefox 113+, Safari 16.2+
+
 // Unit conventions:
 // - px: Fixed pixel dimensions (decorative shapes, images)
 // - em: Scalable sizes relative to font (padding, margins, gaps)
@@ -959,6 +963,23 @@ $mc-value-box-height: 100px;
   .reveal .social-link,
   .reveal .fragment {
     transition: none;
+  }
+}
+
+// ===========================
+// HIGH CONTRAST MODE
+// ===========================
+
+@media (forced-colors: active) {
+  .reveal .corner-bracket,
+  .reveal .callout,
+  .reveal .code-with-filename {
+    border-color: CanvasText;
+  }
+
+  .reveal a:focus-visible,
+  .reveal button:focus-visible {
+    outline-color: Highlight;
   }
 }
 
