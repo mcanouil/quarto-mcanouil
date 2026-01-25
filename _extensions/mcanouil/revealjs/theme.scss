@@ -996,10 +996,13 @@ $mc-value-box-height: 100px;
 // PANEL TABSET
 // ===========================
 
-.reveal .panel-tabset ul li a:focus,
+.reveal .panel-tabset ul li a:focus-visible {
+  outline: 2px solid $body-color;
+  outline-offset: 2px;
+}
+
 .reveal .panel-tabset ul li a:active {
   outline: none;
-  box-shadow: none;
 }
 
 // ===========================
