@@ -148,10 +148,10 @@ body {
   // Core colours
   --mc-fg: #{$_fg};
   --mc-bg: #{$_bg};
-  --mc-muted: #{mix($_bg, $_fg, 35%)};
-  --mc-border: #{mix($_bg, $_fg, 80%)};
-  --mc-border-strong: #{mix($_bg, $_fg, 50%)};
-  --mc-surface: #{mix($_bg, $_fg, 98%)};
+  --mc-muted: #{body-mix(35%)};
+  --mc-border: #{body-mix(80%)};
+  --mc-border-strong: #{body-mix(50%)};
+  --mc-surface: #{body-mix(98%)};
 
   // Semantic colours
   --mc-info: #{$semantic-color-info};
@@ -159,7 +159,7 @@ body {
   --mc-warning: #{$semantic-color-warning};
   --mc-danger: #{$semantic-color-danger};
   --mc-caution: #{$callout-color-caution};
-  --mc-neutral: #{mix($_bg, $_fg, 50%)};
+  --mc-neutral: #{body-mix(50%)};
 }
 
 // Dark mode overrides
@@ -167,10 +167,10 @@ body {
 .quarto-dark {
   --mc-fg: #{$_fg};
   --mc-bg: #{$_bg};
-  --mc-muted: #{mix($_bg, $_fg, 35%)};
-  --mc-border: #{mix($_bg, $_fg, 80%)};
-  --mc-border-strong: #{mix($_bg, $_fg, 50%)};
-  --mc-surface: #{mix($_bg, $_fg, 98%)};
+  --mc-muted: #{body-mix(35%)};
+  --mc-border: #{body-mix(80%)};
+  --mc-border-strong: #{body-mix(50%)};
+  --mc-surface: #{body-mix(98%)};
 
   // Dark mode semantic colours (WCAG compliant)
   --mc-info: #{$semantic-color-info-dark};
@@ -178,7 +178,7 @@ body {
   --mc-warning: #{$semantic-color-warning-dark};
   --mc-danger: #{$semantic-color-danger-dark};
   --mc-caution: #{$semantic-color-caution-dark};
-  --mc-neutral: #{mix($_bg, $_fg, 50%)};
+  --mc-neutral: #{body-mix(50%)};
 }
 
 // Include all shared component styles at root level
@@ -549,6 +549,7 @@ img.about-image {
 // Trestles template about links
 .quarto-about-trestles .about-entity {
   .about-link {
+    // Mix link colour with background for muted appearance (different from body-mix)
     color: mix($_link-color, $_bg, 50%);
     border: solid 1px $_fg;
 
