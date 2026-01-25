@@ -3099,20 +3099,20 @@ header#title-block-header {
 }
 
 // ===========================
-// MAGAZINE / EDITORIAL STYLE
+// PROFESSIONAL / EDITORIAL STYLE
 // ===========================
-.mc-style-magazine {
+.mc-style-professional {
   padding: 2rem 0 1.5rem;
   border-bottom: 4px solid $_fg;
 
   // Top meta: category and date
-  .mc-magazine-meta-top {
+  .mc-professional-meta-top {
     display: flex;
     gap: 1.5rem;
     margin-bottom: 1.5rem;
     align-items: center;
 
-    .mc-magazine-category {
+    .mc-professional-category {
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.15em;
@@ -3120,7 +3120,7 @@ header#title-block-header {
       font-weight: 600;
     }
 
-    .mc-magazine-date {
+    .mc-professional-date {
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
@@ -3129,7 +3129,7 @@ header#title-block-header {
   }
 
   // Byline with avatars
-  .mc-magazine-byline {
+  .mc-professional-byline {
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;
@@ -3138,13 +3138,13 @@ header#title-block-header {
     margin-bottom: 1.5rem;
   }
 
-  .mc-magazine-author {
+  .mc-professional-author {
     display: flex;
     align-items: center;
     gap: 0.75rem;
   }
 
-  .mc-magazine-avatar {
+  .mc-professional-avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -3169,8 +3169,8 @@ header#title-block-header {
     }
   }
 
-  .mc-magazine-author-info {
-    .mc-magazine-author-name {
+  .mc-professional-author-info {
+    .mc-professional-author-name {
       font-weight: 600;
       color: $_fg;
 
@@ -3185,14 +3185,14 @@ header#title-block-header {
       }
     }
 
-    .mc-magazine-author-affiliation {
+    .mc-professional-author-affiliation {
       font-size: 0.85rem;
       color: var(--mc-muted);
     }
   }
 
   // Abstract
-  .mc-magazine-abstract {
+  .mc-professional-abstract {
     margin: 1.5rem 0;
     padding: 1.25rem;
     background: linear-gradient(135deg, var(--mc-surface) 0%, transparent 100%);
@@ -3207,14 +3207,14 @@ header#title-block-header {
   }
 
   // Keywords as dark tags
-  .mc-magazine-keywords {
+  .mc-professional-keywords {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-top: 1.5rem;
   }
 
-  .mc-magazine-keyword {
+  .mc-professional-keyword {
     font-size: 0.75rem;
     padding: 0.35em 0.75em;
     background: $_fg;
@@ -3226,7 +3226,7 @@ header#title-block-header {
   }
 
   // Meta footer
-  .mc-magazine-meta-footer {
+  .mc-professional-meta-footer {
     margin-top: 1.5rem;
     padding-top: 1rem;
     border-top: 1px solid var(--mc-border);
@@ -3246,8 +3246,8 @@ header#title-block-header {
   }
 }
 
-// Magazine style: enhance title in header
-header#title-block-header:has(.mc-style-magazine) {
+// Professional style: enhance title in header
+header#title-block-header:has(.mc-style-professional) {
   padding-bottom: 0;
 
   .quarto-title {
@@ -3313,7 +3313,7 @@ header#title-block-header:has(.mc-style-magazine) {
   }
 
   // Metadata section below title
-  .mc-style-magazine {
+  .mc-style-professional {
     padding-top: 1.5rem;
   }
 }

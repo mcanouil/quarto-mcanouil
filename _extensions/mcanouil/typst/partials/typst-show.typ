@@ -160,9 +160,9 @@ $endif$
 $if(title-page)$
   title-page: $title-page$,
 $endif$
-// Header and Footer
-$if(header-footer-style)$
-  header-footer-style: "$header-footer-style$",
+// Style
+$if(style)$
+  style: "$style$",
 $endif$
 $if(institute)$
   institute: [$institute$],

@@ -9,6 +9,7 @@ contributes:
   project:
     project:
       type: website
+    mc-hide-navbar-title: true
     website:
       favicon: logos/logo-light-path.svg
       back-to-top-navigation: true
@@ -96,7 +97,7 @@ contributes:
       template-partials:
         - html/partials/title-metadata.html
         - html/partials/_title-metadata-academic.html
-        - html/partials/_title-metadata-magazine.html
+        - html/partials/_title-metadata-professional.html
         - html/partials/_title-meta-author.html
       # Theme
       theme:
@@ -115,7 +116,6 @@ contributes:
         body-width: 900px
         margin-width: 300px
       fig-align: center
-      mc-hide-navbar-title: true
       # Table of contents
       toc: true
       toc-depth: 4
@@ -140,7 +140,7 @@ contributes:
       document-type: report
       # Brand
       brand-mode: light
-      header-footer-style: "professional"
+      style: "professional"
       show-corner-brackets: true # Signature corner bracket decorations
       show-margin-decoration: true # Coloured bars along page margins
       show-title-page-background: true # Geometric background on title page

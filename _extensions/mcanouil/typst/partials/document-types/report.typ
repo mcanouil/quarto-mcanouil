@@ -62,7 +62,7 @@
 /// @param title-page Whether to use dedicated title page mode
 ///
 /// Header and Footer:
-/// @param header-footer-style Header/footer layout style ('academic' or 'professional')
+/// @param style Header/footer layout style ('academic' or 'professional')
 /// @param institute Institute name for professional footer left (defaults to first author affiliation or URL)
 /// @param copyright Copyright statement for professional footer right
 /// @param license License information for professional footer right (combined with copyright if both present)
@@ -152,7 +152,7 @@
   // Title Page
   title-page: false,
   // Header and Footer
-  header-footer-style: "academic",
+  style: "academic",
   institute: none,
   copyright: none,
   license: none,
@@ -218,7 +218,7 @@
   // Define content margins for professional style (asymmetric, used after title block)
   // Professional style uses wider left margin to accommodate margin section
   let content-margin = if (
-    header-footer-style == "professional" and margin == (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm)
+    style == "professional" and margin == (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm)
   ) {
     (top: 4cm, bottom: 2.5cm, left: 3cm, right: 2.5cm)
   } else {
@@ -229,7 +229,7 @@
   // This ensures pages with title block have equal left/right margins
   // Asymmetric margins are applied after the title block
   let margin = if (
-    header-footer-style == "professional" and margin == (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm)
+    style == "professional" and margin == (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm)
   ) {
     (top: 4cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm)
   } else {
@@ -287,7 +287,7 @@
   }
 
   // Determine footer left content based on style
-  let footer-left-content = if header-footer-style == "professional" {
+  let footer-left-content = if style == "professional" {
     // Priority: institute → affiliation → URL → none
     if institute != none {
       institute
@@ -304,7 +304,7 @@
   }
 
   // Determine footer right content based on style
-  let footer-right-content = if header-footer-style == "professional" {
+  let footer-right-content = if style == "professional" {
     // Combine copyright and license when both available
     if copyright != none and license != none {
       [#copyright · #license]
@@ -357,7 +357,7 @@
       } else {
         pdf.artifact(
           mcanouil-header(
-            style: header-footer-style,
+            style: style,
             title: title,
             subtitle: subtitle,
             logo: logo,
@@ -377,7 +377,7 @@
       } else {
         pdf.artifact(
           mcanouil-footer(
-            style: header-footer-style,
+            style: style,
             left-content: footer-left-content,
             right-content: footer-right-content,
             colours: colours,
@@ -391,7 +391,7 @@
           if show-title-page-background {
             title-page-background(colours, margin: margin)
           }
-        } else if show-margin-decoration and header-footer-style == "academic" {
+        } else if show-margin-decoration and style == "academic" {
           // Only show margin decoration when style is academic
           margin-decoration(
             colours,
@@ -406,7 +406,7 @@
 
         // Display section in margin (professional style shows vertical section title)
         margin-section(
-          style: header-footer-style,
+          style: style,
           colours: colours,
           margin: margin,
         )
@@ -574,7 +574,7 @@
   // Main content (columns applied via set page in typst-show.typ after outlines)
   // This ensures title block and outlines render in single column
   // For professional style, switch to asymmetric margins after title block
-  if header-footer-style == "professional" and margin != content-margin {
+  if style == "professional" and margin != content-margin {
     // Update margin state and apply asymmetric content margins after title block
     current-margin-state.update(content-margin)
     set page(margin: content-margin)

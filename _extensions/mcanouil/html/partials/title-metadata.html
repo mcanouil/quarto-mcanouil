@@ -1,8 +1,8 @@
 $-- Title metadata template --$
-$-- Use mc-magazine-style: true for magazine style, otherwise academic (default) --$
+$-- Use style: 'professional' (default) or 'academic' --$
 
-$if(mc-magazine-style)$
-$_title-metadata-magazine.html()$
-$else$
+$if(style.academic)$
 $_title-metadata-academic.html()$
+$else$
+$_title-metadata-professional.html()$
 $endif$

@@ -44,7 +44,7 @@ extensions:
     code-window:
       enabled: true
       auto-filename: true
-mc-magazine-style: true  # Set to true for magazine style, false/omit for academic
+style: professional  # Options: 'professional' (default) or 'academic'
 format:
   mcanouil-html:
     output-file: index
@@ -57,7 +57,6 @@ format:
     embed-resources: true
     output-ext: revealjs.html
   mcanouil-typst+dark:
-    header-footer-style: "academic"
     brand-mode: dark
     output-ext: dark.pdf
   mcanouil-typst+light:

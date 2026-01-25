@@ -332,7 +332,7 @@
 }
 
 /// Display section in margin (dispatcher)
-/// Routes to appropriate style-specific function based on header-footer-style
+/// Routes to appropriate style-specific function based on style
 ///
 /// Font size is automatically calculated based on the longest heading in the document
 /// to ensure consistent sizing without text wrapping across all pages.

@@ -27,7 +27,9 @@
 --- @version 1.0.0
 --- @brief HTML options filter
 --- @description Processes YAML options for HTML format styling.
---- Supports: mc-hide-navbar-title (hides navbar brand/title)
+--- Supports:
+---   - style: 'professional' or 'academic' (converts to style.professional/style.academic booleans)
+---   - mc-hide-navbar-title: hides navbar brand/title
 
 -- ============================================================================
 -- FORMAT CHECK
@@ -81,8 +83,21 @@ end
 
 --- Process metadata and add CSS for enabled options
 --- @param meta pandoc.Meta Document metadata
---- @return pandoc.Meta Unchanged metadata
+--- @return pandoc.Meta Modified metadata with style booleans
 local function Meta(meta)
+  -- Convert style string to nested booleans for template use
+  -- Default is "professional" if not specified
+  local style_value = 'professional'  -- default
+  if meta['style'] ~= nil then
+    style_value = pandoc.utils.stringify(meta['style']):lower()
+  end
+
+  -- Create nested style table with boolean values
+  meta['style'] = pandoc.MetaMap({
+    professional = style_value == 'professional',
+    academic = style_value == 'academic'
+  })
+
   -- Check mc-hide-navbar-title option
   if get_bool_option(meta, 'mc-hide-navbar-title') then
     quarto.doc.add_html_dependency({
