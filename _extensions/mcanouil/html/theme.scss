@@ -80,6 +80,8 @@ $_link-underline-thickness-hover: 2px;
 // ===========================
 // BREAKPOINT VARIABLES
 // ===========================
+// Convention: This file uses desktop-first (max-width) media queries throughout.
+// All responsive styles should follow this pattern for consistency.
 $_breakpoint-sm: 576px;
 $_breakpoint-md: 768px;
 $_breakpoint-lg: 992px;
