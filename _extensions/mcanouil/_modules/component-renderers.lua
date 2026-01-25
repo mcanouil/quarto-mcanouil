@@ -13,6 +13,9 @@
 local html_utils = require(
   quarto.utils.resolve_path('../_modules/html-utils.lua'):gsub('%.lua$', '')
 )
+local utils = require(
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+)
 local wrapper = require(
   quarto.utils.resolve_path('../_modules/html-wrapper.lua'):gsub('%.lua$', '')
 )
@@ -77,9 +80,9 @@ M.render_panel = function(div, config)
     if attrs.icon then
       local icon_char = html_utils.get_icon(attrs.icon)
       icon_html = html_utils.bem_span('panel', 'icon', nil, { ['aria-hidden'] = 'true' },
-        html_utils.escape_html(icon_char)) .. ' '
+        utils.escape_html(icon_char)) .. ' '
     end
-    local title_html = html_utils.bem_span('panel', 'title', nil, nil, html_utils.escape_html(attrs.title))
+    local title_html = html_utils.bem_span('panel', 'title', nil, nil, utils.escape_html(attrs.title))
     header_html = html_utils.bem_div('panel', 'header', nil, nil, icon_html .. title_html)
   end
 
@@ -136,7 +139,7 @@ M.render_executive_summary = function(div, config)
   -- Build title
   local title_html = string.format('<h2 class="%s">%s</h2>',
     html_utils.bem_class('executive-summary', 'title'),
-    html_utils.escape_html(title))
+    utils.escape_html(title))
 
   -- Separator
   local separator_html = string.format('<hr class="%s" />',
@@ -190,7 +193,7 @@ M.render_card = function(div, config)
   -- Check for custom colour
   local style_attr = ''
   if attrs.colour then
-    style_attr = string.format(' style="--card-accent: %s;"', html_utils.escape_attribute(attrs.colour))
+    style_attr = string.format(' style="--card-accent: %s;"', utils.escape_attribute(attrs.colour))
   end
 
   local result = { pandoc.RawBlock('html', string.format('<div class="%s"%s>', classes, style_attr)) }
@@ -200,7 +203,7 @@ M.render_card = function(div, config)
     local header_html = string.format('<div class="%s"><h3 class="%s">%s</h3></div>',
       html_utils.bem_class('card', 'header'),
       html_utils.bem_class('card', 'title'),
-      html_utils.escape_html(attrs.title))
+      utils.escape_html(attrs.title))
     table.insert(result, pandoc.RawBlock('html', header_html))
   end
 
@@ -305,11 +308,11 @@ M.render_badge = function(span, config)
   local icon_html = ''
   if attrs.icon then
     local icon_char = html_utils.get_icon(attrs.icon)
-    icon_html = html_utils.bem_span('badge', 'icon', nil, { ['aria-hidden'] = 'true' }, html_utils.escape_html(icon_char)) ..
+    icon_html = html_utils.bem_span('badge', 'icon', nil, { ['aria-hidden'] = 'true' }, utils.escape_html(icon_char)) ..
     ' '
   end
 
-  local text_html = html_utils.bem_span('badge', 'text', nil, nil, html_utils.escape_html(content))
+  local text_html = html_utils.bem_span('badge', 'text', nil, nil, utils.escape_html(content))
 
   local html = string.format('<span class="%s">%s%s</span>', classes, icon_html, text_html)
 

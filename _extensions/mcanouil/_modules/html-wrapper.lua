@@ -106,10 +106,10 @@ local function render_header(block, attrs)
   local icon_html = ''
   if attrs.icon then
     local icon_char = html_utils.get_icon(attrs.icon)
-    icon_html = html_utils.bem_span(block, 'icon', nil, { ['aria-hidden'] = 'true' }, html_utils.escape_html(icon_char))
+    icon_html = html_utils.bem_span(block, 'icon', nil, { ['aria-hidden'] = 'true' }, utils.escape_html(icon_char))
   end
 
-  local title_html = html_utils.bem_span(block, 'title', nil, nil, html_utils.escape_html(attrs.title))
+  local title_html = html_utils.bem_span(block, 'title', nil, nil, utils.escape_html(attrs.title))
 
   return html_utils.bem_div(block, 'header', nil, nil, icon_html .. title_html)
 end

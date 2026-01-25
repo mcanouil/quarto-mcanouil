@@ -57,6 +57,25 @@ function utils_module.trim(str)
   return str:match('^%s*(.-)%s*$')
 end
 
+--- Convert any value to a string, handling Pandoc objects and empty values.
+--- Returns nil for empty or nil values, otherwise returns a string representation.
+--- @param val any The value to convert
+--- @return string|nil The string value or nil if empty
+--- @usage local str = utils_module.to_string(kwargs.value)
+function utils_module.to_string(val)
+  if not val then return nil end
+  if type(val) == 'string' then
+    return val ~= '' and val or nil
+  end
+  -- Handle Pandoc objects
+  if pandoc and pandoc.utils and pandoc.utils.stringify then
+    local str = pandoc.utils.stringify(val)
+    return str ~= '' and str or nil
+  end
+  local str = tostring(val)
+  return str ~= '' and str or nil
+end
+
 --- Escape special LaTeX characters in text.
 --- @param text string The text to escape
 --- @return string The escaped text safe for LaTeX
@@ -99,6 +118,39 @@ function utils_module.escape_lua_pattern(text)
   text = string.gsub(text, "%-", "%%-")
   text = string.gsub(text, "%?", "%%?")
   return text
+end
+
+--- Escape special HTML characters in text.
+--- Escapes &, <, >, ", and ' to prevent XSS and ensure valid HTML.
+--- @param text string The text to escape
+--- @return string Escaped text safe for use in HTML
+--- @usage local escaped = utils_module.escape_html('Hello <World>')
+function utils_module.escape_html(text)
+  if text == nil then return '' end
+  if type(text) ~= 'string' then text = tostring(text) end
+  local result = text
+      :gsub('&', '&amp;')
+      :gsub('<', '&lt;')
+      :gsub('>', '&gt;')
+      :gsub('"', '&quot;')
+      :gsub("'", '&#39;')
+  return result
+end
+
+--- Escape special HTML attribute characters.
+--- Escapes characters that could break attribute values.
+--- @param value string The attribute value to escape
+--- @return string Escaped value safe for use in HTML attributes
+--- @usage local escaped = utils_module.escape_attribute('Hello "World"')
+function utils_module.escape_attribute(value)
+  if value == nil then return '' end
+  if type(value) ~= 'string' then value = tostring(value) end
+  local result = value
+      :gsub('&', '&amp;')
+      :gsub('"', '&quot;')
+      :gsub('<', '&lt;')
+      :gsub('>', '&gt;')
+  return result
 end
 
 --- Escape text for different formats.
@@ -352,14 +404,22 @@ end
 --- @return string Raw HTML string for the header
 function utils_module.raw_header(level, text, id, classes, attributes)
   local attr_str = ''
-  if id and id ~= '' then attr_str = attr_str .. ' id="' .. id .. '"' end
-  if classes and #classes > 0 then attr_str = attr_str .. ' class="' .. table.concat(classes, ' ') .. '"' end
+  if id and id ~= '' then
+    attr_str = attr_str .. ' id="' .. utils_module.escape_attribute(id) .. '"'
+  end
+  if classes and #classes > 0 then
+    local escaped_classes = {}
+    for i, cls in ipairs(classes) do
+      escaped_classes[i] = utils_module.escape_attribute(cls)
+    end
+    attr_str = attr_str .. ' class="' .. table.concat(escaped_classes, ' ') .. '"'
+  end
   if attributes then
     for k, v in pairs(attributes) do
-      attr_str = attr_str .. ' ' .. k .. '="' .. v .. '"'
+      attr_str = attr_str .. ' ' .. utils_module.escape_attribute(k) .. '="' .. utils_module.escape_attribute(v) .. '"'
     end
   end
-  return string.format('<h%d%s>%s</h%d>', level, attr_str, text or '', level)
+  return string.format('<h%d%s>%s</h%d>', level, attr_str, utils_module.escape_html(text or ''), level)
 end
 
 -- ============================================================================
@@ -575,6 +635,17 @@ function utils_module.get_colour(attrs, default)
     return default
   end
   return utils_module.stringify(value)
+end
+
+--- Check if a colour value is a custom colour (hex, rgb, hsl, etc.).
+--- Used to determine whether to apply a semantic class or inline style.
+--- @param colour string|nil The colour value to check
+--- @return boolean True if it's a custom colour value
+--- @usage local is_custom = utils_module.is_custom_colour('#ff6600') -- returns true
+function utils_module.is_custom_colour(colour)
+  if not colour then return false end
+  local str = colour:lower()
+  return str:match('^#') or str:match('^rgb') or str:match('^hsl')
 end
 
 -- ============================================================================

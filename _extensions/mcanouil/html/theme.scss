@@ -442,6 +442,12 @@ td code.sourceCode {
     padding-bottom: 0;
     margin-bottom: 0;
   }
+
+  &.callout-style-default .callout-body {
+    padding-left: .5em;
+    padding-right: .5em;
+    padding-bottom: .5em;
+  }
 }
 
 // ===========================

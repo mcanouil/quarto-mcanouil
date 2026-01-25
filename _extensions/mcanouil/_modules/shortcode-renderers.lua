@@ -20,32 +20,11 @@ local utils = require(
 local M = {}
 
 -- ============================================================================
--- HELPER FUNCTIONS
+-- HELPER FUNCTIONS (aliases to utils module)
 -- ============================================================================
 
---- Safely convert value to string.
---- Handles Pandoc MetaValue objects and other types.
----
---- @param val any The value to convert
---- @return string|nil The string value or nil if empty
-local function to_string(val)
-  if val == nil then return nil end
-  if type(val) == 'string' then return val end
-  -- Handle Pandoc objects
-  if pandoc and pandoc.utils and pandoc.utils.stringify then
-    return pandoc.utils.stringify(val)
-  end
-  return tostring(val)
-end
-
---- Check if a colour value is a custom colour (hex, rgb, hsl, etc.).
---- @param colour string|nil The colour value to check
---- @return boolean True if it's a custom colour
-local function is_custom_colour(colour)
-  if not colour then return false end
-  local str = colour:lower()
-  return str:match('^#') or str:match('^rgb') or str:match('^hsl')
-end
+local to_string = utils.to_string
+local is_custom_colour = utils.is_custom_colour
 
 -- ============================================================================
 -- CONFIGURATION
@@ -94,7 +73,7 @@ M.render_value_box = function(kwargs, config)
   local style_attr = ''
   if is_custom_colour(colour) then
     modifier = 'custom'
-    style_attr = string.format(' style="--custom-colour: %s;"', html_utils.escape_attribute(colour))
+    style_attr = string.format(' style="--custom-colour: %s;"', utils.escape_attribute(colour))
   elseif not modifier then
     modifier = colour
   end
@@ -104,11 +83,11 @@ M.render_value_box = function(kwargs, config)
   local classes = base_class .. ' ' .. mod_class
 
   -- Build value display
-  local value_html = html_utils.bem_span('value-box', 'number', nil, nil, html_utils.escape_html(value))
+  local value_html = html_utils.bem_span('value-box', 'number', nil, nil, utils.escape_html(value))
 
   -- Add unit if provided
   if unit then
-    value_html = value_html .. html_utils.bem_span('value-box', 'unit', nil, nil, html_utils.escape_html(unit))
+    value_html = value_html .. html_utils.bem_span('value-box', 'unit', nil, nil, utils.escape_html(unit))
   end
 
   -- Add icon if provided
@@ -116,14 +95,14 @@ M.render_value_box = function(kwargs, config)
   if icon then
     local icon_char = html_utils.get_icon(icon)
     icon_html = html_utils.bem_span('value-box', 'icon', nil, { ['aria-hidden'] = 'true' },
-      html_utils.escape_html(icon_char))
+      utils.escape_html(icon_char))
   end
 
   -- Build value row
   local value_row_html = html_utils.bem_div('value-box', 'value', nil, nil, value_html .. icon_html)
 
   -- Build label
-  local label_html = html_utils.bem_div('value-box', 'label', nil, nil, html_utils.escape_html(label))
+  local label_html = html_utils.bem_div('value-box', 'label', nil, nil, utils.escape_html(label))
 
   -- Build wrapper
   local aria_label = label .. ': ' .. value
@@ -134,7 +113,7 @@ M.render_value_box = function(kwargs, config)
   return string.format('<div class="%s"%s role="figure" aria-label="%s">%s%s</div>',
     classes,
     style_attr,
-    html_utils.escape_attribute(aria_label),
+    utils.escape_attribute(aria_label),
     value_row_html,
     label_html)
 end
@@ -158,11 +137,11 @@ M.render_badge = function(kwargs, config)
   local icon_html = ''
   if icon then
     local icon_char = html_utils.get_icon(icon)
-    icon_html = html_utils.bem_span('badge', 'icon', nil, { ['aria-hidden'] = 'true' }, html_utils.escape_html(icon_char)) ..
+    icon_html = html_utils.bem_span('badge', 'icon', nil, { ['aria-hidden'] = 'true' }, utils.escape_html(icon_char)) ..
         ' '
   end
 
-  local text_html = html_utils.bem_span('badge', 'text', nil, nil, html_utils.escape_html(text))
+  local text_html = html_utils.bem_span('badge', 'text', nil, nil, utils.escape_html(text))
 
   return string.format('<span class="%s">%s%s</span>', classes, icon_html, text_html)
 end

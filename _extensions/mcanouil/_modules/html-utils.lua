@@ -48,41 +48,6 @@ M.ICON_SHORTCUTS = {
 -- HELPER FUNCTIONS
 -- ============================================================================
 
---- Escape special HTML characters in text.
---- Escapes &, <, >, ", and ' to prevent XSS and ensure valid HTML.
----
---- @param text string The text to escape
---- @return string Escaped text safe for use in HTML
---- @usage local escaped = M.escape_html('Hello <World>')
-M.escape_html = function(text)
-  if text == nil then return '' end
-  if type(text) ~= 'string' then text = tostring(text) end
-  local result = text
-      :gsub('&', '&amp;')
-      :gsub('<', '&lt;')
-      :gsub('>', '&gt;')
-      :gsub('"', '&quot;')
-      :gsub("'", '&#39;')
-  return result
-end
-
---- Escape special HTML attribute characters.
---- Escapes characters that could break attribute values.
----
---- @param value string The attribute value to escape
---- @return string Escaped value safe for use in HTML attributes
---- @usage local escaped = M.escape_attribute('Hello "World"')
-M.escape_attribute = function(value)
-  if value == nil then return '' end
-  if type(value) ~= 'string' then value = tostring(value) end
-  local result = value
-      :gsub('&', '&amp;')
-      :gsub('"', '&quot;')
-      :gsub('<', '&lt;')
-      :gsub('>', '&gt;')
-  return result
-end
-
 --- Build HTML attribute string from a table of key-value pairs.
 --- Handles boolean attributes (true = present, false = omitted).
 ---
@@ -101,7 +66,7 @@ M.build_attributes = function(attrs)
       table.insert(attr_items, key)
     elseif value and value ~= false then
       -- Standard attribute
-      table.insert(attr_items, string.format('%s="%s"', key, M.escape_attribute(tostring(value))))
+      table.insert(attr_items, string.format('%s="%s"', key, utils.escape_attribute(tostring(value))))
     end
   end
 
@@ -150,37 +115,6 @@ M.bem_classes = function(block, modifiers)
   return table.concat(classes, ' ')
 end
 
---- Safely convert value to string.
---- Handles Pandoc MetaValue objects and other types.
----
---- @param val any The value to convert
---- @return string|nil The string value or nil if empty
---- @usage local str = M.to_string(kwargs.value)
-M.to_string = function(val)
-  if not val then return nil end
-  if type(val) == 'string' then
-    return val ~= '' and val or nil
-  end
-  -- Handle Pandoc objects
-  if pandoc and pandoc.utils and pandoc.utils.stringify then
-    local str = pandoc.utils.stringify(val)
-    return str ~= '' and str or nil
-  end
-  local str = tostring(val)
-  return str ~= '' and str or nil
-end
-
---- Check if a colour value is a custom colour (hex, rgb, hsl, etc.).
----
---- @param colour string|nil The colour value to check
---- @return boolean True if it's a custom colour
---- @usage local is_custom = M.is_custom_colour('#ff6600') -- returns true
-M.is_custom_colour = function(colour)
-  if not colour then return false end
-  local str = colour:lower()
-  return str:match('^#') or str:match('^rgb') or str:match('^hsl')
-end
-
 --- Get colour class modifier.
 --- Maps colour names to CSS class modifiers.
 ---
@@ -188,7 +122,7 @@ end
 --- @return string|nil The CSS class modifier or nil if not found
 --- @usage local mod = M.get_colour_modifier('success') -- returns 'success'
 M.get_colour_modifier = function(colour)
-  local str = M.to_string(colour)
+  local str = utils.to_string(colour)
   if not str or str == '' then return nil end
   return M.COLOUR_CLASSES[str:lower()]
 end
@@ -201,7 +135,7 @@ end
 --- @usage local char = M.get_icon('up') -- returns '↑'
 --- @usage local char = M.get_icon('✓') -- returns '✓'
 M.get_icon = function(icon)
-  local str = M.to_string(icon)
+  local str = utils.to_string(icon)
   if not str or str == '' then return nil end
   return M.ICON_SHORTCUTS[str:lower()] or str
 end
@@ -325,10 +259,10 @@ M.render_divider = function(kwargs, config)
   config = config or {}
   local class_prefix = config.class_prefix or ''
 
-  local style = M.to_string(kwargs.style) or 'solid'
-  local label = M.to_string(kwargs.label)
-  local thickness = M.to_string(kwargs.thickness) or '1pt'
-  local width = M.to_string(kwargs.width) or '50%'
+  local style = utils.to_string(kwargs.style) or 'solid'
+  local label = utils.to_string(kwargs.label)
+  local thickness = utils.to_string(kwargs.thickness) or '1pt'
+  local width = utils.to_string(kwargs.width) or '50%'
 
   local base_class = class_prefix .. M.bem_class('divider')
   local mod_class = M.bem_class('divider', nil, style)
@@ -338,9 +272,9 @@ M.render_divider = function(kwargs, config)
 
   if label then
     -- Divider with label
-    local label_html = M.bem_span('divider', 'label', nil, nil, M.escape_html(label))
+    local label_html = M.bem_span('divider', 'label', nil, nil, utils.escape_html(label))
     return string.format('<div class="%s" style="%s" role="separator" aria-label="%s">%s</div>',
-      classes, style_attr, M.escape_attribute(label), label_html)
+      classes, style_attr, utils.escape_attribute(label), label_html)
   else
     -- Simple divider
     return string.format('<hr class="%s" style="%s" />',
@@ -360,18 +294,18 @@ M.render_progress = function(kwargs, config)
   local class_prefix = config.class_prefix or ''
   local default_height = (config.defaults and config.defaults.progress_height) or '1.5em'
 
-  local value = tonumber(M.to_string(kwargs.value)) or 0
-  local label = M.to_string(kwargs.label)
+  local value = tonumber(utils.to_string(kwargs.value)) or 0
+  local label = utils.to_string(kwargs.label)
   local colour = utils.get_colour(kwargs, 'info')
-  local show_value = M.to_string(kwargs['show-value']) ~= 'false'
-  local height = M.to_string(kwargs.height) or default_height
+  local show_value = utils.to_string(kwargs['show-value']) ~= 'false'
+  local height = utils.to_string(kwargs.height) or default_height
 
   -- Handle custom colours (hex, rgb, hsl)
   local modifier = M.get_colour_modifier(colour)
   local custom_colour_style = ''
-  if M.is_custom_colour(colour) then
+  if utils.is_custom_colour(colour) then
     modifier = 'custom'
-    custom_colour_style = string.format(' --custom-colour: %s;', M.escape_attribute(colour))
+    custom_colour_style = string.format(' --custom-colour: %s;', utils.escape_attribute(colour))
   elseif not modifier then
     modifier = colour
   end
@@ -405,7 +339,7 @@ M.render_progress = function(kwargs, config)
   if label then
     local label_html = string.format('<div class="%s">%s</div>',
       M.bem_class('progress', 'label'),
-      M.escape_html(label))
+      utils.escape_html(label))
     return string.format('<div class="%s">%s%s</div>',
       M.bem_class('progress', 'container'),
       label_html,
