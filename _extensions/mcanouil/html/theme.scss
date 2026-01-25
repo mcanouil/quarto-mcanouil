@@ -78,6 +78,54 @@ $_link-underline-thickness-hover: 2px;
 //   - scale() for emphasis, translateX/Y for directional cues
 
 // ===========================
+// BREAKPOINT VARIABLES
+// ===========================
+$_breakpoint-sm: 576px;
+$_breakpoint-md: 768px;
+$_breakpoint-lg: 992px;
+$_breakpoint-xl: 1200px;
+
+// ===========================
+// SPACING SCALE
+// ===========================
+$_space-xs: 0.25rem;
+$_space-sm: 0.5rem;
+$_space-md: 1rem;
+$_space-lg: 1.5rem;
+$_space-xl: 2rem;
+
+// ===========================
+// BORDER RADIUS
+// ===========================
+$_radius-sm: 4px;
+$_radius-md: 8px;
+$_radius-lg: 12px;
+$_radius-full: 50%;
+
+// ===========================
+// ANIMATION TIMING
+// ===========================
+$_anim-fast: 0.2s;
+$_anim-standard: 0.3s;
+$_anim-slow: 0.6s;
+$_easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+// ===========================
+// BOX SHADOW SCALE
+// ===========================
+$_shadow-sm: 0 2px 4px rgba($_fg, 0.08);
+$_shadow-md: 0 4px 12px rgba($_fg, 0.1);
+$_shadow-lg: 0 8px 24px rgba($_fg, 0.15);
+
+// ===========================
+// SPECIAL COLOURS
+// ===========================
+$_color-sponsor: rgb(255, 105, 180);
+$_color-macos-close: #ff5f56;
+$_color-macos-minimize: #ffbd2e;
+$_color-macos-maximize: #27c93f;
+
+// ===========================
 // UTILITY FUNCTIONS
 // ===========================
 // Helper function to mix background and foreground colors
@@ -227,12 +275,6 @@ p:empty {
     color: $_fg;
     background-color: $_bg;
   }
-}
-
-.page-link:hover {
-  color: $_bg;
-  background-color: $_fg;
-  border-color: $_bg;
 }
 
 .input-group-text {
@@ -496,7 +538,7 @@ img.about-image {
       }
     }
 
-    @media(max-width: 992px) {
+    @media(max-width: $_breakpoint-lg) {
       flex-direction: row !important;
       justify-content: center !important;
       flex-wrap: wrap !important;
@@ -648,7 +690,7 @@ img.about-image {
 }
 
 // Responsive navbar adjustments
-@media (max-width: 992px) {
+@media (max-width: $_breakpoint-lg) {
   .navbar-expand-lg {
 
     a.nav-link.active:after,
@@ -662,10 +704,6 @@ img.about-image {
 
 .navbar-brand {
   color: $_fg;
-}
-
-.navbar-logo {
-  max-height: 2em;
 }
 
 // Navbar title with corner brackets animation
@@ -714,7 +752,7 @@ img.about-image {
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: $_breakpoint-md) {
     display: none;
   }
 }
@@ -803,7 +841,7 @@ img.about-image {
   min-width: 100px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: $_breakpoint-md) {
   .quarto-layout-row {
     flex-direction: column;
   }
@@ -855,8 +893,8 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 
 // Blog listing cards with hover effects
 .quarto-post {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 8px;
+  transition: all $_anim-standard $_easing-standard;
+  border-radius: $_radius-md;
   overflow: hidden;
   padding: 1rem;
 
@@ -899,7 +937,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 
 // Grid items
 .quarto-grid-item {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $_anim-standard $_easing-standard;
 
   &:hover {
     transform: translateY(-4px);
@@ -930,7 +968,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 // Buttons and pagination links
 .btn,
 .page-link {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $_anim-fast $_easing-standard;
   text-decoration: none;
   position: relative;
 
@@ -1023,7 +1061,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
             -webkit-text-fill-color: transparent;
             background-clip: text;
 
-            @media (max-width: 768px) {
+            @media (max-width: $_breakpoint-md) {
               font-size: 2rem;
             }
           }
@@ -1034,7 +1072,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
             font-weight: 400;
             margin-bottom: 1.5rem;
 
-            @media (max-width: 768px) {
+            @media (max-width: $_breakpoint-md) {
               font-size: 1rem;
             }
           }
@@ -1055,10 +1093,10 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
           padding: 0.6rem 1rem;
           background-color: rgba($_fg, 0.08);
           border: 1px solid rgba($_fg, 0.15);
-          border-radius: 8px;
+          border-radius: $_radius-md;
           color: rgba($_fg, 0.85);
           text-decoration: none;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all $_anim-standard $_easing-standard;
           font-size: 1.1rem;
           min-width: 2.5rem;
 
@@ -1082,14 +1120,14 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 
           // Special styling for sponsor link
           &:has(iconify-icon[icon*="heart"]) {
-            background-color: rgba(255, 105, 180, 0.1);
-            border-color: rgba(255, 105, 180, 0.3);
-            color: rgb(255, 105, 180);
+            background-color: rgba($_color-sponsor, 0.1);
+            border-color: rgba($_color-sponsor, 0.3);
+            color: $_color-sponsor;
 
             &:hover {
-              background-color: rgba(255, 105, 180, 0.2);
-              border-color: rgba(255, 105, 180, 0.5);
-              color: rgb(255, 80, 150);
+              background-color: rgba($_color-sponsor, 0.2);
+              border-color: rgba($_color-sponsor, 0.5);
+              color: darken($_color-sponsor, 10%);
             }
           }
         }
@@ -1100,7 +1138,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
     .about-image {
       border: 4px solid rgba($_fg, 0.1);
       box-shadow: 0 8px 24px rgba($_fg, 0.15);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all $_anim-standard $_easing-standard;
 
       &:hover {
         transform: scale(1.05);
@@ -1111,7 +1149,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
   }
 
   // Responsive adjustments
-  @media (max-width: 768px) {
+  @media (max-width: $_breakpoint-md) {
     padding: 2rem 0;
     margin-top: -1rem;
     margin-bottom: 1.5rem;
@@ -1129,7 +1167,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 // About entity links (outside hero section)
 .about-entity {
   .about-link {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all $_anim-standard $_easing-standard;
 
     &:hover {
       filter: brightness(1.2);
@@ -1148,7 +1186,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
     margin-bottom: 1.5rem;
     color: rgba($_fg, 0.85);
 
-    @media (max-width: 768px) {
+    @media (max-width: $_breakpoint-md) {
       font-size: 1.05rem;
       line-height: 1.7;
     }
@@ -1174,9 +1212,9 @@ figure:has(img.img-styled) {
       rgba($_fg, 0.02) 0%,
       rgba($_fg, 0.04) 100%);
   border: 1px solid rgba($_fg, 0.08);
-  border-radius: 12px;
+  border-radius: $_radius-lg;
   box-shadow: 0 2px 6px rgba($_fg, 0.06);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $_anim-standard $_easing-standard;
   overflow: visible;
   position: relative;
 
@@ -1187,7 +1225,7 @@ figure:has(img.img-styled) {
 
   // Round the image corners
   img.img-styled {
-    border-radius: 6px;
+    border-radius: $_radius-md;
     display: block;
     width: 100%;
     height: auto;
@@ -1205,7 +1243,7 @@ figure:has(img.img-styled) {
     text-align: right;
     opacity: 0;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all $_anim-standard $_easing-standard;
     line-height: 1.4;
     font-style: italic;
 
@@ -1235,7 +1273,7 @@ figure:has(img.img-styled) {
   }
 
   // Responsive
-  @media (max-width: 768px) {
+  @media (max-width: $_breakpoint-md) {
     padding: 0.75rem;
     margin: 1.5rem auto;
     border-radius: 10px;
@@ -1258,8 +1296,8 @@ figure:has(img.img-styled) {
   width: 65%;
   background: transparent;
   border: 2px dashed rgba($_fg, 0.25);
-  border-radius: 8px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: $_radius-md;
+  transition: all $_anim-standard $_easing-standard;
 
   // Corner accents
   &::before,
@@ -1269,7 +1307,7 @@ figure:has(img.img-styled) {
     width: 12px;
     height: 12px;
     border: 2px solid $_fg;
-    transition: all 0.3s ease;
+    transition: $_link-transition;
   }
 
   // Top-left corner
@@ -1307,7 +1345,7 @@ figure:has(img.img-styled) {
     line-height: 1.8;
     color: $_fg;
 
-    @media (max-width: 768px) {
+    @media (max-width: $_breakpoint-md) {
       font-size: 1rem;
     }
 
@@ -1344,7 +1382,7 @@ figure:has(img.img-styled) {
     margin-top: 1rem;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: $_breakpoint-md) {
     padding: 1.25rem 1.5rem;
   }
 
@@ -1369,8 +1407,8 @@ figure:has(img.img-styled) {
       rgba($_fg, 0.03) 0%,
       rgba($_fg, 0.05) 100%);
   border: 2px solid rgba($_fg, 0.2);
-  border-radius: 8px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: $_radius-md;
+  transition: all $_anim-standard $_easing-standard;
   box-shadow: 0 2px 6px rgba($_fg, 0.06);
 
   // Corner accents - filled style
@@ -1381,7 +1419,7 @@ figure:has(img.img-styled) {
     width: 10px;
     height: 10px;
     background: $_fg;
-    transition: all 0.3s ease;
+    transition: $_link-transition;
     opacity: 0.3;
   }
 
@@ -1423,7 +1461,7 @@ figure:has(img.img-styled) {
     font-style: italic;
     letter-spacing: 0.01em;
 
-    @media (max-width: 768px) {
+    @media (max-width: $_breakpoint-md) {
       font-size: 1.02rem;
     }
 
@@ -1444,7 +1482,7 @@ figure:has(img.img-styled) {
         background: rgba($_fg, 0.15);
         z-index: -1;
         border-radius: 2px;
-        transition: all 0.3s ease;
+        transition: $_link-transition;
       }
     }
 
@@ -1479,7 +1517,7 @@ figure:has(img.img-styled) {
     margin-top: 1rem;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: $_breakpoint-md) {
     padding: 1.25rem 1.5rem;
     width: 80%;
   }
@@ -1535,7 +1573,7 @@ body.quarto-about-solana,
         width: 60px;
         height: 3px;
         background: linear-gradient(90deg, $_fg 0%, rgba($_fg, 0.3) 100%);
-        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: width $_anim-standard $_easing-standard;
       }
 
       &:hover::after {
@@ -1552,7 +1590,7 @@ body.quarto-about-solana,
         position: relative;
         padding: 0.75rem 0 0.75rem 2rem;
         margin-bottom: 0.75rem;
-        transition: all 0.3s ease;
+        transition: $_link-transition;
 
         &::before {
           content: '▸';
@@ -1560,7 +1598,7 @@ body.quarto-about-solana,
           left: 0.5rem;
           color: rgba($_fg, 0.5);
           font-size: 1rem;
-          transition: all 0.3s ease;
+          transition: $_link-transition;
         }
 
         &:hover {
@@ -1616,14 +1654,14 @@ body.quarto-about-solana,
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 0.5rem;
 
-      @media (max-width: 768px) {
+      @media (max-width: $_breakpoint-md) {
         grid-template-columns: 1fr;
       }
 
       li {
         padding: 0.5rem 1rem 0.5rem 1.75rem;
         background-color: rgba($_fg, 0.04);
-        border-radius: 6px;
+        border-radius: $_radius-md;
         font-size: 0.95rem;
 
         &::before {
@@ -1641,7 +1679,7 @@ body.quarto-about-solana,
 }
 
 // Responsive adjustments for index page
-@media (max-width: 768px) {
+@media (max-width: $_breakpoint-md) {
 
   body.quarto-about-solana,
   #quarto-content:has(.quarto-about-solana) {
@@ -1686,10 +1724,10 @@ h6 code:not(.sourceCode) {
   margin: 0 0.1em;
 
   // Rounded corners for modern look
-  border-radius: 4px;
+  border-radius: $_radius-sm;
 
   // Smooth transitions
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $_anim-fast $_easing-standard;
 
   // Subtle border for definition
   border: 1px solid rgba($_fg, 0.12);
@@ -1746,14 +1784,14 @@ nav td code:not(.sourceCode),
 nav div code:not(.sourceCode),
 nav span code:not(.sourceCode) {
   padding: 0.15em 0.4em;
-  border-radius: 4px;
+  border-radius: $_radius-sm;
   border: 1px solid rgba($_fg, 0.12);
 }
 
 // Code blocks with hover shadow
 div.sourceCode {
   transition: box-shadow 0.3s ease;
-  border-radius: 6px;
+  border-radius: $_radius-md;
 
   &:hover {
     box-shadow: 0 4px 12px rgba($_fg, 0.08);
@@ -1764,7 +1802,7 @@ div.sourceCode {
 .code-with-filename {
   margin: 1em 0;
   border: 1px solid rgba($_fg, 0.5);
-  border-radius: 8px;
+  border-radius: $_radius-md;
   overflow: hidden;
 
   // Filename header (title bar)
@@ -1775,7 +1813,7 @@ div.sourceCode {
     margin: 0;
     display: flex;
     align-items: center;
-    transition: all 0.3s ease;
+    transition: $_link-transition;
 
     // Traffic light buttons (macOS style)
     &::before {
@@ -1785,9 +1823,9 @@ div.sourceCode {
       width: 52px;
       height: 12px;
       margin-right: 8px;
-      background-image: radial-gradient(circle at 6px 6px, #ff5f56 5px, transparent 5px),
-        radial-gradient(circle at 21px 6px, #ffbd2e 5px, transparent 5px),
-        radial-gradient(circle at 36px 6px, #27c93f 5px, transparent 5px);
+      background-image: radial-gradient(circle at 6px 6px, $_color-macos-close 5px, transparent 5px),
+        radial-gradient(circle at 21px 6px, $_color-macos-minimize 5px, transparent 5px),
+        radial-gradient(circle at 36px 6px, $_color-macos-maximize 5px, transparent 5px);
     }
 
     // Remove Quarto's default ::after pseudo-element
@@ -1844,7 +1882,7 @@ div.sourceCode {
 }
 
 .code-copy-button {
-  transition: all 0.2s ease;
+  transition: all $_anim-fast ease;
 
   &:hover {
     transform: scale(1.1);
@@ -1859,7 +1897,7 @@ div.sourceCode {
 .navbar-nav .nav-item {
   .nav-link {
     &::after {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all $_anim-standard $_easing-standard;
     }
   }
 }
@@ -1867,7 +1905,7 @@ div.sourceCode {
 // Search form focus effect
 #quarto-search {
   .aa-Form {
-    transition: all 0.3s ease;
+    transition: $_link-transition;
 
     &:focus-within {
       box-shadow: 0 4px 12px rgba($_fg, 0.1);
@@ -1907,7 +1945,7 @@ div.sourceCode {
   border-spacing: 0;
   width: 100%;
   margin: 1.5em 0;
-  border-radius: 8px;
+  border-radius: $_radius-md;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba($_fg, 0.08);
   transition: box-shadow 0.3s ease;
@@ -1937,7 +1975,7 @@ div.sourceCode {
       text-align: left;
       border-bottom: 2px solid rgba($_fg, 0.15);
       position: relative;
-      transition: all 0.3s ease;
+      transition: $_link-transition;
 
       // First column
       &:first-child {
@@ -1973,7 +2011,7 @@ div.sourceCode {
           content: '⇅';
           font-size: 0.9em;
           opacity: 0.5;
-          transition: all 0.3s ease;
+          transition: $_link-transition;
           flex-shrink: 0;
         }
 
@@ -2010,7 +2048,7 @@ div.sourceCode {
   tbody {
     tr {
       border-bottom: 1px solid rgba($_fg, 0.08);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all $_anim-standard $_easing-standard;
       background-color: transparent;
 
       &:hover {
@@ -2039,7 +2077,7 @@ div.sourceCode {
     td {
       padding: 1rem 1.25rem;
       vertical-align: middle;
-      transition: all 0.3s ease;
+      transition: $_link-transition;
 
       // First column
       &:first-child {
@@ -2067,7 +2105,7 @@ div.sourceCode {
     color: $_fg;
     text-decoration: none;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: $_link-transition;
     display: inline-block;
     position: relative;
 
@@ -2081,7 +2119,7 @@ div.sourceCode {
       background: linear-gradient(90deg,
           $_fg 0%,
           rgba($_fg, 0.4) 100%);
-      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: width $_anim-standard $_easing-standard;
       border-radius: 1px;
     }
 
@@ -2112,12 +2150,12 @@ div.sourceCode {
     font-weight: 500;
     text-align: center;
     display: inline-block;
-    transition: all 0.2s ease;
+    transition: all $_anim-fast ease;
 
     &:not(:empty) {
       padding: 0.25em 0.75em;
       background-color: rgba($_fg, 0.05);
-      border-radius: 4px;
+      border-radius: $_radius-sm;
       border: 1px solid rgba($_fg, 0.12);
 
       &:hover {
@@ -2136,7 +2174,7 @@ div.sourceCode {
   gap: 1rem;
   margin-bottom: 1.5rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: $_breakpoint-md) {
     flex-direction: column;
     gap: 0.75rem;
   }
@@ -2146,7 +2184,7 @@ div.sourceCode {
     flex: 1;
     min-width: 200px;
 
-    @media (max-width: 768px) {
+    @media (max-width: $_breakpoint-md) {
       min-width: 100%;
     }
   }
@@ -2158,7 +2196,7 @@ div.sourceCode {
     color: rgba($_fg, 0.7);
     border-radius: 6px 0 0 6px;
     padding: 0.5rem 0.75rem;
-    transition: all 0.3s ease;
+    transition: $_link-transition;
 
     i {
       font-size: 1em;
@@ -2175,7 +2213,7 @@ div.sourceCode {
       background-color: $_bg;
       color: rgba($_fg, 0.85);
       font-size: 0.95em;
-      transition: all 0.3s ease;
+      transition: $_link-transition;
       cursor: pointer;
 
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
@@ -2217,7 +2255,7 @@ div.sourceCode {
     padding: 0.5rem 1rem;
     background-color: $_bg;
     color: rgba($_fg, 0.85);
-    transition: all 0.3s ease;
+    transition: $_link-transition;
 
     &::placeholder {
       color: rgba($_fg, 0.4);
@@ -2249,11 +2287,11 @@ div.sourceCode {
 
   .page-link {
     border: 1px solid rgba($_fg, 0.15);
-    border-radius: 6px;
+    border-radius: $_radius-md;
     padding: 0.5rem 1rem;
     color: rgba($_fg, 0.85);
     background-color: $_bg;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all $_anim-fast $_easing-standard;
     text-decoration: none;
     position: relative;
     display: inline-block;
@@ -2323,7 +2361,7 @@ div.sourceCode {
 // Listing category section
 .quarto-listing-category-title {
   position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $_anim-standard $_easing-standard;
   cursor: default;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
@@ -2340,7 +2378,7 @@ div.sourceCode {
     width: 0;
     height: 2px;
     background: linear-gradient(90deg, $_fg 0%, rgba($_fg, 0.4) 100%);
-    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width $_anim-standard $_easing-standard;
   }
 
   &:hover::after {
@@ -2349,7 +2387,7 @@ div.sourceCode {
 
   // Enhanced section number styling if present
   .header-section-number {
-    transition: all 0.3s ease;
+    transition: $_link-transition;
     opacity: 0.7;
     margin-right: 0.5em;
   }
@@ -2375,11 +2413,11 @@ div.sourceCode {
     padding: 0.25em 0.25em;
     background-color: transparent;
     border: none;
-    border-radius: 4px;
+    border-radius: $_radius-sm;
     font-size: 0.85em;
     color: rgba($_fg, 0.75);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all $_anim-fast ease;
     text-decoration: none;
     position: relative;
     overflow: hidden;
@@ -2426,11 +2464,11 @@ div.sourceCode {
     .quarto-category-count {
       padding: 0.1em 0.4em;
       background-color: rgba($_fg, 0.08);
-      border-radius: 8px;
+      border-radius: $_radius-md;
       font-size: 0.8em;
       font-weight: 500;
       color: rgba($_fg, 0.6);
-      transition: all 0.2s ease;
+      transition: all $_anim-fast ease;
       min-width: 1.8em;
       text-align: center;
     }
@@ -2451,7 +2489,7 @@ div.sourceCode {
 }
 
 // Responsive adjustments for categories
-@media (max-width: 768px) {
+@media (max-width: $_breakpoint-md) {
   .quarto-listing-category {
     gap: 0.2rem;
 
@@ -2491,10 +2529,10 @@ div.sourceCode {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: $_breakpoint-md) {
   .quarto-listing-table {
     font-size: 0.85em;
-    border-radius: 6px;
+    border-radius: $_radius-md;
 
     thead th,
     tbody td {
@@ -2534,7 +2572,7 @@ div.sourceCode {
 // Footer link animations
 .nav-footer {
   a {
-    transition: all 0.3s ease;
+    transition: $_link-transition;
     position: relative;
 
     &::after {
@@ -2545,7 +2583,7 @@ div.sourceCode {
       width: 0;
       height: 1px;
       background: $_fg;
-      transition: all 0.3s ease;
+      transition: $_link-transition;
       transform: translateX(-50%);
     }
 
@@ -2574,7 +2612,7 @@ figure {
 // TOC navigation with animated indicators
 nav#TOC {
   position: relative;
-  transition: all 0.3s ease;
+  transition: $_link-transition;
 
   // TOC Title styling
   #toc-title {
@@ -2598,7 +2636,7 @@ nav#TOC {
       background: linear-gradient(90deg,
           $_fg 0%,
           rgba($_fg, 0.3) 100%);
-      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: width $_anim-standard $_easing-standard;
       border-radius: 2px;
     }
 
@@ -2649,11 +2687,11 @@ nav#TOC {
   // TOC link styling
   .nav-link {
     padding: 0.15rem 0.75rem;
-    border-radius: 6px;
+    border-radius: $_radius-md;
     font-size: 0.875rem;
     line-height: 1.5;
     color: rgba($_fg, 0.75);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all $_anim-fast $_easing-standard;
     display: block;
     text-decoration: none;
     position: relative;
@@ -2678,7 +2716,7 @@ nav#TOC {
       width: 3px;
       background: $_fg;
       transform: scaleY(0);
-      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform $_anim-fast $_easing-standard;
       border-radius: 0 2px 2px 0;
     }
 
@@ -2771,11 +2809,11 @@ nav#TOC {
       display: flex;
       align-items: center;
       padding: 0.5rem 0.75rem;
-      border-radius: 6px;
+      border-radius: $_radius-md;
       font-size: 0.875rem;
       color: rgba($_fg, 0.7);
       text-decoration: none;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all $_anim-fast $_easing-standard;
       background-color: rgba($_fg, 0.02);
       border: 1px solid rgba($_fg, 0.08);
 
@@ -2862,7 +2900,7 @@ nav#TOC {
 // Sidebar navigation hover effects
 .sidebar-navigation {
   .sidebar-item {
-    transition: all 0.2s ease;
+    transition: all $_anim-fast ease;
 
     &:hover {
       padding-left: 0.2rem;
@@ -2874,7 +2912,7 @@ nav#TOC {
 .breadcrumb {
   .breadcrumb-item {
     a {
-      transition: all 0.3s ease;
+      transition: $_link-transition;
 
       &:hover {
         transform: translateX(2px);
@@ -3386,7 +3424,7 @@ main {
   h4.anchored,
   h5.anchored {
     position: relative;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all $_anim-standard $_easing-standard;
     cursor: default;
 
     // Remove default border for animated version
@@ -3403,7 +3441,7 @@ main {
       background: linear-gradient(90deg,
           $_fg 0%,
           rgba($_fg, 0.4) 100%);
-      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: width $_anim-slow $_easing-standard;
       border-radius: 1px;
     }
 
@@ -3435,7 +3473,7 @@ main {
   h4.anchored,
   h5.anchored {
     .header-section-number {
-      transition: all 0.3s ease;
+      transition: $_link-transition;
       opacity: 0.7;
       margin-right: 0.5em;
     }
