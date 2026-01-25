@@ -45,8 +45,8 @@ local SECTION_NAME = 'code-window'
 
 --- Default configuration values
 M.DEFAULT_CONFIG = {
-  enabled = false,
-  auto_filename = false,
+  enabled = true,
+  auto_filename = true,
   typst_wrapper = 'mcanouil-code-window',
 }
 

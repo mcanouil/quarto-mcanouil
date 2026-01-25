@@ -5,11 +5,6 @@ format:
   mcanouil-revealjs: default
 extensions:
   mcanouil:
-    # Code-window styling (all formats)
-    code-window:
-      enabled: true # Enable macOS-style code windows
-      auto-filename: true # Auto-generate filename from language
-      wrapper: mcanouil-code-window # Typst wrapper function name
     debug-borders: false
 engine: knitr
 ---

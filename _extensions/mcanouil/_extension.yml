@@ -71,13 +71,6 @@ contributes:
       date-format: "dddd[, the] Do [of] MMMM, YYYY"
       mermaid:
         theme: dark
-      extensions:
-        mcanouil:
-          # Code-window styling (all formats)
-          code-window:
-            enabled: true # Enable macOS-style code windows
-            auto-filename: true # Auto-generate filename from language
-            wrapper: mcanouil-code-window # Typst wrapper function name
       shortcodes:
         - shortcodes/divider.lua
         - shortcodes/value-box.lua
