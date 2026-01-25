@@ -7,8 +7,9 @@
  * - Favicon generation from slide logo.
  * - Title slide chrome visibility (menu/logo/footer/slide-number).
  *
- * @author Mickaël Canouil
  * @license MIT
+ * @copyright 2026 Mickaël Canouil
+ * @author Mickaël Canouil
  * @version 1.0.0
  */
 

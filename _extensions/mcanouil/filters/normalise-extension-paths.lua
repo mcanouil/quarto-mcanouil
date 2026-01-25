@@ -1,9 +1,7 @@
---[[
-# MIT License
-# Copyright (c) 2026 Mickaël Canouil
-]]
-
 --- @module normalise-extension-paths
+--- @license MIT
+--- @copyright 2026 Mickaël Canouil
+--- @author Mickaël Canouil
 --- @brief Normalises .*_extensions/ to /_extensions/ in logo and orcid-icon paths.
 ---
 --- NOTE: This is a workaround for Quarto's path resolution in Typst output.

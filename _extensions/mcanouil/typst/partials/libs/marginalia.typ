@@ -1,3 +1,7 @@
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+//
 // Marginalia stub functions
 // Temporary workaround: These stub functions pass through content unchanged,
 // allowing documents to compile whilst full marginalia integration is pending.

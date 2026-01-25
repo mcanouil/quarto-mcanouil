@@ -1,3 +1,9 @@
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+//
+// Library imports for Typst template
+
 $utilities.typ()$
 
 $marginalia.typ()$
