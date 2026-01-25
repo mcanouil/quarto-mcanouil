@@ -463,7 +463,6 @@ $mc-value-box-height: 100px;
         font-size: 0.7em;
         color: $text-muted;
         margin: 0 !important;
-        margin-bottom: 0 !important;
       }
     }
 
@@ -796,7 +795,6 @@ $mc-value-box-height: 100px;
 
       // Remove Quarto's default ::after pseudo-element
       &::after {
-        content: none !important;
         display: none !important;
       }
 
