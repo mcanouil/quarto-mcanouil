@@ -405,29 +405,29 @@ td code.sourceCode {
   page-break-inside: avoid;
   break-inside: avoid;
 
-  // Subtle background using colour mix
+  // Subtle background using SCSS mix (computed at build time for browser compatibility)
   &.callout-note {
-    background-color: color-mix(in srgb, $callout-color-note 8%, $_bg) !important;
+    background-color: mix($callout-color-note, $_bg, 8%) !important;
     border-left-color: $callout-color-note !important;
   }
 
   &.callout-tip {
-    background-color: color-mix(in srgb, $callout-color-tip 8%, $_bg) !important;
+    background-color: mix($callout-color-tip, $_bg, 8%) !important;
     border-left-color: $callout-color-tip !important;
   }
 
   &.callout-warning {
-    background-color: color-mix(in srgb, $callout-color-warning 8%, $_bg) !important;
+    background-color: mix($callout-color-warning, $_bg, 8%) !important;
     border-left-color: $callout-color-warning !important;
   }
 
   &.callout-important {
-    background-color: color-mix(in srgb, $callout-color-important 8%, $_bg) !important;
+    background-color: mix($callout-color-important, $_bg, 8%) !important;
     border-left-color: $callout-color-important !important;
   }
 
   &.callout-caution {
-    background-color: color-mix(in srgb, $callout-color-caution 8%, $_bg) !important;
+    background-color: mix($callout-color-caution, $_bg, 8%) !important;
     border-left-color: $callout-color-caution !important;
   }
 
