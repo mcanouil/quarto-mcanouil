@@ -914,6 +914,7 @@ main a:not(:where(
   padding: $_space-md;
 
   &:hover {
+    will-change: transform;
     transform: translateY(-4px);
     box-shadow: $_shadow-lg;
   }
@@ -955,6 +956,7 @@ main a:not(:where(
   transition: all $_anim-standard $_easing-standard;
 
   &:hover {
+    will-change: transform;
     transform: translateY(-4px);
     box-shadow: $_shadow-lg;
   }
