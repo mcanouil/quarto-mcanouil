@@ -2523,7 +2523,7 @@ div.sourceCode {
 }
 
 // Responsive table adjustments
-@media (max-width: 991px) {
+@media (max-width: $_breakpoint-lg) {
   .quarto-listing-table {
     font-size: 0.9em;
 
@@ -2893,7 +2893,7 @@ nav#TOC {
 }
 
 // Responsive adjustments
-@media (max-width: 991px) {
+@media (max-width: $_breakpoint-lg) {
   nav#TOC {
     #toc-title {
       font-size: 0.8125rem;
@@ -3344,7 +3344,7 @@ header#title-block-header:has(.mc-style-professional) {
       color: $_fg;
       position: relative;
 
-      @media (max-width: $mc-breakpoint-sm) {
+      @media (max-width: $_breakpoint-sm) {
         font-size: 2rem;
       }
     }
@@ -3357,7 +3357,7 @@ header#title-block-header:has(.mc-style-professional) {
       max-width: 600px;
       position: relative;
 
-      @media (max-width: $mc-breakpoint-sm) {
+      @media (max-width: $_breakpoint-sm) {
         font-size: 1rem;
       }
     }
