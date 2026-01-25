@@ -412,7 +412,7 @@ $mc-breakpoint-sm: 576px !default;
     break-inside: avoid;
 
     // Remove margin when inside a card grid
-    .mc-card-grid > & {
+    .mc-card-grid>& {
       margin: 0;
     }
 
@@ -551,7 +551,7 @@ $mc-breakpoint-sm: 576px !default;
     break-inside: avoid;
 
     // Remove margin when inside a card grid
-    .mc-card-grid > & {
+    .mc-card-grid>& {
       margin: 0;
     }
 
@@ -718,22 +718,15 @@ $mc-breakpoint-sm: 576px !default;
         flex-shrink: 0;
         width: calc(#{$traffic-light-size} * 3 + #{$traffic-light-gap} * 2);
         height: $traffic-light-size;
-        background:
-          radial-gradient(
-            circle at calc(#{$traffic-light-size} / 2) calc(#{$traffic-light-size} / 2),
-            #{$traffic-light-close} calc(#{$traffic-light-size} / 2 - 1px),
-            transparent calc(#{$traffic-light-size} / 2)
-          ),
-          radial-gradient(
-            circle at calc(#{$traffic-light-size} * 1.5 + #{$traffic-light-gap}) calc(#{$traffic-light-size} / 2),
-            #{$traffic-light-minimise} calc(#{$traffic-light-size} / 2 - 1px),
-            transparent calc(#{$traffic-light-size} / 2)
-          ),
-          radial-gradient(
-            circle at calc(#{$traffic-light-size} * 2.5 + #{$traffic-light-gap} * 2) calc(#{$traffic-light-size} / 2),
-            #{$traffic-light-maximise} calc(#{$traffic-light-size} / 2 - 1px),
-            transparent calc(#{$traffic-light-size} / 2)
-          );
+        background: radial-gradient(circle at calc(#{$traffic-light-size} / 2) calc(#{$traffic-light-size} / 2),
+          #{$traffic-light-close} calc(#{$traffic-light-size} / 2 - 1px),
+          transparent calc(#{$traffic-light-size} / 2)),
+        radial-gradient(circle at calc(#{$traffic-light-size} * 1.5 + #{$traffic-light-gap}) calc(#{$traffic-light-size} / 2),
+          #{$traffic-light-minimise} calc(#{$traffic-light-size} / 2 - 1px),
+          transparent calc(#{$traffic-light-size} / 2)),
+        radial-gradient(circle at calc(#{$traffic-light-size} * 2.5 + #{$traffic-light-gap} * 2) calc(#{$traffic-light-size} / 2),
+          #{$traffic-light-maximise} calc(#{$traffic-light-size} / 2 - 1px),
+          transparent calc(#{$traffic-light-size} / 2));
       }
 
       // Filename styling
