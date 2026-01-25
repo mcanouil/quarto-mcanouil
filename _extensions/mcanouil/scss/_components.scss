@@ -719,15 +719,9 @@ $mc-breakpoint-sm: 576px !default;
         flex-shrink: 0;
         width: calc(#{$traffic-light-size} * 3 + #{$traffic-light-gap} * 2);
         height: $traffic-light-size;
-        background: radial-gradient(circle at calc(#{$traffic-light-size} / 2) calc(#{$traffic-light-size} / 2),
-          #{$traffic-light-close} calc(#{$traffic-light-size} / 2 - 1px),
-          transparent calc(#{$traffic-light-size} / 2)),
-        radial-gradient(circle at calc(#{$traffic-light-size} * 1.5 + #{$traffic-light-gap}) calc(#{$traffic-light-size} / 2),
-          #{$traffic-light-minimise} calc(#{$traffic-light-size} / 2 - 1px),
-          transparent calc(#{$traffic-light-size} / 2)),
-        radial-gradient(circle at calc(#{$traffic-light-size} * 2.5 + #{$traffic-light-gap} * 2) calc(#{$traffic-light-size} / 2),
-          #{$traffic-light-maximise} calc(#{$traffic-light-size} / 2 - 1px),
-          transparent calc(#{$traffic-light-size} / 2));
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='12'%3E%3Ccircle cx='6' cy='6' r='5' fill='%23ff5f56'/%3E%3Ccircle cx='24' cy='6' r='5' fill='%23ffbd2e'/%3E%3Ccircle cx='42' cy='6' r='5' fill='%2327c93f'/%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
       }
 
       // Filename styling
