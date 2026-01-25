@@ -66,7 +66,7 @@ function M.get_config(meta)
   }
 
   local ext_config = meta.extensions and meta.extensions.mcanouil
-                     and meta.extensions.mcanouil[SECTION_NAME]
+      and meta.extensions.mcanouil[SECTION_NAME]
   if not ext_config then
     return config
   end

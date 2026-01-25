@@ -878,18 +878,16 @@ img.about-image {
 // ===========================
 
 // Main content links with subtle underline animation
-main a:not(:where(
-  .nav-link,
-  .btn,
-  .about-link,
-  .listing-category,
-  .quarto-grid-link,
-  .code-annotation-anchor,
-  .anchor-section,
-  .anchorjs-link,
-  .toc-action,
-  #quarto-back-to-top
-)):not(:has(img)) {
+main a:not(:where(.nav-link,
+    .btn,
+    .about-link,
+    .listing-category,
+    .quarto-grid-link,
+    .code-annotation-anchor,
+    .anchor-section,
+    .anchorjs-link,
+    .toc-action,
+    #quarto-back-to-top)):not(:has(img)) {
   position: relative;
   text-decoration: underline;
   text-decoration-color: $_link-underline-color;

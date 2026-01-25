@@ -98,7 +98,8 @@ M.render_panel = function(div, config)
     local icon_html = ''
     if attrs.icon then
       local icon_char = html_utils.get_icon(attrs.icon)
-      icon_html = html_utils.bem_span('panel', 'icon', nil, { ['aria-hidden'] = 'true' }, html_utils.escape_html(icon_char)) .. ' '
+      icon_html = html_utils.bem_span('panel', 'icon', nil, { ['aria-hidden'] = 'true' },
+        html_utils.escape_html(icon_char)) .. ' '
     end
     local title_html = html_utils.bem_span('panel', 'title', nil, nil, html_utils.escape_html(attrs.title))
     header_html = html_utils.bem_div('panel', 'header', nil, nil, icon_html .. title_html)
@@ -120,7 +121,8 @@ M.render_panel = function(div, config)
   end
 
   -- Content wrapper
-  table.insert(result, pandoc.RawBlock('html', string.format('<div class="%s">', html_utils.bem_class('panel', 'content'))))
+  table.insert(result,
+    pandoc.RawBlock('html', string.format('<div class="%s">', html_utils.bem_class('panel', 'content'))))
 
   for _, item in ipairs(div.content) do
     table.insert(result, item)
@@ -178,7 +180,8 @@ M.render_executive_summary = function(div, config)
   table.insert(result, pandoc.RawBlock('html', separator_html))
 
   -- Content wrapper
-  table.insert(result, pandoc.RawBlock('html', string.format('<div class="%s">', html_utils.bem_class('executive-summary', 'content'))))
+  table.insert(result,
+    pandoc.RawBlock('html', string.format('<div class="%s">', html_utils.bem_class('executive-summary', 'content'))))
 
   for _, item in ipairs(div.content) do
     table.insert(result, item)
@@ -258,7 +261,8 @@ M.render_card = function(div, config)
 
   -- Footer if present
   if #footer_content > 0 then
-    table.insert(result, pandoc.RawBlock('html', string.format('<div class="%s">', html_utils.bem_class('card', 'footer'))))
+    table.insert(result,
+      pandoc.RawBlock('html', string.format('<div class="%s">', html_utils.bem_class('card', 'footer'))))
     for _, item in ipairs(footer_content) do
       table.insert(result, item)
     end
@@ -323,7 +327,8 @@ M.render_badge = function(span, config)
   local icon_html = ''
   if attrs.icon then
     local icon_char = html_utils.get_icon(attrs.icon)
-    icon_html = html_utils.bem_span('badge', 'icon', nil, { ['aria-hidden'] = 'true' }, html_utils.escape_html(icon_char)) .. ' '
+    icon_html = html_utils.bem_span('badge', 'icon', nil, { ['aria-hidden'] = 'true' }, html_utils.escape_html(icon_char)) ..
+    ' '
   end
 
   local text_html = html_utils.bem_span('badge', 'text', nil, nil, html_utils.escape_html(content))

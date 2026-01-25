@@ -960,6 +960,7 @@ $mc-value-box-height: 100px;
 // ===========================
 
 @media (prefers-reduced-motion: reduce) {
+
   .reveal .social-link,
   .reveal .fragment {
     transition: none;
@@ -971,6 +972,7 @@ $mc-value-box-height: 100px;
 // ===========================
 
 @media (forced-colors: active) {
+
   .reveal .corner-bracket,
   .reveal .callout,
   .reveal .code-with-filename {

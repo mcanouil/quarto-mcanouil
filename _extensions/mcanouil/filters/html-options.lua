@@ -87,7 +87,7 @@ end
 local function Meta(meta)
   -- Convert style string to nested booleans for template use
   -- Default is "professional" if not specified
-  local style_value = 'professional'  -- default
+  local style_value = 'professional' -- default
   if meta['style'] ~= nil then
     style_value = pandoc.utils.stringify(meta['style']):lower()
   end

@@ -147,7 +147,6 @@ function Meta(meta)
         return html_renderers.render_badge(span, FORMAT_CONFIG)
       end
     }
-
   elseif CURRENT_FORMAT == 'typst' then
     load_typst_modules()
 
@@ -258,7 +257,6 @@ local function DivComponents(div)
         return handler(div)
       end
     end
-
   elseif CURRENT_FORMAT == 'typst' then
     -- Typst processing
     for _, class in ipairs(div.classes) do
@@ -304,7 +302,6 @@ function Span(span)
         return handler(span)
       end
     end
-
   elseif CURRENT_FORMAT == 'typst' then
     -- Typst processing
     for _, class in ipairs(span.classes) do

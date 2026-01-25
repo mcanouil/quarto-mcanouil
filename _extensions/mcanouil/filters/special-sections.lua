@@ -47,7 +47,7 @@ end
 
 -- Configuration: Define supported special section types in order of appearance
 -- References appears first, then appendix, then supplementary
-local SPECIAL_SECTION_TYPES = {'references', 'appendix', 'supplementary'}
+local SPECIAL_SECTION_TYPES = { 'references', 'appendix', 'supplementary' }
 
 -- Storage for collected content by section type
 local special_sections = {}
@@ -117,7 +117,7 @@ end
 --- @return pandoc.List Filtered blocks with special section content removed
 function Blocks(blocks)
   local filtered_blocks = pandoc.List()
-  local active_section = nil  -- Track current special section type
+  local active_section = nil -- Track current special section type
   local section_start_level = nil
   local current_blocks = pandoc.List()
 

@@ -169,7 +169,7 @@ local function load_element_mappings(meta)
 
   -- Read configuration from extensions.mcanouil.typst-markdown
   local extension_config = meta.extensions and meta.extensions.mcanouil
-                           and meta.extensions.mcanouil[SECTION_NAME]
+      and meta.extensions.mcanouil[SECTION_NAME]
   if not extension_config then
     return user_mappings
   end
