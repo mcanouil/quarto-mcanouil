@@ -21,7 +21,8 @@ $presentation-font-size-root: 36px !default;
 
 // Derived colours
 $link-color: $body-color !default;
-$text-muted: mix($body-bg, $body-color, 35%) !default;
+// 25% mix achieves ~5.5:1 contrast ratio (WCAG AA compliant)
+$text-muted: mix($body-bg, $body-color, 25%) !default;
 
 // Section slide colours (inverted by default)
 $section-slide-bg: $body-color !default;
@@ -1003,6 +1004,17 @@ $mc-value-box-height: 100px;
 
 .reveal .panel-tabset ul li a:active {
   outline: none;
+}
+
+// ===========================
+// REDUCED MOTION
+// ===========================
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal .social-link,
+  .reveal .fragment {
+    transition: none;
+  }
 }
 
 // ===========================
