@@ -94,6 +94,9 @@ contributes:
     html:
       # Template
       template-partials:
+        - html/partials/title-metadata.html
+        - html/partials/_title-metadata-academic.html
+        - html/partials/_title-metadata-magazine.html
         - html/partials/_title-meta-author.html
       # Theme
       theme:
@@ -112,6 +115,7 @@ contributes:
         body-width: 900px
         margin-width: 300px
       fig-align: center
+      mc-hide-navbar-title: true
       # Table of contents
       toc: true
       toc-depth: 4
@@ -127,6 +131,10 @@ contributes:
         - file: html/scripts/categories-alphabetical.html
         - file: html/scripts/modal-clipboardjs.html
         - file: html/scripts/external-links.html
+      # HTML-specific filters
+      filters:
+        - at: pre-quarto
+          path: filters/html-options.lua
     typst:
       # Document type
       document-type: report

@@ -25,6 +25,7 @@ author:
         city: London
         country: United Kingdom
 date: today
+date-modified: today
 abstract: |
   This document showcases all features of the Mickaël CANOUIL Typst template for Quarto.
   It demonstrates template-specific components including value boxes, info panels, status badges, dividers, progress bars, cards, card grids, executive summaries, and highlighted blocks.
@@ -43,6 +44,7 @@ extensions:
     code-window:
       enabled: true
       auto-filename: true
+mc-magazine-style: true  # Set to true for magazine style, false/omit for academic
 format:
   mcanouil-html:
     output-file: index
@@ -1271,7 +1273,7 @@ title-page: true             # Dedicated title page mode
 #### Margin Section Configuration
 
 **Note**: Margin sections are only displayed in professional style.
-Currently, margin section styling is controlled by internal constants in [margin-section.typ](_extensions/mcanouil/typst/partials/margin-section.typ):
+Currently, margin section styling is controlled by internal constants in `margin-section.typ`:
 
 - `MARGIN-SECTION-REFERENCE-SIZE`: Reference font size for measuring text widths (default: 12pt).
 - `MARGIN-SECTION-FILL-RATIO`: Target fill ratio for vertical constraint; the longest heading occupies at most this percentage of available height (default: 90%).
