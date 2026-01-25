@@ -96,7 +96,7 @@
       width: 100%,
       inset: (left: 2em, right: 2em),
       [
-        #text(weight: "bold", size: 10pt)[#keywords-title] #text(size: 10pt, style: "italic")[#keywords.join(", ")]
+        #text(weight: "bold", size: 10pt)[#keywords-title:] #text(size: 10pt, style: "italic")[#keywords.join(", ")]
       ],
     )
     #v(1em)
