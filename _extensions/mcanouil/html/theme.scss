@@ -396,7 +396,7 @@ td code.sourceCode {
 // Border colour matches the callout type for visual consistency
 
 .callout {
-  // Override Quarto defaults - only left border in callout colour
+  // Override Quarto defaults (!important required to override inline styles)
   border: none !important;
   border-left: 4px solid !important;
   border-radius: 4px !important;
@@ -541,6 +541,7 @@ img.about-image {
       }
     }
 
+    // Override Quarto's column layout on smaller screens (!important for Bootstrap override)
     @media(max-width: $_breakpoint-lg) {
       flex-direction: row !important;
       justify-content: center !important;
@@ -1719,6 +1720,7 @@ body.quarto-about-solana,
 // CODE ENHANCEMENTS
 // ===========================
 
+// Override Quarto/Bootstrap code styling (!important required for specificity)
 code:not(.sourceCode) {
   color: $_fg !important;
   background-color: body-mix(90%) !important;
@@ -3571,6 +3573,7 @@ main {
 // ===========================
 
 // Disable all animations for users who prefer reduced motion
+// Note: !important is intentional here to ensure accessibility overrides all other styles
 @media (prefers-reduced-motion: reduce) {
 
   *,
