@@ -321,9 +321,9 @@ function Image(img)
   return img
 end
 
---- Process CodeBlock elements with filename attribute
---- Delegates to code-window module for format-specific processing.
---- Requires code-window: true in document YAML to enable.
+--- Process CodeBlock elements with filename attribute.
+--- Only handles Typst format here; HTML/Reveal.js is handled by
+--- filters/code-window.lua at post-quarto stage for code-annotation compatibility.
 --- @param block pandoc.CodeBlock Code block element to process
 --- @return pandoc.RawBlock|pandoc.CodeBlock Transformed element or original
 function CodeBlock(block)
@@ -331,8 +331,8 @@ function CodeBlock(block)
     return block
   end
 
-  -- Delegate to code-window module
-  if CODE_WINDOW_CONFIG then
+  -- Only process Typst here; HTML/Reveal.js handled by post-quarto filter
+  if CURRENT_FORMAT == 'typst' and CODE_WINDOW_CONFIG then
     return code_window.process(block, CURRENT_FORMAT, CODE_WINDOW_CONFIG)
   end
 

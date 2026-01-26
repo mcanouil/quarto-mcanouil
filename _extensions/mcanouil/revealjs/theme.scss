@@ -772,7 +772,8 @@ $mc-value-box-height: 100px;
     margin: 0.8em 0;
     border: 1px solid body-mix(50%);
     border-radius: 8px;
-    overflow: hidden;
+    // Use visible overflow to allow annotation elements to extend beyond container
+    overflow: visible;
 
     // Filename header (title bar)
     .code-with-filename-file {
@@ -783,6 +784,9 @@ $mc-value-box-height: 100px;
       display: flex;
       align-items: center;
       min-height: 1.2em;
+      // Clip content to maintain border-radius on title bar
+      border-radius: 8px 8px 0 0;
+      overflow: hidden;
 
       // Traffic light buttons (macOS style) - 50% larger than HTML version
       &::before {
@@ -826,23 +830,16 @@ $mc-value-box-height: 100px;
       margin: 0;
       border-radius: 0;
       border: none;
-      max-height: none;
-      overflow: visible;
     }
 
     div.sourceCode {
       border-top: none;
-
-      pre {
-        max-height: none;
-        overflow: visible;
-      }
     }
 
-    // Ensure code content doesn't get unnecessary scrollbar
+    // Allow code content to scroll
     pre code {
-      max-height: none;
-      overflow: visible;
+      max-height: 400px;
+      overflow: auto;
     }
 
     // Auto-generated filenames display in simulated small caps (uppercase, smaller)
@@ -852,7 +849,39 @@ $mc-value-box-height: 100px;
         font-size: 0.8em;
       }
     }
+
+    // Code block bottom border-radius
+    .code-copy-outer-scaffold {
+      border-radius: 0 0 8px 8px;
+      overflow: hidden;
+    }
   }
+
+  // Line highlight styling for code annotations
+  #code-annotation-line-highlight {
+    margin-left: unset;
+    width: 100%;
+  }
+}
+
+// Hide all scrollbars in Reveal.js presentations
+// This prevents second scrollbar when tippy tooltips appear
+// Uses scrollbar-width for Firefox and ::-webkit-scrollbar for Chrome/Safari
+*:not(pre):not(code) {
+  scrollbar-width: none !important; // Firefox
+  -ms-overflow-style: none !important; // IE/Edge
+
+  &::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+
+// Ensure tippy tooltips appear above all content
+.reveal [data-tippy-root],
+[data-tippy-root] {
+  z-index: 9999 !important;
 }
 
 // ===========================

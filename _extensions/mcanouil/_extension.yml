@@ -138,6 +138,8 @@ contributes:
       filters:
         - at: pre-quarto
           path: filters/html-options.lua
+        - at: post-quarto
+          path: filters/code-window.lua
     typst:
       # Document type
       document-type: report
@@ -280,6 +282,10 @@ contributes:
           code-annotation-fragments: true # Enable annotation fragment navigation
           # Debugging
           debug-borders: false # Show debug borders on slides
+      # Reveal.js-specific filters
+      filters:
+        - at: post-quarto
+          path: filters/code-window.lua
       # Standard Reveal.js options
       transition: slide
       slide-number: c
