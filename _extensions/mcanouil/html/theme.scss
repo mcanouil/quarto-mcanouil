@@ -314,8 +314,27 @@ td code.sourceCode {
   background-color: body-mix(95%);
 }
 
-.code-annotated .code-copy-button {
-  margin-right: 1.5em;
+// Restore consistent vertical padding for code blocks with annotations
+// Quarto removes padding on .code-annotation-code, causing visual inconsistency
+pre.code-annotation-code {
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+}
+
+// Style code annotation markers as interactive buttons
+.code-annotation-anchor {
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+}
+
+// Prevent copy button overlap with code annotation gutter
+.code-copy-outer-scaffold:has(.code-annotated)>.code-copy-button {
+  right: 1.5em;
+  margin-right: 0;
 }
 
 // Code annotation workaround
@@ -324,6 +343,8 @@ td code.sourceCode {
 #code-annotation-line-highlight {
   margin-left: unset;
   width: 100%;
+  // Offset highlight to account for restored vertical padding
+  margin-top: 0.4rem;
 }
 
 #code-annotation-line-highlight-gutter,

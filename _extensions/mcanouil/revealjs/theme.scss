@@ -246,6 +246,19 @@ $mc-value-box-height: 100px;
   border-radius: 3px;
 }
 
+// Style code annotation markers as interactive buttons
+.reveal .code-annotation-anchor {
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+}
+
+// NOTE: Copy button fix is in revealjs-plugin/mcanouil/revealjs-mcanouil.css
+// Theme SCSS rules don't reliably make it into Reveal.js output
+
 // ===========================
 // SECTION SLIDES (Level-1 Headings)
 // ===========================
@@ -861,6 +874,8 @@ $mc-value-box-height: 100px;
   #code-annotation-line-highlight {
     margin-left: unset;
     width: 100%;
+    // Offset highlight to account for restored vertical padding
+    margin-top: 0.4rem;
   }
 }
 

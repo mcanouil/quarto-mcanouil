@@ -69,15 +69,13 @@
 }
 
 /* =========================================================================
-   CODE ANNOTATION ENHANCEMENTS
+   CODE ANNOTATION COPY BUTTON FIX
    ========================================================================= */
 
-.reveal .code-annotation-anchor {
-  cursor: pointer;
-}
-
-.reveal .code-annotation-anchor:hover {
-  opacity: 0.8;
+/* Prevent copy button overlap with code annotation gutter */
+.reveal .code-copy-outer-scaffold:has(.code-annotated) > .code-copy-button {
+  right: 2.5em;
+  margin-right: 0;
 }
 
 /* =========================================================================

@@ -134,6 +134,7 @@ contributes:
         - file: html/scripts/categories-alphabetical.html
         - file: html/scripts/modal-clipboardjs.html
         - file: html/scripts/external-links.html
+        - file: html/scripts/code-annotation-click.html
       # HTML-specific filters
       filters:
         - at: pre-quarto
