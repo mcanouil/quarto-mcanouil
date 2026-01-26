@@ -64,11 +64,14 @@ window.RevealJsMCanouil = function () {
 
   /**
    * Collect subsections (h2 headings) from sibling slides until next section.
+   * Skips duplicated headings (only first occurrence is included) and
+   * headings marked with .unlisted class.
    * @param {Element} sectionSlide - The section slide element.
    * @returns {Array} Array of subsection objects with text and id.
    */
   function collectSubsections(sectionSlide) {
     const subsections = [];
+    const seenTexts = new Set();
     const parent = sectionSlide.parentElement;
 
     if (parent?.tagName === "SECTION") {
@@ -84,10 +87,23 @@ window.RevealJsMCanouil = function () {
 
         if (getDirectH1(sibling)) break;
 
+        // Skip unlisted slides
+        if (sibling.classList.contains("unlisted")) continue;
+
         const h2 = sibling.querySelector("h2");
         if (h2) {
+          // Skip unlisted headings
+          if (h2.classList.contains("unlisted")) continue;
+
+          const text = h2.textContent.trim();
+          const normalisedText = text.toLowerCase();
+
+          // Skip duplicates
+          if (seenTexts.has(normalisedText)) continue;
+          seenTexts.add(normalisedText);
+
           subsections.push({
-            text: h2.textContent,
+            text: text,
             id: sibling.id || "",
           });
         }
@@ -109,10 +125,32 @@ window.RevealJsMCanouil = function () {
           break;
         }
 
+        // Skip unlisted slides
+        if (current.classList.contains("unlisted")) {
+          current = current.nextElementSibling;
+          continue;
+        }
+
         const h2 = current.querySelector("h2");
         if (h2) {
+          // Skip unlisted headings
+          if (h2.classList.contains("unlisted")) {
+            current = current.nextElementSibling;
+            continue;
+          }
+
+          const text = h2.textContent.trim();
+          const normalisedText = text.toLowerCase();
+
+          // Skip duplicates
+          if (seenTexts.has(normalisedText)) {
+            current = current.nextElementSibling;
+            continue;
+          }
+          seenTexts.add(normalisedText);
+
           subsections.push({
-            text: h2.textContent,
+            text: text,
             id: current.id || "",
           });
         }

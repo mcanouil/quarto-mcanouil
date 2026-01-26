@@ -24,6 +24,14 @@ This presentation tests all components of the mcanouil Reveal.js format.
 - [Gradient underlines on headings.]{.fragment fragment-index="4"}
 - [Code blocks and annotations.]{.fragment fragment-index="5"}
 
+## About This Test
+
+Here we go again.
+
+## Hiding From Menu and TOC {.unlisted}
+
+This slide should not appear in the menu or table of contents.
+
 ## Features Being Tested
 
 1. Custom title slide partial.
