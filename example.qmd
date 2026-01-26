@@ -64,7 +64,7 @@ format:
     toc-depth: 3
   mcanouil-html+academic:
     style: academic
-    output-file: index
+    output-file: example-academic.html
     toc: true
     toc-depth: 3
   mcanouil-revealjs+dark:
