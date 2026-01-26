@@ -98,7 +98,8 @@ format:
     output-file: example-light-academic.pdf
     watermark-text: "DEMO"
 format-links:
-  - mcanouil-html
+  - format: mcanouil-html
+    text: "HTML (Professional Style)"
   - format: mcanouil-html+academic
     text: "HTML (Academic Style)"
   - format: mcanouil-revealjs+dark
