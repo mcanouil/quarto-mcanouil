@@ -39,29 +39,6 @@ keywords:
   - Tutorial
 lang: en-GB
 copyright: "© 2026 Mickaël CANOUIL"
-style: professional  # Options: 'professional' (default) or 'academic'
-format:
-  mcanouil-html:
-    output-file: index
-    toc: true
-    toc-depth: 3
-  mcanouil-revealjs:
-    brand-mode: dark
-    scrollable: true
-    smaller: true
-    embed-resources: true
-    output-file: example-revealjs.html
-  mcanouil-typst+dark:
-    brand-mode: dark
-    output-file: example-dark.pdf
-  mcanouil-typst+light:
-    keep-typ: true
-    brand-mode: light
-    output-file: example-light.pdf
-    watermark-text: "DEMO"              # Text watermark content
-    # link-underline: true              # Underline links
-    # link-underline-opacity: 50%       # Underline opacity
-    # link-colour: auto                 # Optional custom link colour
 crossref:
   custom:
     - kind: float                       # Define custom cross-reference type
@@ -79,6 +56,63 @@ references:
     issued: 2024
     title: "An Example Article for Demonstrating Citations"
     type: article-journal
+style: professional  # Options: 'professional' (default) or 'academic'
+format:
+  mcanouil-html:
+    output-file: index
+    toc: true
+    toc-depth: 3
+  mcanouil-html+academic:
+    style: academic
+    output-file: index
+    toc: true
+    toc-depth: 3
+  mcanouil-revealjs+dark:
+    brand-mode: dark
+    scrollable: true
+    smaller: true
+    embed-resources: true
+    output-file: example-revealjs-dark.html
+  mcanouil-revealjs+light:
+    brand-mode: light
+    scrollable: true
+    smaller: true
+    embed-resources: true
+    output-file: example-revealjs-light.html
+  mcanouil-typst+dark+pro:
+    brand-mode: dark
+    output-file: example-dark-professional.pdf
+    watermark-text: "DEMO"  
+  mcanouil-typst+light+pro:
+    brand-mode: light
+    output-file: example-light-professional.pdf
+    watermark-text: "DEMO"
+  mcanouil-typst+dark+aca:
+    style: academic
+    brand-mode: dark
+    output-file: example-dark-academic.pdf
+    watermark-text: "DEMO"  
+  mcanouil-typst+light+aca:
+    style: academic
+    brand-mode: light
+    output-file: example-light-academic.pdf
+    watermark-text: "DEMO"
+format-links:
+  - mcanouil-html
+  - format: mcanouil-html+academic
+    text: "HTML (Academic Style)"
+  - format: mcanouil-revealjs+dark
+    text: "Reveal.js (Dark Mode)"
+  - format: mcanouil-revealjs+light
+  - text: "Reveal.js (Light Mode)"
+    format: mcanouil-typst+dark+pro
+    text: "PDF (Dark Professional)"
+  - format: mcanouil-typst+light+pro
+    text: "PDF (Light Professional)"
+  - format: mcanouil-typst+dark+aca
+    text: "PDF (Dark Academic)"
+  - format: mcanouil-typst+light+aca
+    text: "PDF (Light Academic)"
 ---
 
 ## Introduction {#sec-intro}
