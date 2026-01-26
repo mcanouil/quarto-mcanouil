@@ -104,8 +104,8 @@ format-links:
   - format: mcanouil-revealjs+dark
     text: "Reveal.js (Dark Mode)"
   - format: mcanouil-revealjs+light
-  - text: "Reveal.js (Light Mode)"
-    format: mcanouil-typst+dark+pro
+    text: "Reveal.js (Light Mode)"
+  - format: mcanouil-typst+dark+pro
     text: "PDF (Dark Professional)"
   - format: mcanouil-typst+light+pro
     text: "PDF (Light Professional)"
