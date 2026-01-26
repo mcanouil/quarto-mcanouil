@@ -65,6 +65,7 @@ format:
   mcanouil-html+academic:
     style: academic
     output-file: example-academic.html
+    embed-resources: true
     toc: true
     toc-depth: 3
   mcanouil-revealjs+dark:
@@ -99,23 +100,39 @@ format:
     watermark-text: "DEMO"
 format-links:
   - mcanouil-html
-  # - format: mcanouil-html+academic
-  #   text: "HTML (Academic Style)"
+  - format: mcanouil-html+academic
+    text: "HTML (Academic Style)"
+    target: _blank
+    rel: noopener noreferrer
   - format: mcanouil-revealjs+dark
     text: "Reveal.js (Dark Mode)"
+    target: _blank
+    rel: noopener noreferrer
   - format: mcanouil-revealjs+light
     text: "Reveal.js (Light Mode)"
+    target: _blank
+    rel: noopener noreferrer
   - format: mcanouil-typst+dark+pro
     text: "PDF (Dark Professional)"
+    target: _blank
+    rel: noopener noreferrer
   - format: mcanouil-typst+light+pro
     text: "PDF (Light Professional)"
+    target: _blank
+    rel: noopener noreferrer
   - format: mcanouil-typst+dark+aca
     text: "PDF (Dark Academic)"
+    target: _blank
+    rel: noopener noreferrer
   - format: mcanouil-typst+light+aca
     text: "PDF (Light Academic)"
+    target: _blank
+    rel: noopener noreferrer
 other-links:
   - text: "HTML (Academic Style)"
     href: example-academic.html
+    target: _blank
+    rel: noopener noreferrer
 ---
 
 ## Introduction {#sec-intro}
