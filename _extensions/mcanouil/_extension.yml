@@ -59,7 +59,7 @@ contributes:
           attributes:
             corresponding: true
           affiliations:
-            - name: Independent Consultant
+            - name: Independent Contractor
               city: Lille
               country: France
       copyright: "© 2026 Mickaël CANOUIL"

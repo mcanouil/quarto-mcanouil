@@ -12,7 +12,7 @@ author:
     attributes:
       corresponding: true
     affiliations:
-      - name: Independent Consultant
+      - name: Independent Contractor
         city: Lille
         country: France
   - name:
