@@ -22,7 +22,9 @@ end
 -- MODULES
 -- ============================================================================
 
-local utils = require('_modules.utils')
+local utils = require(
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+)
 
 -- ============================================================================
 -- CSS TEMPLATES
