@@ -2,16 +2,10 @@ name: RevealJsMCanouil
 script: revealjs-mcanouil.js
 stylesheet: revealjs-mcanouil.css
 config:
-  # Nested namespace (canonical)
-  mcanouil-revealjs:
-    section-outline: true
-    date-superscript: true
-    favicon-from-logo: true
-    menu-logo-visibility: true
-    debug-borders: false
-  # Top-level aliases (for convenience - users can specify directly under format)
-  section-outline: true
-  date-superscript: true
-  favicon-from-logo: true
-  menu-logo-visibility: true
-  debug-borders: false
+  extensions:
+    mcanouil:
+      section-outline: true
+      date-superscript: true
+      favicon-from-logo: true
+      hide-title-slide-chrome: true
+      debug-borders: false

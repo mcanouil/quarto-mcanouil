@@ -2,10 +2,10 @@
 title: "Reveal.js Format Test"
 subtitle: "Comprehensive Component Testing"
 format:
-  mcanouil-revealjs: default
-extensions:
-  mcanouil:
-    debug-borders: false
+  mcanouil-revealjs:
+    extensions:
+      mcanouil:
+        debug-borders: true
 engine: knitr
 ---
 

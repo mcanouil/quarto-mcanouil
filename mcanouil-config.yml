@@ -1,0 +1,11 @@
+extensions:
+  mcanouil:
+    # Reveal.js
+    section-outline: true # Show subsection outline on section slides
+    date-superscript: true # Format ordinal dates (1st, 2nd, 3rd)
+    hide-title-slide-chrome: true # Hide menu/logo/footer on title slide
+    favicon-from-logo: true # Generate favicon from slide logo
+    code-annotation-fragments: true # Enable annotation fragment navigation
+    debug-borders: false # Show debug borders on slides
+    # HTML
+    hide-navbar-title: true

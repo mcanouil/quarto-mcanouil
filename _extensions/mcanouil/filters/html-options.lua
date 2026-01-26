@@ -7,7 +7,7 @@
 --- @description Processes YAML options for HTML format styling.
 --- Supports:
 ---   - style: 'professional' or 'academic' (converts to style.professional/style.academic booleans)
----   - mc-hide-navbar-title: hides navbar brand/title
+---   - extensions.mcanouil.hide-navbar-title: hides navbar brand/title
 
 -- ============================================================================
 -- FORMAT CHECK
@@ -19,41 +19,23 @@ if not quarto.doc.is_format('html') then
 end
 
 -- ============================================================================
+-- MODULES
+-- ============================================================================
+
+local utils = require('_modules.utils')
+
+-- ============================================================================
 -- CSS TEMPLATES
 -- ============================================================================
 
 local CSS_HIDE_NAVBAR_TITLE = [[
 <style>
-/* mc-hide-navbar-title: Hide navbar brand/title */
+/* extensions.mcanouil.hide-navbar-title: Hide navbar brand/title */
 a.navbar-brand {
   display: none;
 }
 </style>
 ]]
-
--- ============================================================================
--- HELPER FUNCTIONS
--- ============================================================================
-
---- Get boolean value from metadata
---- @param meta pandoc.Meta Document metadata
---- @param key string Metadata key to read
---- @return boolean True if metadata value is truthy
-local function get_bool_option(meta, key)
-  if meta[key] == nil then
-    return false
-  end
-  local value = meta[key]
-  if type(value) == 'boolean' then
-    return value
-  end
-  if pandoc.utils.type(value) == 'boolean' then
-    return value
-  end
-  -- Handle pandoc MetaInlines/MetaString
-  local str = pandoc.utils.stringify(value):lower()
-  return str == 'true' or str == 'yes' or str == '1'
-end
 
 -- ============================================================================
 -- FILTER FUNCTIONS
@@ -76,10 +58,10 @@ local function Meta(meta)
     academic = style_value == 'academic'
   })
 
-  -- Check mc-hide-navbar-title option
-  if get_bool_option(meta, 'mc-hide-navbar-title') then
+  -- Check extensions.mcanouil.hide-navbar-title option
+  if utils.get_mcanouil_config(meta, 'hide-navbar-title') then
     quarto.doc.add_html_dependency({
-      name = 'mc-hide-navbar-title',
+      name = 'hide-navbar-title',
       version = '1.0.0',
       head = CSS_HIDE_NAVBAR_TITLE
     })
