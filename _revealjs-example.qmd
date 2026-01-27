@@ -32,6 +32,10 @@ Here we go again.
 
 This slide should not appear in the menu or table of contents.
 
+## Links to [quarto.org](https://quarto.org)
+
+See [quarto.org](https://quarto.org) for more information.
+
 ## Features Being Tested
 
 1. Custom title slide partial.

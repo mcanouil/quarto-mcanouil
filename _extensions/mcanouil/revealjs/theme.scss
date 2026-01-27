@@ -37,6 +37,15 @@ $text-muted: mix($body-bg, $body-color, 25%) !default;
 $section-slide-bg: $body-color !default;
 $section-slide-fg: $body-bg !default;
 
+// Link style tokens (matching HTML theme)
+$_link-transition-duration: 0.3s;
+$_link-transition-timing: ease;
+$_link-transition: all $_link-transition-duration $_link-transition-timing;
+$_link-underline-color: rgba($body-color, 0.3);
+$_link-underline-color-hover: $body-color;
+$_link-underline-thickness: 1px;
+$_link-underline-thickness-hover: 2px;
+
 /*-- scss:functions --*/
 
 // Helper function to mix background and foreground colours
@@ -199,9 +208,30 @@ $mc-value-box-height: 100px;
     outline-offset: 2px;
   }
 
-  // Underline links in paragraphs for better visibility
-  p > a {
+  // Animated underline for content links (matching HTML theme)
+  // Excludes navigation, buttons, and special link types
+  p > a,
+  li > a,
+  td > a,
+  h1 > a,
+  h2 > a,
+  h3 > a,
+  h4 > a,
+  h5 > a,
+  h6 > a {
+    position: relative;
+    color: inherit;
+    font: inherit;
     text-decoration: underline;
+    text-decoration-color: $_link-underline-color;
+    text-decoration-thickness: $_link-underline-thickness;
+    text-underline-offset: 2px;
+    transition: $_link-transition;
+
+    &:hover {
+      text-decoration-color: $_link-underline-color-hover;
+      text-decoration-thickness: $_link-underline-thickness-hover;
+    }
   }
 }
 
