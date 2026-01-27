@@ -893,12 +893,6 @@ $mc-value-box-height: 100px;
   }
 }
 
-// Ensure tippy tooltips appear above all content
-.reveal [data-tippy-root],
-[data-tippy-root] {
-  z-index: 9999 !important;
-}
-
 // ===========================
 // CALLOUT STYLING
 // ===========================
