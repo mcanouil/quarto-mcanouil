@@ -198,6 +198,11 @@ $mc-value-box-height: 100px;
     outline: 2px solid $body-color;
     outline-offset: 2px;
   }
+
+  // Underline links in paragraphs for better visibility
+  p > a {
+    text-decoration: underline;
+  }
 }
 
 // ===========================
