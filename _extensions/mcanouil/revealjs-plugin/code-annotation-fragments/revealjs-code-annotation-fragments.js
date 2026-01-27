@@ -95,6 +95,22 @@ window.RevealJsCodeAnnotationFragments = function () {
   }
 
   /**
+   * Patch all annotation tooltips to append to their slide.
+   * This prevents overflow clipping from inner containers.
+   */
+  function patchAnnotationTooltips() {
+    const anchors = document.querySelectorAll(".code-annotation-anchor");
+    for (const anchor of anchors) {
+      if (anchor._tippy) {
+        const slide = anchor.closest("section");
+        if (slide) {
+          anchor._tippy.setProps({ appendTo: slide });
+        }
+      }
+    }
+  }
+
+  /**
    * Show annotation tooltip for a specific anchor.
    * @param {string} targetCell - The target cell ID.
    * @param {string} targetAnnotation - The annotation number.
@@ -114,8 +130,16 @@ window.RevealJsCodeAnnotationFragments = function () {
     if (!anchor) return;
 
     if (anchor._tippy) {
-      anchor._tippy.popperInstance?.update();
+      // Append to slide to avoid overflow clipping from inner containers
+      const slide = anchor.closest("section");
+      if (slide) {
+        anchor._tippy.setProps({ appendTo: slide });
+      }
       anchor._tippy.show();
+      // Update position after showing (popper instance exists only after show)
+      requestAnimationFrame(() => {
+        anchor._tippy?.popperInstance?.update();
+      });
     } else {
       anchor.click();
     }
@@ -329,6 +353,10 @@ window.RevealJsCodeAnnotationFragments = function () {
 
     init: function (deck) {
       const config = deck.getConfig();
+
+      // Always patch tooltips to avoid overflow clipping
+      deck.on("ready", patchAnnotationTooltips);
+      deck.on("slidechanged", patchAnnotationTooltips);
 
       if (!getEnabled(config)) return;
 
