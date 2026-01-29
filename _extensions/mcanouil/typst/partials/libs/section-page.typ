@@ -357,8 +357,9 @@
       #set text(size: 0pt)
       #it
     ]
-  ]
 
-  // Reset section page state
-  section-page-state.update(false)
+    // Reset section page state inside the page call
+    // so the next page's background context sees false
+    #section-page-state.update(false)
+  ]
 }
