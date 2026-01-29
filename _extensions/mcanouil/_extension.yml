@@ -20,6 +20,8 @@ contributes:
         debug-borders: false # Show debug borders on slides
         # HTML
         hide-navbar-title: true
+        # Grid background
+        grid-background: false
     website:
       favicon: logos/logo-light-path.svg
       back-to-top-navigation: true
@@ -90,11 +92,17 @@ contributes:
         - at: pre-ast
           path: filters/panel-tabset.lua
         - at: pre-quarto
+          path: filters/grid-background.lua
+        - at: pre-quarto
           path: filters/components.lua
         - at: pre-quarto
           path: filters/math-alt-text.lua
         - at: post-render
           path: filters/normalise-extension-paths.lua
+      extensions:
+        mcanouil:
+          # Grid background
+          grid-background: true
     html:
       # Template
       template-partials:
@@ -283,6 +291,7 @@ contributes:
           code-annotation-fragments: true # Enable annotation fragment navigation
           # Debugging
           debug-borders: false # Show debug borders on slides
+          grid-background: true
       # Reveal.js-specific filters
       filters:
         - at: post-quarto
