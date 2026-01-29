@@ -91,6 +91,19 @@ end
 -- FORMAT-SPECIFIC PROCESSORS
 -- ============================================================================
 
+--- Count the longest run of consecutive backtick characters in a string.
+--- @param s string The string to scan
+--- @return number The length of the longest consecutive backtick run (0 if none)
+local function max_consecutive_backticks(s)
+  local max_len = 0
+  for run in s:gmatch('`+') do
+    if #run > max_len then
+      max_len = #run
+    end
+  end
+  return max_len
+end
+
 --- Process CodeBlock for Typst format.
 --- Wraps code block with Typst wrapper function that sets state for show rules.
 --- Passes 'auto: true' when filename is auto-generated for smallcaps styling.
@@ -114,13 +127,18 @@ function M.process_typst(block, config)
   end
 
   local code_content = block.text
+  local fence_len = math.max(3, max_consecutive_backticks(code_content) + 1)
+  local fence = string.rep('`', fence_len)
+
   local typst_code = string.format(
-    '#%s(filename: "%s", is-auto: %s)[```%s\n%s\n```]',
+    '#%s(filename: "%s", is-auto: %s)[%s%s\n%s\n%s]',
     config.typst_wrapper,
     filename:gsub('"', '\\"'),
     is_auto and 'true' or 'false',
+    fence,
     lang,
-    code_content
+    code_content,
+    fence
   )
 
   return pandoc.RawBlock('typst', typst_code)
