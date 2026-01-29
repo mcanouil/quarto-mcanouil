@@ -26,8 +26,6 @@ The extension contributes brand theming that affects:
 - Layout and styling
 - Visual identity elements
 
-**Note:** A `_quarto.yml` file is required at the project root for the brand configuration to take effect.
-
 ## Example
 
 Here is the source code for a minimal example: [example.qmd](example.qmd).

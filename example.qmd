@@ -1,5 +1,5 @@
 ---
-title: "Mickaël CANOUIL Typst Template"
+title: "Mickaël CANOUIL Template"
 subtitle: "Complete Guide"
 author:
   - name:
@@ -27,9 +27,9 @@ author:
 date: today
 date-modified: today
 abstract: |
-  This document showcases all features of the Mickaël CANOUIL Typst template for Quarto.
+  This document showcases all features of the Mickaël CANOUIL template for Quarto, spanning HTML, Typst (PDF), and Reveal.js (presentations) formats.
   It demonstrates template-specific components including value boxes, info panels, status badges, dividers, progress bars, cards, card grids, executive summaries, and highlighted blocks.
-  Additionally, it covers standard Quarto features such as figures, tables, mathematical notation, callouts, code blocks, and cross-references.
+  Additionally, it covers standard Quarto features such as figures, tables, mathematical notation, callouts, code blocks, code annotations, mermaid diagrams, and cross-references.
   Use this document as both a learning resource and a quick reference guide for all available template capabilities.
 keywords:
   - Quarto
@@ -137,7 +137,8 @@ other-links:
 
 ## Introduction {#sec-intro}
 
-This document showcases all features of the Mickaël CANOUIL Typst template for Quarto.
+This document showcases all features of the Mickaël CANOUIL template for Quarto.
+It covers HTML, Typst (PDF), and Reveal.js (presentations) formats.
 It serves as both an educational resource and a quick reference guide.
 
 ::: {.highlight}
@@ -147,12 +148,12 @@ Each section includes working examples you can copy and adapt for your own docum
 
 ### Document Organisation
 
-This demonstration is organised into six main sections:
+This demonstration is organised into five main sections:
 
-1. **Template-Specific Components** (@sec-components): Value boxes, panels, badges, dividers, progress bars, card grids, and executive summaries.
-2. **Quarto Features** (@sec-quarto): Figures, tables, mathematics, callouts, and code blocks.
+1. **Template-Specific Components** (@sec-components): Value boxes, panels, badges, dividers, progress bars, card grids, executive summaries, grid background, mermaid diagrams, and code annotations.
+2. **Quarto Features** (@sec-quarto): Figures, tables, mathematics, callouts, tabsets, and code blocks.
 3. **Typography and Layout** (@sec-typography): Headings, lists, quotations, asides, and layout features.
-4. **Advanced Features** (@sec-advanced): Footnotes, citations, custom cross-references, and special sections.
+4. **Advanced Features** (@sec-advanced): Footnotes, citations, custom cross-references, document types, Reveal.js options, and special sections.
 5. **Conclusion** (@sec-conclusion): Summary of all features covered.
 
 Cross-references work throughout this document.
@@ -318,6 +319,11 @@ Badges support optional icons using any UTF-8 character or emoji:
 Combine multiple badges to provide comprehensive status information:
 
 Document Status: [Active]{.badge colour="success"} [High Priority]{.badge colour="warning"} [Review Required]{.badge colour="info"}
+
+**Badge Syntax:**
+
+- **Span syntax** (all formats): `[Text]{.badge colour="success" icon="✓"}`.
+- **Shortcode** (HTML and Reveal.js only): `{{</* badge text="Text" colour="success" icon="✓" */>}}`.
 
 **Badge Parameters:**
 
@@ -759,8 +765,8 @@ Variable names like `my_variable`, function calls like `calculate_mean()`, and c
 
 #### Code Windows
 
-When `extensions.code-window.enabled: true` is set, code blocks with a `filename` attribute display a macOS-style window header.
-Auto-generated filenames from language names use small-caps styling.
+When `extensions.mcanouil.code-window.enabled: true` is set (the default), code blocks with a `filename` attribute display a macOS-style window header.
+With `extensions.mcanouil.code-window.auto-filename: true` (the default), code blocks without explicit filenames automatically show the language name in small-caps styling.
 
 ```{.python filename="fibonacci.py"}
 def fibonacci(n: int) -> int:
@@ -849,6 +855,73 @@ else
     echo "Backup failed" >&2
     exit 1
 fi
+```
+
+### Grid Background {#sec-grid-background}
+
+The template supports a subtle grid background overlay for HTML and Reveal.js formats.
+This is controlled via the `extensions.mcanouil.grid-background` option.
+
+**YAML Configuration:**
+
+```yaml
+extensions:
+  mcanouil:
+    grid-background: true  # Enable grid background (default: false)
+```
+
+When enabled, a faint grid pattern appears behind all content.
+The grid uses a 50px spacing with a colour derived from the foreground and background colours.
+
+**Format Availability:**
+
+- **HTML**: Applied to the page body.
+- **Reveal.js**: Applied to slide backgrounds via a pseudo-element overlay.
+- **Typst**: Not available (PDF format).
+
+### Mermaid Diagrams {#sec-mermaid}
+
+The template supports Mermaid diagrams with automatic dark theme styling.
+
+```{mermaid}
+%%| fig-cap: "A simple flowchart demonstrating Mermaid diagram support."
+%%| label: fig-mermaid
+flowchart LR
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Action A]
+    B -->|No| D[Action B]
+    C --> E[End]
+    D --> E
+```
+
+See @fig-mermaid for the rendered diagram.
+
+### Code Annotations {#sec-annotations}
+
+Code annotations allow readers to explore code explanations interactively.
+In Reveal.js, the `code-annotation-fragments` plugin enables fragment-based navigation through annotations.
+
+```python
+def calculate_area(radius: float) -> float: # <1>
+    """Calculate the area of a circle.""" # <2>
+    import math # <3>
+    return math.pi * radius ** 2 # <4>
+```
+1. Function signature with type hints for input and output.
+2. Docstring describing the function purpose.
+3. Import the `math` module for access to `pi`.
+4. Apply the area formula: A = pi * r^2.
+
+**Configuration:**
+
+```yaml
+# Enable code annotations (set in YAML front matter)
+code-annotations: select  # Options: select, hover, none
+
+# Reveal.js fragment navigation for annotations
+extensions:
+  mcanouil:
+    code-annotation-fragments: true
 ```
 
 ## Typography and Layout {#sec-typography}
@@ -998,33 +1071,40 @@ This document includes comprehensive cross-references throughout:
 
 **Sections:**
 
-- Introduction: @sec-intro
-- Template Components: @sec-components
-- Value Boxes: @sec-value-boxes
-- Section Pages: @sec-section-pages
-- Figures: @sec-figures
-- Tables: @sec-tables
-- Mathematics: @sec-maths
-- Callouts: @sec-callouts
+- Introduction: @sec-intro.
+- Template Components: @sec-components.
+- Value Boxes: @sec-value-boxes.
+- Grid Background: @sec-grid-background.
+- Mermaid Diagrams: @sec-mermaid.
+- Code Annotations: @sec-annotations.
+- Section Pages: @sec-section-pages.
+- Figures: @sec-figures.
+- Tables: @sec-tables.
+- Mathematics: @sec-maths.
+- Callouts: @sec-callouts.
+- Document Types: @sec-document-types.
+- Reveal.js Options: @sec-revealjs-options.
+- Closing Slide: @sec-closing-slide.
 
 **Figures:**
 
-- Simple figure: @fig-example
-- Wide figure: @fig-wide
-- Multiple subfigures: @fig-multiple (specifically @fig-sub1 and @fig-sub2)
+- Simple figure: @fig-example.
+- Wide figure: @fig-wide.
+- Mermaid diagram: @fig-mermaid.
+- Multiple subfigures: @fig-multiple (specifically @fig-sub1 and @fig-sub2).
 
 **Tables:**
 
-- Simple table: @tbl-simple
-- Aligned table: @tbl-aligned
-- Colour scheme table: @tbl-colours
+- Simple table: @tbl-simple.
+- Aligned table: @tbl-aligned.
+- Colour scheme table: @tbl-colours.
 
 **Equations:**
 
-- Einstein's equation: @eq-einstein
-- Quadratic formula: @eq-quadratic
-- Maxwell's equations: @eq-maxwell
-- Matrix equation: @eq-matrix
+- Einstein's equation: @eq-einstein.
+- Quadratic formula: @eq-quadratic.
+- Maxwell's equations: @eq-maxwell.
+- Matrix equation: @eq-matrix.
 
 ## Advanced Features {#sec-advanced}
 
@@ -1063,17 +1143,73 @@ Example text demonstrating custom cross-reference types.
 
 Reference custom floats using @txt-example in your text.
 
+### Document Types (Typst) {#sec-document-types}
+
+The Typst format supports multiple document types via the `document-type` parameter.
+Each type provides a distinct layout and structure suited to its purpose.
+
+**Available Document Types:**
+
+- `report` (default): Standard report layout with title page, table of contents, and section pages.
+- `invoice`: Invoice layout for billing documents.
+- `letter`: Formal letter layout.
+- `cv`: Curriculum vitae layout.
+
+**YAML Configuration:**
+
+```yaml
+format:
+  mcanouil-typst:
+    document-type: report  # Options: report, invoice, letter, cv
+```
+
+### Reveal.js Closing Slide {#sec-closing-slide}
+
+The Reveal.js format supports a custom closing slide with a photo and social links.
+
+**YAML Configuration:**
+
+```yaml
+format:
+  mcanouil-revealjs:
+    closing-slide:
+      photo: "https://github.com/mcanouil.png"
+      social:
+        website: https://mickael.canouil.fr
+        github: mcanouil
+        linkedin: MickaelCanouil
+        bluesky: mickael.canouil.fr
+        mastodon: https://fosstodon.org/%40MickaelCanouil
+```
+
+The closing slide displays the author photo alongside social media links, providing a professional end to presentations.
+
+### Reveal.js Extension Options {#sec-revealjs-options}
+
+The Reveal.js format supports several extension-specific options under the `extensions.mcanouil` namespace:
+
+```yaml
+extensions:
+  mcanouil:
+    section-outline: true           # Show subsection outline on section slides.
+    date-superscript: true          # Format ordinal dates (1st, 2nd, 3rd).
+    hide-title-slide-chrome: true   # Hide menu/logo/footer on title slide.
+    favicon-from-logo: true         # Generate favicon from slide logo.
+    code-annotation-fragments: true # Enable annotation fragment navigation.
+    debug-borders: false            # Show debug borders on slides.
+```
+
 ### Special Sections {#sec-special}
 
 Special sections (appendix and supplementary) automatically relocate to the document end with customised numbering.
 
 ## Conclusion {#sec-conclusion}
 
-This demonstration showcases the complete feature set of the Mickaël CANOUIL Typst template.
+This demonstration showcases the complete feature set of the Mickaël CANOUIL template across HTML, Typst (PDF), and Reveal.js (presentations) formats.
 
 ### Template-Specific Components
 
-The template provides nine specialised components:
+The template provides specialised components:
 
 1. **Value Boxes** (@sec-value-boxes): Display metrics, KPIs, and statistics with icons and colours.
 2. **Info Panels** (@sec-panels): Highlight content with eight style variants (subtle, emphasis, accent, outline, info, success, warning, danger).
@@ -1084,6 +1220,9 @@ The template provides nine specialised components:
 7. **Card Grids** (@sec-cards): Present multiple cards in flexible grid layouts.
 8. **Executive Summaries** (@sec-exec-summary): Create prominent summary blocks for professional reports.
 9. **Highlighted Blocks** (@sec-layout): Draw attention to key information with subtle background emphasis.
+10. **Grid Background** (@sec-grid-background): Subtle grid overlay for HTML and Reveal.js formats.
+11. **Code Annotations** (@sec-annotations): Interactive code explanations with fragment navigation.
+12. **Mermaid Diagrams** (@sec-mermaid): Flowcharts and diagrams with automatic dark theme styling.
 
 ### Quarto Features
 
@@ -1093,6 +1232,7 @@ Standard Quarto features work seamlessly with enhanced styling:
 - **Tables** (@sec-tables): Simple tables, column alignment, and complex data tables.
 - **Mathematics** (@sec-maths): Inline expressions and display equations with cross-references.
 - **Callouts** (@sec-callouts): Five callout types (note, tip, important, warning, caution).
+- **Tabsets** (@sec-tabsets): Panel tabsets with automatic Typst conversion to headings.
 - **Code Blocks** (@sec-code): Syntax highlighting for Python, R, Bash, inline code, and macOS-style code windows.
 
 ### Typography and Layout
@@ -1104,6 +1244,13 @@ Comprehensive typography and layout features:
 - **Quotations** (@sec-quotes): Block quotes and asides with proper styling.
 - **Layout Features** (@sec-layout): Multi-column layouts and highlighted blocks.
 - **Cross-References** (@sec-refs): Seamless referencing throughout the document.
+
+### Advanced Features
+
+- **Document Types** (@sec-document-types): Report, invoice, letter, and CV layouts for Typst.
+- **Closing Slide** (@sec-closing-slide): Custom closing slide with photo and social links for Reveal.js.
+- **Reveal.js Options** (@sec-revealjs-options): Section outlines, date formatting, and more.
+- **Special Sections** (@sec-special): Auto-relocating appendix and supplementary sections.
 
 ### Customisation Options
 
@@ -1132,12 +1279,10 @@ The template is designed with PDF accessibility (PDF/UA-1) compliance in mind:
 
 To use these features in your own documents:
 
-1. Install the template extension: `quarto add mcanouil/quarto-mcanouil`
-2. Set the format in YAML front matter: `format: mcanouil-typst`
+1. Install the template extension: `quarto add mcanouil/quarto-mcanouil`.
+2. Set the format in YAML front matter: `format: mcanouil-html`, `format: mcanouil-typst`, or `format: mcanouil-revealjs`.
 3. Customise template parameters as demonstrated in this document's YAML.
 4. Copy and adapt examples from each section as needed.
-
-For additional examples and the complete source code, refer to the `template.qmd` file in the extension repository.
 
 ## References {.references}
 
@@ -1180,11 +1325,14 @@ This section documents all available YAML front matter options for customising t
 #### Style Options
 
 ```yaml
-# Header and footer style
-header-footer-style: "professional"  # "academic" or "professional"
+# Document style
+style: "professional"  # "academic" or "professional"
 
 # Colour mode
 brand-mode: "light"  # "light" or "dark"
+
+# Document type (Typst only)
+document-type: "report"  # "report", "invoice", "letter", or "cv"
 
 # Override default colours (optional)
 colour-background: "#FFFFFF"  # Hex colour code
@@ -1309,13 +1457,48 @@ link-colour: null            # Override link colour (null uses foreground)
 
 #### Professional Style Options
 
-Additional options available when `header-footer-style: "professional"`:
+Additional options available when `style: "professional"`:
 
 ```yaml
 institute: "Company Name"    # Footer left content (defaults to first author affiliation)
 copyright: "© 2026 Company"  # Footer right content
 license: "MIT License"       # Licence info (combined with copyright if both present)
 title-page: true             # Dedicated title page mode
+```
+
+#### Extensions Configuration
+
+```yaml
+extensions:
+  mcanouil:
+    # Grid background (HTML and Reveal.js)
+    grid-background: false           # Subtle grid overlay (default: false)
+    # Code window styling (all formats)
+    code-window:
+      enabled: true                  # macOS-style code windows (default: true)
+      auto-filename: true            # Auto-show language name (default: true)
+    # HTML only
+    hide-navbar-title: true          # Hide title from navbar (default: true)
+    # Reveal.js only
+    section-outline: true            # Subsection outline on section slides
+    date-superscript: true           # Ordinal date formatting (1st, 2nd)
+    hide-title-slide-chrome: true    # Hide chrome on title slide
+    favicon-from-logo: true          # Generate favicon from logo
+    code-annotation-fragments: true  # Fragment navigation for annotations
+    debug-borders: false             # Debug borders on slides
+```
+
+#### Closing Slide (Reveal.js)
+
+```yaml
+closing-slide:
+  photo: "https://example.com/photo.png"
+  social:
+    website: https://example.com
+    github: username
+    linkedin: username
+    bluesky: handle.bsky.social
+    mastodon: https://instance/@user
 ```
 
 #### Margin Section Configuration
@@ -1350,7 +1533,8 @@ If an option is not specified, the following defaults apply:
 
 | Option                    | Default      | Description                             |
 |---------------------------|--------------|-----------------------------------------|
-| `header-footer-style`     | `"academic"` | Academic style with simple header/footer |
+| `style`                   | `"academic"` | Academic style with simple header/footer |
+| `document-type`           | `"report"`   | Document layout type (Typst only)       |
 | `brand-mode`              | `"light"`    | Light colour scheme                     |
 | `show-corner-brackets`    | `true`       | Decorative brackets enabled             |
 | `show-logo`               | `true`       | Logo displayed when provided            |
