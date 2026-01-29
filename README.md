@@ -1,40 +1,84 @@
 # Mickaël Canouil's Brand Extension For Quarto
 
-A Quarto extension that provides brand theming and styling for documents (HTML, Typst) and presentations (Reveal.js).
+A Quarto extension providing branded theming, custom components, and professional styling for HTML documents, Typst (PDF) reports, and Reveal.js presentations.
 
 ## Installation
 
 ```bash
-quarto add mcanouil/quarto-mcanouil
+quarto add mcanouil/quarto-mcanouil@0.9.0
 ```
 
 This will install the extension under the `_extensions` subdirectory.
-If you're using version control, you will want to check in this directory.
+If you are using version control, you will want to check in this directory.
 
-## Usage
+## Project Type
 
-This extension applies Mickaël Canouil's brand theming to Quarto documents using a brand configuration file.
+The extension contributes a **`mcanouil`** project type, which provides a pre-configured Quarto website with branded navbar, sidebar, footer, favicon, and `mcanouil-html` as the default format.
 
-To use this extension, you need to:
+```yaml
+# _quarto.yml
+project:
+  type: mcanouil
+```
 
-1. Ensure your project has a `_quarto.yml` file (required for the brand configuration to take effect)
-2. The extension will automatically apply the branding based on the `brand.yml` file
+## Formats
 
-The extension contributes brand theming that affects:
+The extension provides three format families:
 
-- Colours and typography
-- Layout and styling
-- Visual identity elements
+- **`mcanouil-html`**: Styled HTML documents with professional or academic layouts.
+- **`mcanouil-typst`**: Typst-based PDF output with light/dark modes and multiple document types (report, invoice, letter, CV).
+- **`mcanouil-revealjs`**: Reveal.js presentations with light/dark modes, section outlines, and a closing slide.
+
+## Key Features
+
+- **Brand theming**: Consistent colours, typography, and logos across all formats via `brand.yml`.
+- **Custom components**: Value boxes, info panels, status badges, dividers, progress bars, card grids, and executive summaries.
+- **Code windows**: macOS-style code block headers with filename display.
+- **Grid background**: Subtle grid overlay for HTML and Reveal.js.
+- **Special sections**: Auto-relocating appendix and supplementary sections with custom numbering (Typst).
+- **Accessibility**: PDF/UA-1 compliance, alt text support, and WCAG AA contrast validation (Typst).
+
+## Quick Start
+
+```yaml
+---
+title: "My Document"
+format: mcanouil-html
+---
+```
+
+```yaml
+---
+title: "My Report"
+format:
+  mcanouil-typst:
+    style: professional
+    brand-mode: light
+---
+```
+
+```yaml
+---
+title: "My Presentation"
+format:
+  mcanouil-revealjs:
+    brand-mode: dark
+---
+```
 
 ## Example
 
-Here is the source code for a minimal example: [example.qmd](example.qmd).
+Source: [example.qmd](example.qmd).
 
-Output of `example.qmd`:
+Rendered outputs:
 
-- [HTML](https://m.canouil.dev/quarto-mcanouil/)
-- [HTML (mcanouil)](https://m.canouil.dev/quarto-mcanouil/example-mcanouil-html.html)
-- [Typst Dark (PDF)](https://m.canouil.dev/quarto-mcanouil/example-typst-dark.pdf)
-- [Typst Light (PDF)](https://m.canouil.dev/quarto-mcanouil/example-typst-light.pdf)
-- [Reveal.js Dark (HTML)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-dark.html) | [Reveal.js Dark (PDF)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-dark.pdf)
-- [Reveal.js Light (HTML)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-light.html) | [Reveal.js Light (PDF)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-light.pdf)
+- [HTML (Professional)](https://m.canouil.dev/quarto-mcanouil/).
+- [HTML (Academic)](https://m.canouil.dev/quarto-mcanouil/example-academic.html).
+- [Reveal.js (Dark)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-dark.html).
+- [Reveal.js (Light)](https://m.canouil.dev/quarto-mcanouil/example-revealjs-light.html).
+- [PDF (Dark Professional)](https://m.canouil.dev/quarto-mcanouil/example-dark-professional.pdf).
+- [PDF (Light Professional)](https://m.canouil.dev/quarto-mcanouil/example-light-professional.pdf).
+- [PDF (Dark Academic)](https://m.canouil.dev/quarto-mcanouil/example-dark-academic.pdf).
+- [PDF (Light Academic)](https://m.canouil.dev/quarto-mcanouil/example-light-academic.pdf).
+
+See [example.qmd](example.qmd) for full documentation of all components, configuration options, and YAML parameters.
