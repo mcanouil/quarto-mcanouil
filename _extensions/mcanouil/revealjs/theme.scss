@@ -210,15 +210,15 @@ $mc-value-box-height: 100px;
 
   // Animated underline for content links (matching HTML theme)
   // Excludes navigation, buttons, and special link types
-  p > a,
-  li > a,
-  td > a,
-  h1 > a,
-  h2 > a,
-  h3 > a,
-  h4 > a,
-  h5 > a,
-  h6 > a {
+  p>a,
+  li>a,
+  td>a,
+  h1>a,
+  h2>a,
+  h3>a,
+  h4>a,
+  h5>a,
+  h6>a {
     position: relative;
     color: inherit;
     font: inherit;
