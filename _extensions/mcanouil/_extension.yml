@@ -212,6 +212,8 @@ contributes:
       # Typst-specific filters
       filters:
         - at: pre-quarto
+          path: filters/page-break-inside.lua
+        - at: pre-quarto
           path: filters/logo-metadata.lua
         - at: pre-quarto
           path: filters/special-sections.lua

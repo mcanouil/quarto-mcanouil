@@ -244,8 +244,8 @@
   table: true,
   callout: false,
   code: auto,
-  quote: true,
-  terms: auto,
+  quote: false,
+  terms: false,
 )
 
 /// Process page-break-inside configuration into breakable settings
