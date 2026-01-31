@@ -35,6 +35,6 @@ jobs:
       quarto: "${{ github.event.inputs.quarto }}"
       post-render: false
       tinytex: false
-      r: true
+      r: false
       python: false
       julia: false
