@@ -38,7 +38,7 @@ jobs:
       version: "${{ github.event.inputs.version }}"
       formats: "mcanouil-html+academic mcanouil-revealjs+dark mcanouil-revealjs+light mcanouil-typst+dark+pro mcanouil-typst+light+pro mcanouil-typst+dark+aca mcanouil-typst+light+aca mcanouil-html"
       quarto: "${{ github.event.inputs.quarto }}"
-      post-render: "${{ github.event.inputs['post-render'] }}"
+      post-render: ${{ github.event.inputs['post-render'] }}
       tinytex: false
       r: true
       python: false
