@@ -204,6 +204,7 @@ contributes:
         - typst/partials/document-types/letter.typ
         - typst/partials/document-types/cv.typ
         - typst/partials/libs.typ
+        - typst/partials/numbering.typ
         - typst/partials/show-rules.typ
         - typst/partials/biblio.typ
         - typst/partials/notes.typ

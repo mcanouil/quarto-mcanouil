@@ -6,6 +6,8 @@
 
 $utilities.typ()$
 
+$numbering.typ()$
+
 $marginalia.typ()$
 
 $definitions.typ()$
