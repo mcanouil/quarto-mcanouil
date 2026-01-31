@@ -13,13 +13,10 @@ on:
           - "minor"
           - "major"
       quarto:
-        type: choice
+        type: string
         description: "Quarto version"
         required: false
-        default: "release"
-        options:
-          - "release"
-          - "pre-release"
+        default: "pre-release"
 
 permissions:
   contents: write
