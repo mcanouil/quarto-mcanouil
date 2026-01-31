@@ -133,6 +133,7 @@ other-links:
     href: example-academic.html
     target: _blank
     rel: noopener noreferrer
+engine: markdown
 ---
 
 ## Introduction {#sec-intro}
