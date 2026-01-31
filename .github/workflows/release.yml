@@ -31,7 +31,7 @@ jobs:
     with:
       gh-app-id: ${{ vars.APP_ID }}
       version: "${{ github.event.inputs.version }}"
-      formats: "mcanouil-html+academicmcanouil-typst+dark+pro mcanouil-typst+light+pro mcanouil-typst+dark+aca mcanouil-typst+light+aca mcanouil-html mcanouil-revealjs+dark mcanouil-revealjs+light"
+      formats: "mcanouil-html+academic mcanouil-typst+dark+pro mcanouil-typst+light+pro mcanouil-typst+dark+aca mcanouil-typst+light+aca mcanouil-html mcanouil-revealjs+dark mcanouil-revealjs+light"
       quarto: "${{ github.event.inputs.quarto }}"
       post-render: false
       tinytex: false
