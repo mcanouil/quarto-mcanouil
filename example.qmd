@@ -84,24 +84,20 @@ format:
     brand-mode: dark
     output-file: example-dark-professional.pdf
     watermark-text: "DEMO"
-    mermaid-format: svg
   mcanouil-typst+light+pro:
     brand-mode: light
     output-file: example-light-professional.pdf
     watermark-text: "DEMO"
-    mermaid-format: svg
   mcanouil-typst+dark+aca:
     style: academic
     brand-mode: dark
     output-file: example-dark-academic.pdf
     watermark-text: "DEMO"
-    mermaid-format: svg
   mcanouil-typst+light+aca:
     style: academic
     brand-mode: light
     output-file: example-light-academic.pdf
     watermark-text: "DEMO"
-    mermaid-format: svg
 format-links:
   - mcanouil-html
   - format: mcanouil-html+academic
