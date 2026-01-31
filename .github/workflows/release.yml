@@ -17,11 +17,6 @@ on:
         description: "Quarto version"
         required: false
         default: "pre-release"
-      post-render:
-        type: boolean
-        description: "Run post-render scripts"
-        required: false
-        default: true
 
 permissions:
   contents: write
@@ -38,7 +33,7 @@ jobs:
       version: "${{ github.event.inputs.version }}"
       formats: "mcanouil-html+academic mcanouil-revealjs+dark mcanouil-revealjs+light mcanouil-typst+dark+pro mcanouil-typst+light+pro mcanouil-typst+dark+aca mcanouil-typst+light+aca mcanouil-html"
       quarto: "${{ github.event.inputs.quarto }}"
-      post-render: ${{ github.event.inputs['post-render'] }}
+      post-render: false
       tinytex: false
       r: true
       python: false
