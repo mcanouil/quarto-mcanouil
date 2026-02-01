@@ -514,6 +514,16 @@
     }
   })
 
+  // Expand auto-width boxes containing images to full width
+  // This allows images inside boxes (e.g., in callouts) to be horizontally centred
+  show box.where(width: auto): it => {
+    if it.body != none and it.body.func() == image {
+      box(width: 100%, it.body)
+    } else {
+      it
+    }
+  }
+
   // Figure show rule
   show figure: it => apply-figure-style(it, colours)
 
