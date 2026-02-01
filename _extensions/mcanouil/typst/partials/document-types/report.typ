@@ -516,9 +516,22 @@
 
   // Expand auto-width boxes containing images to full width
   // This allows images inside boxes (e.g., in callouts) to be horizontally centred
+  // All existing box properties (stroke, radius, clip, inset) are preserved
+  // to avoid stripping styling from image-border boxes
   show box.where(width: auto): it => {
     if it.body != none and it.body.func() == image {
-      box(width: 100%, it.body)
+      box(
+        width: 100%,
+        height: it.height,
+        baseline: it.baseline,
+        fill: it.fill,
+        stroke: it.stroke,
+        radius: it.radius,
+        inset: it.inset,
+        outset: it.outset,
+        clip: it.clip,
+        it.body,
+      )
     } else {
       it
     }
