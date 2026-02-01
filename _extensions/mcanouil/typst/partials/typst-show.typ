@@ -5,7 +5,6 @@
 // Quarto metadata mapping to Typst template
 // Maps YAML frontmatter to mcanouil-document dispatcher function parameters.
 // The dispatcher routes to the appropriate template based on document-type.
-#set text(fallback: false)
 #show: mcanouil-document.with(
 // Document Type (report, invoice, letter, cv)
 
