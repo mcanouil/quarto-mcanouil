@@ -39,9 +39,12 @@ color:
 typography:
   fonts:
     - family: Alegreya Sans
-      source: google
+      source: bunny
+    - family: Fira Code
+      source: bunny
   base: Alegreya Sans
   headings: Alegreya Sans
+  monospace: Fira Code
   link:
     color: foreground
 defaults:

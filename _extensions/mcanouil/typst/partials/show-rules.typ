@@ -223,7 +223,7 @@
                 size: if is-auto { 0.7em } else { 0.85em },
                 weight: 500,
                 fill: filename-colour,
-                font: ("Fira Code", "Menlo", "Monaco", "Consolas", "monospace"),
+                font: ("Fira Code", "Menlo", "Monaco", "Courier New"),
                 // Apply uppercase for auto-generated filenames (simulated small caps)
                 if is-auto { upper(filename) } else { filename },
               )
