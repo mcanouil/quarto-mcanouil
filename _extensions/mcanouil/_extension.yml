@@ -180,6 +180,7 @@ contributes:
         - typst/partials/libs/definitions.typ
         - typst/partials/libs/page.typ
         - typst/partials/libs/colours.typ
+        - typst/partials/libs/code-annotations.typ
         - typst/partials/libs/typography.typ
         - typst/partials/libs/decorations.typ
         - typst/partials/libs/watermark.typ
@@ -212,6 +213,8 @@ contributes:
         - typst/partials/typst-show.typ
       # Typst-specific filters
       filters:
+        - at: pre-ast
+          path: filters/typst-code-annotation.lua
         - at: pre-quarto
           path: filters/page-break-inside.lua
         - at: pre-quarto

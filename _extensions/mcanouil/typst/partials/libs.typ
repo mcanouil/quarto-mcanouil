@@ -14,6 +14,8 @@ $definitions.typ()$
 
 $colours.typ()$
 
+$code-annotations.typ()$
+
 $typography.typ()$
 
 $decorations.typ()$

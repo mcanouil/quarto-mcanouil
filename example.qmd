@@ -908,6 +908,7 @@ def calculate_area(radius: float) -> float: # <1>
     import math # <3>
     return math.pi * radius ** 2 # <4>
 ```
+
 1. Function signature with type hints for input and output.
 2. Docstring describing the function purpose.
 3. Import the `math` module for access to `pi`.

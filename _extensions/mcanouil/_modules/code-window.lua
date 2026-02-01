@@ -115,6 +115,22 @@ function M.process_typst(block, config)
   local filename = M.get_filename(block, config.auto_filename)
 
   if not filename then
+    -- Even without a code-window, wrap with annotated-code() if annotations exist
+    local annot_dict = block.attributes['data-code-annotations']
+    if annot_dict then
+      local lang = ''
+      if block.classes and #block.classes > 0 then
+        lang = block.classes[1]
+      end
+      local code_content = block.text
+      local fence_len = math.max(3, max_consecutive_backticks(code_content) + 1)
+      local fence = string.rep('`', fence_len)
+      local typst_code = string.format(
+        '#annotated-code(%s, mcanouil-colours(mode: effective-brand-mode))[%s%s\n%s\n%s]',
+        annot_dict, fence, lang, code_content, fence
+      )
+      return pandoc.RawBlock('typst', typst_code)
+    end
     return block
   end
 
@@ -130,15 +146,25 @@ function M.process_typst(block, config)
   local fence_len = math.max(3, max_consecutive_backticks(code_content) + 1)
   local fence = string.rep('`', fence_len)
 
+  -- Check for code annotations set by typst-code-annotation filter
+  local annot_dict = block.attributes['data-code-annotations']
+
+  local raw_code = string.format('%s%s\n%s\n%s', fence, lang, code_content, fence)
+
+  -- Wrap with annotated-code() if annotations are present
+  if annot_dict then
+    raw_code = string.format(
+      '#annotated-code(%s, mcanouil-colours(mode: effective-brand-mode))[%s]',
+      annot_dict, raw_code
+    )
+  end
+
   local typst_code = string.format(
-    '#%s(filename: "%s", is-auto: %s)[%s%s\n%s\n%s]',
+    '#%s(filename: "%s", is-auto: %s)[%s]',
     config.typst_wrapper,
     filename:gsub('"', '\\"'),
     is_auto and 'true' or 'false',
-    fence,
-    lang,
-    code_content,
-    fence
+    raw_code
   )
 
   return pandoc.RawBlock('typst', typst_code)
