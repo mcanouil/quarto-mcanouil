@@ -428,27 +428,27 @@ pre.code-annotation-code {
 
   // Subtle background using SCSS mix (computed at build time for browser compatibility)
   &.callout-note {
-    background-color: mix($callout-color-note, $_bg, 8%) !important;
+    background-color: mix($callout-color-note, $_bg, 15%) !important;
     border-left-color: $callout-color-note !important;
   }
 
   &.callout-tip {
-    background-color: mix($callout-color-tip, $_bg, 8%) !important;
+    background-color: mix($callout-color-tip, $_bg, 15%) !important;
     border-left-color: $callout-color-tip !important;
   }
 
   &.callout-warning {
-    background-color: mix($callout-color-warning, $_bg, 8%) !important;
+    background-color: mix($callout-color-warning, $_bg, 15%) !important;
     border-left-color: $callout-color-warning !important;
   }
 
   &.callout-important {
-    background-color: mix($callout-color-important, $_bg, 8%) !important;
+    background-color: mix($callout-color-important, $_bg, 15%) !important;
     border-left-color: $callout-color-important !important;
   }
 
   &.callout-caution {
-    background-color: mix($callout-color-caution, $_bg, 8%) !important;
+    background-color: mix($callout-color-caution, $_bg, 15%) !important;
     border-left-color: $callout-color-caution !important;
   }
 

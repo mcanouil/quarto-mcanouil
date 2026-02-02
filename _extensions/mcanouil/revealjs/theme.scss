@@ -942,27 +942,27 @@ $mc-value-box-height: 100px;
   border-radius: 4px !important;
 
   &.callout-note {
-    background-color: color-mix(in srgb, $callout-color-note 8%, $body-bg) !important;
+    background-color: color-mix(in srgb, $callout-color-note 15%, $body-bg) !important;
     border-left-color: $callout-color-note !important;
   }
 
   &.callout-tip {
-    background-color: color-mix(in srgb, $callout-color-tip 8%, $body-bg) !important;
+    background-color: color-mix(in srgb, $callout-color-tip 15%, $body-bg) !important;
     border-left-color: $callout-color-tip !important;
   }
 
   &.callout-warning {
-    background-color: color-mix(in srgb, $callout-color-warning 8%, $body-bg) !important;
+    background-color: color-mix(in srgb, $callout-color-warning 15%, $body-bg) !important;
     border-left-color: $callout-color-warning !important;
   }
 
   &.callout-important {
-    background-color: color-mix(in srgb, $callout-color-important 8%, $body-bg) !important;
+    background-color: color-mix(in srgb, $callout-color-important 15%, $body-bg) !important;
     border-left-color: $callout-color-important !important;
   }
 
   &.callout-caution {
-    background-color: color-mix(in srgb, $callout-color-caution 8%, $body-bg) !important;
+    background-color: color-mix(in srgb, $callout-color-caution 15%, $body-bg) !important;
     border-left-color: $callout-color-caution !important;
   }
 
