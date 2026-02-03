@@ -18,6 +18,14 @@ if not quarto.doc.is_format('typst') then
 end
 
 -- ============================================================================
+-- MODULE IMPORTS
+-- ============================================================================
+
+local utils = require(
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+)
+
+-- ============================================================================
 -- CONSTANTS
 -- ============================================================================
 
@@ -25,97 +33,90 @@ local COLOURS_EXPR = 'mcanouil-colours(mode: effective-brand-mode)'
 
 --- Comment characters per language (subset matching Quarto's constants.lua).
 local LANG_COMMENT_CHARS = {
-  apl = {"⍝"},
-  asy = {"//"},
-  awk = {"#"},
-  bash = {"#"},
-  c = {"/*", "*/"},
-  cc = {"//"},
-  coffee = {"#"},
-  cpp = {"//"},
-  csharp = {"//"},
-  css = {"/*", "*/"},
-  d3 = {"//"},
-  dockerfile = {"#"},
-  dot = {"//"},
-  elm = {"#"},
-  fortran = {"!"},
-  fortran95 = {"!"},
-  fsharp = {"//"},
-  gap = {"#"},
-  gawk = {"#"},
-  go = {"//"},
-  groovy = {"//"},
-  haskell = {"--"},
-  html = {"<!--", "-->"},
-  java = {"//"},
-  javascript = {"//"},
-  js = {"//"},
-  json = {"//"},
-  julia = {"#"},
-  latex = {"%"},
-  lua = {"--"},
-  markdown = {"<!--", "-->"},
-  matlab = {"%"},
-  mermaid = {"%%"},
-  mysql = {"--"},
-  node = {"//"},
-  ocaml = {"(*", "*)"},
-  octave = {"#"},
-  ojs = {"//"},
-  perl = {"#"},
-  powershell = {"#"},
-  psql = {"--"},
-  python = {"#"},
-  q = {"/"},
-  r = {"#"},
-  ruby = {"#"},
-  rust = {"//"},
-  sas = {"*", ";"},
-  sass = {"//"},
-  scala = {"//"},
-  scss = {"//"},
-  sed = {"#"},
-  sql = {"--"},
-  stan = {"#"},
-  stata = {"*"},
-  swift = {"//"},
-  tikz = {"%"},
-  typescript = {"//"},
-  typst = {"//"},
-  vhdl = {"--"},
-  yaml = {"#"},
+  apl = { "⍝" },
+  asy = { "//" },
+  awk = { "#" },
+  bash = { "#" },
+  c = { "/*", "*/" },
+  cc = { "//" },
+  coffee = { "#" },
+  cpp = { "//" },
+  csharp = { "//" },
+  css = { "/*", "*/" },
+  d3 = { "//" },
+  dockerfile = { "#" },
+  dot = { "//" },
+  elm = { "#" },
+  fortran = { "!" },
+  fortran95 = { "!" },
+  fsharp = { "//" },
+  gap = { "#" },
+  gawk = { "#" },
+  go = { "//" },
+  groovy = { "//" },
+  haskell = { "--" },
+  html = { "<!--", "-->" },
+  java = { "//" },
+  javascript = { "//" },
+  js = { "//" },
+  json = { "//" },
+  julia = { "#" },
+  latex = { "%" },
+  lua = { "--" },
+  markdown = { "<!--", "-->" },
+  matlab = { "%" },
+  mermaid = { "%%" },
+  mysql = { "--" },
+  node = { "//" },
+  ocaml = { "(*", "*)" },
+  octave = { "#" },
+  ojs = { "//" },
+  perl = { "#" },
+  powershell = { "#" },
+  psql = { "--" },
+  python = { "#" },
+  q = { "/" },
+  r = { "#" },
+  ruby = { "#" },
+  rust = { "//" },
+  sas = { "*", ";" },
+  sass = { "//" },
+  scala = { "//" },
+  scss = { "//" },
+  sed = { "#" },
+  sql = { "--" },
+  stan = { "#" },
+  stata = { "*" },
+  swift = { "//" },
+  tikz = { "%" },
+  typescript = { "//" },
+  typst = { "//" },
+  vhdl = { "--" },
+  yaml = { "#" },
 }
 
-local DEFAULT_COMMENT = {"#"}
+local DEFAULT_COMMENT = { "#" }
 
 -- ============================================================================
 -- ANNOTATION DETECTION
 -- ============================================================================
 
---- Escape Lua pattern special characters in a string.
---- @param s string
---- @return string
-local function pattern_escape(s)
-  return s:gsub('[%(%)%.%%%+%-%*%?%[%]%^%$]', '%%%0')
-end
-
 --- Build annotation detector for a given language.
 --- @param lang string|nil Language identifier
 --- @return table|nil Provider with annotation_number and strip_annotation functions
-local function annote_provider(lang)
+local function annotation_provider(lang)
   local comment_chars = LANG_COMMENT_CHARS[lang] or DEFAULT_COMMENT
   if comment_chars == nil then
     return nil
   end
 
-  local start_comment = pattern_escape(comment_chars[1])
+  local start_comment = utils.escape_pattern(comment_chars[1])
   local match_expr = '.*' .. start_comment .. '%s*<([0-9]+)>%s*'
   local strip_prefix = '%s*' .. start_comment .. '%s*<'
   local strip_suffix = '>%s*'
 
   if #comment_chars == 2 then
-    local end_comment = pattern_escape(comment_chars[2])
+    local end_comment = utils.escape_pattern(comment_chars[2])
     match_expr = match_expr .. end_comment .. '%s*'
     strip_suffix = strip_suffix .. end_comment .. '%s*'
   end
@@ -131,8 +132,8 @@ local function annote_provider(lang)
       end
       return nil
     end,
-    strip_annotation = function(line, annote_id)
-      return line:gsub(strip_prefix .. annote_id .. strip_suffix, '')
+    strip_annotation = function(line, annotation_id)
+      return line:gsub(strip_prefix .. annotation_id .. strip_suffix, '')
     end,
   }
 end
@@ -140,7 +141,7 @@ end
 --- Split text into lines.
 --- @param s string
 --- @return function Iterator over lines
-local function to_lines(s)
+local function split_into_lines(s)
   if s:sub(-1) ~= '\n' then
     s = s .. '\n'
   end
@@ -168,10 +169,10 @@ end
 --- mapping annotation numbers to their line numbers.
 --- @param code_block pandoc.CodeBlock
 --- @return pandoc.CodeBlock Cleaned code block
---- @return table|nil Annotations: {[annote_number] = line_number, ...}
+--- @return table|nil Annotations: {[annotation_number] = line_number, ...}
 local function resolve_annotations(code_block)
   local lang = get_language(code_block)
-  local provider = annote_provider(lang)
+  local provider = annotation_provider(lang)
   if provider == nil then
     return code_block, nil
   end
@@ -180,11 +181,11 @@ local function resolve_annotations(code_block)
   local new_lines = {}
   local line_number = 1
 
-  for line in to_lines(code_block.text) do
-    local annote_number = provider.annotation_number(line)
-    if annote_number ~= nil then
-      annotations[annote_number] = line_number
-      local stripped = provider.strip_annotation(line, tostring(annote_number))
+  for line in split_into_lines(code_block.text) do
+    local annotation_number = provider.annotation_number(line)
+    if annotation_number ~= nil then
+      annotations[annotation_number] = line_number
+      local stripped = provider.strip_annotation(line, tostring(annotation_number))
       table.insert(new_lines, stripped)
     else
       table.insert(new_lines, line)
@@ -238,14 +239,14 @@ local function build_annotation_list(ol, annotations)
   local items = pandoc.Blocks({})
 
   for i, item in ipairs(ol.content) do
-    local annote_number = ol.start + i - 1
-    if annotations[annote_number] then
+    local annotation_number = ol.start + i - 1
+    if annotations[annotation_number] then
       local content_inlines = item[1].content or pandoc.Inlines(item[1])
       -- Wrap content in Typst content brackets: #annotation-item(N, [content], colours)
       local block_content = pandoc.Inlines({})
       block_content:insert(pandoc.RawInline(
         'typst',
-        '#annotation-item(' .. tostring(annote_number) .. ', ['
+        '#annotation-item(' .. tostring(annotation_number) .. ', ['
       ))
       block_content:extend(content_inlines)
       block_content:insert(pandoc.RawInline('typst', '], ' .. COLOURS_EXPR .. ')'))
@@ -309,10 +310,10 @@ end
 -- MAIN FILTER
 -- ============================================================================
 
---- Read the code-annotations metadata parameter.
+--- Check if code annotations are enabled in metadata.
 --- @param meta pandoc.Meta
---- @return boolean Whether annotations should be processed
-local function should_process(meta)
+--- @return boolean Whether annotations are enabled
+local function get_annotations_config(meta)
   local val = meta['code-annotations']
   if val == nil then
     return true
@@ -324,18 +325,18 @@ local function should_process(meta)
   return true
 end
 
-local process_annotations = true
+local annotations_enabled = true
 
 return {
   {
     Meta = function(meta)
-      process_annotations = should_process(meta)
+      annotations_enabled = get_annotations_config(meta)
     end,
   },
   {
     traverse = 'topdown',
     Blocks = function(blocks)
-      if not process_annotations then
+      if not annotations_enabled then
         return nil
       end
 
@@ -361,7 +362,6 @@ return {
           else
             outputs:insert(block)
           end
-
         elseif block.t == 'Div' and block.attr.classes:includes('cell') then
           flush_pending()
           local resolved, annotations = process_cell_div(block)
@@ -371,14 +371,12 @@ return {
           else
             outputs:insert(block)
           end
-
         elseif block.t == 'OrderedList' and pending_annotations then
           local annotation_blocks = build_annotation_list(block, pending_annotations)
           outputs:insert(pending_code)
           outputs:extend(annotation_blocks)
           pending_code = nil
           pending_annotations = nil
-
         else
           flush_pending()
           outputs:insert(block)

@@ -51,7 +51,7 @@ end
 --- @param div pandoc.Div Card-grid div containing card divs
 --- @param config table Component configuration (not used for card-grid special processing)
 --- @return pandoc.RawBlock Typst code for rendering card grid
-local function process_div(div, config)
+local function process_card_grid(div, config)
   local cards = pandoc.List()
   local columns = div.attributes.columns and tonumber(div.attributes.columns) or 3
 
@@ -154,6 +154,6 @@ end
 
 return {
   extract_card = extract_card,
-  process_div = process_div,
+  process_card_grid = process_card_grid,
   process_card_div = process_card_div
 }

@@ -153,7 +153,7 @@ function Meta(meta)
         return typst_wrapper.create_wrapped_handler(true)(div, config)
       end,
       ['card-grid'] = function(div, config)
-        return typst_card_grid.process_div(div, config)
+        return typst_card_grid.process_card_grid(div, config)
       end,
       ['card'] = function(div, config)
         return typst_card_grid.process_card_div(div, config)
@@ -162,7 +162,7 @@ function Meta(meta)
 
     SPAN_HANDLERS = {
       ['badge'] = function(span, config)
-        return typst_badges.process_span(span, config)
+        return typst_badges.process_badge(span, config)
       end
     }
   end
@@ -294,8 +294,8 @@ function Span(span)
           local content = pandoc.write(pandoc.Pandoc({ pandoc.Plain(span.content) }), 'typst')
           local attrs = typst_wrapper.attributes_to_table(span)
           local has_attributes = next(attrs) ~= nil
-          local should_pass = config.arguments or has_attributes
-          local typst_code = typst_wrapper.build_function_call(config.wrapper, content, attrs, should_pass)
+          local include_attributes = config.arguments or has_attributes
+          local typst_code = typst_wrapper.build_function_call(config.wrapper, content, attrs, include_attributes)
           return pandoc.RawInline('typst', typst_code)
         end
       end
@@ -333,7 +333,7 @@ function CodeBlock(block)
 
   -- Only process Typst here; HTML/Reveal.js handled by post-quarto filter
   if CURRENT_FORMAT == 'typst' and CODE_WINDOW_CONFIG then
-    return code_window.process(block, CURRENT_FORMAT, CODE_WINDOW_CONFIG)
+    return code_window.process_code_block(block, CURRENT_FORMAT, CODE_WINDOW_CONFIG)
   end
 
   return block

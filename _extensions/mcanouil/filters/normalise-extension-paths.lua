@@ -12,25 +12,25 @@
 
 local KEYS = { 'logo', 'logo-light', 'logo-dark', 'orcid-icon' }
 
-local function normalise(value)
+local function normalise_path(value)
   local t = pandoc.utils.type(value)
   if t == 'string' then
     return (value:gsub("^.*_extensions/", "/_extensions/"))
   elseif t == 'Inlines' then
     return pandoc.Inlines({ pandoc.Str((pandoc.utils.stringify(value):gsub("^.*_extensions/", "/_extensions/"))) })
   elseif t == 'List' then
-    local r = {}
-    for i, v in ipairs(value) do r[i] = normalise(v) end
-    return r
+    local result = {}
+    for i, v in ipairs(value) do result[i] = normalise_path(v) end
+    return result
   elseif t == 'table' or t == 'MetaMap' then
-    local r = {}
-    for k, v in pairs(value) do r[k] = normalise(v) end
-    return r
+    local result = {}
+    for k, v in pairs(value) do result[k] = normalise_path(v) end
+    return result
   end
   return value
 end
 
-local function get(tbl, path)
+local function get_nested_meta(tbl, path)
   local cur = tbl
   for p in path:gmatch("[^.]+") do
     local t = pandoc.utils.type(cur)
@@ -45,14 +45,14 @@ local function Meta(meta)
 
   -- Normalise top-level keys
   for _, k in ipairs(KEYS) do
-    if meta[k] then meta[k] = normalise(meta[k]) end
+    if meta[k] then meta[k] = normalise_path(meta[k]) end
   end
 
   -- Set logo.path from appropriate variant based on brand-mode
   local mode = meta['brand-mode'] and pandoc.utils.stringify(meta['brand-mode']) or 'light'
-  local src = get(meta, 'logo-' .. mode .. '.path')
+  local src = get_nested_meta(meta, 'logo-' .. mode .. '.path')
   if src and meta['logo'] then
-    meta['logo']['path'] = normalise(src)
+    meta['logo']['path'] = normalise_path(src)
   end
 
   return meta

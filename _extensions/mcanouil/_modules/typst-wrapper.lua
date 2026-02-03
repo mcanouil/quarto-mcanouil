@@ -78,9 +78,9 @@ end
 --- @return string, string Opening and closing wrappers
 local function build_typst_block_wrappers(config, attrs)
   local has_attributes = next(attrs) ~= nil
-  local should_pass = config.arguments or has_attributes
+  local include_attributes = config.arguments or has_attributes
 
-  if should_pass and has_attributes then
+  if include_attributes and has_attributes then
     local attr_string = build_attribute_string(attrs)
     return string.format('#%s(%s)[', config.wrapper, attr_string), ']'
   else

@@ -26,7 +26,7 @@ local utils = require(
 --- @param span pandoc.Span Span element
 --- @param config table Component configuration with wrapper and arguments fields
 --- @return pandoc.RawInline Typst code inline
-local function process_span(span, config)
+local function process_badge(span, config)
   -- Convert content to plain text
   local content = utils.stringify(span.content)
 
@@ -36,14 +36,14 @@ local function process_span(span, config)
   -- Always pass attributes if any exist
   -- config.arguments forces passing even when empty
   local has_attributes = next(attrs) ~= nil
-  local should_pass = config.arguments or has_attributes
+  local include_attributes = config.arguments or has_attributes
 
   -- Build function call using wrapper name
   local typst_code = wrapper.build_function_call(
     config.wrapper,
     content,
     attrs,
-    should_pass
+    include_attributes
   )
 
   return pandoc.RawInline('typst', typst_code)
@@ -54,5 +54,5 @@ end
 -- ============================================================================
 
 return {
-  process_span = process_span
+  process_badge = process_badge
 }

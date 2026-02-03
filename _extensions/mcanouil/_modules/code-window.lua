@@ -229,7 +229,7 @@ end
 --- @param format string Current format ('typst', 'html', 'revealjs')
 --- @param config CodeWindowConfig Configuration from get_config()
 --- @return pandoc.RawBlock|pandoc.CodeBlock Transformed or original block
-function M.process(block, format, config)
+function M.process_code_block(block, format, config)
   if not config.enabled then
     return block
   end

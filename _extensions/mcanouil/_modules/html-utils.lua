@@ -148,8 +148,8 @@ end
 --- @param content string|nil The inner content (can include nested HTML)
 --- @param self_closing boolean|nil If true, generates self-closing tag (e.g., <hr />)
 --- @return string Complete HTML element string
---- @usage local html = M.element('div', {class = 'panel'}, 'Content')
-M.element = function(tag, attrs, content, self_closing)
+--- @usage local html = M.build_element('div', {class = 'panel'}, 'Content')
+M.build_element = function(tag, attrs, content, self_closing)
   local attr_str = M.build_attributes(attrs or {})
   if self_closing then
     return string.format('<%s%s />', tag, attr_str)
@@ -181,7 +181,7 @@ M.bem_div = function(block, element, modifier, attrs, content)
     merged_attrs.class = classes
   end
 
-  return M.element('div', merged_attrs, content)
+  return M.build_element('div', merged_attrs, content)
 end
 
 --- Build a span element with BEM classes.
@@ -205,7 +205,7 @@ M.bem_span = function(block, element, modifier, attrs, content)
     merged_attrs.class = classes
   end
 
-  return M.element('span', merged_attrs, content)
+  return M.build_element('span', merged_attrs, content)
 end
 
 -- ============================================================================

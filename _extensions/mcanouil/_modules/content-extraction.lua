@@ -5,7 +5,7 @@
 --- @author Mickaël Canouil
 --- @version 1.0.0
 
-local content_module = {}
+local M = {}
 
 -- Load utils module for raw_header function
 local utils = require(quarto.utils.resolve_path("../_modules/utils.lua"):gsub("%.lua$", ""))
@@ -22,8 +22,8 @@ local utils = require(quarto.utils.resolve_path("../_modules/utils.lua"):gsub("%
 --- @param section_id string Header identifier to find
 --- @param include_header boolean|nil Whether to include the header itself (default: true)
 --- @return table<integer, table>|nil Array of blocks in section, or nil if not found
---- @usage local section = content_module.extract_section(blocks, "introduction", true)
-function content_module.extract_section(blocks, section_id, include_header)
+--- @usage local section = M.extract_section(blocks, "introduction", true)
+function M.extract_section(blocks, section_id, include_header)
   if blocks == nil or section_id == nil or section_id == '' then
     return nil
   end
@@ -73,8 +73,8 @@ end
 --- @param div_id string Div identifier to find
 --- @param include_div boolean|nil Whether to include the div wrapper itself (default: false)
 --- @return table<integer, table>|nil Array of blocks in div, or nil if not found
---- @usage local div_content = content_module.extract_div(blocks, "my-div", false)
-function content_module.extract_div(blocks, div_id, include_div)
+--- @usage local div_content = M.extract_div(blocks, "my-div", false)
+function M.extract_div(blocks, div_id, include_div)
   if blocks == nil or div_id == nil or div_id == '' then
     return nil
   end
@@ -108,8 +108,8 @@ end
 --- @param blocks table<integer, table> Array of blocks to search
 --- @param predicate function Function that returns true for target block: function(block) → boolean
 --- @return integer|nil Index of first matching block (1-based), or nil if not found
---- @usage local idx = content_module.find_block(blocks, function(b) return b.t == 'Header' end)
-function content_module.find_block(blocks, predicate)
+--- @usage local idx = M.find_block(blocks, function(b) return b.t == 'Header' end)
+function M.find_block(blocks, predicate)
   if blocks == nil or predicate == nil then
     return nil
   end
@@ -135,8 +135,8 @@ end
 --- @param id_prefix string|nil Prefix to add to header IDs (e.g., "modal-123-")
 --- @param format string|nil Output format (default: 'html')
 --- @return table<integer, table> Modified blocks with headers as RawBlocks
---- @usage local protected = content_module.protect_headers(blocks, "modal-123", "html")
-function content_module.protect_headers(blocks, id_prefix, format)
+--- @usage local protected = M.protect_headers(blocks, "modal-123", "html")
+function M.protect_headers(blocks, id_prefix, format)
   if blocks == nil then
     return {}
   end
@@ -191,8 +191,8 @@ end
 ---
 --- @param blocks table<integer, table> Array of Pandoc blocks to parse
 --- @return table Parsed structure: {header_text = string|nil, header_level = integer|nil, body_blocks = table, footer_blocks = table}
---- @usage local parsed = content_module.parse_sections(modal_content)
-function content_module.parse_sections(blocks)
+--- @usage local parsed = M.parse_sections(modal_content)
+function M.parse_sections(blocks)
   if blocks == nil then
     return {
       header_text = nil,
@@ -249,8 +249,8 @@ end
 --- @param code_text string Code block text content
 --- @param pattern string|nil Pattern to match (default: language-cell-decorator pattern)
 --- @return string|nil, string filename (if found), cleaned text (metadata removed)
---- @usage local filename, clean_text = content_module.extract_code_metadata("python | filename: script.py\nprint('hello')")
-function content_module.extract_code_metadata(code_text, pattern)
+--- @usage local filename, clean_text = M.extract_code_metadata("python | filename: script.py\nprint('hello')")
+function M.extract_code_metadata(code_text, pattern)
   if code_text == nil or code_text == '' then
     return nil, code_text
   end
@@ -274,4 +274,4 @@ end
 -- MODULE EXPORT
 -- ============================================================================
 
-return content_module
+return M

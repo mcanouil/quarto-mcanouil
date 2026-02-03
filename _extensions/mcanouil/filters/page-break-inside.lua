@@ -17,7 +17,7 @@ local BREAKABLE_KEYS = { "table", "callout", "code", "quote", "terms" }
 --- Convert a Pandoc metadata value to its string representation.
 --- @param value any Pandoc MetaValue
 --- @return string
-local function meta_value_to_string(value)
+local function stringify_meta_value(value)
   if type(value) == "boolean" then
     return tostring(value)
   end
@@ -38,7 +38,7 @@ function Meta(meta)
   for _, key in ipairs(BREAKABLE_KEYS) do
     local user_value = pbi[key]
     if user_value ~= nil then
-      normalised[key] = meta_value_to_string(user_value)
+      normalised[key] = stringify_meta_value(user_value)
     else
       normalised[key] = BREAKABLE_DEFAULTS[key]
     end
