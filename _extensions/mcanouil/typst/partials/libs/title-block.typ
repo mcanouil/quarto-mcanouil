@@ -60,15 +60,23 @@
   // Collect affiliations and create mapping
   let (affiliations, aff-map) = collect-affiliations(authors)
 
+  // Helper to check if a value is a valid file path (not none, not empty, and looks like a path)
+  // Excludes simple names like "light" or "dark" which are brand references, not paths
+  let is-valid-path(val) = {
+    val != none and val != "" and (val.contains("/") or val.contains("."))
+  }
+
   // For title page: invert logo selection based on brand-mode
   // Dark mode (dark background) -> use light logo (visible on dark)
   // Light mode (light background) -> use dark logo (visible on light)
-  let title-page-logo = if brand-mode == "dark" and logo-light != none {
+  let title-page-logo = if brand-mode == "dark" and is-valid-path(logo-light) {
     logo-light
-  } else if brand-mode == "light" and logo-dark != none {
+  } else if brand-mode == "light" and is-valid-path(logo-dark) {
     logo-dark
-  } else {
+  } else if is-valid-path(logo) {
     logo // fallback to standard logo
+  } else {
+    none
   }
   // Note: .replace("\\", "") removes backslash escapes from paths (Quarto escaping workaround)
   title-page-logo = if title-page-logo != none {

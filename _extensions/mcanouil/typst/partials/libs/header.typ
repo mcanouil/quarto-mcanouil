@@ -175,13 +175,21 @@
   colours: none,
   show-logo: true,
 ) = {
+  // Helper to check if a value is a valid file path (not none, not empty, and looks like a path)
+  // Excludes simple names like "light" or "dark" which are brand references, not paths
+  let is-valid-path(val) = {
+    val != none and val != "" and (val.contains("/") or val.contains("."))
+  }
+
   if style == "professional" {
-    let header-logo = if brand-mode == "dark" and logo-dark != none {
+    let header-logo = if brand-mode == "dark" and is-valid-path(logo-dark) {
       logo-dark
-    } else if brand-mode == "light" and logo-light != none {
+    } else if brand-mode == "light" and is-valid-path(logo-light) {
       logo-light
-    } else {
+    } else if is-valid-path(logo) {
       logo // fallback to standard logo
+    } else {
+      none
     }
     // Note: .replace("\\", "") removes backslash escapes from paths (Quarto escaping workaround)
     header-logo = if header-logo != none {
@@ -198,12 +206,14 @@
       show-logo: show-logo,
     )
   } else {
-    let header-logo = if brand-mode == "dark" and logo-light != none {
+    let header-logo = if brand-mode == "dark" and is-valid-path(logo-light) {
       logo-light
-    } else if brand-mode == "light" and logo-dark != none {
+    } else if brand-mode == "light" and is-valid-path(logo-dark) {
       logo-dark
-    } else {
+    } else if is-valid-path(logo) {
       logo // fallback to standard logo
+    } else {
+      none
     }
     // Note: .replace("\\", "") removes backslash escapes from paths (Quarto escaping workaround)
     header-logo = if header-logo != none {
