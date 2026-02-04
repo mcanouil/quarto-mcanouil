@@ -67,11 +67,15 @@ $if(colour.background)$
   colour-background: $colour.background$,
 $elseif(colour-background)$
   colour-background: $colour-background$,
+$elseif(brand)$
+  colour-background: brand-color.at("background", default: none),
 $endif$
 $if(colour.foreground)$
   colour-foreground: $colour.foreground$,
 $elseif(colour-foreground)$
   colour-foreground: $colour-foreground$,
+$elseif(brand)$
+  colour-foreground: brand-color.at("foreground", default: none),
 $endif$
 $if(colour.muted)$
   colour-muted: $colour.muted$,
@@ -186,12 +190,23 @@ $endif$
 // Typography
 $if(mainfont)$
   font-body: "$mainfont$",
+$elseif(brand.typography.base.family)$
+  font-body: $brand.typography.base.family$,
 $endif$
 $if(sansfont)$
   font-headings: "$sansfont$",
+$elseif(brand.typography.headings.family)$
+  font-headings: $brand.typography.headings.family$,
+$endif$
+$if(codefont)$
+  font-code: ($for(codefont)$"$codefont$",$endfor$),
+$elseif(brand.typography.monospace.family)$
+  font-code: $brand.typography.monospace.family$,
 $endif$
 $if(fontsize)$
   font-size: $fontsize$,
+$elseif(brand.typography.base.size)$
+  font-size: $brand.typography.base.size$,
 $endif$
 $if(heading.weight)$
   heading-weight: "$heading.weight$",
@@ -329,64 +344,80 @@ $endif$
 // Define brand mode with default fallback to "light"
 #let effective-brand-mode = "$if(brand-mode)$$brand-mode$$else$light$endif$"
 
+// Helper to get colours with brand-color support
+// Uses brand-color from Quarto's brand.yml integration when available
+#let effective-colours() = {
+$if(brand)$
+  // brand.yml is configured - use brand-color injected by Quarto's typst-brand-yaml.lua filter
+  mcanouil-colours(
+    mode: effective-brand-mode,
+    colour-background: brand-color.at("background", default: none),
+    colour-foreground: brand-color.at("foreground", default: none),
+  )
+$else$
+  // No brand.yml - use template defaults
+  mcanouil-colours(mode: effective-brand-mode)
+$endif$
+}
+
 // Override Quarto's brand-color to respect template brand-mode
 // This ensures callouts and other Quarto-generated elements use the correct colours
 #let brand-colour-override = (
-  background: mcanouil-colours(mode: effective-brand-mode).background,
-  foreground: mcanouil-colours(mode: effective-brand-mode).foreground,
+  background: effective-colours().background,
+  foreground: effective-colours().foreground,
 )
 
 // Wrapper functions for typst-markdown filter
-// These inject colours from template brand-mode
+// These inject colours from template brand-mode with brand.yml support
 
 // Wrapper for .highlight divs
 #let mcanouil-highlight(content, ..args) = {
-  _highlight(content, mcanouil-colours(mode: effective-brand-mode), ..args)
+  _highlight(content, effective-colours(), ..args)
 }
 
 // Image border wrapper - uses template brand-mode colours
 #let mcanouil-image-border(content) = {
-  image-border(content, mcanouil-colours(mode: effective-brand-mode))
+  image-border(content, effective-colours())
 }
 
 // Wrapper for .value-box divs
 #let mcanouil-value-box(content, ..args) = {
-  render-value-box(colours: mcanouil-colours(mode: effective-brand-mode), ..args)
+  render-value-box(colours: effective-colours(), ..args)
 }
 
 // Wrapper for .panel divs
 #let mcanouil-panel(content, ..args) = {
-  render-panel(content, colours: mcanouil-colours(mode: effective-brand-mode), ..args)
+  render-panel(content, colours: effective-colours(), ..args)
 }
 
 // Wrapper for .badge spans
 #let mcanouil-badge(content, ..args) = {
-  render-badge(content, colours: mcanouil-colours(mode: effective-brand-mode), ..args)
+  render-badge(content, colours: effective-colours(), ..args)
 }
 
 // Wrapper for .divider divs
 #let mcanouil-divider(content, ..args) = {
-  render-divider(colours: mcanouil-colours(mode: effective-brand-mode), ..args)
+  render-divider(colours: effective-colours(), ..args)
 }
 
 // Wrapper for .progress divs
 #let mcanouil-progress(content, ..args) = {
-  render-progress(colours: mcanouil-colours(mode: effective-brand-mode), ..args)
+  render-progress(colours: effective-colours(), ..args)
 }
 
 // Wrapper for .executive-summary divs
 #let mcanouil-executive-summary(content, ..args) = {
-  render-executive-summary(content, colours: mcanouil-colours(mode: effective-brand-mode), ..args)
+  render-executive-summary(content, colours: effective-colours(), ..args)
 }
 
 // Wrapper for card grid rendering
 #let mcanouil-card-grid(cards, ..args) = {
-  render-card-grid(cards, mcanouil-colours(mode: effective-brand-mode), ..args)
+  render-card-grid(cards, effective-colours(), ..args)
 }
 
 // Wrapper for standalone .card divs
 #let mcanouil-card(content, ..args) = {
-  let colours = mcanouil-colours(mode: effective-brand-mode)
+  let colours = effective-colours()
   let named = args.named()
   let card-title = named.at("title", default: none)
   let card-footer = named.at("footer", default: none)
