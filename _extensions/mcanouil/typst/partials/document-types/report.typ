@@ -58,6 +58,7 @@
 /// Typography:
 /// @param font-body Body text font family
 /// @param font-headings Heading font family
+/// @param font-code Monospace font family for code
 /// @param font-size Base font size
 /// @param heading-weight Heading font weight
 /// @param heading-style Heading font style
@@ -146,6 +147,7 @@
   // Typography
   font-body: "Alegreya Sans",
   font-headings: "Alegreya Sans",
+  font-code: "Fira Code",
   font-size: 11pt,
   heading-weight: "bold",
   heading-style: "normal",
@@ -420,6 +422,9 @@
     leading: paragraph-settings.leading,
     first-line-indent: paragraph-settings.first-line-indent,
   )
+
+  // Monospace font for code
+  show raw: set text(font: font-code)
 
   // Section numbering (will be overridden in special section modes)
   set heading(numbering: section-numbering)
