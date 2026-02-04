@@ -12,11 +12,9 @@
 
 #let COLOUR-LIGHT-BACKGROUND = rgb("#fafafa")
 #let COLOUR-LIGHT-FOREGROUND = rgb("#333333")
-#let COLOUR-LIGHT-MUTED = rgb("#666666")
 
 #let COLOUR-DARK-BACKGROUND = rgb("#333333")
 #let COLOUR-DARK-FOREGROUND = rgb("#fafafa")
-#let COLOUR-DARK-MUTED = rgb("#999999")
 
 // Callout type colours (for admonitions)
 // All colours meet WCAG AA contrast ratio requirements (4.5:1) on light background
@@ -42,24 +40,35 @@
   colour-foreground: none,
   colour-muted: none,
 ) = {
+  // Build base with background and foreground only
   let base = if mode == "dark" {
     (
       background: COLOUR-DARK-BACKGROUND,
       foreground: COLOUR-DARK-FOREGROUND,
-      muted: COLOUR-DARK-MUTED,
     )
   } else {
     (
       background: COLOUR-LIGHT-BACKGROUND,
       foreground: COLOUR-LIGHT-FOREGROUND,
-      muted: COLOUR-LIGHT-MUTED,
     )
   }
 
   // Override with colour overrides if provided
   if colour-background != none { base.background = colour-background }
   if colour-foreground != none { base.foreground = colour-foreground }
-  if colour-muted != none { base.muted = colour-muted }
+
+  // Compute muted from foreground/background, or use explicit override
+  if colour-muted != none {
+    base.muted = colour-muted
+  } else {
+    // Compute muted as 50% mix between foreground and background
+    // This ensures muted adapts to brand colours automatically
+    base.muted = color.mix(
+      (base.background, 50%),
+      (base.foreground, 50%),
+      space: rgb,
+    )
+  }
 
   base
 }
