@@ -33,6 +33,7 @@ contributes:
       repo-link-rel: noopener noreferrer
       navbar:
         background: dark
+        foreground: light
         search: true
         logo:
           light: light
@@ -40,6 +41,7 @@ contributes:
         logo-alt: "Mickaël CANOUIL logo"
       sidebar:
         background: dark
+        foreground: light
         search: true
         logo:
           light: light
@@ -51,6 +53,8 @@ contributes:
         collapse-level: 2
       page-footer:
         border: true
+        background: dark
+        foreground: light
         left: |
           Powered by [Quarto](https://quarto.org){target="_blank" rel="noopener noreferrer"}.
         center: |
