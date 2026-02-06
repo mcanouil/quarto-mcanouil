@@ -823,15 +823,11 @@ img.about-image {
   }
 }
 
-// Sidebar toggle (inherits sidebar text colour via currentColor)
+// Sidebar toggle: use $sidebar-fg explicitly (Quarto does not set `color`
+// on .sidebar-navigation, so currentColor falls through to body colour).
 .sidebar-navigation .quarto-color-scheme-toggle {
-  &:not(.alternate) .bi::before {
-    @include toggle-icon($_icon-sun, currentColor);
-  }
-
-  &.alternate .bi::before {
-    @include toggle-icon($_icon-moon, currentColor);
-  }
+  &:not(.alternate) .bi::before { @include toggle-icon($_icon-sun, $sidebar-fg); }
+  &.alternate .bi::before { @include toggle-icon($_icon-moon, $sidebar-fg); }
 }
 
 // Top-right toggle (body area, uses dimmed foreground colour)
