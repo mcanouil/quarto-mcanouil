@@ -45,11 +45,9 @@ $_bg: #fafafa;
 $_sidebar-text: $_fg;
 
 @if variable-exists(sidebar-bg) {
-  $_sidebar-text: if(
-    abs(lightness($sidebar-bg) - lightness($_fg)) < abs(lightness($sidebar-bg) - lightness($_bg)),
-    $_bg,
-    $_fg
-  ) !global;
+  $_sidebar-text: if(abs(lightness($sidebar-bg) - lightness($_fg)) < abs(lightness($sidebar-bg) - lightness($_bg)),
+      $_bg,
+      $_fg ) !global;
 }
 
 // Internal link colour with fallback (like $_fg/$foreground pattern)
@@ -275,26 +273,17 @@ p:empty {
 }
 
 // Secondary navigation text and border
-// Quarto sets background from $navbar-bg but does not set colour on the base
-// rule, so children inherit body colour (which can match the background).
-// Explicitly set colour from $navbar-fg so all children (search icon, toggle,
-// breadcrumbs) are visible.
+// The secondary nav sits below the navbar but follows the *sidebar* colour
+// scheme, not the navbar one.  Use $_sidebar-text (auto-contrasted against
+// $sidebar-bg) so the search icon, toggle, and breadcrumbs remain visible
+// regardless of whether the sidebar is light or dark.
 nav.quarto-secondary-nav {
   border-bottom: 1px solid body-mix(50%);
-
-  @if variable-exists(navbar-fg) {
-    color: $navbar-fg;
-  } @else {
-    color: $_bg;
-  }
+  color: $_sidebar-text;
 
   // .btn explicitly sets color via --bs-btn-color, overriding inheritance.
   .quarto-search-button {
-    @if variable-exists(navbar-fg) {
-      color: $navbar-fg;
-    } @else {
-      color: $_bg;
-    }
+    color: $_sidebar-text;
   }
 }
 
