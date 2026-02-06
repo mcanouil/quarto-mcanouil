@@ -39,18 +39,18 @@ contributes:
           light: light
           dark: dark
         logo-alt: "Mickaël CANOUIL logo"
-      sidebar:
-        # background: dark
-        # foreground: light
-        # style: docked
-        search: true
-        logo:
-          light: light
-          dark: dark
-        logo-alt: "Mickaël CANOUIL logo"
-        pinned: true
-        align: center
-        collapse-level: 2
+      # sidebar:
+      #   background: dark
+      #   foreground: light
+      #   style: docked
+      #   search: true
+      #   logo:
+      #     light: light
+      #     dark: dark
+      #   logo-alt: "Mickaël CANOUIL logo"
+      #   pinned: true
+      #   align: center
+      #   collapse-level: 2
       page-footer:
         border: true
         # background: dark
