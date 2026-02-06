@@ -1983,20 +1983,35 @@ div.sourceCode {
   }
 }
 
-// Sidebar title text colour (inherits from $sidebar-fg set by brand/metadata)
+// Sidebar title text colour
 .sidebar-navigation .sidebar-title a {
-  color: inherit;
+  color: $sidebar-fg;
 }
 
-// Sidebar search theming (inherits from $sidebar-fg set by brand/metadata)
+// Sidebar search theming: use $sidebar-fg explicitly because Quarto does not
+// set a `color` on .sidebar-navigation, so `inherit` falls through to body.
+// The .aa-Input override is needed because Quarto's base rule
+// (.aa-DetachedFormContainer .aa-Form .aa-InputWrapper .aa-Input) has higher
+// specificity (4 classes) and sets color to $body-color, which can match the
+// sidebar background in dark mode, making the cursor and text invisible.
 .sidebar-search .aa-Form {
   background-color: transparent;
-  border-color: currentColor;
-  color: inherit;
+  border-color: $sidebar-fg;
+  color: $sidebar-fg;
+
+  .aa-InputWrapper .aa-Input {
+    color: $sidebar-fg;
+    caret-color: $sidebar-fg;
+
+    &::placeholder {
+      color: $sidebar-fg;
+      opacity: 0.5;
+    }
+  }
 
   .aa-InputWrapperPrefix .aa-Label svg,
   .aa-InputWrapperPrefix .aa-LoadingIndicator svg {
-    color: inherit;
+    color: $sidebar-fg;
     opacity: 0.8;
   }
 }
@@ -2005,7 +2020,7 @@ div.sourceCode {
 .sidebar-tools-main {
 
   #quarto-search .aa-DetachedSearchButton .aa-DetachedSearchButtonIcon {
-    color: inherit;
+    color: $sidebar-fg;
   }
 }
 
