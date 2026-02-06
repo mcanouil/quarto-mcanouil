@@ -275,7 +275,7 @@ p:empty {
 // $sidebar-bg) so the search icon, toggle, and breadcrumbs remain visible
 // regardless of whether the sidebar is light or dark.
 nav.quarto-secondary-nav {
-  border-bottom: 1px solid body-mix(50%);
+  border-bottom: 1px solid rgba($sidebar-fg, 0.3);
   color: $sidebar-fg;
 
   // .btn explicitly sets color via --bs-btn-color, overriding inheritance.
@@ -624,11 +624,11 @@ img.about-image {
 .navbar {
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  border-bottom: 1px solid body-mix(50%);
+  border-bottom: 1px solid rgba($navbar-fg, 0.2);
 
   &.bg-primary,
   &.bg-dark {
-    border: 1px solid body-mix(50%);
+    border: 1px solid rgba($navbar-fg, 0.2);
   }
 
   &.fixed-top {
@@ -641,15 +641,40 @@ img.about-image {
 }
 
 // Footer navigation
-// Background and text colours are controlled by $footer-bg/$footer-fg
-// (set via brand.yml defaults + page-footer metadata).
-.nav-footer,
-.footer {
-  border-top: 1px solid body-mix(50%);
+// Quarto's `body .nav-footer` sets border-top to #dee2e6.  Match that
+// specificity with `body` prefix.  Use $footer-fg which Quarto computes from
+// the page-footer background/foreground metadata.  When these are not set,
+// $footer-fg falls back to an auto-computed value; set explicit page-footer
+// background/foreground in _extension.yml or _quarto.yml for best results.
+body .nav-footer,
+body .footer {
+  border-top: 1px solid rgba($footer-fg, 0.3);
+  color: $footer-fg;
 
-  a:hover {
-    color: inherit;
-    opacity: 0.8;
+  a {
+    color: $footer-fg;
+
+    &:hover {
+      color: $footer-fg;
+      opacity: 0.8;
+    }
+  }
+}
+
+// Horizontal rule: use body foreground for brand-awareness
+hr {
+  color: $body-color;
+  border-top-color: $body-color;
+  opacity: 0.25;
+}
+
+// Appendix border: override Quarto's #dee2e6 default with brand foreground
+#quarto-appendix.default {
+  border-top-color: rgba($body-color, 0.15);
+
+  .quarto-appendix-bibtex,
+  .quarto-appendix-citeas {
+    border-color: rgba($body-color, 0.15);
   }
 }
 
@@ -826,8 +851,13 @@ img.about-image {
 // Sidebar toggle: use $sidebar-fg explicitly (Quarto does not set `color`
 // on .sidebar-navigation, so currentColor falls through to body colour).
 .sidebar-navigation .quarto-color-scheme-toggle {
-  &:not(.alternate) .bi::before { @include toggle-icon($_icon-sun, $sidebar-fg); }
-  &.alternate .bi::before { @include toggle-icon($_icon-moon, $sidebar-fg); }
+  &:not(.alternate) .bi::before {
+    @include toggle-icon($_icon-sun, $sidebar-fg);
+  }
+
+  &.alternate .bi::before {
+    @include toggle-icon($_icon-moon, $sidebar-fg);
+  }
 }
 
 // Top-right toggle (body area, uses dimmed foreground colour)
@@ -3004,8 +3034,14 @@ nav#TOC {
 // SIDEBAR & BREADCRUMBS
 // ===========================
 
-// Sidebar navigation hover effects
-.sidebar-navigation {
+// Sidebar border: override Quarto's .sidebar.sidebar-navigation:not(.rollup)
+// which uses #dee2e6.  Match full selector for equal specificity; !important to
+// override their !important.
+.sidebar.sidebar-navigation:not(.rollup) {
+  border-right: 1px solid rgba($sidebar-fg, 0.2) !important;
+}
+
+.sidebar.sidebar-navigation {
   .sidebar-item {
     transition: all $_anim-fast ease;
 
