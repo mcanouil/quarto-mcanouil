@@ -79,6 +79,8 @@ contributes:
       lang: en
       code-copy: true
       code-overflow: wrap
+      code-link: false
+      code-tools: false
       date: today
       date-format: "dddd[, the] Do [of] MMMM, YYYY"
       mermaid:
@@ -111,6 +113,7 @@ contributes:
         - html/partials/_title-metadata-professional.html
         - html/partials/_title-meta-author.html
       # Theme
+      respect-user-color-scheme: true
       theme:
         light:
           - cosmo
