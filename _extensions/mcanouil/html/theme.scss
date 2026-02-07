@@ -525,6 +525,11 @@ pre.code-annotation-code {
   }
 }
 
+// Tab content borders (Quarto/Bootstrap default is #dee2e6)
+.tab-content {
+  border-color: rgba($body-color, 0.15);
+}
+
 // Tooltips
 .tooltip {
   animation: fadeIn 0.2s ease;
@@ -848,9 +853,18 @@ hr {
   }
 }
 
-// Sidebar toggle: use $sidebar-fg explicitly (Quarto does not set `color`
-// on .sidebar-navigation, so currentColor falls through to body colour).
+// Sidebar toggle: inherit size and colour from sidebar tools.
+// Other tools (.quarto-navigation-tool) use font-size: .875rem + opacity: .7.
+// The toggle already has .quarto-navigation-tool so it gets those, but the
+// ::before pseudo-element is hardcoded at 1rem.  Override to match.
 .sidebar-navigation .quarto-color-scheme-toggle {
+  .bi::before {
+    height: 0.875rem;
+    width: 0.875rem;
+    background-size: 0.875rem 0.875rem;
+    vertical-align: middle;
+  }
+
   &:not(.alternate) .bi::before {
     @include toggle-icon($_icon-sun, $sidebar-fg);
   }
@@ -1874,14 +1888,8 @@ nav span code:not(.sourceCode) {
   border: 1px solid rgba($body-color, 0.12);
 }
 
-// Code blocks with hover shadow
 div.sourceCode {
-  transition: box-shadow 0.3s ease;
   border-radius: $_radius-md;
-
-  &:hover {
-    box-shadow: $_shadow-md;
-  }
 }
 
 // Code with filename wrapper (macOS-style code window)
@@ -1951,19 +1959,20 @@ div.sourceCode {
     border-top: none;
   }
 
-  // Hover effect for the entire wrapper
-  &:hover {
-    .code-with-filename-file {
-      background-color: rgba($body-color, 0.1);
-    }
-  }
-
   // Auto-generated filenames display in simulated small caps (uppercase, smaller)
   &.code-window-auto {
     .code-with-filename-file pre strong {
       text-transform: uppercase;
       font-size: 0.8em;
     }
+  }
+}
+
+// Dark mode override for code filename header (Quarto base uses #555)
+[data-bs-theme="dark"],
+.quarto-dark {
+  .code-with-filename .code-with-filename-file {
+    background-color: rgba($body-color, 0.08);
   }
 }
 
@@ -2745,6 +2754,11 @@ figure {
 // ===========================
 // TABLE OF CONTENTS (TOC)
 // ===========================
+
+// TOC link border-left: override Quarto's #e9ecef with brand colour
+.sidebar nav[role="doc-toc"] > ul a {
+  border-left-color: rgba($body-color, 0.1);
+}
 
 // TOC navigation with animated indicators
 nav#TOC {
