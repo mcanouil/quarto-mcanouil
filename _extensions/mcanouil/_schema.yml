@@ -92,7 +92,8 @@ shortcodes:
         description: "Descriptive label below the value."
       icon:
         type: string
-        description: "Icon character or shortcut name (up, down, stable). Any character is accepted."
+        description: "Icon character or shortcut name (up, down, stable)."
+        enum: [up, down, stable]
       colour:
         type: string
         default: "info"
