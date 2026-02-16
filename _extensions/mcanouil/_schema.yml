@@ -35,6 +35,22 @@ options:
     type: boolean
     default: true
     description: "Hide the navbar brand and title (HTML)."
+  code-window:
+    type: object
+    description: "Configuration for macOS-style code block window decorations."
+    properties:
+      enabled:
+        type: boolean
+        default: true
+        description: "Enable code-window styling on code blocks."
+      auto-filename:
+        type: boolean
+        default: true
+        description: "Automatically generate filename labels from the code block language."
+      wrapper:
+        type: string
+        default: "mcanouil-code-window"
+        description: "Typst wrapper function name for code-window rendering."
 
 shortcodes:
   divider:
