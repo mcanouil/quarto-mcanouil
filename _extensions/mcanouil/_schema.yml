@@ -2,6 +2,8 @@
 # Provides configuration validation and IDE support for options,
 # shortcodes, formats, and element attributes.
 
+$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v1/extension-schema.json
+
 options:
   grid-background:
     type: boolean
@@ -106,7 +108,7 @@ shortcodes:
     description: "Render a progress bar."
     attributes:
       value:
-        type: number
+        type: integer
         default: 0
         min: 0
         max: 100
