@@ -1281,7 +1281,7 @@ The template is designed with PDF accessibility (PDF/UA-1) compliance in mind:
 
 To use these features in your own documents:
 
-1. Install the template extension: `quarto add mcanouil/quarto-mcanouil@0.16.0`.
+1. Install the template extension: `quarto add mcanouil/quarto-mcanouil@0.16.1`.
 2. Set the format in YAML front matter: `format: mcanouil-html`, `format: mcanouil-typst`, or `format: mcanouil-revealjs`.
 3. Customise template parameters as demonstrated in this document's YAML.
 4. Copy and adapt examples from each section as needed.
