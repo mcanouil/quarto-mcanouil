@@ -1,6 +1,6 @@
 # Schema for the mcanouil extension
 # Provides configuration validation and IDE support for options,
-# shortcodes, formats, and element attributes.
+# shortcodes, formats, attributes, and classes.
 
 $schema: https://m.canouil.dev/quarto-wizard/assets/schema/v1/extension-schema.json
 
@@ -216,7 +216,7 @@ formats:
       enum: [light, dark]
       description: "Brand colour mode for the presentation."
 
-element-attributes:
+attributes:
   panel:
     title:
       type: string
@@ -279,3 +279,27 @@ element-attributes:
     icon:
       type: string
       description: "Icon character displayed before the badge text."
+
+classes:
+  panel:
+    description: "Styled panel container with title, icon, and colour theme."
+  executive-summary:
+    description: "Executive summary section with title and decorative brackets."
+  card-grid:
+    description: "Grid layout for card components."
+  card:
+    description: "Card component with title, style, and colour options."
+  card-footer:
+    description: "Footer section within a card component."
+  highlight:
+    description: "Content emphasis block."
+  badge:
+    description: "Inline badge element with colour and icon."
+  panel-tabset:
+    description: "Tabbed panel container."
+  references:
+    description: "Special section for references."
+  appendix:
+    description: "Special section for appendix content."
+  supplementary:
+    description: "Special section for supplementary material."
