@@ -61,7 +61,7 @@ shortcodes:
       style:
         type: string
         default: "solid"
-        enum: [solid, dashed, dotted, double]
+        enum: [solid, dashed, dotted, ornamental, gradient]
         description: "Border style of the divider line."
       label:
         type: string
@@ -94,8 +94,7 @@ shortcodes:
         description: "Descriptive label below the value."
       icon:
         type: string
-        description: "Icon character or shortcut name (up, down, stable)."
-        enum: [up, down, stable]
+        description: "Icon character or shortcut name (up, down, stable). Accepts any UTF-8 character."
       colour:
         type: string
         default: "info"
@@ -238,7 +237,7 @@ element-attributes:
       description: "Title for the executive summary section."
     show-corner-brackets:
       type: boolean
-      default: false
+      default: true
       description: "Show decorative corner brackets."
 
   card-grid:
@@ -246,6 +245,9 @@ element-attributes:
       type: string
       default: "3"
       description: "Number of columns in the card grid."
+    alt:
+      type: string
+      description: "Alternative text for the card grid (wraps grid in a figure; Typst only)."
 
   card:
     title:
@@ -254,14 +256,17 @@ element-attributes:
     style:
       type: string
       default: "subtle"
-      description: "Colour theme for the card."
-      enum: [info, success, warning, danger, caution, neutral, subtle, emphasis, accent, outline]
+      description: "Visual style for the card."
+      enum: [subtle, outlined, filled]
     colour:
       type: string
       aliases: [color]
       description: "Custom accent colour for the card."
       completion:
         type: color
+
+  # Highlight block for emphasising content (no user-facing attributes).
+  highlight: {}
 
   badge:
     colour:
