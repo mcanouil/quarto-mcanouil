@@ -127,7 +127,9 @@ contributes:
           - cosmo
           - brand
           - html/theme.scss
-      syntax-highlighting: github
+      syntax-highlighting:
+        light: github-light
+        dark: github-dark
       # Layout
       grid:
         sidebar-width: 300px
