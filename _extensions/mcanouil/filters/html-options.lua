@@ -61,7 +61,8 @@ local function Meta(meta)
   })
 
   -- Check extensions.mcanouil.hide-navbar-title option
-  if utils.get_mcanouil_config(meta, 'hide-navbar-title') then
+  local mcanouil_config = utils.get_extension_config(meta, 'mcanouil')
+  if mcanouil_config and mcanouil_config['hide-navbar-title'] then
     quarto.doc.add_html_dependency({
       name = 'hide-navbar-title',
       version = '1.0.0',

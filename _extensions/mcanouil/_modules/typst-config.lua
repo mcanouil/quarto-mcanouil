@@ -146,8 +146,8 @@ local function load_element_mappings(meta)
   }
 
   -- Read configuration from extensions.mcanouil.typst-markdown
-  local extension_config = meta.extensions and meta.extensions.mcanouil
-      and meta.extensions.mcanouil[SECTION_NAME]
+  local mcanouil_config = utils.get_extension_config(meta, 'mcanouil')
+  local extension_config = mcanouil_config and mcanouil_config[SECTION_NAME]
   if not extension_config then
     return user_mappings
   end
