@@ -67,7 +67,8 @@ body {
 --- @param meta pandoc.Meta Document metadata
 --- @return pandoc.Meta Unmodified metadata
 local function Meta(meta)
-  local config = utils.get_mcanouil_config(meta, 'grid-background')
+  local mcanouil_config = utils.get_extension_config(meta, 'mcanouil')
+  local config = mcanouil_config and mcanouil_config['grid-background']
   -- Default is false (no grid); inject CSS only when explicitly true
   if config ~= nil and pandoc.utils.stringify(config) == 'true' then
     quarto.doc.add_html_dependency({
