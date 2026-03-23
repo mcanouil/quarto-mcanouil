@@ -25,8 +25,8 @@ end
 -- MODULES
 -- ============================================================================
 
-local utils = require(
-  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+local meta_mod = require(
+  quarto.utils.resolve_path('../_modules/metadata.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================
@@ -67,7 +67,7 @@ body {
 --- @param meta pandoc.Meta Document metadata
 --- @return pandoc.Meta Unmodified metadata
 local function Meta(meta)
-  local mcanouil_config = utils.get_extension_config(meta, 'mcanouil')
+  local mcanouil_config = meta_mod.get_extension_config(meta, 'mcanouil')
   local config = mcanouil_config and mcanouil_config['grid-background']
   -- Default is false (no grid); inject CSS only when explicitly true
   if config ~= nil and pandoc.utils.stringify(config) == 'true' then

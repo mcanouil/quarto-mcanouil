@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Refactoring
+
+- refactor: Replace monolithic `utils.lua` with focused modules (`string.lua`, `logging.lua`, `metadata.lua`, `pandoc-helpers.lua`, `html.lua`, `paths.lua`, `colour.lua`).
+
 ## 0.16.3 (2026-03-23)
 
 ### New Features
@@ -29,8 +33,6 @@
 - fix: Update quarto version requirement and syntax highlighting.
 
 ## 0.15.6 (2026-02-11)
-
-No user-facing changes.
 
 ## 0.15.5 (2026-02-07)
 
@@ -134,8 +136,6 @@ No user-facing changes.
 
 ## 0.12.1 (2026-02-01)
 
-No user-facing changes.
-
 ## 0.12.0 (2026-02-01)
 
 ### New Features
@@ -204,8 +204,6 @@ No user-facing changes.
 
 ## 0.7.4 (2026-01-26)
 
-No user-facing changes.
-
 ## 0.7.3 (2026-01-26)
 
 ### Bug Fixes
@@ -219,8 +217,6 @@ No user-facing changes.
 - fix: Update output file name for academic format.
 
 ## 0.7.1 (2026-01-26)
-
-No user-facing changes.
 
 ## 0.7.0 (2026-01-26)
 
