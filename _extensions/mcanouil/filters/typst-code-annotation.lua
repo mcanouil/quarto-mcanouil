@@ -21,8 +21,8 @@ end
 -- MODULE IMPORTS
 -- ============================================================================
 
-local utils = require(
-  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+local str = require(
+  quarto.utils.resolve_path('../_modules/string.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================
@@ -120,13 +120,13 @@ local function annotation_provider(lang)
     return nil
   end
 
-  local start_comment = utils.escape_pattern(comment_chars[1])
+  local start_comment = str.escape_pattern(comment_chars[1])
   local match_expr = '.*' .. start_comment .. '%s*<([0-9]+)>%s*'
   local strip_prefix = '%s*' .. start_comment .. '%s*<'
   local strip_suffix = '>%s*'
 
   if #comment_chars == 2 then
-    local end_comment = utils.escape_pattern(comment_chars[2])
+    local end_comment = str.escape_pattern(comment_chars[2])
     match_expr = match_expr .. end_comment .. '%s*'
     strip_suffix = strip_suffix .. end_comment .. '%s*'
   end

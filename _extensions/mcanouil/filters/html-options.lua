@@ -22,8 +22,8 @@ end
 -- MODULES
 -- ============================================================================
 
-local utils = require(
-  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+local meta_mod = require(
+  quarto.utils.resolve_path('../_modules/metadata.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================
@@ -61,7 +61,7 @@ local function Meta(meta)
   })
 
   -- Check extensions.mcanouil.hide-navbar-title option
-  local mcanouil_config = utils.get_extension_config(meta, 'mcanouil')
+  local mcanouil_config = meta_mod.get_extension_config(meta, 'mcanouil')
   if mcanouil_config and mcanouil_config['hide-navbar-title'] then
     quarto.doc.add_html_dependency({
       name = 'hide-navbar-title',
