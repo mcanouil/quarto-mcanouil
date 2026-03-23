@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-No user-facing changes.
+### New Features
+
+- feat: Add bidirectional linking to Typst code annotations.
+- feat: Add upstream-compatible Quarto code annotation functions for forward compatibility with quarto-dev/quarto-cli#14170.
 
 ## 0.16.1 (2026-02-21)
 
