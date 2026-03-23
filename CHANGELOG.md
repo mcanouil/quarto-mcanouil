@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.16.3 (2026-03-23)
+
 ### New Features
 
 - feat: Add bidirectional linking to Typst code annotations.
