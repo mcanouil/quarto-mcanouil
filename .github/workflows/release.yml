@@ -7,16 +7,19 @@ on:
         type: choice
         description: "Version"
         required: false
-        default: "patch"
+        default: "minor"
         options:
           - "patch"
           - "minor"
           - "major"
       quarto:
-        type: string
+        type: choice
         description: "Quarto version"
         required: false
-        default: "pre-release"
+        default: "release"
+        options:
+          - "release"
+          - "pre-release"
 
 permissions:
   contents: write
@@ -26,15 +29,9 @@ permissions:
 
 jobs:
   release:
-    uses: mcanouil/quarto-workflows/.github/workflows/release-extension.yml@main
+    uses: mcanouil/quarto-workflows/.github/workflows/release.yml@main
     secrets: inherit
     with:
       gh-app-id: ${{ vars.APP_ID }}
       version: "${{ github.event.inputs.version }}"
-      formats: "mcanouil-html+academic mcanouil-typst+dark+pro mcanouil-typst+light+pro mcanouil-typst+dark+aca mcanouil-typst+light+aca mcanouil-html mcanouil-revealjs+dark mcanouil-revealjs+light"
       quarto: "${{ github.event.inputs.quarto }}"
-      post-render: false
-      tinytex: false
-      r: false
-      python: false
-      julia: false
