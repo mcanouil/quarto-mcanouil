@@ -1905,7 +1905,7 @@ div.sourceCode {
 
   // Filename header (title bar)
   .code-with-filename-file {
-    background-color: rgba($body-color, 0.08);
+    background-color: body-mix(92%);
     border-bottom: 1px solid rgba($body-color, 0.5);
     padding: 0.6em 1em;
     margin: 0;
@@ -1969,14 +1969,6 @@ div.sourceCode {
       text-transform: uppercase;
       font-size: 0.8em;
     }
-  }
-}
-
-// Dark mode override for code filename header (Quarto base uses #555)
-[data-bs-theme="dark"],
-.quarto-dark {
-  .code-with-filename .code-with-filename-file {
-    background-color: rgba($body-color, 0.08);
   }
 }
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: Use opaque background colour for filename bar to prevent parent background bleed-through.
+
 ## 0.17.0 (2026-03-23)
 
 ### Refactoring
