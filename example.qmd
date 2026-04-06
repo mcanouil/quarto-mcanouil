@@ -134,7 +134,6 @@ other-links:
     target: _blank
     rel: noopener noreferrer
 engine: markdown
-syntax-highlighting: github-dark
 ---
 
 ## Introduction {#sec-intro}

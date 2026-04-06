@@ -183,8 +183,6 @@
   link-underline: true,
   link-underline-opacity: 50%,
   link-colour: none,
-  // Syntax Highlighting
-  syntax-highlighting: "mcanouil",
   // Content
   body,
 ) = {
@@ -461,23 +459,11 @@
   // Link styling
   show link: it => apply-link-style(it, colours, link-colour, link-underline, link-underline-opacity)
 
-  // Code block and inline code styling
-  // Only apply custom styling with "mcanouil" syntax highlighting;
-  // other modes (idiomatic, Skylighting themes) use Quarto/Pandoc defaults.
-  show raw.where(block: true): it => {
-    if syntax-highlighting == "mcanouil" {
-      apply-code-block-style(it, colours, breakable-settings)
-    } else {
-      it
-    }
-  }
-  show raw.where(block: false): it => {
-    if syntax-highlighting == "mcanouil" {
-      apply-inline-code-style(it, colours)
-    } else {
-      it
-    }
-  }
+  // Code block styling
+  show raw.where(block: true): it => apply-code-block-style(it, colours, breakable-settings)
+
+  // Inline code styling
+  show raw.where(block: false): it => apply-inline-code-style(it, colours)
 
   // Blockquote styling
   show quote.where(block: true): it => apply-quote-style(it, colours, quote-width, quote-align, breakable-settings)

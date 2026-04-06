@@ -339,9 +339,6 @@ $if(link.colour)$
 $elseif(link-colour)$
   link-colour: $link-colour$,
 $endif$
-$if(syntax-highlighting)$
-  syntax-highlighting: "$syntax-highlighting$",
-$endif$
 )
 
 // Define brand mode with default fallback to "light"
