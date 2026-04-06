@@ -5,6 +5,7 @@
 ### New Features
 
 - feat: Add title block group toggles for HTML (`title-block-authors`, `title-block-abstract`, `title-block-meta`).
+- feat: Add multi-style code-window support (macOS, Windows, default) with block-level overrides, Skylighting hotfix, and integrated code annotations for Typst.
 
 ### Bug Fixes
 
