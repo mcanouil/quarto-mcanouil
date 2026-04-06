@@ -157,6 +157,18 @@ formats:
       enum: [professional, academic]
       enum-case-insensitive: true
       description: "Template style variant for the HTML format."
+    title-block-authors:
+      type: boolean
+      default: true
+      description: "Show authors, affiliations, and corresponding author in the title block."
+    title-block-abstract:
+      type: boolean
+      default: true
+      description: "Show abstract and keywords in the title block."
+    title-block-meta:
+      type: boolean
+      default: true
+      description: "Show dates, DOI, and categories in the title block."
 
   mcanouil-typst:
     document-type:
@@ -228,7 +240,19 @@ attributes:
       type: string
       default: "subtle"
       description: "Colour theme for the panel border."
-      enum: [info, success, warning, danger, caution, neutral, subtle, emphasis, accent, outline]
+      enum:
+        [
+          info,
+          success,
+          warning,
+          danger,
+          caution,
+          neutral,
+          subtle,
+          emphasis,
+          accent,
+          outline,
+        ]
 
   executive-summary:
     title:
