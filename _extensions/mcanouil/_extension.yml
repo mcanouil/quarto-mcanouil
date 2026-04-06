@@ -169,7 +169,7 @@ contributes:
       show-title-page-background: true # Geometric background on title page
       show-heading-underlines: true # Gradient underlines below headings
       show-logo: true # Display logo in header
-      syntax-highlighting: idiomatic
+      syntax-highlighting: mcanouil
       # Logo/Visual assets
       logo:
         light:
