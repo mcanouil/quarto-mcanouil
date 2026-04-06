@@ -33,7 +33,7 @@ The extension provides three format families:
 
 - **Brand theming**: Consistent colours, typography, and logos across all formats via `brand.yml`.
 - **Custom components**: Value boxes, info panels, status badges, dividers, progress bars, card grids, and executive summaries.
-- **Code windows**: macOS-style code block headers with filename display.
+- **Code windows**: Code block window decorations (macOS, Windows, or plain style) with filename display and block-level overrides.
 - **Grid background**: Subtle grid overlay for HTML and Reveal.js.
 - **Special sections**: Auto-relocating appendix and supplementary sections with custom numbering (Typst).
 - **Accessibility**: PDF/UA-1 compliance, alt text support, and WCAG AA contrast validation (Typst).

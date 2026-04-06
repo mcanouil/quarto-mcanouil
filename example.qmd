@@ -766,7 +766,9 @@ Variable names like `my_variable`, function calls like `calculate_mean()`, and c
 
 #### Code Windows
 
-When `extensions.mcanouil.code-window.enabled: true` is set (the default), code blocks with a `filename` attribute display a macOS-style window header.
+When `extensions.mcanouil.code-window.enabled: true` is set (the default), code blocks with a `filename` attribute display a window-style header.
+The decoration style is controlled by `extensions.mcanouil.code-window.style` and can be `"macos"` (traffic lights, the default), `"windows"` (title bar buttons), or `"default"` (plain filename).
+Individual blocks can override the style with `code-window-style`, opt out with `code-window-enabled="false"`, or suppress auto-filenames with `code-window-no-auto-filename`.
 With `extensions.mcanouil.code-window.auto-filename: true` (the default), code blocks without explicit filenames automatically show the language name in small-caps styling.
 
 ```{.python filename="fibonacci.py"}
@@ -1235,7 +1237,7 @@ Standard Quarto features work seamlessly with enhanced styling:
 - **Mathematics** (@sec-maths): Inline expressions and display equations with cross-references.
 - **Callouts** (@sec-callouts): Five callout types (note, tip, important, warning, caution).
 - **Tabsets** (@sec-tabsets): Panel tabsets with automatic Typst conversion to headings.
-- **Code Blocks** (@sec-code): Syntax highlighting for Python, R, Bash, inline code, and macOS-style code windows.
+- **Code Blocks** (@sec-code): Syntax highlighting for Python, R, Bash, inline code, and code windows (macOS, Windows, or plain style).
 
 ### Typography and Layout
 
@@ -1477,8 +1479,9 @@ extensions:
     grid-background: false           # Subtle grid overlay (default: false)
     # Code window styling (all formats)
     code-window:
-      enabled: true                  # macOS-style code windows (default: true)
+      enabled: true                  # Code window decorations (default: true)
       auto-filename: true            # Auto-show language name (default: true)
+      style: macos                   # Style: macos, windows, or default
     # HTML only
     hide-navbar-title: true          # Hide title from navbar (default: true)
     # Reveal.js only
