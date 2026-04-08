@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.18.0 (2026-04-08)
+
 ### New Features
 
 - feat: Add title block group toggles for HTML (`title-block-authors`, `title-block-abstract`, `title-block-meta`).
