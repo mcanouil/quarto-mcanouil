@@ -222,6 +222,8 @@ contributes:
         - typst/partials/typst-show.typ
       # Typst-specific filters
       filters:
+        - at: pre-ast
+          path: filters/typst-syntax-highlighting.lua
         - at: pre-quarto
           path: filters/page-break-inside.lua
         - at: pre-quarto

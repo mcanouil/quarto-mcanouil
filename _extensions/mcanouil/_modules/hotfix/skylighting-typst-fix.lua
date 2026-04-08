@@ -27,8 +27,17 @@ local function build_skylighting_override()
   local hm = PANDOC_WRITER_OPTIONS and PANDOC_WRITER_OPTIONS.highlight_method
   if not hm then return nil end
 
+  -- Detect active Skylighting from text-styles (always present when active).
+  -- background-color may be nil/userdata for themes without an explicit bg.
+  if not hm['text-styles'] then return nil end
+
   local bg = hm['background-color']
-  if not bg or type(bg) ~= 'string' then return nil end
+  local bg_expr
+  if bg and type(bg) == 'string' then
+    bg_expr = string.format('if fill != none { fill } else { rgb("%s") }', bg)
+  else
+    bg_expr = 'fill'
+  end
 
   local circled = _wrapper_prefix .. '-circled-number'
   return string.format([==[
@@ -39,7 +48,7 @@ local function build_skylighting_override()
   start: 1,
   sourcelines,
 ) = {
-  let bgcolor = if fill != none { fill } else { rgb("%s") }
+  let bgcolor = %s
   let has-gutter = start + sourcelines.len() > 999
 
   context {
@@ -102,7 +111,7 @@ local function build_skylighting_override()
     )
   }
 }
-]==], bg, circled, circled)
+]==], bg_expr, circled, circled)
 end
 
 --- Build a show raw.line rule for annotation support in idiomatic mode.
@@ -179,18 +188,13 @@ local function process_typst_inline(el)
   rendered = rendered:gsub('%s+$', '')
   if rendered == '' then return el end
 
-  local typst_code
-  if bg_fill then
-    typst_code = string.format(
-      '#box(fill: %s, inset: (x: 3pt, y: 0pt), outset: (y: 3pt), radius: 2pt, stroke: none)[%s]',
-      bg_fill, rendered)
-  else
-    typst_code = string.format(
-      '#context { let _bg = _cw-page-bg(); let _f = _cw-fg(_bg); '
-      .. 'box(fill: color.mix((_f, 10%%), (_bg, 90%%)), '
-      .. 'inset: (x: 3pt, y: 0pt), outset: (y: 3pt), radius: 2pt, stroke: none)[%s] }',
-      rendered)
-  end
+  -- In idiomatic mode (no Skylighting background), return unchanged and let
+  -- the Typst show rule (apply-inline-code-style) handle the background.
+  if not bg_fill then return el end
+
+  local typst_code = string.format(
+    '#box(fill: %s, inset: (x: 3pt, y: 0pt), outset: (y: 3pt), radius: 2pt, stroke: none)[%s]',
+    bg_fill, rendered)
 
   return pandoc.RawInline('typst', typst_code)
 end
