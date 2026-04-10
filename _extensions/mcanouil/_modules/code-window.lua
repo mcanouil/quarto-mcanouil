@@ -392,10 +392,14 @@ end
 --- Handles both code-window wrapping and standalone annotation rendering.
 --- @param block pandoc.CodeBlock
 --- @param next_block pandoc.Block|nil The block following this CodeBlock
+--- @param wrap_expansions boolean If true, multi-block expansions are wrapped
+---   in a Pandoc Div so Quarto's layout processor sees a single child per
+---   CodeBlock (prevents layout-ncol from splitting open/body/close across
+---   grid cells).
 --- @return pandoc.List replacement_blocks Blocks to splice in
 --- @return boolean consumed_next Whether the next block was consumed
 --- @return integer|nil annotation_block_id Block ID if annotations were found (for parent propagation)
-local function process_typst_block(block, next_block)
+local function process_typst_block(block, next_block, wrap_expansions)
   local filename, is_auto, block_style, window_opted_out = resolve_window_params(block)
   local has_window = filename and filename ~= ''
   local effective_style = block_style or CONFIG.style
@@ -455,8 +459,36 @@ local function process_typst_block(block, next_block)
     consumed_next = true
   end
 
+  -- When the current block sits directly inside a layout-ncol/layout-nrow/
+  -- layout Div, Quarto's layout processor distributes each direct child into
+  -- a grid cell. A multi-block expansion would be split across cells, leaving
+  -- the #mcanouil-code-window(...)[ opener and its closing ] in different
+  -- cells and producing unclosed Typst delimiters. Wrap the expansion in a
+  -- Div so the layout processor sees it as a single child.
+  if wrap_expansions and #result > 1 then
+    result = {
+      pandoc.Div(
+        pandoc.Blocks(result),
+        pandoc.Attr('', { 'cw-typst-layout-group' })
+      ),
+    }
+  end
+
   local returned_block_id = has_annotations and (not consumed_next) and block_id or nil
   return result, consumed_next, returned_block_id
+end
+
+--- Detect whether a Div is a Quarto layout container. Layout containers
+--- distribute direct block children across grid cells; expanded code-window
+--- blocks must be grouped in a single child to survive this distribution.
+--- @param div pandoc.Div
+--- @return boolean
+local function is_layout_div(div)
+  local attrs = div.attributes
+  if not attrs then return false end
+  return attrs['layout-ncol'] ~= nil
+    or attrs['layout-nrow'] ~= nil
+    or attrs['layout'] ~= nil
 end
 
 --- Check if a Div is Quarto's DecoratedCodeBlock wrapper.
@@ -485,9 +517,12 @@ end
 --- Process a flat list of blocks for Typst, handling CodeBlocks and their
 --- following OrderedLists. Called recursively on Div contents.
 --- @param blocks pandoc.Blocks|pandoc.List
+--- @param wrap_expansions boolean When true, multi-block CodeBlock expansions
+---   at this level are wrapped in a Div so Quarto's layout processor sees a
+---   single child per input CodeBlock. Set when descending into a layout Div.
 --- @return pandoc.Blocks processed_blocks
 --- @return integer|nil pending_annotation_block_id Block ID if the last block had annotations (for parent consumption)
-local function process_typst_blocks(blocks)
+local function process_typst_blocks(blocks, wrap_expansions)
   local new_blocks = {}
   local pending_annot_block_id = nil
   local i = 1
@@ -496,7 +531,8 @@ local function process_typst_blocks(blocks)
 
     if blk.t == 'CodeBlock' then
       local next_blk = blocks[i + 1]
-      local replacement, consumed_next, annot_id = process_typst_block(blk, next_blk)
+      local replacement, consumed_next, annot_id =
+        process_typst_block(blk, next_blk, wrap_expansions)
       for _, rb in ipairs(replacement) do
         table.insert(new_blocks, rb)
       end
@@ -513,7 +549,8 @@ local function process_typst_blocks(blocks)
       local inner_block = extract_codeblock(blk)
       if inner_block then
         local next_blk = blocks[i + 1]
-        local replacement, consumed_next, annot_id = process_typst_block(inner_block, next_blk)
+        local replacement, consumed_next, annot_id =
+          process_typst_block(inner_block, next_blk, wrap_expansions)
         for _, rb in ipairs(replacement) do
           table.insert(new_blocks, rb)
         end
@@ -526,14 +563,14 @@ local function process_typst_blocks(blocks)
         end
       else
         -- Fallback: keep the Div as-is if no CodeBlock found.
-        local processed, inner_pending = process_typst_blocks(blk.content)
+        local processed, inner_pending = process_typst_blocks(blk.content, is_layout_div(blk))
         blk.content = processed
         table.insert(new_blocks, blk)
         pending_annot_block_id = inner_pending
         i = i + 1
       end
     elseif blk.t == 'Div' then
-      local processed, inner_pending = process_typst_blocks(blk.content)
+      local processed, inner_pending = process_typst_blocks(blk.content, is_layout_div(blk))
       blk.content = processed
       table.insert(new_blocks, blk)
       -- If the Div's last processed block had pending annotations,
@@ -573,7 +610,9 @@ function Pandoc(doc)
   end
 
   -- Process code blocks and annotations throughout the document tree.
-  doc.blocks = process_typst_blocks(doc.blocks)
+  -- Top-level blocks are not inside any layout Div, so expansion wrapping
+  -- is disabled at this level.
+  doc.blocks = process_typst_blocks(doc.blocks, false)
 
   return doc
 end

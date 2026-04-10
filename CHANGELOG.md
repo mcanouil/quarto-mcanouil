@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: Prevent Typst compile failure when a code-window wrapped code block is placed inside a `layout-ncol`, `layout-nrow`, or `layout` div.
+
 ## 0.18.0 (2026-04-08)
 
 ### New Features
