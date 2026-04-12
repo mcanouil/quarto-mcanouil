@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: Add dark mode background override for code filename header bar.
+
 ## 0.19.0 (2026-04-10)
 
 ### Bug Fixes
