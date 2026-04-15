@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: Add explicit background colour to tab content to prevent background bleed-through.
+
 ## 0.19.1 (2026-04-12)
 
 ### Bug Fixes
