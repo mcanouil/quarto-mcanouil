@@ -5,7 +5,7 @@ A Quarto extension providing branded theming, custom components, and professiona
 ## Installation
 
 ```bash
-quarto add mcanouil/quarto-mcanouil@0.19.1
+quarto add mcanouil/quarto-mcanouil@0.19.2
 ```
 
 This will install the extension under the `_extensions` subdirectory.
