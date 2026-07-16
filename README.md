@@ -2,6 +2,10 @@
 
 A Quarto extension providing branded theming, custom components, and professional styling for HTML documents, Typst (PDF) reports, and Reveal.js presentations.
 
+> [!WARNING]
+> This extension is primarily a personal development environment.
+> It is not intended for production use, and breaking changes may occur at any time without notice.
+
 ## Installation
 
 ```bash
