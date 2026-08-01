@@ -14,6 +14,8 @@ A personal brand spread across a website, a report, and a talk usually means thr
 
 [See a report rendered by this site](preview.pdf).
 
+![](preview.pdf){.embed-art loading="lazy" title="A report rendered by mcanouil-typst"}
+
 ## Installation
 
 ```bash
