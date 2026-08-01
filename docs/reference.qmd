@@ -1,0 +1,55 @@
+---
+title: "Reference"
+subtitle: "The project type, the formats, and what they share."
+description: "The complete mcanouil extension: the project type, the three format families, the shared components, and the RevealJS options."
+---
+
+## The project type
+
+```yaml
+project:
+  type: mcanouil
+```
+
+A pre-configured Quarto website: branded navbar, sidebar, footer, and favicon, with `mcanouil-html` as the default format.
+
+## The formats
+
+| Format | Output | Notes |
+| --- | --- | --- |
+| `mcanouil-html` | HTML | Professional or academic layouts. |
+| `mcanouil-typst` | PDF, through Typst | Light and dark modes, and several document types: report, invoice, letter, CV. |
+| `mcanouil-revealjs` | Slides | Light and dark modes, section outlines, and a closing slide. |
+
+: The three format families. {.striped .hover tbl-colwidths="[26,22,52]"}
+
+Common options include `style`, choosing the layout, and `brand-mode`, choosing light or dark.
+
+## What they share
+
+- **Brand theming**, through `brand.yml`: colours, typography, and logos, consistent across all three.
+- **Components**: value boxes, info panels, status badges, dividers, progress bars, card grids, and executive summaries.
+- **Code windows**: window decoration on code blocks, in macOS, Windows, or plain style, with a filename and per-block overrides.
+- **Grid background**: a subtle overlay, in HTML and RevealJS.
+- **Special sections**: appendices and supplementary sections that relocate themselves and number separately, in Typst.
+- **Accessibility**: PDF/UA-1 compliance, alt text, and WCAG AA contrast validation, in Typst.
+
+## RevealJS options
+
+Set under `extensions.mcanouil`, and enabled by the project type by default.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `section-outline` | `true` | Show a subsection outline on section slides. |
+| `date-superscript` | `true` | Format ordinal dates as 1st, 2nd, 3rd. |
+| `hide-title-slide-chrome` | `true` | Hide the menu, logo, and footer on the title slide. |
+| `favicon-from-logo` | `true` | Generate a favicon from the slide logo. |
+| `code-annotation-fragments` | `true` | Step through code annotations as fragments. |
+| `debug-borders` | `false` | Draw borders on slide regions, for layout work. |
+
+: RevealJS options. {.striped .hover tbl-colwidths="[30,12,58]"}
+
+## Limitations
+
+- The formats are opinionated by design: they are one person's brand rather than a neutral starting point.
+- Typst-only features, the special sections and the accessibility checks among them, have no HTML equivalent.

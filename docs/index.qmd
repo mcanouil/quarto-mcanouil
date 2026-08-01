@@ -1,0 +1,74 @@
+---
+title: "Mickaël Canouil's Brand"
+subtitle: "One brand across HTML, Typst, and RevealJS."
+description: "What the mcanouil extension provides: a project type, three formats, and the components they share."
+authors:
+  - name: "Mickaël CANOUIL, _Ph.D._"
+    orcid: "0000-0002-3396-4549"
+    url: "https://mickael.canouil.fr"
+---
+
+A personal brand spread across a website, a report, and a talk usually means three themes drifting apart.
+
+`mcanouil` is one extension carrying all three: a project type for the website, and formats for HTML, Typst, and RevealJS that share a `brand.yml`, a component set, and a look.
+
+[See a report rendered by this site](preview.pdf).
+
+## Installation
+
+```bash
+quarto add {{< var extension.reference >}}
+```
+
+This will install the extension under the `_extensions` subdirectory.
+If you are using version control, you will want to check in this directory.
+
+::: {.btn-group role="group" aria-label="Quarto Wizard installer options"}
+
+[Visual Studio Code](vscode://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in Visual Studio Code using the Quarto Wizard extension."}
+[Positron](positron://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in Positron using the Quarto Wizard extension."}
+[VSCodium](vscodium://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in VSCodium using the Quarto Wizard extension."}
+
+:::
+
+## Quick start
+
+A website:
+
+```yaml
+project:
+  type: mcanouil
+```
+
+A document, a report, or a deck:
+
+```yaml
+format: mcanouil-html
+```
+
+```yaml
+format:
+  mcanouil-typst:
+    style: professional
+    brand-mode: light
+```
+
+```yaml
+format:
+  mcanouil-revealjs:
+    brand-mode: dark
+```
+
+See the [Reference](reference.qmd) for the three formats and what they share, and the [Examples](examples.qmd) for worked front matter.
+
+## Where it works
+
+HTML, Typst, and RevealJS, plus the project type that ties a website together.
+
+## Links
+
+- [Reference](reference.qmd) for the project type, the formats, and the components.
+- [Examples](examples.qmd) for worked front matter.
+- [A rendered report](preview.pdf), built by this site.
+- [Changelog](changelog.qmd) for what each release changed.
+- [Source and issues](https://github.com/mcanouil/quarto-mcanouil) on GitHub.

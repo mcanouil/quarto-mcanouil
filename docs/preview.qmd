@@ -1,0 +1,24 @@
+---
+title: "The Typst format"
+subtitle: "Rendered by the documentation site"
+author: "Mickaël CANOUIL"
+date: last-modified
+format:
+  mcanouil-typst:
+    style: professional
+    brand-mode: light
+---
+
+## A section
+
+This document is produced by `mcanouil-typst` as the site is published, so the layout, the typography, and the colours are the extension rather than a description of it.
+
+## Another section
+
+| Column | Column |
+| --- | --- |
+| A | B |
+
+: A table styled by the format.
+
+The same brand drives the HTML and RevealJS formats, so a report, a page, and a deck look like one another.
