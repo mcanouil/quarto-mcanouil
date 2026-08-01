@@ -13,12 +13,29 @@ format:
 
 This document is produced by `mcanouil-typst` as the site is published, so the layout, the typography, and the colours are the extension rather than a description of it.
 
-## Another section
+## The components
 
-| Column | Column |
+The shortcodes and the divs are rendered natively by each format rather than passed through as HTML.
+
+{{< value-box value="99" unit="%" label="Coverage" colour="success" >}}
+
+{{< progress value="72" label="Progress" colour="info" >}}
+
+{{< divider style="gradient" label="A divider" >}}
+
+::: {.panel title="A panel" style="accent"}
+
+Panels carry a title, an optional icon, and one of ten colour themes.
+
+:::
+
+## A table
+
+| Option | Effect |
 | --- | --- |
-| A | B |
+| `style` | Chooses between the professional and academic layouts. |
+| `brand-mode` | Chooses between the light and dark palettes. |
 
-: A table styled by the format.
+: The two options this document sets. {tbl-colwidths="[30,70]"}
 
 The same brand drives the HTML and RevealJS formats, so a report, a page, and a deck look like one another.
