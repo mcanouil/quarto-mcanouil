@@ -2,9 +2,9 @@
 
 The extensions here fall into two groups, told apart by where they sit.
 
-## Committed, directly under `_extensions/`
+## Committed, under `mcanouil/`
 
-`atelier`, `iconify`, `gitlink`, `code-window`, and `pastel` are dependencies of the website itself: the project type and theme, the footer glyphs, the repository widget, the code block decoration, and the shared palette.
+`mcanouil/atelier`, `mcanouil/iconify`, `mcanouil/gitlink`, `mcanouil/code-window`, and `mcanouil/pastel` are dependencies of the website itself: the project type and theme, the footer glyphs, the repository widget, the code block decoration, and the shared palette.
 They arrive with the scaffold, which carries its own copies, and are checked in like any other Quarto extension.
 Beyond that they are managed for you: [Quarto Wizard](https://m.canouil.dev/quarto-wizard) installs them, and the Quarto Extensions Updates workflow keeps them current by scanning this directory.
 
@@ -15,10 +15,11 @@ Beyond that they are managed for you: [Quarto Wizard](https://m.canouil.dev/quar
 >
 > `quarto add` also fails here outright: `../_quarto.yml` declares `project: type: atelier`, and it builds a project context before installing anything, so it reports `Unsupported project type atelier` whenever atelier is missing or is the extension being replaced.
 
-## Generated, at `_extensions/mcanouil/`
+## Generated, under `local/`
 
-`mcanouil/` is a copy of the extension this repository publishes, taken from `_extensions/` at the repository root.
+`local/mcanouil/` is a copy of the extension this repository publishes, taken from `_extensions/` at the repository root.
 It is ignored by Git and produced by `../_scripts/sync-extension.sh`, so the repository root stays the single source of truth.
+The `local` owner says where it came from, and keeps it clear of the vendored dependencies even when the extension is named after its owner.
 
 Run the sync before previewing the site locally:
 
@@ -32,10 +33,3 @@ The Pages workflow runs it before every render, so CI always builds the checked-
 A real copy is needed, rather than a symlink or a pre-render step.
 Quarto builds its extension registry while reading `_quarto.yml`, before any pre-render script runs, and it does not follow symlinks.
 A shortcode contributed by an extension that is only linked, or only copied in by `pre-render`, is reported as `Shortcode 'mcanouil' not found` and renders as nothing.
-
-## Why the layout differs here
-
-This repository publishes an extension named `mcanouil`, which is also the owner directory the dependencies normally sit under.
-The two cannot share that path, so the dependencies are committed unowned, directly under `_extensions/`, and the synced copy of this repository's own extension takes `_extensions/mcanouil/`.
-
-Quarto resolves an extension by either form, so nothing else changes.

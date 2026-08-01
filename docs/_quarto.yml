@@ -67,7 +67,7 @@ website:
     right: |
       Licence: [MIT](https://github.com/mcanouil/quarto-mcanouil?tab=MIT-1-ov-file#readme).
 
-brand: _extensions/pastel/brand.yml
+brand: _extensions/mcanouil/pastel/brand.yml
 
 format:
   # Configure the extension format by name. Declaring `html` would replace
@@ -77,11 +77,11 @@ format:
     theme:
       light:
         - brand
-        - _extensions/pastel/pastel.scss
+        - _extensions/mcanouil/pastel/pastel.scss
         - assets/theme.scss
       dark:
         - brand
-        - _extensions/pastel/pastel.scss
+        - _extensions/mcanouil/pastel/pastel.scss
         - assets/theme.scss
 
 filters:
