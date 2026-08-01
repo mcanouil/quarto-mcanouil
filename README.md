@@ -5,7 +5,7 @@ One extension carrying a personal brand across three outputs: a Quarto project t
 ## Installation
 
 ```bash
-quarto add mcanouil/quarto-mcanouil@0.20.0
+quarto add mcanouil/quarto-mcanouil@0.20.1
 ```
 
 This will install the extension under the `_extensions` subdirectory.
