@@ -1,0 +1,98 @@
+---
+title: "Examples"
+subtitle: "Worked front matter."
+description: "The front matter behind the rendered report, and the equivalents for a website, a document, and a deck."
+---
+
+The [rendered report](preview.pdf) on this site is built by the format as the site is published.
+
+## The report on this site
+
+```yaml
+---
+title: "The Typst format"
+subtitle: "Rendered by the documentation site"
+author: "Mickaël CANOUIL"
+date: last-modified
+format:
+  mcanouil-typst:
+    style: professional
+    brand-mode: light
+---
+```
+
+`style` chooses the layout, and `brand-mode` chooses between the light and dark palettes.
+
+## A website
+
+```yaml
+project:
+  type: mcanouil
+```
+
+The project type supplies the navbar, sidebar, footer, and favicon, and sets `mcanouil-html` as the default format, so a site needs nothing else to be branded.
+
+## A document
+
+```yaml
+---
+title: "My Document"
+format: mcanouil-html
+---
+```
+
+## A presentation
+
+```yaml
+---
+title: "My Presentation"
+format:
+  mcanouil-revealjs:
+    brand-mode: dark
+---
+```
+
+The RevealJS options are enabled by default under the project type, and set individually elsewhere:
+
+```yaml
+extensions:
+  mcanouil:
+    section-outline: true
+    hide-title-slide-chrome: true
+    debug-borders: false
+```
+
+`debug-borders` is the one to reach for while laying a deck out, and to turn off before presenting it.
+
+## Components in a document
+
+```markdown
+{{{< value-box value="99" unit="%" label="Coverage" colour="success" >}}}
+
+{{{< progress value="72" label="Progress" colour="info" >}}}
+
+{{{< divider style="gradient" label="A divider" >}}}
+
+::: {.panel title="A panel" style="accent"}
+
+The body of the panel.
+
+:::
+```
+
+Each renders natively in the format you are producing, so the same source gives a Typst panel in a report and a styled `div` on a page.
+The [rendered report](preview.pdf) carries all four.
+
+## A code window on one block
+
+````markdown
+```{.python code-window-style="windows" code-window-no-auto-filename="true"}
+print("Hello")
+```
+````
+
+The three `code-window-*` attributes override the project settings for a single block, which is how one block gets a different decoration, or none.
+
+## Source
+
+The repository ships a starting point you can copy: [`example.qmd`](https://github.com/mcanouil/quarto-mcanouil/blob/main/example.qmd).

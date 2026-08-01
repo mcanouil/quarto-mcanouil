@@ -1,0 +1,41 @@
+---
+title: "The Typst format"
+subtitle: "Rendered by the documentation site"
+author: "Mickaël CANOUIL"
+date: last-modified
+format:
+  mcanouil-typst:
+    style: professional
+    brand-mode: light
+---
+
+## A section
+
+This document is produced by `mcanouil-typst` as the site is published, so the layout, the typography, and the colours are the extension rather than a description of it.
+
+## The components
+
+The shortcodes and the divs are rendered natively by each format rather than passed through as HTML.
+
+{{< value-box value="99" unit="%" label="Coverage" colour="success" >}}
+
+{{< progress value="72" label="Progress" colour="info" >}}
+
+{{< divider style="gradient" label="A divider" >}}
+
+::: {.panel title="A panel" style="accent"}
+
+Panels carry a title, an optional icon, and one of ten colour themes.
+
+:::
+
+## A table
+
+| Option | Effect |
+| --- | --- |
+| `style` | Chooses between the professional and academic layouts. |
+| `brand-mode` | Chooses between the light and dark palettes. |
+
+: The two options this document sets. {tbl-colwidths="[30,70]"}
+
+The same brand drives the HTML and RevealJS formats, so a report, a page, and a deck look like one another.

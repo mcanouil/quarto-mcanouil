@@ -1,0 +1,143 @@
+---
+title: "Reference"
+subtitle: "The project type, the formats, and what they share."
+description: "The complete mcanouil extension: the project type, the three format families, the shared components, and the RevealJS options."
+---
+
+## The project type
+
+```yaml
+project:
+  type: mcanouil
+```
+
+A pre-configured Quarto website: a branded navbar, a footer, and a favicon, with `mcanouil-html` as the default format.
+
+It also sets `back-to-top-navigation`, `page-navigation`, `open-graph`, `twitter-card`, and the source and issue repository actions, each of which a site can override.
+
+## The formats
+
+| Format | Output | Notes |
+| --- | --- | --- |
+| `mcanouil-html` | HTML | Professional or academic layouts. |
+| `mcanouil-typst` | PDF, through Typst | Light and dark modes, and four document types: report, invoice, letter, CV. |
+| `mcanouil-revealjs` | Slides | Light and dark modes, section outlines, and a closing slide. |
+
+: The three format families. {.striped .hover tbl-colwidths="[26,22,52]"}
+
+### `mcanouil-html`
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `style` | `professional`, `academic` | `professional` | The layout variant. Matched case insensitively. |
+| `title-block-authors` | boolean | `true` | Show the authors, affiliations, and corresponding author. |
+| `title-block-abstract` | boolean | `true` | Show the abstract and the keywords. |
+| `title-block-meta` | boolean | `true` | Show the dates, the DOI, and the categories. |
+
+: Options under `mcanouil-html`. {.striped .hover tbl-colwidths="[26,20,12,42]"}
+
+### `mcanouil-typst`
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `document-type` | `report`, `invoice`, `letter`, `cv` | `report` | The template the document is built from. |
+| `style` | `professional`, `academic` | `professional` | The layout variant. |
+| `brand-mode` | `light`, `dark` | `light` | The brand palette. |
+| `show-corner-brackets` | boolean | `true` | Corner bracket decorations. |
+| `show-margin-decoration` | boolean | `true` | Coloured bars along the page margins. |
+| `show-title-page-background` | boolean | `true` | A geometric background on the title page. |
+| `show-heading-underlines` | boolean | `true` | Gradient underlines below headings. |
+| `show-logo` | boolean | `true` | The logo in the header. |
+| `section-page` | boolean | `true` | A title page before each top-level section. |
+| `section-pagebreak` | boolean | `true` | A page break before each section title page. |
+| `list-of` | boolean | `true` | Lists of figures and tables. |
+
+: Options under `mcanouil-typst`. {.striped .hover tbl-colwidths="[28,20,10,42]"}
+
+### `mcanouil-revealjs`
+
+`brand-mode` is `light` or `dark`, and is `dark` here rather than the `light` the Typst format uses.
+
+Everything else a deck exposes is set under `extensions.mcanouil`, below.
+
+## Options under `extensions.mcanouil`
+
+| Option | Default | Applies to | Description |
+| --- | --- | --- | --- |
+| `grid-background` | `false` | HTML, RevealJS | A grid overlay behind the content. |
+| `hide-navbar-title` | `true` | HTML | Hide the navbar brand and title. |
+| `section-outline` | `true` | RevealJS | A subsection outline on section slides. |
+| `date-superscript` | `true` | RevealJS | Ordinal dates as 1st, 2nd, 3rd. |
+| `hide-title-slide-chrome` | `true` | RevealJS | Hide the menu, logo, and footer on the title slide. |
+| `favicon-from-logo` | `true` | RevealJS | A favicon built from the slide logo. |
+| `code-annotation-fragments` | `true` | RevealJS | Step through code annotations as fragments. |
+| `debug-borders` | `false` | RevealJS | Borders on slide regions, for layout work. |
+
+: Options under `extensions.mcanouil`. {.striped .hover tbl-colwidths="[28,10,16,46]"}
+
+::: {.callout-note}
+`grid-background` has three different values depending on where you read it from.
+The option itself defaults to `false`, the formats turn it on, and the project type turns it back off, so a document gets the grid and a website does not unless it asks for one.
+:::
+
+### Code windows
+
+Set under `extensions.mcanouil.code-window`.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `enabled` | boolean | `true` | Apply window chrome to code blocks. |
+| `auto-filename` | boolean | `true` | Label each block with a filename derived from its language. |
+| `style` | `default`, `macos`, `windows` | `macos` | The window decoration. An unknown value falls back to `macos` with a warning. |
+| `wrapper` | string | `mcanouil-code-window` | The Typst function the block is wrapped in. |
+
+: Code window options. {.striped .hover tbl-colwidths="[24,22,18,36]"}
+
+A single block overrides the project with `code-window-enabled`, `code-window-no-auto-filename`, and `code-window-style` as code block attributes.
+
+## Shortcodes
+
+| Shortcode | Attributes |
+| --- | --- |
+| `{{{< divider >}}}` | `style` (`solid`, `dashed`, `dotted`, `ornamental`, `gradient`; `solid`), `label`, `thickness` (`1pt`), `width` (`50%`). |
+| `{{{< value-box >}}}` | `value` (`0`), `unit`, `label`, `icon`, `colour` (`info`). |
+| `{{{< progress >}}}` | `value` (`0`), `label`, `colour` (`info`), `show-value` (`true`), `height`. |
+| `{{{< badge >}}}` | `text`, `icon`, `colour` (`neutral`). |
+
+: The shortcodes, with defaults in brackets. {.striped .hover tbl-colwidths="[24,76]"}
+
+`colour` accepts a theme name or a colour value, and `color` is accepted as a spelling of it.
+
+::: {.callout-note}
+`{{{< badge >}}}` renders in HTML and RevealJS only.
+In Typst it produces nothing, and a badge is written as `[text]{.badge}` instead.
+:::
+
+## Divs
+
+| Class | Attributes |
+| --- | --- |
+| `.panel` | `title`, `icon`, `style` (one of ten themes; `subtle`). |
+| `.executive-summary` | `title` (`Executive Summary`), `show-corner-brackets` (`true`). |
+| `.card-grid` | `columns` (`3`), `alt`, which wraps the grid in a figure in Typst. |
+| `.card` | `title`, `style` (`subtle`, `outlined`, `filled`; `subtle`), `colour`. |
+| `.card-footer` | The footer of a card. |
+| `.highlight` | A content emphasis block. |
+| `.badge` | `colour` (`neutral`), `icon`. The Typst spelling of the badge shortcode. |
+| `.references`, `.appendix`, `.supplementary` | The special sections. |
+
+: The divs and spans the formats style. {.striped .hover tbl-colwidths="[28,72]"}
+
+## What the formats share
+
+- **Brand theming**, through `brand.yml`: colours, typography, and logos, consistent across all three.
+- **Components**: the shortcodes and divs above, rendered natively per format rather than as HTML passed through.
+- **Code windows**: window decoration on code blocks, with per-block overrides.
+- **Special sections**: appendices and supplementary sections that relocate themselves and number separately, in Typst.
+- **Accessibility**: alt text on maths and on card grids, a palette whose semantic colours are chosen to meet WCAG AA at 4.5:1, and Typst show rules written to keep the tag structure PDF/UA-1 expects.
+
+## Limitations
+
+- The formats are opinionated by design: they are one person's brand rather than a neutral starting point.
+- Typst-only features, the special sections among them, have no HTML equivalent.
+- The palette is chosen against the WCAG AA threshold; nothing measures the contrast of a colour you supply yourself.
