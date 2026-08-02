@@ -2,7 +2,7 @@
 # Provides configuration validation and IDE support for options,
 # shortcodes, formats, attributes, and classes.
 
-$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v1/extension-schema.json
+$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json
 
 options:
   grid-background:
@@ -130,8 +130,8 @@ shortcodes:
       value:
         type: integer
         default: 0
-        min: 0
-        max: 100
+        minimum: 0
+        maximum: 100
         description: "Progress percentage (0 to 100)."
       label:
         type: string
@@ -176,7 +176,7 @@ formats:
       type: string
       default: "professional"
       enum: [professional, academic]
-      enum-case-insensitive: true
+      enumCaseInsensitive: true
       description: "Template style variant for the HTML format."
     title-block-authors:
       type: boolean
@@ -196,7 +196,7 @@ formats:
       type: string
       default: "report"
       enum: [report, invoice, letter, cv]
-      enum-case-insensitive: true
+      enumCaseInsensitive: true
       description: "Document type template to use."
     brand-mode:
       type: string
@@ -207,7 +207,7 @@ formats:
       type: string
       default: "professional"
       enum: [professional, academic]
-      enum-case-insensitive: true
+      enumCaseInsensitive: true
       description: "Template style variant."
     show-corner-brackets:
       type: boolean
