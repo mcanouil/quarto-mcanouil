@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Refactoring
+
+- refactor: Target the Quarto Wizard v2 extension schema in `_schema.yml`, renaming `min` and `max` to `minimum` and `maximum`, and `enum-case-insensitive` to `enumCaseInsensitive`.
+
 ## 0.20.1 (2026-08-01)
 
 ### Documentation
