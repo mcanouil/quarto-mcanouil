@@ -1,4 +1,4 @@
---- @module html-options
+--- @module "html-options"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil

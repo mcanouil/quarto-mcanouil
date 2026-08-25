@@ -1,4 +1,4 @@
---- @module math-alt-text
+--- @module "math-alt-text"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil

@@ -1,4 +1,4 @@
---- @module normalise-extension-paths
+--- @module "normalise-extension-paths"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil

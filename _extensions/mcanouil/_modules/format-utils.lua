@@ -1,4 +1,4 @@
---- @module format-utils
+--- @module "format-utils"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil

@@ -1,4 +1,4 @@
---- @module divider
+--- @module "divider"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil

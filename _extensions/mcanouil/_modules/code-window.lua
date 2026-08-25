@@ -1,4 +1,4 @@
---- @module code-window
+--- @module "code-window"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil

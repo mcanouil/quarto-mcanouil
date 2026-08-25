@@ -1,4 +1,4 @@
---- @module html-utils
+--- @module "html-utils"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil

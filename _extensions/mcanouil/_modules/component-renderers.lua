@@ -1,4 +1,4 @@
---- @module component-renderers
+--- @module "component-renderers"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil

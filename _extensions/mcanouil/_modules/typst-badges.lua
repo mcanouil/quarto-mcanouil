@@ -1,4 +1,4 @@
---- @module typst-badges
+--- @module "typst-badges"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil

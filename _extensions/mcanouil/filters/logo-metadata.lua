@@ -1,4 +1,4 @@
---- @module logo-metadata
+--- @module "logo-metadata"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil

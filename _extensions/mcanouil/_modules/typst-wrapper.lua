@@ -1,4 +1,4 @@
---- @module typst-wrapper
+--- @module "typst-wrapper"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil

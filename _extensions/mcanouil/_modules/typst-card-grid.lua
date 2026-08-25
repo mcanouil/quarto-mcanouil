@@ -1,4 +1,4 @@
---- @module typst-card-grid
+--- @module "typst-card-grid"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
