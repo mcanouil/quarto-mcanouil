@@ -14,7 +14,7 @@ local wrapper = require(
   quarto.utils.resolve_path('../_modules/typst-wrapper.lua'):gsub('%.lua$', '')
 )
 local str = require(
-  quarto.utils.resolve_path('../_modules/string.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('../_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', '')
 )
 
 -- ============================================================================
