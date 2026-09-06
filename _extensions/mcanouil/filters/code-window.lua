@@ -6,23 +6,23 @@
 --- Loads all submodules, wires dependencies, and assembles the filter list.
 
 local EXTENSION_NAME = 'mcanouil'
-local log = require(quarto.utils.resolve_path('../_modules/logging.lua'):gsub('%.lua$', ''))
+local log = require(quarto.utils.resolve_path('../_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
 
 -- ============================================================================
 -- LOAD SUBMODULES
 -- ============================================================================
 
 local str = require(
-  quarto.utils.resolve_path('../_modules/string.lua'):gsub('%.lua$', ''))
+  quarto.utils.resolve_path('../_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 
 local meta_mod = require(
-  quarto.utils.resolve_path('../_modules/metadata.lua'):gsub('%.lua$', ''))
+  quarto.utils.resolve_path('../_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))
 
 local pdoc = require(
-  quarto.utils.resolve_path('../_modules/pandoc-helpers.lua'):gsub('%.lua$', ''))
+  quarto.utils.resolve_path('../_vendor/quarto-lua-modules/pandoc-helpers.lua'):gsub('%.lua$', ''))
 
 local html_mod = require(
-  quarto.utils.resolve_path('../_modules/html.lua'):gsub('%.lua$', ''))
+  quarto.utils.resolve_path('../_vendor/quarto-lua-modules/html.lua'):gsub('%.lua$', ''))
 
 local language = require(
   quarto.utils.resolve_path('../_modules/language.lua'):gsub('%.lua$', ''))

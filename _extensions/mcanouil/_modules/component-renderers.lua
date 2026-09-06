@@ -14,7 +14,7 @@ local html_utils = require(
   quarto.utils.resolve_path('../_modules/html-utils.lua'):gsub('%.lua$', '')
 )
 local str = require(
-  quarto.utils.resolve_path('../_modules/string.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('../_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', '')
 )
 local wrapper = require(
   quarto.utils.resolve_path('../_modules/html-wrapper.lua'):gsub('%.lua$', '')
