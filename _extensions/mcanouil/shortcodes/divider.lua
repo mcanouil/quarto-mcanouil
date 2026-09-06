@@ -20,6 +20,29 @@ local html_utils = require(
 local typst_utils = require(
   quarto.utils.resolve_path('../_modules/typst-utils.lua'):gsub('%.lua$', '')
 )
+local schema = require(
+  quarto.utils.resolve_path('../_vendor/quarto-wizard/schema.lua'):gsub('%.lua$', '')
+)
+local schema_check = require(
+  quarto.utils.resolve_path('../_vendor/quarto-lua-modules/schema-check.lua'):gsub('%.lua$', '')
+)
+
+-- ============================================================================
+-- SCHEMA CHECK
+-- ============================================================================
+
+--- The check for this shortcode, built once for the render. It reads
+--- `_schema.yml` on the way in, so it belongs at file scope: a check built
+--- inside the handler would read the schema again for every call in the
+--- document.
+---
+--- The schema path is given because the check module resolves it against the
+--- directory of the entry point that is running, and this file sits one
+--- directory below the schema.
+---
+--- The check reports and changes nothing, so an attribute the schema does not
+--- accept is named and still reaches the renderer below.
+local checker = schema_check.new(schema, 'mcanouil', '../_schema.yml')
 
 -- ============================================================================
 -- SHORTCODE HANDLER
@@ -27,7 +50,9 @@ local typst_utils = require(
 
 --- @type table<string, function> Shortcode handlers
 return {
-  ['divider'] = function(_args, kwargs, _meta)
+  ['divider'] = function(args, kwargs, _meta)
+    checker:call('divider', args, kwargs)
+
     local format = format_utils.get_format()
 
     if format == 'typst' then

@@ -14,6 +14,12 @@
 local format_utils = require(
   quarto.utils.resolve_path('../_modules/format-utils.lua'):gsub('%.lua$', '')
 )
+local schema = require(
+  quarto.utils.resolve_path('../_vendor/quarto-wizard/schema.lua'):gsub('%.lua$', '')
+)
+local schema_check = require(
+  quarto.utils.resolve_path('../_vendor/quarto-lua-modules/schema-check.lua'):gsub('%.lua$', '')
+)
 
 -- Lazy-loaded modules (loaded based on format)
 local html_renderers = nil
@@ -54,6 +60,33 @@ local function load_typst_modules()
 end
 
 -- ============================================================================
+-- SCHEMA CHECK
+-- ============================================================================
+
+--- @type string Extension name every schema message carries
+local EXTENSION_NAME = 'mcanouil'
+
+--- The schema check, built once and used by the metadata handler below. It
+--- reads `_schema.yml` on the way in and checks the document configuration
+--- against it. The check reports and changes nothing.
+---
+--- The validator is injected rather than required by the check module, so the
+--- two vendored sources stay independent of where the other was placed.
+---
+--- The schema path is given because the check module resolves it against the
+--- directory of the entry point that is running, and this file sits one
+--- directory below the schema.
+---
+--- The check lives in this filter because the filter is declared once, in the
+--- common format block, so it runs for every format the extension contributes
+--- to, and its metadata handler runs for every render with no format guard in
+--- front of it. The check therefore speaks once per render.
+---
+--- A schema that cannot be read is reported by the module as an error and the
+--- render carries on: a configuration file must not stop a document.
+local checker = schema_check.new(schema, EXTENSION_NAME, '../_schema.yml')
+
+-- ============================================================================
 -- GLOBAL CONFIGURATION
 -- ============================================================================
 
@@ -77,10 +110,13 @@ local TYPST_SPAN_MAPPINGS = {}
 -- METADATA PROCESSING
 -- ============================================================================
 
---- Load configuration from document metadata
+--- Load configuration from document metadata, and check that configuration
+--- against the schema.
 --- @param meta pandoc.Meta Document metadata
 --- @return pandoc.Meta Unchanged metadata
 function Meta(meta)
+  checker:options(meta)
+
   CURRENT_FORMAT = format_utils.get_format()
   FORMAT_CONFIG = format_utils.get_config()
 
