@@ -10,4 +10,4 @@ repository-code: "https://github.com/mcanouil/quarto-mcanouil"
 url: "http://m.canouil.dev/quarto-mcanouil/"
 license: "MIT"
 date-released: "2026-09-07"
-version: 0.21.0
+version: 0.21.1
