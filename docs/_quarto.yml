@@ -20,9 +20,15 @@ website:
   title: "Mickaël Canouil's Brand"
   description: "A Quarto project type and three formats, sharing one brand across HTML, Typst, and RevealJS."
   # No trailing slash: Quarto builds the social image URL by concatenating this
-  # with a leading-slash image path, without normalising.
+  # with the image path, without normalising.
   site-url: &site-url https://m.canouil.dev/quarto-mcanouil
   repo-url: https://github.com/mcanouil/quarto-mcanouil
+  open-graph:
+    image: assets/social/og-image.png
+    image-alt: "The quarto-mcanouil social card: the extension name and the \"brand\" badge over the line \"Mickaël CANOUIL's branding for Quarto projects\", beside a dark code window showing _quarto.yml."
+  twitter-card:
+    image: assets/social/og-image.png
+    image-alt: "The quarto-mcanouil social card: the extension name and the \"brand\" badge over the line \"Mickaël CANOUIL's branding for Quarto projects\", beside a dark code window showing _quarto.yml."
   # The Quarto project root is docs/, so the edit and issue links need the
   # subdirectory; without it they point at the repository root and 404.
   repo-subdir: docs
