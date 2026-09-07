@@ -6,6 +6,10 @@
 
 - docs: Serve the extension's social card as the Open Graph image, so a shared link shows the card rather than the first image on the page. (#132)
 
+### Refactoring
+
+- build: Update the vendored Lua modules to 2.3.0. A module no longer carries a version line in its header, so its checksum changes only when its code changes. (#133)
+
 ## 0.21.1 (2026-09-07)
 
 ### Bug Fixes
