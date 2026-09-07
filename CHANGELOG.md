@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.21.0 (2026-09-07)
+
 ### New Features
 
 - feat: Check the configuration under `extensions.mcanouil` and the `badge`, `divider`, `progress` and `value-box` shortcode calls against the extension schema. The check reports what the schema does not accept, and changes nothing in the document. (#126)
