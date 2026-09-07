@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: A shortcode attribute the schema does not accept no longer fails a Typst build. The attribute is left out of the Typst call and reported, as it is for HTML and Reveal.js. (#130)
+- fix: A shortcode attribute written with a documented alias now reaches Typst under the name the schema declares. (#130)
+
 ## 0.21.0 (2026-09-07)
 
 ### New Features
