@@ -57,7 +57,11 @@ return {
 
     if format == 'typst' then
       -- Typst rendering
-      return pandoc.RawBlock('typst', typst_utils.build_shortcode_function_call('mcanouil-divider', kwargs))
+      local spellings = typst_utils.accepted_attributes(checker.schema, 'divider')
+      return pandoc.RawBlock(
+        'typst',
+        typst_utils.build_shortcode_function_call('mcanouil-divider', kwargs, nil, spellings)
+      )
     elseif format == 'html' or format == 'revealjs' then
       -- HTML-based rendering
       local config = format_utils.get_config()
