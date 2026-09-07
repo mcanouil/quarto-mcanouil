@@ -3,7 +3,6 @@
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
---- @version 2.2.0
 ---
 --- Holds the wiring that every extension would otherwise copy: read the schema
 --- once, check the document configuration against it, check one shortcode call
