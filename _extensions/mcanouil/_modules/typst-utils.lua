@@ -63,26 +63,68 @@ M.typst_value = function(value)
   return '"' .. M.escape_attribute_value(value) .. '"'
 end
 
+--- Map every spelling a shortcode accepts to the name the schema declares.
+--- A Typst function rejects a named argument it does not declare, so a key that
+--- the schema does not accept must not reach it, and an alias must arrive under
+--- the declared name. Under html an unknown key is ignored by the renderer and
+--- reported by the schema check; this gives Typst the same behaviour.
+---
+--- @param schema table|nil Parsed schema, as held by the shortcode's checker
+--- @param shortcode_name string Shortcode name as the schema declares it
+--- @return table|nil Map of accepted spelling to declared name, or nil when the
+---   schema declares no attributes for this shortcode
+--- @usage local spellings = M.accepted_attributes(checker.schema, 'value-box')
+M.accepted_attributes = function(schema, shortcode_name)
+  local entry = schema and schema.shortcodes and schema.shortcodes[shortcode_name]
+  if type(entry) ~= 'table' or type(entry.attributes) ~= 'table' then
+    return nil
+  end
+
+  local spellings = {}
+  for name, descriptor in pairs(entry.attributes) do
+    spellings[name] = name
+    if type(descriptor) == 'table' and type(descriptor.aliases) == 'table' then
+      for _, alias in ipairs(descriptor.aliases) do
+        spellings[alias] = name
+      end
+    end
+  end
+
+  return spellings
+end
+
 --- Build Typst function call for shortcodes with optional parameter mapping.
 --- Generates a complete Typst function call with attributes from keyword arguments.
 --- Supports parameter name mapping for localisation or compatibility purposes.
 ---
+--- When `spellings` is given, a key it does not list is left out of the call and
+--- an alias is emitted under the name the schema declares. Without it every key
+--- is forwarded, which is what callers that pass no schema still get.
+---
 --- @param function_name string The Typst function name (e.g., 'mcanouil-progress')
 --- @param kwargs table Keyword arguments to pass as function parameters
 --- @param param_mapping table|nil Optional parameter name mappings (e.g., {old_name = 'new_name'})
+--- @param spellings table|nil Accepted spelling to declared name, from `M.accepted_attributes`
 --- @return string Complete Typst function call (e.g., '#mcanouil-progress(value: 75)[]')
 --- @usage local code = M.build_shortcode_function_call('mcanouil-progress', {value = 75})
 --- @usage local code = M.build_shortcode_function_call('mcanouil-progress', {colour = 'blue'})
-M.build_shortcode_function_call = function(function_name, kwargs, param_mapping)
+M.build_shortcode_function_call = function(function_name, kwargs, param_mapping, spellings)
   -- Build attribute string
   local attr_items = {}
   for key, value in pairs(kwargs) do
-    -- Apply parameter name mapping if provided
-    local typst_key = key
-    if param_mapping and param_mapping[key] then
-      typst_key = param_mapping[key]
+    local declared_key = key
+    if spellings then
+      declared_key = spellings[key]
     end
-    table.insert(attr_items, string.format('%s: %s', typst_key, M.typst_value(value)))
+
+    if declared_key then
+      -- Apply parameter name mapping if provided
+      local typst_key = declared_key
+      if param_mapping and param_mapping[declared_key] then
+        typst_key = param_mapping[declared_key]
+      end
+      table.insert(attr_items, string.format('%s: %s', typst_key, M.typst_value(value)))
+    end
   end
 
   -- Generate function call
