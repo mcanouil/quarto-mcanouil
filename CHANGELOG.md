@@ -13,6 +13,7 @@
 ### Refactoring
 
 - build: Update the vendored Lua modules to 2.3.0. A module no longer carries a version line in its header, so its checksum changes only when its code changes. (#133)
+- build: Fetch the schema validator from a Quarto Wizard release asset rather than a raw path inside its repository, which a refactor could move without notice. The vendored file is unchanged. (#135)
 
 ## 0.21.1 (2026-09-07)
 
