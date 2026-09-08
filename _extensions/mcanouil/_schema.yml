@@ -306,7 +306,7 @@ attributes:
     colour:
       type: string
       aliases: [color]
-      description: "Custom accent colour for the card: a hex code, or in Typst output a colour name such as blue. HTML ignores a name. A value naming no colour uses the muted colour."
+      description: "Custom accent colour for the card: a hex code or a colour name such as blue, honoured in both HTML and Typst output. In Typst a value naming no colour uses the muted colour."
       completion:
         type: color
 

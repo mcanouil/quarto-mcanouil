@@ -46,12 +46,7 @@
     // A hex string, a colour name, or a colour object. A shortcode attribute
     // arrives as a string, so an unresolved one would reach a colour function
     // as a string and stop the build; the document keeps its default instead.
-    let resolved = resolve-colour(colour)
-    if resolved != none {
-      resolved
-    } else {
-      colours.foreground
-    }
+    resolve-colour-or(colour, colours.foreground)
   } else {
     colours.foreground
   }

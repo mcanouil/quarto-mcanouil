@@ -167,9 +167,17 @@
     none
   } else if type(value) != str {
     // A colour, a gradient or a tiling arrives already built, from an attribute
-    // that Typst read as an expression rather than a string. Passed through, so
-    // this stays a string resolver and narrows nothing.
-    value
+    // that Typst read as an expression rather than a string. Those pass through.
+    // Anything else, such as a number or a boolean, is not a paint and would
+    // stop the build further on, so it resolves to nothing instead.
+    // The kind is compared as a name because `tiling` was `pattern` in earlier
+    // Typst, and naming the missing one directly would raise here.
+    let kind = str(type(value))
+    if kind == "color" or kind == "gradient" or kind == "tiling" or kind == "pattern" {
+      value
+    } else {
+      none
+    }
   } else {
     // Trimmed once, so a name and a hex value tolerate surrounding space alike.
     let text = value.trim()
@@ -191,6 +199,21 @@
     } else {
       NAMED-COLOURS.at(lower(text), default: none)
     }
+  }
+}
+
+/// Resolve an attribute value to a colour, or to the caller's default.
+/// Every component that reads a colour attribute wants the same thing: the
+/// value when it names a colour, and its own fallback when it does not.
+/// @param value Attribute value
+/// @param default Colour to use when the value names no colour
+/// @return Color
+#let resolve-colour-or(value, default) = {
+  let resolved = resolve-colour(value)
+  if resolved != none {
+    resolved
+  } else {
+    default
   }
 }
 
@@ -218,12 +241,7 @@
   } else if type(colour-type) == str and colour-type.starts-with("#") {
     // Custom hex colour. Resolved rather than passed straight to `rgb`, which
     // raises on a malformed value and would stop the build over a typo.
-    let resolved = resolve-colour(colour-type)
-    if resolved != none {
-      resolved
-    } else {
-      COLOUR-SEMANTIC-INFO
-    }
+    resolve-colour-or(colour-type, COLOUR-SEMANTIC-INFO)
   } else {
     // Default to info colour
     COLOUR-SEMANTIC-INFO

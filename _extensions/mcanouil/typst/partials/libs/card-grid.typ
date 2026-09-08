@@ -46,16 +46,7 @@
   // A div attribute arrives as a string, so a hex value or a colour name has to
   // become a colour first. `rgb` alone stops the build on a name, so an
   // unresolved value keeps the default rather than removing the document.
-  let card-colour = if type(card-colour-raw) == str {
-    let resolved = resolve-colour(card-colour-raw)
-    if resolved != none {
-      resolved
-    } else {
-      colours.muted
-    }
-  } else {
-    card-colour-raw
-  }
+  let card-colour = resolve-colour-or(card-colour-raw, colours.muted)
 
   // Determine card styling based on style
   let (bg-colour, border-colour, title-colour, header-bg, content-colour) = if card-style == "filled" {
