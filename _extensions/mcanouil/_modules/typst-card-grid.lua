@@ -87,12 +87,10 @@ local function process_card_grid(div, config)
       table.insert(card_parts, string.format('style: %s', typst_utils.typst_value(card.style)))
     end
     if card.colour then
-      -- Hex colours need rgb() wrapper, other values use typst_value()
-      if card.colour:match('^#') then
-        table.insert(card_parts, string.format('colour: rgb(%s)', typst_utils.typst_value(card.colour)))
-      else
-        table.insert(card_parts, string.format('colour: %s', typst_utils.typst_value(card.colour)))
-      end
+      -- Passed as a string, hex or name alike. The Typst side resolves it, and
+      -- wrapping a hex value in `rgb()` here would raise on a malformed one
+      -- before that resolution could keep the card's default.
+      table.insert(card_parts, string.format('colour: %s', typst_utils.typst_value(card.colour)))
     end
 
     table.insert(card_items, '(' .. table.concat(card_parts, ', ') .. ')')
@@ -129,11 +127,10 @@ local function process_card_div(div, config)
     table.insert(parts, string.format('style: %s', typst_utils.typst_value(card.style)))
   end
   if card.colour then
-    if card.colour:match('^#') then
-      table.insert(parts, string.format('colour: rgb(%s)', typst_utils.typst_value(card.colour)))
-    else
-      table.insert(parts, string.format('colour: %s', typst_utils.typst_value(card.colour)))
-    end
+    -- Passed as a string, hex or name alike. The Typst side resolves it, and
+    -- wrapping a hex value in `rgb()` here would raise on a malformed one
+    -- before that resolution could keep the card's default.
+    table.insert(parts, string.format('colour: %s', typst_utils.typst_value(card.colour)))
   end
 
   local args_str = ''

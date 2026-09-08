@@ -120,7 +120,7 @@ shortcodes:
         type: string
         default: "info"
         aliases: [color]
-        description: "Colour theme or custom colour value."
+        description: "Colour theme (success, warning, danger, info, neutral) or a hex code. Typst output also accepts a colour name such as blue; HTML ignores a name. A value naming no colour uses the foreground colour."
         completion:
           type: color
 
@@ -140,7 +140,7 @@ shortcodes:
         type: string
         default: "info"
         aliases: [color]
-        description: "Colour theme or custom colour value."
+        description: "Colour theme (success, warning, danger, info, neutral) or a hex code. Any other value falls back to the info colour."
         completion:
           type: color
       show-value:
@@ -306,7 +306,7 @@ attributes:
     colour:
       type: string
       aliases: [color]
-      description: "Custom accent colour for the card."
+      description: "Custom accent colour for the card: a hex code or a colour name such as blue, honoured in both HTML and Typst output. In Typst a value naming no colour uses the muted colour."
       completion:
         type: color
 

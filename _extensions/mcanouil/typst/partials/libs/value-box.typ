@@ -28,9 +28,12 @@
 // ============================================================================
 
 /// Get colour for value box.
-/// Supports predefined colour types or custom colour values (hex codes, rgb(), etc.).
+/// Supports predefined colour types or custom colour values: a Typst colour
+/// name such as "blue", a hex code, or a colour object.
+/// A value that names no colour falls back to the foreground colour, which is
+/// what an absent value already gives, rather than stopping the build.
 /// Uses semantic colours (brighter) for UI components, not callout colours.
-/// @param colour Colour type (success, warning, danger, info, neutral) or custom colour (e.g., "#ff0000", rgb(...))
+/// @param colour Colour type (success, warning, danger, info, neutral), a colour name, or custom colour (e.g., "blue", "#ff0000", rgb(...))
 /// @param colours Colour scheme dictionary
 /// @return Color Colour for the value box
 #let get-value-box-colour(colour, colours) = {
@@ -40,13 +43,10 @@
   } else if colour == "neutral" {
     colours.muted
   } else if colour != none and colour != "" {
-    // Custom colour value - check if it's a hex string
-    if type(colour) == str and colour.starts-with("#") {
-      rgb(colour)
-    } else {
-      // Already a color object (rgb(), color function, etc.)
-      colour
-    }
+    // A hex string, a colour name, or a colour object. A shortcode attribute
+    // arrives as a string, so an unresolved one would reach a colour function
+    // as a string and stop the build; the document keeps its default instead.
+    resolve-colour-or(colour, colours.foreground)
   } else {
     colours.foreground
   }

@@ -129,6 +129,94 @@
 #let COLOUR-SEMANTIC-DANGER = rgb("#cc0000")   // 5.9:1 contrast
 #let COLOUR-SEMANTIC-INFO = rgb("#0066cc")     // 7.5:1 contrast
 
+/// The colours Typst names in its standard library.
+/// A shortcode attribute arrives as a string, so a name has to be looked up
+/// before any colour function sees it.
+#let NAMED-COLOURS = (
+  black: black,
+  gray: gray,
+  grey: gray,
+  silver: silver,
+  white: white,
+  navy: navy,
+  blue: blue,
+  aqua: aqua,
+  teal: teal,
+  eastern: eastern,
+  purple: purple,
+  fuchsia: fuchsia,
+  maroon: maroon,
+  red: red,
+  orange: orange,
+  yellow: yellow,
+  olive: olive,
+  green: green,
+  lime: lime,
+)
+
+/// Resolve an attribute value to a colour.
+/// Accepts a colour, a hex string such as "#ff0000", or a colour name such as
+/// "blue". Returns `none` when the value names no colour, so the caller keeps
+/// its own default rather than passing a string on to a colour function.
+/// A malformed hex value returns `none` as well: `rgb` stops the build on one,
+/// and a fault in the configuration must not remove the document.
+/// @param value Attribute value
+/// @return Color, or none when the value resolves to no colour
+#let resolve-colour(value) = {
+  if value == none {
+    none
+  } else if type(value) != str {
+    // A colour, a gradient or a tiling arrives already built, from an attribute
+    // that Typst read as an expression rather than a string. Those pass through.
+    // Anything else, such as a number or a boolean, is not a paint and would
+    // stop the build further on, so it resolves to nothing instead.
+    // The kind is compared as a name because `tiling` was `pattern` in earlier
+    // Typst, and naming the missing one directly would raise here.
+    let kind = str(type(value))
+    if kind == "color" or kind == "gradient" or kind == "tiling" or kind == "pattern" {
+      value
+    } else {
+      none
+    }
+  } else {
+    // Trimmed once, so a name and a hex value tolerate surrounding space alike.
+    let text = value.trim()
+    if text.starts-with("#") {
+      // Typst accepts 3, 4, 6 and 8 hex digits. Anything else raises rather
+      // than returning, so the shape is checked before `rgb` sees it.
+      // Checked without a regular expression on purpose. This file is a Pandoc
+      // template, and the character that anchors a pattern to the end of a
+      // string is the one that opens a template interpolation, so an anchored
+      // pattern does not survive the template pass. It cannot appear in a
+      // comment here either.
+      let digits = lower(text.slice(1))
+      let length-ok = digits.len() == 3 or digits.len() == 4 or digits.len() == 6 or digits.len() == 8
+      if length-ok and digits.clusters().all(c => "0123456789abcdef".contains(c)) {
+        rgb(text)
+      } else {
+        none
+      }
+    } else {
+      NAMED-COLOURS.at(lower(text), default: none)
+    }
+  }
+}
+
+/// Resolve an attribute value to a colour, or to the caller's default.
+/// Every component that reads a colour attribute wants the same thing: the
+/// value when it names a colour, and its own fallback when it does not.
+/// @param value Attribute value
+/// @param default Colour to use when the value names no colour
+/// @return Color
+#let resolve-colour-or(value, default) = {
+  let resolved = resolve-colour(value)
+  if resolved != none {
+    resolved
+  } else {
+    default
+  }
+}
+
 /// Get semantic colour for UI components (success, warning, danger, info, neutral)
 /// Automatically adjusts brightness for dark mode to maintain WCAG contrast.
 /// @param colour-type Colour type string or custom hex colour
@@ -151,8 +239,9 @@
   } else if colour-type == "neutral" {
     colour-mix(colours, 50%)
   } else if type(colour-type) == str and colour-type.starts-with("#") {
-    // Custom hex colour
-    rgb(colour-type)
+    // Custom hex colour. Resolved rather than passed straight to `rgb`, which
+    // raises on a malformed value and would stop the build over a typo.
+    resolve-colour-or(colour-type, COLOUR-SEMANTIC-INFO)
   } else {
     // Default to info colour
     COLOUR-SEMANTIC-INFO
