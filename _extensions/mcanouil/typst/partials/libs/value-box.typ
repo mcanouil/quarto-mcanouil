@@ -28,9 +28,12 @@
 // ============================================================================
 
 /// Get colour for value box.
-/// Supports predefined colour types or custom colour values (hex codes, rgb(), etc.).
+/// Supports predefined colour types or custom colour values: a Typst colour
+/// name such as "blue", a hex code, or a colour object.
+/// A value that names no colour keeps the box's default rather than stopping
+/// the build.
 /// Uses semantic colours (brighter) for UI components, not callout colours.
-/// @param colour Colour type (success, warning, danger, info, neutral) or custom colour (e.g., "#ff0000", rgb(...))
+/// @param colour Colour type (success, warning, danger, info, neutral), a colour name, or custom colour (e.g., "blue", "#ff0000", rgb(...))
 /// @param colours Colour scheme dictionary
 /// @return Color Colour for the value box
 #let get-value-box-colour(colour, colours) = {

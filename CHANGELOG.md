@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: Accept a Typst colour name, such as `blue`, in the `colour` attribute of `value-box` and `.card`. Both stopped a Typst build on a name rather than colouring anything, and a value that names no colour now keeps the component's default.
+
 ### Documentation
 
 - docs: Serve the extension's social card as the Open Graph image, so a shared link shows the card rather than the first image on the page. (#132)

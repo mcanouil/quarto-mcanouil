@@ -158,6 +158,8 @@
 /// Accepts a colour, a hex string such as "#ff0000", or a colour name such as
 /// "blue". Returns `none` when the value names no colour, so the caller keeps
 /// its own default rather than passing a string on to a colour function.
+/// A malformed hex value returns `none` as well: `rgb` stops the build on one,
+/// and a fault in the configuration must not remove the document.
 /// @param value Attribute value
 /// @return Color, or none when the value resolves to no colour
 #let resolve-colour(value) = {
@@ -165,10 +167,27 @@
     value
   } else if type(value) != str {
     none
-  } else if value.starts-with("#") {
-    rgb(value)
   } else {
-    NAMED-COLOURS.at(lower(value.trim()), default: none)
+    // Trimmed once, so a name and a hex value tolerate surrounding space alike.
+    let text = value.trim()
+    if text.starts-with("#") {
+      // Typst accepts 3, 4, 6 and 8 hex digits. Anything else raises rather
+      // than returning, so the shape is checked before `rgb` sees it.
+      // Checked without a regular expression on purpose. This file is a Pandoc
+      // template, and the character that anchors a pattern to the end of a
+      // string is the one that opens a template interpolation, so an anchored
+      // pattern does not survive the template pass. It cannot appear in a
+      // comment here either.
+      let digits = lower(text.slice(1))
+      let length-ok = digits.len() == 3 or digits.len() == 4 or digits.len() == 6 or digits.len() == 8
+      if length-ok and digits.clusters().all(c => "0123456789abcdef".contains(c)) {
+        rgb(text)
+      } else {
+        none
+      }
+    } else {
+      NAMED-COLOURS.at(lower(text), default: none)
+    }
   }
 }
 
