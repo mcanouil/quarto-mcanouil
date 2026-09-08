@@ -129,6 +129,49 @@
 #let COLOUR-SEMANTIC-DANGER = rgb("#cc0000")   // 5.9:1 contrast
 #let COLOUR-SEMANTIC-INFO = rgb("#0066cc")     // 7.5:1 contrast
 
+/// The colours Typst names in its standard library.
+/// A shortcode attribute arrives as a string, so a name has to be looked up
+/// before any colour function sees it.
+#let NAMED-COLOURS = (
+  black: black,
+  gray: gray,
+  grey: gray,
+  silver: silver,
+  white: white,
+  navy: navy,
+  blue: blue,
+  aqua: aqua,
+  teal: teal,
+  eastern: eastern,
+  purple: purple,
+  fuchsia: fuchsia,
+  maroon: maroon,
+  red: red,
+  orange: orange,
+  yellow: yellow,
+  olive: olive,
+  green: green,
+  lime: lime,
+)
+
+/// Resolve an attribute value to a colour.
+/// Accepts a colour, a hex string such as "#ff0000", or a colour name such as
+/// "blue". Returns `none` when the value names no colour, so the caller keeps
+/// its own default rather than passing a string on to a colour function.
+/// @param value Attribute value
+/// @return Color, or none when the value resolves to no colour
+#let resolve-colour(value) = {
+  if type(value) == color {
+    value
+  } else if type(value) != str {
+    none
+  } else if value.starts-with("#") {
+    rgb(value)
+  } else {
+    NAMED-COLOURS.at(lower(value.trim()), default: none)
+  }
+}
+
 /// Get semantic colour for UI components (success, warning, danger, info, neutral)
 /// Automatically adjusts brightness for dark mode to maintain WCAG contrast.
 /// @param colour-type Colour type string or custom hex colour

@@ -43,9 +43,16 @@
   let card-colour-raw = config.at("colour", default: colours.muted)
   let card-style = config.at("style", default: "subtle")
 
-  // Convert colour string to colour object if needed
+  // A div attribute arrives as a string, so a hex value or a colour name has to
+  // become a colour first. `rgb` alone stops the build on a name, so an
+  // unresolved value keeps the default rather than removing the document.
   let card-colour = if type(card-colour-raw) == str {
-    rgb(card-colour-raw)
+    let resolved = resolve-colour(card-colour-raw)
+    if resolved != none {
+      resolved
+    } else {
+      colours.muted
+    }
   } else {
     card-colour-raw
   }

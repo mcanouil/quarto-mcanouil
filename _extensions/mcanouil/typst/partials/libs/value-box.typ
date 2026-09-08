@@ -40,12 +40,14 @@
   } else if colour == "neutral" {
     colours.muted
   } else if colour != none and colour != "" {
-    // Custom colour value - check if it's a hex string
-    if type(colour) == str and colour.starts-with("#") {
-      rgb(colour)
+    // A hex string, a colour name, or a colour object. A shortcode attribute
+    // arrives as a string, so an unresolved one would reach a colour function
+    // as a string and stop the build; the document keeps its default instead.
+    let resolved = resolve-colour(colour)
+    if resolved != none {
+      resolved
     } else {
-      // Already a color object (rgb(), color function, etc.)
-      colour
+      colours.foreground
     }
   } else {
     colours.foreground
