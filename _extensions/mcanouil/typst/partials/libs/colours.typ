@@ -163,10 +163,13 @@
 /// @param value Attribute value
 /// @return Color, or none when the value resolves to no colour
 #let resolve-colour(value) = {
-  if type(value) == color {
-    value
-  } else if type(value) != str {
+  if value == none {
     none
+  } else if type(value) != str {
+    // A colour, a gradient or a tiling arrives already built, from an attribute
+    // that Typst read as an expression rather than a string. Passed through, so
+    // this stays a string resolver and narrows nothing.
+    value
   } else {
     // Trimmed once, so a name and a hex value tolerate surrounding space alike.
     let text = value.trim()
@@ -213,8 +216,14 @@
   } else if colour-type == "neutral" {
     colour-mix(colours, 50%)
   } else if type(colour-type) == str and colour-type.starts-with("#") {
-    // Custom hex colour
-    rgb(colour-type)
+    // Custom hex colour. Resolved rather than passed straight to `rgb`, which
+    // raises on a malformed value and would stop the build over a typo.
+    let resolved = resolve-colour(colour-type)
+    if resolved != none {
+      resolved
+    } else {
+      COLOUR-SEMANTIC-INFO
+    }
   } else {
     // Default to info colour
     COLOUR-SEMANTIC-INFO

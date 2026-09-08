@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-- fix: Accept a Typst colour name, such as `blue`, in the `colour` attribute of `value-box` and `.card`. Both stopped a Typst build on a name rather than colouring anything, and a value that names no colour now keeps the component's default.
+- fix: Accept a Typst colour name, such as `blue`, in the `colour` attribute of `value-box` and `.card` in Typst output. Both stopped the build on a name rather than colouring anything, and a malformed hex code stopped it as well. A value that names no colour now uses the component's fallback colour instead of stopping the build.
 
 ### Documentation
 

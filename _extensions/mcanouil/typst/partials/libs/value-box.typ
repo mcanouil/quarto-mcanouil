@@ -30,8 +30,8 @@
 /// Get colour for value box.
 /// Supports predefined colour types or custom colour values: a Typst colour
 /// name such as "blue", a hex code, or a colour object.
-/// A value that names no colour keeps the box's default rather than stopping
-/// the build.
+/// A value that names no colour falls back to the foreground colour, which is
+/// what an absent value already gives, rather than stopping the build.
 /// Uses semantic colours (brighter) for UI components, not callout colours.
 /// @param colour Colour type (success, warning, danger, info, neutral), a colour name, or custom colour (e.g., "blue", "#ff0000", rgb(...))
 /// @param colours Colour scheme dictionary
