@@ -40,6 +40,7 @@ options:
   code-window:
     type: object
     description: "Configuration for code block window decorations."
+    additionalProperties: false
     properties:
       enabled:
         type: boolean
@@ -61,6 +62,7 @@ options:
       hotfix:
         type: object
         description: "Hot-fix toggles for Typst output workarounds."
+        additionalProperties: false
         properties:
           code-annotations:
             type: [boolean, object]
