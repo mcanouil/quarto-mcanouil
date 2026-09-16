@@ -25,13 +25,17 @@ local str = require(
 --- Badges are inline elements with text content and optional attributes
 --- @param span pandoc.Span Span element
 --- @param config table Component configuration with wrapper and arguments fields
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return pandoc.RawInline Typst code inline
-local function process_badge(span, config)
+local function process_badge(span, config, written)
   -- Convert content to plain text
   local content = str.stringify(span.content)
 
   -- Convert attributes to table
   local attrs = wrapper.attributes_to_table(span)
+  for key, value in pairs(written or {}) do
+    attrs[key] = value
+  end
 
   -- Always pass attributes if any exist
   -- config.arguments forces passing even when empty

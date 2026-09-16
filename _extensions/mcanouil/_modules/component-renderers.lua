@@ -292,11 +292,16 @@ end
 --- Render a badge span.
 --- @param span pandoc.Span The span element
 --- @param config FormatConfig|nil Configuration options
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return pandoc.RawInline The rendered badge
-M.render_badge = function(span, config)
+M.render_badge = function(span, config, written)
   config = config or M.HTML_CONFIG
+  written = written or {}
 
   local attrs = wrapper.attributes_to_table(span)
+  for key, value in pairs(written) do
+    attrs[key] = value
+  end
   local content = pandoc.utils.stringify(span.content)
 
   local colour = attrs.colour or attrs.color or 'neutral'

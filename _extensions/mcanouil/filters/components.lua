@@ -86,6 +86,44 @@ local EXTENSION_NAME = 'mcanouil'
 --- render carries on: a configuration file must not stop a document.
 local checker = schema_check.new(schema, EXTENSION_NAME, '../_schema.yml')
 
+--- @type table<string, table<string, string>> Per-group map of a resolved
+--- attribute name to the raw attribute name it is also accepted under. Only
+--- an attribute the descriptor declares `aliases:` for needs an entry, so
+--- that presence can be tested under either spelling.
+local GROUP_ALIASES = {
+  badge = { colour = 'color' }
+}
+
+--- Check an element's attributes against a declared group, and return only
+--- the ones the document actually wrote, resolved through the schema.
+---
+--- Several groups declare a `default:`, and `checker:attributes` merges that
+--- default into the table it returns, discarding whether the document wrote
+--- the attribute or the schema filled it in. Reading the merged table
+--- directly would make every element look as though it wrote the default,
+--- silently overriding whatever fallback the caller applies for an absent
+--- attribute (a per-format literal, a heading extracted from the content).
+---
+--- So this reads the raw attribute list first, keeps a resolved value only
+--- when the document wrote it under its own name or a declared alias, and
+--- leaves every other key out, so the caller's own fallback still runs
+--- exactly as before for a genuinely absent attribute.
+--- @param el pandoc.Div|pandoc.Span Element carrying the attributes
+--- @param group string Schema attribute group name
+--- @return table<string, any> written Schema-resolved values, written keys only
+local function checked_attributes(el, group)
+  local resolved = checker:attributes(el.attributes, group) or {}
+  local aliases = GROUP_ALIASES[group]
+  local written = {}
+  for key, value in pairs(resolved) do
+    local alias = aliases and aliases[key]
+    if el.attributes[key] ~= nil or (alias and el.attributes[alias] ~= nil) then
+      written[key] = value
+    end
+  end
+  return written
+end
+
 -- ============================================================================
 -- GLOBAL CONFIGURATION
 -- ============================================================================
@@ -141,7 +179,7 @@ function Meta(meta)
 
     SPAN_HANDLERS = {
       ['badge'] = function(span)
-        return html_renderers.render_badge(span, FORMAT_CONFIG)
+        return html_renderers.render_badge(span, FORMAT_CONFIG, checked_attributes(span, 'badge'))
       end
     }
   elseif CURRENT_FORMAT == 'typst' then
@@ -181,7 +219,7 @@ function Meta(meta)
 
     SPAN_HANDLERS = {
       ['badge'] = function(span, config)
-        return typst_badges.process_badge(span, config)
+        return typst_badges.process_badge(span, config, checked_attributes(span, 'badge'))
       end
     }
   end
