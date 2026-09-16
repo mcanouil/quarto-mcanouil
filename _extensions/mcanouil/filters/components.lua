@@ -184,7 +184,9 @@ function Meta(meta)
         return html_renderers.render_panel(div, FORMAT_CONFIG, checked_attributes(div, 'panel'))
       end,
       ['executive-summary'] = function(div)
-        return html_renderers.render_executive_summary(div, FORMAT_CONFIG)
+        return html_renderers.render_executive_summary(
+          div, FORMAT_CONFIG, checked_attributes(div, 'executive-summary')
+        )
       end,
       ['card-grid'] = function(div)
         return html_renderers.render_card_grid(
@@ -226,7 +228,7 @@ function Meta(meta)
         return typst_wrapper.create_wrapped_handler(false)(div, config)
       end,
       ['executive-summary'] = function(div, config)
-        return typst_wrapper.create_wrapped_handler(true)(div, config)
+        return typst_wrapper.create_wrapped_handler(true)(div, config, checked_attributes(div, 'executive-summary'))
       end,
       ['card-grid'] = function(div, config)
         return typst_card_grid.process_card_grid(

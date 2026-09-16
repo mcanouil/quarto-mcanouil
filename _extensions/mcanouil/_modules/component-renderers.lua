@@ -122,16 +122,29 @@ end
 --- Render an executive summary component.
 --- @param div pandoc.Div The div element
 --- @param config FormatConfig|nil Configuration options
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return table List of pandoc elements
-M.render_executive_summary = function(div, config)
+M.render_executive_summary = function(div, config, written)
   config = config or M.HTML_CONFIG
+  written = written or {}
   local class_prefix = config.class_prefix or ''
 
   local attrs = wrapper.attributes_to_table(div)
   wrapper.extract_first_heading_as_title(div, attrs)
+  for key, value in pairs(written) do
+    attrs[key] = value
+  end
 
   local title = attrs.title or 'Executive Summary'
-  local show_brackets = attrs['show-corner-brackets'] ~= 'false'
+  -- `show-corner-brackets` resolves to a genuine Lua boolean once the
+  -- document writes a schema-legal `true`/`false`; a value the schema
+  -- rejects (and an attribute the document never wrote) still comes through
+  -- as a string, so the extension's own "only the literal false turns it
+  -- off" dialect keeps deciding those cases exactly as before.
+  local show_brackets = attrs['show-corner-brackets']
+  if type(show_brackets) ~= 'boolean' then
+    show_brackets = show_brackets ~= 'false'
+  end
 
   local base_class = class_prefix .. html_utils.bem_class('executive-summary')
 
