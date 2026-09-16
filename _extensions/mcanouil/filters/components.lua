@@ -181,7 +181,7 @@ function Meta(meta)
     -- Build HTML/Reveal.js handlers
     DIV_HANDLERS = {
       ['panel'] = function(div)
-        return html_renderers.render_panel(div, FORMAT_CONFIG)
+        return html_renderers.render_panel(div, FORMAT_CONFIG, checked_attributes(div, 'panel'))
       end,
       ['executive-summary'] = function(div)
         return html_renderers.render_executive_summary(div, FORMAT_CONFIG)
@@ -217,7 +217,7 @@ function Meta(meta)
         return typst_wrapper.create_atomic_handler()(div, config)
       end,
       ['panel'] = function(div, config)
-        return typst_wrapper.create_wrapped_handler(true)(div, config)
+        return typst_wrapper.create_wrapped_handler(true)(div, config, checked_attributes(div, 'panel'))
       end,
       ['progress'] = function(div, config)
         return typst_wrapper.create_atomic_handler()(div, config)

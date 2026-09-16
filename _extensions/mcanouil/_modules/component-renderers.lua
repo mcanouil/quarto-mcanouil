@@ -55,13 +55,18 @@ M.REVEALJS_CONFIG = {
 --- Render a panel component.
 --- @param div pandoc.Div The div element
 --- @param config FormatConfig|nil Configuration options
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return table List of pandoc elements
-M.render_panel = function(div, config)
+M.render_panel = function(div, config, written)
   config = config or M.HTML_CONFIG
+  written = written or {}
   local class_prefix = config.class_prefix or ''
 
   local attrs = wrapper.attributes_to_table(div)
   wrapper.extract_first_heading_as_title(div, attrs)
+  for key, value in pairs(written) do
+    attrs[key] = value
+  end
 
   local style = attrs.style or 'subtle'
   local modifier = html_utils.get_colour_modifier(style)

@@ -109,11 +109,15 @@ end
 --- @param div pandoc.Div Div element with content
 --- @param config table Configuration with wrapper field
 --- @param extract_title boolean Whether to extract first heading as title
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return table List of pandoc elements (opening wrapper, content, closing wrapper)
-local function build_wrapped_content(div, config, extract_title)
+local function build_wrapped_content(div, config, extract_title, written)
   local attrs = attributes_to_table(div)
   if extract_title then
     extract_first_heading_as_title(div, attrs)
+  end
+  for key, value in pairs(written or {}) do
+    attrs[key] = value
   end
   local opening, closing = build_typst_block_wrappers(config, attrs)
   local result = { pandoc.RawBlock('typst', opening) }
@@ -139,10 +143,10 @@ end
 
 --- Create handler for wrapped content components
 --- @param extract_title boolean Whether to extract first heading as title
---- @return function Handler function taking (div, config) and returning table
+--- @return function Handler function taking (div, config, written) and returning table
 local function create_wrapped_handler(extract_title)
-  return function(div, config)
-    return build_wrapped_content(div, config, extract_title)
+  return function(div, config, written)
+    return build_wrapped_content(div, config, extract_title, written)
   end
 end
 
