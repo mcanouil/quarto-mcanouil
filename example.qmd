@@ -1565,7 +1565,7 @@ The template validates options and provides helpful error messages:
 
 | Component          | Shortcode/Class        | Key Parameters                          |
 |--------------------|------------------------|-----------------------------------------|
-| Value Box          | `{{< value-box >}}`    | value, unit, label, icon, colour, alt   |
+| Value Box          | `{{< value-box >}}`    | value, unit, label, icon, colour        |
 | Panel              | `.panel`               | style, title, icon                      |
 | Badge              | `.badge`               | colour, icon                            |
 | Divider            | `{{< divider >}}`      | style, label, width, thickness          |
