@@ -211,10 +211,6 @@ Arrange multiple value boxes using Quarto's `layout-ncol` feature:
 - `label`: Description text (required).
 - `icon`: Icon shortcuts (up ↑, down ↓, stable —) or any UTF-8 character.
 - `colour`: Colour types (success, warning, danger, info, neutral) or hex colours (#ff0000).
-- `background`: Optional background colour override.
-- `show-border`: Display border around the box (default: true).
-- `alignment`: Content alignment (center, left, right; default: center).
-- `alt`: Optional alt text for accessibility when using grid layouts (wraps grid in figure with alt text).
 
 ### Info Panels {#sec-panels}
 
