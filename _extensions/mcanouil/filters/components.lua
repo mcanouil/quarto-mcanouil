@@ -125,6 +125,22 @@ local function checked_attributes(el, group)
   return written
 end
 
+--- Check every nested card inside a card grid against the `card` group.
+--- A card-grid's own handler builds this before rendering, because a card
+--- nested in a grid is consumed inside the grid's own processing and never
+--- reaches this filter's own per-class dispatch on its own.
+--- @param div pandoc.Div The card-grid div
+--- @return table<pandoc.Div, table> card_overrides Nested card div to its own written attributes
+local function checked_nested_cards(div)
+  local card_overrides = {}
+  for _, item in ipairs(div.content) do
+    if item.t == 'Div' and item.classes and item.classes:includes('card') then
+      card_overrides[item] = checked_attributes(item, 'card')
+    end
+  end
+  return card_overrides
+end
+
 -- ============================================================================
 -- GLOBAL CONFIGURATION
 -- ============================================================================
@@ -171,7 +187,9 @@ function Meta(meta)
         return html_renderers.render_executive_summary(div, FORMAT_CONFIG)
       end,
       ['card-grid'] = function(div)
-        return html_renderers.render_card_grid(div, FORMAT_CONFIG)
+        return html_renderers.render_card_grid(
+          div, FORMAT_CONFIG, checked_attributes(div, 'card-grid'), checked_nested_cards(div)
+        )
       end,
       ['card'] = function(div)
         return html_renderers.render_card(div, FORMAT_CONFIG, checked_attributes(div, 'card'))
@@ -211,7 +229,9 @@ function Meta(meta)
         return typst_wrapper.create_wrapped_handler(true)(div, config)
       end,
       ['card-grid'] = function(div, config)
-        return typst_card_grid.process_card_grid(div, config)
+        return typst_card_grid.process_card_grid(
+          div, config, checked_attributes(div, 'card-grid'), checked_nested_cards(div)
+        )
       end,
       ['card'] = function(div, config)
         return typst_card_grid.process_card_div(div, config, checked_attributes(div, 'card'))

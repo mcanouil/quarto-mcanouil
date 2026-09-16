@@ -52,15 +52,19 @@ end
 --- Extracts cards from child divs and builds Typst code
 --- @param div pandoc.Div Card-grid div containing card divs
 --- @param config table Component configuration (not used for card-grid special processing)
+--- @param written table|nil Schema-resolved attributes the document wrote
+--- @param card_overrides table|nil Nested card div to its own written attributes
 --- @return pandoc.RawBlock Typst code for rendering card grid
-local function process_card_grid(div, config)
+local function process_card_grid(div, config, written, card_overrides)
+  written = written or {}
   local cards = pandoc.List()
-  local columns = div.attributes.columns and tonumber(div.attributes.columns) or 3
+  local columns_value = written.columns or div.attributes.columns
+  local columns = columns_value and tonumber(columns_value) or 3
 
   -- Extract cards from child divs
   for _, block in ipairs(div.content) do
     if block.t == 'Div' and block.classes:includes('card') then
-      local card = extract_card(block)
+      local card = extract_card(block, card_overrides and card_overrides[block])
       if card.title or card.content or card.footer then
         cards:insert(card)
       end
