@@ -292,9 +292,6 @@ attributes:
       type: string
       default: "3"
       description: "Number of columns in the card grid."
-    alt:
-      type: string
-      description: "Alternative text for the card grid (wraps grid in a figure; Typst only)."
 
   card:
     title:

@@ -119,7 +119,7 @@ In Typst it produces nothing, and a badge is written as `[text]{.badge}` instead
 | --- | --- |
 | `.panel` | `title`, `icon`, `style` (one of ten themes; `subtle`). |
 | `.executive-summary` | `title` (`Executive Summary`), `show-corner-brackets` (`true`). |
-| `.card-grid` | `columns` (`3`), `alt`, which wraps the grid in a figure in Typst. |
+| `.card-grid` | `columns` (`3`). |
 | `.card` | `title`, `style` (`subtle`, `outlined`, `filled`; `subtle`), `colour`. |
 | `.card-footer` | The footer of a card. |
 | `.highlight` | A content emphasis block. |
