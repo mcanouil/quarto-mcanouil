@@ -27,9 +27,11 @@ local content_extraction = require(
 --- Extract card data from a div.
 --- Uses content_extraction.parse_sections() for header/body/footer extraction.
 --- @param div pandoc.Div The card div.
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return table Card data with title, content, footer, style, colour.
-local function extract_card(div)
+local function extract_card(div, written)
   local parsed = content_extraction.parse_sections(div.content)
+  written = written or {}
 
   return {
     title = parsed.header_text,
@@ -37,8 +39,8 @@ local function extract_card(div)
         and str.stringify(parsed.body_blocks) or nil,
     footer = parsed.footer_blocks and #parsed.footer_blocks > 0
         and str.stringify(parsed.footer_blocks) or nil,
-    style = div.attributes.style,
-    colour = div.attributes.colour
+    style = written.style or div.attributes.style,
+    colour = written.colour or div.attributes.colour
   }
 end
 
@@ -110,9 +112,10 @@ end
 --- Extracts card data and builds Typst code for a single card
 --- @param div pandoc.Div Card div
 --- @param config table Component configuration
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return pandoc.RawBlock Typst code for rendering single card
-local function process_card_div(div, config)
-  local card = extract_card(div)
+local function process_card_div(div, config, written)
+  local card = extract_card(div, written)
 
   -- Build Typst function call
   local parts = {}

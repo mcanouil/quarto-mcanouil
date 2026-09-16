@@ -176,12 +176,17 @@ end
 --- Render a single card.
 --- @param div pandoc.Div The card div element
 --- @param config FormatConfig|nil Configuration options
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return table List of pandoc elements
-M.render_card = function(div, config)
+M.render_card = function(div, config, written)
   config = config or M.HTML_CONFIG
+  written = written or {}
 
   local attrs = wrapper.attributes_to_table(div)
   wrapper.extract_first_heading_as_title(div, attrs)
+  for key, value in pairs(written) do
+    attrs[key] = value
+  end
 
   local style = attrs.style or 'subtle'
   local modifier = html_utils.get_colour_modifier(style) or style

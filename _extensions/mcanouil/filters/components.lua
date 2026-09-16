@@ -91,6 +91,7 @@ local checker = schema_check.new(schema, EXTENSION_NAME, '../_schema.yml')
 --- an attribute the descriptor declares `aliases:` for needs an entry, so
 --- that presence can be tested under either spelling.
 local GROUP_ALIASES = {
+  card = { colour = 'color' },
   badge = { colour = 'color' }
 }
 
@@ -173,7 +174,7 @@ function Meta(meta)
         return html_renderers.render_card_grid(div, FORMAT_CONFIG)
       end,
       ['card'] = function(div)
-        return html_renderers.render_card(div, FORMAT_CONFIG)
+        return html_renderers.render_card(div, FORMAT_CONFIG, checked_attributes(div, 'card'))
       end
     }
 
@@ -213,7 +214,7 @@ function Meta(meta)
         return typst_card_grid.process_card_grid(div, config)
       end,
       ['card'] = function(div, config)
-        return typst_card_grid.process_card_div(div, config)
+        return typst_card_grid.process_card_div(div, config, checked_attributes(div, 'card'))
       end
     }
 
