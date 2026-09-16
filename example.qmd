@@ -246,7 +246,8 @@ They maintain clarity whilst keeping the design minimal and unobtrusive.
 #### Status-Based Panels
 
 ::: {.panel style="info" icon="ℹ"}
-## Information Panel
+
+##### Information Panel
 
 Info panels use note callout colours for explanatory content.
 Panel titles can be set via the `title` attribute or as the first heading inside the panel.
@@ -397,6 +398,7 @@ Card grids provide flexible layouts for displaying content in card format.
 
 ::: {.card-grid columns="3"}
 ::: {.card}
+
 ## Performance
 
 Optimised for speed with minimal overhead and efficient rendering across all platforms.
@@ -407,6 +409,7 @@ Optimised for speed with minimal overhead and efficient rendering across all pla
 :::
 
 ::: {.card}
+
 ## Security
 
 Enterprise-grade security with end-to-end encryption, compliance, and regular audits.
@@ -417,6 +420,7 @@ SOC 2 Type II certified
 :::
 
 ::: {.card}
+
 ## Scalability
 
 Scales effortlessly from small teams to global enterprises with millions of users.
@@ -433,6 +437,7 @@ Cards support three distinct styles:
 
 ::: {.card-grid columns="3"}
 ::: {.card style="subtle"}
+
 ## Subtle Style
 
 Light background with subtle border.
@@ -440,6 +445,7 @@ This is the default card style.
 :::
 
 ::: {.card style="outlined"}
+
 ## Outlined Style
 
 Clear border with transparent background.
@@ -447,6 +453,7 @@ Clean and minimal appearance.
 :::
 
 ::: {.card style="filled" colour="#3498db"}
+
 ## Filled Style
 
 Bold filled background with contrasting text.
@@ -467,6 +474,7 @@ Maximum visual impact.
 Individual cards can be used outside of card grids for single-item emphasis:
 
 ::: {.card style="outlined"}
+
 ## Standalone Card Example
 
 This card is used independently, not within a card-grid.
@@ -474,6 +482,7 @@ It provides the same styling options as cards within grids.
 :::
 
 ::: {.card style="filled" colour="#9b59b6"}
+
 ## Filled Standalone Card
 
 Filled cards with custom colours work perfectly as standalone components.
@@ -485,6 +494,7 @@ Ideal for call-to-action blocks or featured content.
 Executive summary blocks provide prominent, professional summary sections for reports.
 
 ::: {.executive-summary}
+
 ## Executive Summary
 
 This quarter exceeded all strategic targets across revenue, customer satisfaction, and project delivery.
@@ -676,8 +686,7 @@ x_1 \\
 x_2 \\
 x_3
 \end{bmatrix}
-=
-\begin{bmatrix}
+= \begin{bmatrix}
 b_1 \\
 b_2 \\
 b_3
