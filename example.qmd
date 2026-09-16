@@ -460,7 +460,6 @@ Maximum visual impact.
 **Card Grid Parameters:**
 
 - `columns`: Number of columns (1-4).
-- `alt`: Optional alt text for accessibility (wraps grid in figure with alt text).
 - Card `style`: subtle, outlined, or filled.
 - Card `colour`: Custom accent colour (for filled style).
 - Cards support title (## Heading), content, and footer (after ---).
@@ -1280,7 +1279,6 @@ The template is designed with PDF accessibility (PDF/UA-1) compliance in mind:
 - **PDF/UA-1 Standard**: Enabled by default via `pdf-standard: ua-1` (requires Typst >= 0.14).
 - **Semantic Structure**: Proper heading hierarchy, tables with headers, and semantic elements.
 - **Decorative Elements as Artifacts**: Corner brackets, margin decorations, watermarks, and other decorative elements are marked as PDF artifacts so screen readers skip them.
-- **Alt Text Support**: Grid-based components (card grids, value box grids) support an optional `alt` parameter for accessibility descriptions.
 - **Non-Colour Differentiation**: Callouts include default titles (Note, Tip, Warning, etc.) to ensure information is not conveyed by colour alone.
 - **WCAG AA Contrast**: Colours are validated to meet WCAG AA contrast requirements.
 

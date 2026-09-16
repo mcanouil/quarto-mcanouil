@@ -134,7 +134,7 @@ In Typst it produces nothing, and a badge is written as `[text]{.badge}` instead
 - **Components**: the shortcodes and divs above, rendered natively per format rather than as HTML passed through.
 - **Code windows**: window decoration on code blocks, with per-block overrides.
 - **Special sections**: appendices and supplementary sections that relocate themselves and number separately, in Typst.
-- **Accessibility**: alt text on maths and on card grids, a palette whose semantic colours are chosen to meet WCAG AA at 4.5:1, and Typst show rules written to keep the tag structure PDF/UA-1 expects.
+- **Accessibility**: alt text on maths, a palette whose semantic colours are chosen to meet WCAG AA at 4.5:1, and Typst show rules written to keep the tag structure PDF/UA-1 expects.
 
 ## Limitations
 
