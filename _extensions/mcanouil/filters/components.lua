@@ -180,13 +180,12 @@ local FORMAT_GROUPS = {
 --- @param meta pandoc.Meta Document metadata
 --- @return pandoc.Meta Unchanged metadata
 function Meta(meta)
-  checker:options(meta)
-
   CURRENT_FORMAT = format_utils.get_format()
   FORMAT_CONFIG = format_utils.get_config()
 
   local format_group = FORMAT_GROUPS[CURRENT_FORMAT]
   if format_group then
+    checker:options(meta)
     checker:format(format_group)
   end
 
