@@ -211,10 +211,6 @@ Arrange multiple value boxes using Quarto's `layout-ncol` feature:
 - `label`: Description text (required).
 - `icon`: Icon shortcuts (up ↑, down ↓, stable —) or any UTF-8 character.
 - `colour`: Colour types (success, warning, danger, info, neutral) or hex colours (#ff0000).
-- `background`: Optional background colour override.
-- `show-border`: Display border around the box (default: true).
-- `alignment`: Content alignment (center, left, right; default: center).
-- `alt`: Optional alt text for accessibility when using grid layouts (wraps grid in figure with alt text).
 
 ### Info Panels {#sec-panels}
 
@@ -246,7 +242,8 @@ They maintain clarity whilst keeping the design minimal and unobtrusive.
 #### Status-Based Panels
 
 ::: {.panel style="info" icon="ℹ"}
-## Information Panel
+
+##### Information Panel
 
 Info panels use note callout colours for explanatory content.
 Panel titles can be set via the `title` attribute or as the first heading inside the panel.
@@ -395,8 +392,9 @@ Card grids provide flexible layouts for displaying content in card format.
 
 #### Basic Card Grid
 
-::: {.card-grid columns="3" alt="Feature cards showing Performance, Security, and Scalability capabilities"}
+::: {.card-grid columns="3"}
 ::: {.card}
+
 ## Performance
 
 Optimised for speed with minimal overhead and efficient rendering across all platforms.
@@ -407,6 +405,7 @@ Optimised for speed with minimal overhead and efficient rendering across all pla
 :::
 
 ::: {.card}
+
 ## Security
 
 Enterprise-grade security with end-to-end encryption, compliance, and regular audits.
@@ -417,6 +416,7 @@ SOC 2 Type II certified
 :::
 
 ::: {.card}
+
 ## Scalability
 
 Scales effortlessly from small teams to global enterprises with millions of users.
@@ -431,8 +431,9 @@ Scales effortlessly from small teams to global enterprises with millions of user
 
 Cards support three distinct styles:
 
-::: {.card-grid columns="3" alt="Card style comparison showing subtle, outlined, and filled variants"}
+::: {.card-grid columns="3"}
 ::: {.card style="subtle"}
+
 ## Subtle Style
 
 Light background with subtle border.
@@ -440,6 +441,7 @@ This is the default card style.
 :::
 
 ::: {.card style="outlined"}
+
 ## Outlined Style
 
 Clear border with transparent background.
@@ -447,6 +449,7 @@ Clean and minimal appearance.
 :::
 
 ::: {.card style="filled" colour="#3498db"}
+
 ## Filled Style
 
 Bold filled background with contrasting text.
@@ -457,7 +460,6 @@ Maximum visual impact.
 **Card Grid Parameters:**
 
 - `columns`: Number of columns (1-4).
-- `alt`: Optional alt text for accessibility (wraps grid in figure with alt text).
 - Card `style`: subtle, outlined, or filled.
 - Card `colour`: Custom accent colour (for filled style).
 - Cards support title (## Heading), content, and footer (after ---).
@@ -467,6 +469,7 @@ Maximum visual impact.
 Individual cards can be used outside of card grids for single-item emphasis:
 
 ::: {.card style="outlined"}
+
 ## Standalone Card Example
 
 This card is used independently, not within a card-grid.
@@ -474,6 +477,7 @@ It provides the same styling options as cards within grids.
 :::
 
 ::: {.card style="filled" colour="#9b59b6"}
+
 ## Filled Standalone Card
 
 Filled cards with custom colours work perfectly as standalone components.
@@ -485,6 +489,7 @@ Ideal for call-to-action blocks or featured content.
 Executive summary blocks provide prominent, professional summary sections for reports.
 
 ::: {.executive-summary}
+
 ## Executive Summary
 
 This quarter exceeded all strategic targets across revenue, customer satisfaction, and project delivery.
@@ -676,8 +681,7 @@ x_1 \\
 x_2 \\
 x_3
 \end{bmatrix}
-=
-\begin{bmatrix}
+= \begin{bmatrix}
 b_1 \\
 b_2 \\
 b_3
@@ -1275,7 +1279,6 @@ The template is designed with PDF accessibility (PDF/UA-1) compliance in mind:
 - **PDF/UA-1 Standard**: Enabled by default via `pdf-standard: ua-1` (requires Typst >= 0.14).
 - **Semantic Structure**: Proper heading hierarchy, tables with headers, and semantic elements.
 - **Decorative Elements as Artifacts**: Corner brackets, margin decorations, watermarks, and other decorative elements are marked as PDF artifacts so screen readers skip them.
-- **Alt Text Support**: Grid-based components (card grids, value box grids) support an optional `alt` parameter for accessibility descriptions.
 - **Non-Colour Differentiation**: Callouts include default titles (Note, Tip, Warning, etc.) to ensure information is not conveyed by colour alone.
 - **WCAG AA Contrast**: Colours are validated to meet WCAG AA contrast requirements.
 
@@ -1565,13 +1568,13 @@ The template validates options and provides helpful error messages:
 
 | Component          | Shortcode/Class        | Key Parameters                          |
 |--------------------|------------------------|-----------------------------------------|
-| Value Box          | `{{< value-box >}}`    | value, unit, label, icon, colour, alt   |
+| Value Box          | `{{< value-box >}}`    | value, unit, label, icon, colour        |
 | Panel              | `.panel`               | style, title, icon                      |
 | Badge              | `.badge`               | colour, icon                            |
 | Divider            | `{{< divider >}}`      | style, label, width, thickness          |
 | Progress Bar       | `{{< progress >}}`     | value, label, colour                    |
 | Card               | `.card`                | style, colour                           |
-| Card Grid          | `.card-grid`           | columns, alt                            |
+| Card Grid          | `.card-grid`           | columns                                 |
 | Executive Summary  | `.executive-summary`   | title                                   |
 | Highlight          | `.highlight`           | (none)                                  |
 

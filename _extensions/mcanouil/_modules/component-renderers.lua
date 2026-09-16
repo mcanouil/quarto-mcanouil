@@ -55,13 +55,18 @@ M.REVEALJS_CONFIG = {
 --- Render a panel component.
 --- @param div pandoc.Div The div element
 --- @param config FormatConfig|nil Configuration options
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return table List of pandoc elements
-M.render_panel = function(div, config)
+M.render_panel = function(div, config, written)
   config = config or M.HTML_CONFIG
+  written = written or {}
   local class_prefix = config.class_prefix or ''
 
   local attrs = wrapper.attributes_to_table(div)
   wrapper.extract_first_heading_as_title(div, attrs)
+  for key, value in pairs(written) do
+    attrs[key] = value
+  end
 
   local style = attrs.style or 'subtle'
   local modifier = html_utils.get_colour_modifier(style)
@@ -117,16 +122,29 @@ end
 --- Render an executive summary component.
 --- @param div pandoc.Div The div element
 --- @param config FormatConfig|nil Configuration options
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return table List of pandoc elements
-M.render_executive_summary = function(div, config)
+M.render_executive_summary = function(div, config, written)
   config = config or M.HTML_CONFIG
+  written = written or {}
   local class_prefix = config.class_prefix or ''
 
   local attrs = wrapper.attributes_to_table(div)
   wrapper.extract_first_heading_as_title(div, attrs)
+  for key, value in pairs(written) do
+    attrs[key] = value
+  end
 
   local title = attrs.title or 'Executive Summary'
-  local show_brackets = attrs['show-corner-brackets'] ~= 'false'
+  -- `show-corner-brackets` resolves to a genuine Lua boolean once the
+  -- document writes a schema-legal `true`/`false`; a value the schema
+  -- rejects (and an attribute the document never wrote) still comes through
+  -- as a string, so the extension's own "only the literal false turns it
+  -- off" dialect keeps deciding those cases exactly as before.
+  local show_brackets = attrs['show-corner-brackets']
+  if type(show_brackets) ~= 'boolean' then
+    show_brackets = show_brackets ~= 'false'
+  end
 
   local base_class = class_prefix .. html_utils.bem_class('executive-summary')
 
@@ -176,12 +194,17 @@ end
 --- Render a single card.
 --- @param div pandoc.Div The card div element
 --- @param config FormatConfig|nil Configuration options
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return table List of pandoc elements
-M.render_card = function(div, config)
+M.render_card = function(div, config, written)
   config = config or M.HTML_CONFIG
+  written = written or {}
 
   local attrs = wrapper.attributes_to_table(div)
   wrapper.extract_first_heading_as_title(div, attrs)
+  for key, value in pairs(written) do
+    attrs[key] = value
+  end
 
   local style = attrs.style or 'subtle'
   local modifier = html_utils.get_colour_modifier(style) or style
@@ -258,14 +281,21 @@ end
 --- Render a card grid component.
 --- @param div pandoc.Div The div element
 --- @param config FormatConfig|nil Configuration options
+--- @param written table|nil Schema-resolved attributes the document wrote
+--- @param card_overrides table|nil Nested card div to its own written attributes
 --- @return table List of pandoc elements
-M.render_card_grid = function(div, config)
+M.render_card_grid = function(div, config, written, card_overrides)
   config = config or M.HTML_CONFIG
+  written = written or {}
   local class_prefix = config.class_prefix or ''
+  -- `columns` falls back to a per-format literal (3 for HTML, 2 for
+  -- Reveal.js) that differs from the schema's own declared default (3), so
+  -- only a value the document actually wrote is taken from the schema; an
+  -- absent attribute still falls back to the per-format literal below.
   local default_columns = config.defaults and config.defaults.columns or '3'
 
   local attrs = wrapper.attributes_to_table(div)
-  local columns = attrs.columns or default_columns
+  local columns = written.columns or attrs.columns or default_columns
 
   local grid_class = class_prefix .. html_utils.bem_class('card-grid')
   local style_attr = string.format('--card-columns: %s;', columns)
@@ -275,7 +305,7 @@ M.render_card_grid = function(div, config)
   -- Process child divs as cards
   for _, item in ipairs(div.content) do
     if item.t == 'Div' and item.classes and item.classes:includes('card') then
-      local card_html = M.render_card(item, config)
+      local card_html = M.render_card(item, config, card_overrides and card_overrides[item])
       for _, block in ipairs(card_html) do
         table.insert(result, block)
       end
@@ -292,11 +322,16 @@ end
 --- Render a badge span.
 --- @param span pandoc.Span The span element
 --- @param config FormatConfig|nil Configuration options
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return pandoc.RawInline The rendered badge
-M.render_badge = function(span, config)
+M.render_badge = function(span, config, written)
   config = config or M.HTML_CONFIG
+  written = written or {}
 
   local attrs = wrapper.attributes_to_table(span)
+  for key, value in pairs(written) do
+    attrs[key] = value
+  end
   local content = pandoc.utils.stringify(span.content)
 
   local colour = attrs.colour or attrs.color or 'neutral'

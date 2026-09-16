@@ -27,9 +27,11 @@ local content_extraction = require(
 --- Extract card data from a div.
 --- Uses content_extraction.parse_sections() for header/body/footer extraction.
 --- @param div pandoc.Div The card div.
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return table Card data with title, content, footer, style, colour.
-local function extract_card(div)
+local function extract_card(div, written)
   local parsed = content_extraction.parse_sections(div.content)
+  written = written or {}
 
   return {
     title = parsed.header_text,
@@ -37,8 +39,8 @@ local function extract_card(div)
         and str.stringify(parsed.body_blocks) or nil,
     footer = parsed.footer_blocks and #parsed.footer_blocks > 0
         and str.stringify(parsed.footer_blocks) or nil,
-    style = div.attributes.style,
-    colour = div.attributes.colour
+    style = written.style or div.attributes.style,
+    colour = written.colour or div.attributes.colour
   }
 end
 
@@ -50,15 +52,19 @@ end
 --- Extracts cards from child divs and builds Typst code
 --- @param div pandoc.Div Card-grid div containing card divs
 --- @param config table Component configuration (not used for card-grid special processing)
+--- @param written table|nil Schema-resolved attributes the document wrote
+--- @param card_overrides table|nil Nested card div to its own written attributes
 --- @return pandoc.RawBlock Typst code for rendering card grid
-local function process_card_grid(div, config)
+local function process_card_grid(div, config, written, card_overrides)
+  written = written or {}
   local cards = pandoc.List()
-  local columns = div.attributes.columns and tonumber(div.attributes.columns) or 3
+  local columns_value = written.columns or div.attributes.columns
+  local columns = columns_value and tonumber(columns_value) or 3
 
   -- Extract cards from child divs
   for _, block in ipairs(div.content) do
     if block.t == 'Div' and block.classes:includes('card') then
-      local card = extract_card(block)
+      local card = extract_card(block, card_overrides and card_overrides[block])
       if card.title or card.content or card.footer then
         cards:insert(card)
       end
@@ -110,9 +116,10 @@ end
 --- Extracts card data and builds Typst code for a single card
 --- @param div pandoc.Div Card div
 --- @param config table Component configuration
+--- @param written table|nil Schema-resolved attributes the document wrote
 --- @return pandoc.RawBlock Typst code for rendering single card
-local function process_card_div(div, config)
-  local card = extract_card(div)
+local function process_card_div(div, config, written)
+  local card = extract_card(div, written)
 
   -- Build Typst function call
   local parts = {}

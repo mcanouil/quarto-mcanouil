@@ -86,6 +86,61 @@ local EXTENSION_NAME = 'mcanouil'
 --- render carries on: a configuration file must not stop a document.
 local checker = schema_check.new(schema, EXTENSION_NAME, '../_schema.yml')
 
+--- @type table<string, table<string, string>> Per-group map of a resolved
+--- attribute name to the raw attribute name it is also accepted under. Only
+--- an attribute the descriptor declares `aliases:` for needs an entry, so
+--- that presence can be tested under either spelling.
+local GROUP_ALIASES = {
+  card = { colour = 'color' },
+  badge = { colour = 'color' }
+}
+
+--- Check an element's attributes against a declared group, and return only
+--- the ones the document actually wrote, resolved through the schema.
+---
+--- Several groups declare a `default:`, and `checker:attributes` merges that
+--- default into the table it returns, discarding whether the document wrote
+--- the attribute or the schema filled it in. Reading the merged table
+--- directly would make every element look as though it wrote the default,
+--- silently overriding whatever fallback the caller applies for an absent
+--- attribute (a per-format literal, a heading extracted from the content).
+---
+--- So this reads the raw attribute list first, keeps a resolved value only
+--- when the document wrote it under its own name or a declared alias, and
+--- leaves every other key out, so the caller's own fallback still runs
+--- exactly as before for a genuinely absent attribute.
+--- @param el pandoc.Div|pandoc.Span Element carrying the attributes
+--- @param group string Schema attribute group name
+--- @return table<string, any> written Schema-resolved values, written keys only
+local function checked_attributes(el, group)
+  local resolved = checker:attributes(el.attributes, group) or {}
+  local aliases = GROUP_ALIASES[group]
+  local written = {}
+  for key, value in pairs(resolved) do
+    local alias = aliases and aliases[key]
+    if el.attributes[key] ~= nil or (alias and el.attributes[alias] ~= nil) then
+      written[key] = value
+    end
+  end
+  return written
+end
+
+--- Check every nested card inside a card grid against the `card` group.
+--- A card-grid's own handler builds this before rendering, because a card
+--- nested in a grid is consumed inside the grid's own processing and never
+--- reaches this filter's own per-class dispatch on its own.
+--- @param div pandoc.Div The card-grid div
+--- @return table<pandoc.Div, table> card_overrides Nested card div to its own written attributes
+local function checked_nested_cards(div)
+  local card_overrides = {}
+  for _, item in ipairs(div.content) do
+    if item.t == 'Div' and item.classes and item.classes:includes('card') then
+      card_overrides[item] = checked_attributes(item, 'card')
+    end
+  end
+  return card_overrides
+end
+
 -- ============================================================================
 -- GLOBAL CONFIGURATION
 -- ============================================================================
@@ -106,6 +161,16 @@ local SPAN_HANDLERS = {}
 local TYPST_DIV_MAPPINGS = {}
 local TYPST_SPAN_MAPPINGS = {}
 
+--- @type table<string, string> `format_utils.get_format()` name to the
+--- schema's own declared format group name. The schema declares three
+--- format groups, and nothing in the vendored validator can tell which of
+--- them a render selected, so the extension names its own format here.
+local FORMAT_GROUPS = {
+  html = 'mcanouil-html',
+  typst = 'mcanouil-typst',
+  revealjs = 'mcanouil-revealjs'
+}
+
 -- ============================================================================
 -- METADATA PROCESSING
 -- ============================================================================
@@ -115,10 +180,14 @@ local TYPST_SPAN_MAPPINGS = {}
 --- @param meta pandoc.Meta Document metadata
 --- @return pandoc.Meta Unchanged metadata
 function Meta(meta)
-  checker:options(meta)
-
   CURRENT_FORMAT = format_utils.get_format()
   FORMAT_CONFIG = format_utils.get_config()
+
+  local format_group = FORMAT_GROUPS[CURRENT_FORMAT]
+  if format_group then
+    checker:options(meta)
+    checker:format(format_group)
+  end
 
   if CURRENT_FORMAT == 'html' or CURRENT_FORMAT == 'revealjs' then
     load_html_modules()
@@ -126,22 +195,26 @@ function Meta(meta)
     -- Build HTML/Reveal.js handlers
     DIV_HANDLERS = {
       ['panel'] = function(div)
-        return html_renderers.render_panel(div, FORMAT_CONFIG)
+        return html_renderers.render_panel(div, FORMAT_CONFIG, checked_attributes(div, 'panel'))
       end,
       ['executive-summary'] = function(div)
-        return html_renderers.render_executive_summary(div, FORMAT_CONFIG)
+        return html_renderers.render_executive_summary(
+          div, FORMAT_CONFIG, checked_attributes(div, 'executive-summary')
+        )
       end,
       ['card-grid'] = function(div)
-        return html_renderers.render_card_grid(div, FORMAT_CONFIG)
+        return html_renderers.render_card_grid(
+          div, FORMAT_CONFIG, checked_attributes(div, 'card-grid'), checked_nested_cards(div)
+        )
       end,
       ['card'] = function(div)
-        return html_renderers.render_card(div, FORMAT_CONFIG)
+        return html_renderers.render_card(div, FORMAT_CONFIG, checked_attributes(div, 'card'))
       end
     }
 
     SPAN_HANDLERS = {
       ['badge'] = function(span)
-        return html_renderers.render_badge(span, FORMAT_CONFIG)
+        return html_renderers.render_badge(span, FORMAT_CONFIG, checked_attributes(span, 'badge'))
       end
     }
   elseif CURRENT_FORMAT == 'typst' then
@@ -160,7 +233,7 @@ function Meta(meta)
         return typst_wrapper.create_atomic_handler()(div, config)
       end,
       ['panel'] = function(div, config)
-        return typst_wrapper.create_wrapped_handler(true)(div, config)
+        return typst_wrapper.create_wrapped_handler(true)(div, config, checked_attributes(div, 'panel'))
       end,
       ['progress'] = function(div, config)
         return typst_wrapper.create_atomic_handler()(div, config)
@@ -169,19 +242,21 @@ function Meta(meta)
         return typst_wrapper.create_wrapped_handler(false)(div, config)
       end,
       ['executive-summary'] = function(div, config)
-        return typst_wrapper.create_wrapped_handler(true)(div, config)
+        return typst_wrapper.create_wrapped_handler(true)(div, config, checked_attributes(div, 'executive-summary'))
       end,
       ['card-grid'] = function(div, config)
-        return typst_card_grid.process_card_grid(div, config)
+        return typst_card_grid.process_card_grid(
+          div, config, checked_attributes(div, 'card-grid'), checked_nested_cards(div)
+        )
       end,
       ['card'] = function(div, config)
-        return typst_card_grid.process_card_div(div, config)
+        return typst_card_grid.process_card_div(div, config, checked_attributes(div, 'card'))
       end
     }
 
     SPAN_HANDLERS = {
       ['badge'] = function(span, config)
-        return typst_badges.process_badge(span, config)
+        return typst_badges.process_badge(span, config, checked_attributes(span, 'badge'))
       end
     }
   end

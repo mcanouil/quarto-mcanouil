@@ -78,6 +78,23 @@ local function read_block_style(block)
   return nil
 end
 
+--- Read the block-level code-window-no-auto-filename attribute as an exact
+--- boolean. Only the literal "true" suppresses the auto filename; anything
+--- else, including "false" and an absent attribute, leaves it enabled,
+--- matching the schema's own declared default of false. A bare truthy
+--- check here would make "false" behave like "true", since any non-nil Lua
+--- value, including the string "false", is truthy.
+--- Strips the attribute from the block.
+--- @param block pandoc.CodeBlock Code block element
+--- @return boolean no_auto True only when the document wrote "true"
+local function read_no_auto_filename(block)
+  local raw = block.attributes['code-window-no-auto-filename']
+  if raw then
+    block.attributes['code-window-no-auto-filename'] = nil
+  end
+  return raw == 'true'
+end
+
 -- NOTE: Typst helper functions (_cw-page-bg, _cw-fg, _cw-annotations,
 -- mcanouil-code-window-annote-colour, mcanouil-code-window-circled-number,
 -- mcanouil-code-window-annotation-item, mcanouil-code-window-annotated-content)
@@ -167,10 +184,7 @@ local function process_html(block)
 
   local block_style = read_block_style(block)
   local explicit_filename = block.attributes['filename']
-  local no_auto = block.attributes['code-window-no-auto-filename']
-  if no_auto then
-    block.attributes['code-window-no-auto-filename'] = nil
-  end
+  local no_auto = read_no_auto_filename(block)
 
   if explicit_filename and explicit_filename ~= '' then
     -- Let Quarto create the .code-with-filename wrapper.
@@ -373,10 +387,7 @@ local function resolve_window_params(block)
   local explicit_filename = block.attributes['filename']
   local filename = explicit_filename
   local is_auto = false
-  local no_auto = block.attributes['code-window-no-auto-filename']
-  if no_auto then
-    block.attributes['code-window-no-auto-filename'] = nil
-  end
+  local no_auto = read_no_auto_filename(block)
 
   if (not filename or filename == '') and not no_auto then
     if CONFIG.auto_filename and block.classes and #block.classes > 0 then
