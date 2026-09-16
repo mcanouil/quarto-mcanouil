@@ -33,6 +33,12 @@ local code_annotations = require(
 local code_window = require(
   quarto.utils.resolve_path('../_modules/code-window.lua'):gsub('%.lua$', ''))
 
+local schema = require(
+  quarto.utils.resolve_path('../_vendor/quarto-wizard/schema.lua'):gsub('%.lua$', ''))
+
+local schema_check = require(
+  quarto.utils.resolve_path('../_vendor/quarto-lua-modules/schema-check.lua'):gsub('%.lua$', ''))
+
 -- Inject all dependencies into the code-window module
 code_window.set_dependencies({
   str = str,
@@ -42,6 +48,46 @@ code_window.set_dependencies({
   html_mod = html_mod,
   code_annotations = code_annotations,
 })
+
+-- ============================================================================
+-- SCHEMA CHECK
+-- ============================================================================
+
+--- The schema check for the `CodeBlock` attribute group, built once for the
+--- render. No checker instance existed anywhere in this file's own
+--- processing, unlike `filters/components.lua`, so this is the first one
+--- built here, not a second one layered on an existing instance.
+---
+--- The schema path is given because the check module resolves it against the
+--- directory of the entry point that is running, and this file sits one
+--- directory below the schema.
+local checker = schema_check.new(schema, EXTENSION_NAME, '../_schema.yml')
+
+--- Check a code block's `code-window-*` attributes against the schema, and
+--- return the block unchanged.
+---
+--- This is a validation-only pass: `code-window-enabled` and
+--- `code-window-style` are read again, unchanged, by `code_window.CodeBlock`
+--- (HTML) and by the Typst block walk in `code_window.Pandoc`, exactly as
+--- before this task. `code-window-no-auto-filename` is read there the same
+--- way too, and deliberately not routed through the schema-resolved value:
+--- both read sites test the raw attribute for Lua truthiness rather than
+--- comparing it against the string "true", so the string "false" is already
+--- truthy and already suppresses the auto filename exactly as "true" does,
+--- against the schema's own declared default of false. That is a
+--- pre-existing defect, independent of this check, and this task's own
+--- global constraints direct that a defect a task's change merely reveals is
+--- reported and preserved, not fixed under cover of a schema check.
+---
+--- Run first in the filter list, before `language.CodeBlock` can inject its
+--- own `code-window-no-auto-filename` value for a block with no recognised
+--- language, so only what the document itself wrote is ever checked.
+--- @param block pandoc.CodeBlock Code block element
+--- @return pandoc.CodeBlock block Unchanged
+local function check_code_window_attributes(block)
+  checker:attributes(block.attributes, 'CodeBlock')
+  return block
+end
 
 -- ============================================================================
 -- SKYLIGHTING HOT-FIX
@@ -70,6 +116,7 @@ end
 -- ============================================================================
 
 local filters = {
+  { CodeBlock = check_code_window_attributes },
   { CodeBlock = language.CodeBlock },
   { Meta = code_window.Meta },
   { Pandoc = code_window.Pandoc },
