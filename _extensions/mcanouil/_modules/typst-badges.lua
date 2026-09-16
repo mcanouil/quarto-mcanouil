@@ -36,6 +36,16 @@ local function process_badge(span, config, written)
   for key, value in pairs(written or {}) do
     attrs[key] = value
   end
+  -- The schema resolves `color` into its declared name `colour` (and picks
+  -- `colour` when the document writes both), but the raw attribute table
+  -- above still carries the alias verbatim. `render-badge`
+  -- (typst/partials/libs/badges.typ:120) declares only `colour`, with no
+  -- `..rest` to absorb an extra named argument, so a `color:` argument
+  -- alongside `colour:` fails the whole Typst compile rather than being
+  -- ignored. Drop the raw alias once the declared name has a resolved value.
+  if written and written.colour ~= nil then
+    attrs.color = nil
+  end
 
   -- Always pass attributes if any exist
   -- config.arguments forces passing even when empty
