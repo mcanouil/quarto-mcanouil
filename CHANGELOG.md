@@ -5,14 +5,23 @@
 ### New Features
 
 - feat: Report a key nested inside an option that the schema does not declare, such as a typo in a nested setting. Only top-level keys were checked before. (#136)
+- feat: Check the badge, card, card-grid, panel, executive-summary, and CodeBlock attribute groups against the schema, so a value the schema rejects is now named. (#136)
+- feat: Check the format options against the schema for all three declared formats, so a format option the schema rejects is now named. (#136)
 
 ### Bug Fixes
 
 - fix: Accept a Typst colour name, such as `blue`, in the `colour` attribute of `value-box` and `.card` in Typst output. Both stopped the build on a name rather than colouring anything, and a malformed hex code stopped it as well. A value that names no colour now uses the component's fallback colour instead of stopping the build. (#134)
+- fix: Stop a Typst badge written with the color alias from crashing the render, by dropping the raw alias once the declared colour name has a resolved value. (#136)
+- fix: Remove the card-grid alt attribute, which no renderer implemented, from the schema and from the documentation and worked example that described it. (#136)
+- fix: Read code-window-no-auto-filename as a real boolean, so a value of false no longer suppresses the automatic filename in the same way as true. (#136)
+- fix: Gate the options check on the html, typst and revealjs formats so non-acting formats stay silent. (#136)
 
 ### Documentation
 
 - docs: Serve the extension's social card as the Open Graph image, so a shared link shows the card rather than the first image on the page. (#132)
+- docs: Remove the value-box alt parameter from the feature reference table, which no renderer implemented. (#136)
+- docs: Remove the value-box alt, background, show-border, and alignment parameters from the worked example, which no renderer implemented. (#136)
+- docs: Remove three remaining claims that card grids or value box grids support an alt parameter, keeping the true claim that maths does. (#136)
 
 ### Refactoring
 
