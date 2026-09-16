@@ -161,6 +161,16 @@ local SPAN_HANDLERS = {}
 local TYPST_DIV_MAPPINGS = {}
 local TYPST_SPAN_MAPPINGS = {}
 
+--- @type table<string, string> `format_utils.get_format()` name to the
+--- schema's own declared format group name. The schema declares three
+--- format groups, and nothing in the vendored validator can tell which of
+--- them a render selected, so the extension names its own format here.
+local FORMAT_GROUPS = {
+  html = 'mcanouil-html',
+  typst = 'mcanouil-typst',
+  revealjs = 'mcanouil-revealjs'
+}
+
 -- ============================================================================
 -- METADATA PROCESSING
 -- ============================================================================
@@ -174,6 +184,11 @@ function Meta(meta)
 
   CURRENT_FORMAT = format_utils.get_format()
   FORMAT_CONFIG = format_utils.get_config()
+
+  local format_group = FORMAT_GROUPS[CURRENT_FORMAT]
+  if format_group then
+    checker:format(format_group)
+  end
 
   if CURRENT_FORMAT == 'html' or CURRENT_FORMAT == 'revealjs' then
     load_html_modules()
