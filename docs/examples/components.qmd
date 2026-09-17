@@ -44,7 +44,9 @@ A value box shows one number, with an optional unit, label, and icon.
 
 ### Icons
 
-The `icon` attribute takes any single character, so an emoji works.
+The `icon` attribute takes any text, and a symbol or an emoji is what it is for.
+A longer value is drawn as written, so `icon="new"` puts the word `new` where the symbol goes.
+
 Three names are shortcuts:
 
 - `up` gives an upward arrow.

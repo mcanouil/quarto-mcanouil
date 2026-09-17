@@ -23,7 +23,8 @@ The body of the panel.
 :::
 ```
 
-An `icon` attribute puts one character before the title.
+An `icon` attribute puts a symbol before the title.
+It takes any text, and it is drawn as written.
 
 The reference lists ten theme names for `style`, and a panel draws nine of them.
 
