@@ -1,0 +1,108 @@
+---
+title: "Reveal.js format"
+subtitle: "Section slides, ordinal dates, and the options for laying a deck out."
+description: "Worked examples of the mcanouil-revealjs option and of the Reveal.js document options, including the two that help while a deck is being built."
+---
+
+`mcanouil-revealjs` produces slides.
+One option belongs to the format, and the rest are document options under `extensions: mcanouil:`.
+
+The [Reference](../reference.qmd#mcanouil-revealjs) covers the format.
+The [Reference](../reference.qmd#options-under-extensions.mcanouil) lists the document options and which output each applies to.
+
+## A presentation
+
+```yaml
+---
+title: "My Presentation"
+format:
+  mcanouil-revealjs:
+    brand-mode: dark
+---
+```
+
+`brand-mode` defaults to `dark` for a deck, where the Typst format defaults to `light`.
+A deck and a report built from one brand therefore look different unless one of them sets the option.
+
+## The document options
+
+```yaml
+extensions:
+  mcanouil:
+    section-outline: true
+    date-superscript: true
+    hide-title-slide-chrome: true
+    favicon-from-logo: true
+    code-annotation-fragments: true
+    debug-borders: false
+```
+
+Every value above is the default the plugin applies.
+A deck under `project: type: mcanouil` receives the same values from the project type.
+
+## Section outlines
+
+`section-outline` puts a list of the subsections on each section slide, so the audience sees what the section holds.
+It is marked as a navigation landmark, so a screen reader announces it as one.
+
+Turn it off for a deck whose sections hold one slide each:
+
+```yaml
+extensions:
+  mcanouil:
+    section-outline: false
+```
+
+## Ordinal dates
+
+`date-superscript` writes an ordinal date with a raised suffix, so `1st` and `2nd` are set the way they are printed.
+
+```yaml
+extensions:
+  mcanouil:
+    date-superscript: false
+```
+
+Turn it off for a deck in a language whose ordinals do not work that way.
+
+## The title slide
+
+`hide-title-slide-chrome` hides the menu, the logo, and the footer on the title slide only.
+The rest of the deck keeps them.
+
+`favicon-from-logo` builds the browser tab icon from the slide logo, so a deck served from a URL carries its own mark.
+
+```yaml
+extensions:
+  mcanouil:
+    hide-title-slide-chrome: false
+    favicon-from-logo: false
+```
+
+## Code annotations as fragments
+
+`code-annotation-fragments` steps through the annotations on a code block one at a time, as fragments, rather than showing them all at once.
+
+```yaml
+extensions:
+  mcanouil:
+    code-annotation-fragments: true
+```
+
+This is the option to keep on for a teaching deck, where each line of a block is explained in turn.
+
+## Two options for laying a deck out
+
+`debug-borders` draws a border around each slide region, so the space a title, a body, and a footer occupy is visible.
+
+`grid-background` draws a faint grid behind the slides, which helps when elements have to line up.
+
+```yaml
+extensions:
+  mcanouil:
+    debug-borders: true
+    grid-background: true
+```
+
+Turn both off before presenting.
+`debug-borders` defaults to off, so a deck that never sets it is safe.

@@ -1,0 +1,133 @@
+---
+title: "Typst format"
+subtitle: "Document types, page decoration, and section pages."
+description: "Worked examples of the mcanouil-typst options, and of the mapping that sends a div class to a Typst function."
+---
+
+`mcanouil-typst` produces a PDF through Typst.
+The [rendered report](../preview.pdf) on this site is built by it as the site publishes.
+
+The [Reference](../reference.qmd#mcanouil-typst) lists every option and its default.
+This page shows what each one changes.
+
+## The report on this site
+
+```yaml
+---
+title: "The Typst format"
+subtitle: "Rendered by the documentation site"
+author: "Mickaël CANOUIL"
+date: last-modified
+format:
+  mcanouil-typst:
+    style: professional
+    brand-mode: light
+---
+```
+
+## Document type
+
+```yaml
+format:
+  mcanouil-typst:
+    document-type: letter
+```
+
+`document-type` takes `report`, `invoice`, `letter`, or `cv`, and it is matched without regard to case.
+It chooses the template the document is built from, so it changes the structure of the page rather than its colours.
+The default is `report`.
+
+## Page decoration
+
+Five options control the decoration, and each defaults to on.
+
+```yaml
+format:
+  mcanouil-typst:
+    show-corner-brackets: false
+    show-margin-decoration: false
+    show-title-page-background: false
+    show-heading-underlines: false
+    show-logo: false
+```
+
+- `show-corner-brackets` draws the signature brackets at the page corners.
+- `show-margin-decoration` draws coloured bars along the margins.
+- `show-title-page-background` draws the geometric background on the title page.
+- `show-heading-underlines` draws the gradient underline below a heading.
+- `show-logo` puts the logo in the header.
+
+Turning all five off gives a plain document that keeps the typography and the palette.
+That is the setting to use when a document must be printed in one colour.
+
+## Section pages
+
+```yaml
+format:
+  mcanouil-typst:
+    section-page: true
+    section-pagebreak: true
+```
+
+`section-page` puts a title page before each top-level section.
+`section-pagebreak` puts a page break before that title page.
+
+Both default to on, which suits a long report.
+A short document reads better with both off, because a two-page note does not need a title page for each of its sections.
+
+## Lists of figures and tables
+
+```yaml
+format:
+  mcanouil-typst:
+    list-of: false
+```
+
+`list-of` includes the list of figures and the list of tables after the table of contents.
+It defaults to on.
+
+## Brand mode
+
+```yaml
+format:
+  mcanouil-typst:
+    brand-mode: dark
+```
+
+`brand-mode` chooses between the light and the dark palette, and defaults to `light` here.
+A Reveal.js deck defaults to `dark` instead, so a document and a deck built from the same brand do not match unless one of them says so.
+
+## Sending a class to a Typst function
+
+The extension maps a div or a span class to a Typst function.
+The built-in mappings cover the components, and a document can add its own:
+
+```yaml
+extensions:
+  mcanouil:
+    typst-markdown:
+      divs:
+        note: my-note
+      spans:
+        sidenote:
+          function: my-sidenote
+          arguments: true
+```
+
+The four keys are `divs`, `spans`, `tables`, and `images`.
+
+A plain function name wraps the content and passes no attributes.
+A table needs a `function:` key, and `arguments: true` passes the element's attributes to the function as named arguments.
+A table with no `function:` key is reported as a warning and ignored, and the render carries on.
+
+The class is then written as an ordinary fenced div:
+
+```markdown
+::: {.note}
+
+The content this function receives.
+
+:::
+```
+
+The function has to exist in the template scope, so this is for a document that already supplies its own Typst partials.

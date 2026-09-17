@@ -1,0 +1,97 @@
+---
+title: "Special sections"
+subtitle: "Appendices, supplementary material, and tabsets in Typst."
+description: "Worked examples of the references, appendix, and supplementary headings, and of what a panel-tabset becomes in Typst output."
+---
+
+Two filters reorganise a document for Typst output.
+Neither one acts on HTML or on a Reveal.js deck.
+
+## The classes go on a heading
+
+A special section is marked on the heading, not on a div.
+
+```markdown
+## References {.references}
+
+## Appendix {.appendix}
+
+## Supplementary material {.supplementary}
+```
+
+A section runs from its heading to the next ordinary heading of the same level or a higher one.
+Everything in between travels with it.
+
+## What the filter does
+
+Each special section is moved to the end of the document.
+The order is always references, then appendix, then supplementary, whatever order the source uses.
+
+At the start of each section:
+
+- The heading counter resets to zero.
+- The figure counter resets to zero.
+- References get no heading numbering.
+- An appendix and a supplementary section each get their own numbering scheme.
+
+So a figure in an appendix is numbered from one again, under the appendix scheme, rather than continuing the sequence of the body.
+
+## A worked document
+
+```markdown
+---
+title: "A report"
+format: mcanouil-typst
+---
+
+## Introduction
+
+The body of the report.
+
+## Appendix {.appendix}
+
+A table that supports the argument.
+
+## Results
+
+More of the body.
+
+## References {.references}
+```
+
+The appendix heading is followed by an ordinary heading of the same level, `Results`, so the appendix holds one section only.
+`Results` stays in the body.
+The rendered document ends with the references, and then the appendix, in that order, whichever came first in the source.
+
+## In HTML output
+
+These three classes do nothing.
+The headings stay where they are written, and they keep their normal numbering.
+A document that must work in both formats should read correctly in source order.
+
+## Tabsets
+
+A tabset is Quarto's own `.panel-tabset` div.
+
+```markdown
+::: {.panel-tabset}
+
+## R
+
+The R version.
+
+## Python
+
+The Python version.
+
+:::
+```
+
+HTML output gives the tabbed interface Quarto normally produces.
+
+Typst has no tabs, so the filter unwraps the div and turns the structure into headings.
+Each tab name becomes a heading, at level 2 at the shallowest.
+Any heading written inside a tab moves below the tab name, so the outline still nests correctly.
+
+The [Reference](../reference.qmd#divs) lists the classes.
+The [Limitations](../reference.qmd#limitations) section states which features are Typst only.

@@ -1,0 +1,110 @@
+---
+title: "HTML format"
+subtitle: "The title block, the navbar, and the grid."
+description: "Worked examples of the mcanouil-html options: the layout style, the three title block groups, and the options a standalone document must set for itself."
+---
+
+An option belongs in one of two places, and which one depends on the option.
+
+- A format option goes under `format: mcanouil-html:`.
+- A document option goes under `extensions: mcanouil:`.
+
+The [Reference](../reference.qmd#mcanouil-html) lists the format options.
+The [Reference](../reference.qmd#options-under-extensions.mcanouil) lists the document options.
+
+## A document
+
+```yaml
+---
+title: "My Document"
+format: mcanouil-html
+---
+```
+
+## The layout style
+
+```yaml
+---
+title: "My Document"
+format:
+  mcanouil-html:
+    style: academic
+---
+```
+
+`style` takes `professional` or `academic`, and it is matched without regard to case, so `Academic` works.
+Any other value gives the professional layout.
+
+## The title block
+
+The title block is built from three groups, and each one can be switched off.
+
+```yaml
+---
+title: "A paper"
+author: "Mickaël CANOUIL"
+date: last-modified
+abstract: "One paragraph."
+format:
+  mcanouil-html:
+    title-block-authors: true
+    title-block-abstract: false
+    title-block-meta: false
+---
+```
+
+- `title-block-authors` shows the authors, their affiliations, and the corresponding author.
+- `title-block-abstract` shows the abstract and the keywords.
+- `title-block-meta` shows the dates, the DOI, and the categories.
+
+Each defaults to `true`, so a document that writes none of them gets the whole title block.
+
+Switch off the groups whose metadata a page does not carry.
+A landing page with one author and no abstract reads better with `title-block-abstract` and `title-block-meta` off.
+
+## Options a website supplies and a document does not
+
+The project type ships a value for several document options, so a site gets them without writing anything.
+
+```yaml
+project:
+  type: mcanouil
+```
+
+That project type sets `hide-navbar-title: true` and `grid-background: false`.
+
+A standalone document has no project type, so it has no value for those options, and it has to write them itself:
+
+```yaml
+---
+title: "My Document"
+format: mcanouil-html
+extensions:
+  mcanouil:
+    hide-navbar-title: true
+    grid-background: true
+---
+```
+
+::: {.callout-note}
+
+The defaults in the reference are the values the project type and the formats supply.
+A standalone document that writes nothing gets the behaviour of an absent option, which for `hide-navbar-title` means the navbar title stays visible.
+
+:::
+
+## The grid background
+
+`grid-background` draws a faint grid behind the content.
+
+```yaml
+extensions:
+  mcanouil:
+    grid-background: true
+```
+
+The option is read as text, so only the value `true` turns it on.
+It covers an HTML page and a Reveal.js slide background from the same setting.
+
+The value differs by context, as the [Reference](../reference.qmd#options-under-extensions.mcanouil) explains: the option itself defaults to off, the formats turn it on, and the project type turns it back off.
+So a standalone document gets the grid and a website does not, unless either asks for the opposite.

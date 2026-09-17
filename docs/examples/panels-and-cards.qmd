@@ -1,0 +1,169 @@
+---
+title: "Panels and cards"
+subtitle: "The container divs, and how they find their titles."
+description: "Worked examples of the panel, card, card-grid, card-footer, and highlight divs, including the two ways a card gets a footer."
+---
+
+A container is a fenced div with a class.
+The [Reference](../reference.qmd#divs) lists the classes and their attributes.
+This page shows the source, and the behaviour the reference tables cannot carry.
+
+## Panel
+
+A panel is a bordered region with an optional header.
+
+```markdown
+::: {.panel title="A panel" style="accent"}
+
+The body of the panel.
+
+:::
+```
+
+`style` takes one of ten theme names: `info`, `success`, `warning`, `danger`, `caution`, `neutral`, `subtle`, `emphasis`, `accent`, and `outline`.
+It defaults to `subtle`.
+
+An `icon` attribute puts one character before the title.
+
+### The title comes from the first heading
+
+A panel with no `title` attribute takes its title from the first heading inside it, and that heading is removed from the body.
+
+```markdown
+::: {.panel style="info"}
+
+## Method
+
+The heading above becomes the panel title.
+
+:::
+```
+
+The same rule applies to a card and to an executive summary.
+
+## Card
+
+A card is a titled box.
+
+```markdown
+::: {.card title="Coverage" style="outlined"}
+
+Ninety-nine per cent of lines are covered.
+
+:::
+```
+
+`style` takes `subtle`, `outlined`, or `filled`, and defaults to `subtle`.
+
+`colour` takes a hex code or a colour name, and it is honoured in both HTML and Typst output.
+In HTML it becomes the `--card-accent` custom property.
+
+## The two ways to give a card a footer
+
+A card footer can be written as an explicit div:
+
+```markdown
+::: {.card title="Release"}
+
+The body of the card.
+
+::: {.card-footer}
+
+Published on 1 March.
+
+:::
+
+:::
+```
+
+It can also be written as a horizontal rule.
+Everything after the rule becomes the footer:
+
+```markdown
+::: {.card title="Release"}
+
+The body of the card.
+
+---
+
+Published on 1 March.
+
+:::
+```
+
+The two forms produce the same markup.
+Use the rule when the footer is one line, and the div when the footer holds more than one block.
+
+## Card grid
+
+A card grid lays cards out in columns.
+
+```markdown
+::: {.card-grid columns="2"}
+
+::: {.card title="First"}
+
+The first card.
+
+:::
+
+::: {.card title="Second"}
+
+The second card.
+
+:::
+
+:::
+```
+
+A card inside a grid is rendered by the grid itself, not on its own.
+
+### The default number of columns depends on the format
+
+`columns` defaults to `3` in HTML output and to `2` in a Reveal.js deck, because two cards fill a slide better than three.
+The reference gives `3`, which is the value the schema declares and the value HTML uses.
+Write `columns` when a deck and a page must match.
+
+## Highlight
+
+A highlight block emphasises a passage.
+
+```markdown
+::: {.highlight}
+
+The sentence that matters most.
+
+:::
+```
+
+It takes no attributes.
+In Typst output it is wrapped in a template function.
+In HTML it is styled by the stylesheet alone, so it carries no generated markup of its own.
+
+## Executive summary
+
+An executive summary is a titled block with decorative corner brackets.
+
+```markdown
+::: {.executive-summary}
+
+Three sentences on what the report found.
+
+:::
+```
+
+`title` defaults to `Executive Summary`.
+
+`show-corner-brackets` removes the brackets, and only the literal `false` does so:
+
+```markdown
+::: {.executive-summary title="In brief" show-corner-brackets="false"}
+
+Three sentences on what the report found.
+
+:::
+```
+
+## Where the containers appear
+
+The [rendered report](../preview.pdf) on this site carries a panel, and it is built by `mcanouil-typst` as the site publishes.

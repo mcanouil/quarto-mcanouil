@@ -63,8 +63,23 @@ website:
         text: "Home"
       - href: reference.qmd
         text: "Reference"
-      - href: examples.qmd
+      - section: examples.qmd
         text: "Examples"
+        contents:
+          - href: examples/components.qmd
+            text: "Components"
+          - href: examples/panels-and-cards.qmd
+            text: "Panels and cards"
+          - href: examples/special-sections.qmd
+            text: "Special sections"
+          - href: examples/html-format.qmd
+            text: "HTML format"
+          - href: examples/typst-format.qmd
+            text: "Typst format"
+          - href: examples/revealjs-format.qmd
+            text: "Reveal.js format"
+          - href: examples/code-windows.qmd
+            text: "Code windows"
       - text: "---"
       - href: changelog.qmd
         text: "Changelog"

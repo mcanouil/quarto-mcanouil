@@ -1,0 +1,115 @@
+---
+title: "Components"
+subtitle: "The four shortcodes, and the attributes that shape them."
+description: "Worked examples of the divider, value-box, progress, and badge shortcodes, with the defaults the code applies and the colour and icon values it accepts."
+---
+
+A component is written once and rendered by the format you produce.
+The same source gives a Typst panel in a report and a styled `div` on a page.
+
+The [Reference](../reference.qmd#shortcodes) lists every attribute and its default.
+This page shows how each one is used, and what the code does with the value.
+
+## Divider
+
+A divider draws a horizontal rule across part of the page.
+
+```markdown
+{{{< divider >}}}
+
+{{{< divider style="dashed" width="80%" >}}}
+
+{{{< divider style="gradient" label="Results" >}}}
+
+{{{< divider style="ornamental" thickness="3pt" >}}}
+```
+
+The `style` attribute takes `solid`, `dashed`, `dotted`, `ornamental`, or `gradient`.
+
+`thickness` and `width` become CSS custom properties in HTML output, `--divider-thickness` and `--divider-width`.
+A thickness is any CSS length, and it defaults to `1pt`.
+A width is a length or a percentage, and it defaults to `50%`.
+
+The `label` attribute changes the markup, not only the text.
+A divider with no label is an `<hr>` element.
+A divider with a label is a `<div>` with `role="separator"`, and the label becomes the accessible name.
+
+## Value box
+
+A value box shows one number, with an optional unit, label, and icon.
+
+```markdown
+{{{< value-box value="99" unit="%" label="Coverage" colour="success" >}}}
+
+{{{< value-box value="1240" label="Downloads" icon="up" colour="info" >}}}
+
+{{{< value-box value="3" unit="ms" label="Latency" icon="down" colour="#74aadb" >}}}
+```
+
+### Icons
+
+The `icon` attribute takes any single character, so an emoji works.
+Three names are shortcuts:
+
+- `up` gives an upward arrow.
+- `down` gives a downward arrow.
+- `stable` gives a horizontal bar.
+
+A name that is not one of the three is used as the character itself.
+
+### Colours
+
+`colour` accepts one of ten theme names: `info`, `success`, `warning`, `danger`, `caution`, `neutral`, `subtle`, `emphasis`, `accent`, and `outline`.
+It also accepts a colour value such as `#74aadb`.
+`color` is accepted as a spelling of the same attribute.
+
+## Progress
+
+A progress bar shows a percentage.
+
+```markdown
+{{{< progress value="72" label="Progress" colour="info" >}}}
+
+{{{< progress value="40" show-value="false" >}}}
+
+{{{< progress value="95" height="0.6em" colour="success" >}}}
+```
+
+The `value` is clamped to the range 0 to 100, so a value outside it produces a full or an empty bar rather than an error.
+
+`show-value` writes the percentage inside the bar, and is on unless the attribute is exactly `false`.
+
+`height` is a CSS length.
+Its default depends on the format: `1.5em` in HTML output, and `1.2em` in a Reveal.js deck.
+
+A colour that is not a theme name and is a real colour value, such as a hex code, is passed through as the `--custom-colour` property instead of a theme class.
+
+## Badge
+
+A badge is an inline label.
+It is the one component with two spellings, and the spelling depends on the output format.
+
+```markdown
+The build is {{{< badge text="passing" colour="success" >}}} today.
+```
+
+The shortcode produces nothing at all in Typst output.
+Write the span form instead, which works in every format:
+
+```markdown
+The build is [passing]{.badge colour="success"} today.
+```
+
+The span takes `colour` and `icon`, and the badge text is the content of the span.
+The shortcode takes the same two, and `text` carries the label.
+
+::: {.callout-tip}
+
+Use the span form everywhere if a document is rendered to more than one format.
+It is the only form that survives all three.
+
+:::
+
+## Where the components appear
+
+The [rendered report](../preview.pdf) on this site is built by `mcanouil-typst` as the site publishes, and it carries a value box, a progress bar, a divider, and a panel.

@@ -1,0 +1,100 @@
+---
+title: "Code windows"
+subtitle: "Window chrome on code blocks, per project and per block."
+description: "Worked examples of the code-window options, the three per-block attributes, and the three Typst hot-fix toggles."
+---
+
+A code window draws window chrome around a code block.
+The options sit under `extensions: mcanouil: code-window:`, and three attributes override them for one block.
+
+The [Reference](../reference.qmd#code-windows) lists the options and their defaults.
+
+## The project settings
+
+```yaml
+extensions:
+  mcanouil:
+    code-window:
+      enabled: true
+      auto-filename: true
+      style: macos
+      wrapper: mcanouil-code-window
+```
+
+- `enabled` switches the chrome on and off for every block.
+- `auto-filename` labels a block with a filename built from its language, so a Python block is labelled as a Python file.
+- `style` takes `default`, `macos`, or `windows`.
+  An unknown value falls back to `macos`, and says so as a warning.
+- `wrapper` names the Typst function a block is wrapped in, for a document that supplies its own.
+
+This documentation site turns `auto-filename` off, because its blocks are configuration to copy rather than files to save, and a generated filename would only add noise.
+
+## One block at a time
+
+Three attributes on the block itself override the project.
+
+````markdown
+```{.python code-window-style="windows"}
+print("Hello")
+```
+````
+
+````markdown
+```{.python code-window-no-auto-filename="true"}
+print("Hello")
+```
+````
+
+````markdown
+```{.python code-window-enabled="false"}
+print("Hello")
+```
+````
+
+- `code-window-style` changes the decoration for this block.
+- `code-window-no-auto-filename` suppresses the generated filename for this block.
+- `code-window-enabled="false"` leaves this block undecorated.
+
+An attribute is read and then removed, so it does not reach the output.
+
+::: {.callout-important}
+
+`code-window-enabled` only switches chrome off.
+It cannot switch it on.
+When the project sets `enabled: false`, the filter stops before it reads any block attribute, so `code-window-enabled="true"` does nothing.
+
+:::
+
+## Turning the chrome off entirely
+
+```yaml
+extensions:
+  mcanouil:
+    code-window:
+      enabled: false
+```
+
+No block is decorated after that, and no block can opt back in.
+Set `enabled: true` and switch off the individual blocks instead when most blocks need chrome and a few do not.
+
+## The Typst hot-fixes
+
+Three toggles work around Typst output problems.
+Each defaults to on, and each can be switched off on its own.
+
+```yaml
+extensions:
+  mcanouil:
+    code-window:
+      hotfix:
+        code-annotations: true
+        skylighting: true
+        typst-title: true
+```
+
+- `code-annotations` processes the annotations on a code block so they survive into Typst output.
+- `skylighting` fixes the styling of a highlighted block in Typst.
+- `typst-title` evaluates a theorem title as Typst markup rather than as plain text.
+
+Switch one off when a document supplies its own handling of the same thing, and leave the rest on.
+A toggle accepts an object as well as a boolean, for a fix that carries its own settings.
