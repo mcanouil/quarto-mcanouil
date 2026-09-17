@@ -67,9 +67,26 @@ The rendered document ends with the references, and then the appendix, in that o
 
 ## In HTML output
 
-These three classes do nothing.
-The headings stay where they are written, and they keep their normal numbering.
-A document that must work in both formats should read correctly in source order.
+The extension does nothing here, and Quarto does.
+
+Quarto has its own appendix, and it collects a section marked `{.appendix}` or `{.references}` into it, at the foot of the page.
+A section marked `{.supplementary}` is left where it is written, because that class is the extension's own.
+
+So the classes move a section in both formats, for different reasons, and they do not move the same set.
+The numbering stays as Quarto produces it, because the renumbering is the Typst filter's work.
+
+Set `appendix-style: none` to keep every section in source order:
+
+```yaml
+---
+title: "A report"
+format:
+  mcanouil-html:
+    appendix-style: none
+---
+```
+
+A document that must read the same in both formats should either set that, or write its sections in the order the Typst output produces, which is references, then appendix, then supplementary.
 
 ## Tabsets
 
