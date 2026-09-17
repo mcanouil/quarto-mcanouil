@@ -1,13 +1,8 @@
 ---
 title: "HTML format"
 subtitle: "The title block, the navbar, and the grid."
-description: "Worked examples of the mcanouil-html options: the layout style, the three title block groups, and the options a standalone document must set for itself."
+description: "Worked examples of the mcanouil-html options, and of the options whose value depends on whether a document is part of a website."
 ---
-
-An option belongs in one of two places, and which one depends on the option.
-
-- A format option goes under `format: mcanouil-html:`.
-- A document option goes under `extensions: mcanouil:`.
 
 The [Reference](../reference.qmd#mcanouil-html) lists the format options.
 The [Reference](../reference.qmd#options-under-extensions.mcanouil) lists the document options.
@@ -32,8 +27,7 @@ format:
 ---
 ```
 
-`style` takes `professional` or `academic`, and it is matched without regard to case, so `Academic` works.
-Any other value gives the professional layout.
+`style` is matched without regard to case, so `Academic` works, and any value that is not `academic` gives the professional layout.
 
 ## The title block
 
@@ -47,33 +41,27 @@ date: last-modified
 abstract: "One paragraph."
 format:
   mcanouil-html:
-    title-block-authors: true
     title-block-abstract: false
     title-block-meta: false
 ---
 ```
 
-- `title-block-authors` shows the authors, their affiliations, and the corresponding author.
-- `title-block-abstract` shows the abstract and the keywords.
-- `title-block-meta` shows the dates, the DOI, and the categories.
-
-Each defaults to `true`, so a document that writes none of them gets the whole title block.
-
 Switch off the groups whose metadata a page does not carry.
-A landing page with one author and no abstract reads better with `title-block-abstract` and `title-block-meta` off.
+A landing page with one author and no abstract reads better with `title-block-abstract` and `title-block-meta` off, which leaves the authors group alone.
 
-## Options a website supplies and a document does not
+## Where a default comes from
 
-The project type ships a value for several document options, so a site gets them without writing anything.
+A default is supplied by the project type or by the format, not by the filter that reads it.
+So the same option can differ between a website and a standalone document.
 
-```yaml
-project:
-  type: mcanouil
-```
+| Option | In a website | In a standalone document |
+| --- | --- | --- |
+| `hide-navbar-title` | `true`, from the project type. | No value, so the navbar title stays visible. |
+| `grid-background` | `false`, from the project type. | `true`, from the format. |
 
-That project type sets `hide-navbar-title: true` and `grid-background: false`.
+: Where each value comes from. {.striped .hover tbl-colwidths="[30,35,35]"}
 
-A standalone document has no project type, so it has no value for those options, and it has to write them itself:
+A standalone document that wants the website behaviour writes it:
 
 ```yaml
 ---
@@ -82,16 +70,9 @@ format: mcanouil-html
 extensions:
   mcanouil:
     hide-navbar-title: true
-    grid-background: true
+    grid-background: false
 ---
 ```
-
-::: {.callout-note}
-
-The defaults in the reference are the values the project type and the formats supply.
-A standalone document that writes nothing gets the behaviour of an absent option, which for `hide-navbar-title` means the navbar title stays visible.
-
-:::
 
 ## The grid background
 
@@ -104,7 +85,6 @@ extensions:
 ```
 
 The option is read as text, so only the value `true` turns it on.
-It covers an HTML page and a Reveal.js slide background from the same setting.
+One setting covers an HTML page and a Reveal.js slide background.
 
-The value differs by context, as the [Reference](../reference.qmd#options-under-extensions.mcanouil) explains: the option itself defaults to off, the formats turn it on, and the project type turns it back off.
-So a standalone document gets the grid and a website does not, unless either asks for the opposite.
+The [Reference](../reference.qmd#options-under-extensions.mcanouil) explains the order the three values are applied in.

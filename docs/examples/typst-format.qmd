@@ -1,14 +1,16 @@
 ---
 title: "Typst format"
 subtitle: "Document types, page decoration, and section pages."
-description: "Worked examples of the mcanouil-typst options, and of the mapping that sends a div class to a Typst function."
+description: "Worked examples of the mcanouil-typst options, and of the mapping that sends a div or span class to a Typst function."
 ---
 
 `mcanouil-typst` produces a PDF through Typst.
-The [rendered report](../preview.pdf) on this site is built by it as the site publishes.
+The [rendered report](../preview.pdf) on this site is built by it as the site publishes, and it carries a value box, a progress bar, a divider, and a panel.
 
 The [Reference](../reference.qmd#mcanouil-typst) lists every option and its default.
 This page shows what each one changes.
+
+Typst also rearranges a document, which [Special sections and tabsets](special-sections.qmd) covers.
 
 ## The report on this site
 
@@ -33,13 +35,21 @@ format:
     document-type: letter
 ```
 
-`document-type` takes `report`, `invoice`, `letter`, or `cv`, and it is matched without regard to case.
-It chooses the template the document is built from, so it changes the structure of the page rather than its colours.
-The default is `report`.
+`document-type` chooses the template the document is built from, so it changes the structure of the page rather than its colours.
+
+::: {.callout-warning}
+
+Write the value in lower case.
+The template tests it against `report`, `invoice`, `letter`, and `cv` exactly, and renders a report on any other value, silently.
+So `Letter` gives a report.
+
+The schema accepts any case, so nothing warns about it either.
+
+:::
 
 ## Page decoration
 
-Five options control the decoration, and each defaults to on.
+Five options control the decoration, and each is on unless the document says otherwise.
 
 ```yaml
 format:
@@ -51,29 +61,27 @@ format:
     show-logo: false
 ```
 
-- `show-corner-brackets` draws the signature brackets at the page corners.
-- `show-margin-decoration` draws coloured bars along the margins.
-- `show-title-page-background` draws the geometric background on the title page.
-- `show-heading-underlines` draws the gradient underline below a heading.
-- `show-logo` puts the logo in the header.
-
 Turning all five off gives a plain document that keeps the typography and the palette.
 That is the setting to use when a document must be printed in one colour.
 
 ## Section pages
 
+`section-page` puts a title page before each top-level section.
+
 ```yaml
 format:
   mcanouil-typst:
-    section-page: true
-    section-pagebreak: true
+    section-page: false
 ```
 
-`section-page` puts a title page before each top-level section.
-`section-pagebreak` puts a page break before that title page.
+A short document reads better without them, because a two-page note does not need a title page for each of its sections.
 
-Both default to on, which suits a long report.
-A short document reads better with both off, because a two-page note does not need a title page for each of its sections.
+::: {.callout-note}
+
+`section-pagebreak` applies only where a section title page does not.
+A section page always begins on a new page, whatever `section-pagebreak` says, and the option is read only for a level 1 heading that gets no section page, either because `section-page` is off or because the heading is not in the outline.
+
+:::
 
 ## Lists of figures and tables
 
@@ -84,7 +92,6 @@ format:
 ```
 
 `list-of` includes the list of figures and the list of tables after the table of contents.
-It defaults to on.
 
 ## Brand mode
 
@@ -94,8 +101,8 @@ format:
     brand-mode: dark
 ```
 
-`brand-mode` chooses between the light and the dark palette, and defaults to `light` here.
-A Reveal.js deck defaults to `dark` instead, so a document and a deck built from the same brand do not match unless one of them says so.
+`brand-mode` chooses between the light and the dark palette.
+A document defaults to `light` and a Reveal.js deck defaults to `dark`, so a report and a deck built from one brand do not match unless one of them sets the option.
 
 ## Sending a class to a Typst function
 
@@ -114,12 +121,6 @@ extensions:
           arguments: true
 ```
 
-The four keys are `divs`, `spans`, `tables`, and `images`.
-
-A plain function name wraps the content and passes no attributes.
-A table needs a `function:` key, and `arguments: true` passes the element's attributes to the function as named arguments.
-A table with no `function:` key is reported as a warning and ignored, and the render carries on.
-
 The class is then written as an ordinary fenced div:
 
 ```markdown
@@ -129,5 +130,18 @@ The content this function receives.
 
 :::
 ```
+
+A mapping is written either as a plain function name, or as a table with a `function:` key.
+A table with no `function:` key is reported as a warning and ignored, and the render carries on.
+
+`arguments: true` forces the parenthesised call form for an element that carries no attributes.
+An element that does carry attributes passes them as named arguments either way, so `arguments` changes nothing for it.
+
+::: {.callout-note}
+
+`tables:` and `images:` are read and then never used.
+The filter's table and image handlers return the element unchanged, so only `divs:` and `spans:` do anything today.
+
+:::
 
 The function has to exist in the template scope, so this is for a document that already supplies its own Typst partials.

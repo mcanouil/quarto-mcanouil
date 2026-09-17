@@ -1,12 +1,15 @@
 ---
-title: "Panels and cards"
-subtitle: "The container divs, and how they find their titles."
-description: "Worked examples of the panel, card, card-grid, card-footer, and highlight divs, including the two ways a card gets a footer."
+title: "Containers"
+subtitle: "Panels, cards, highlights, and the executive summary."
+description: "Worked examples of the container divs, including the two ways a card gets a footer and the parts that behave differently in Typst output."
 ---
 
 A container is a fenced div with a class.
 The [Reference](../reference.qmd#divs) lists the classes and their attributes.
 This page shows the source, and the behaviour the reference tables cannot carry.
+
+Several of these containers behave differently in Typst output.
+Each difference is marked below.
 
 ## Panel
 
@@ -20,12 +23,14 @@ The body of the panel.
 :::
 ```
 
-`style` takes one of ten theme names: `info`, `success`, `warning`, `danger`, `caution`, `neutral`, `subtle`, `emphasis`, `accent`, and `outline`.
-It defaults to `subtle`.
-
 An `icon` attribute puts one character before the title.
 
-### The title comes from the first heading
+`style` takes one of ten theme names in HTML and in a Reveal.js deck: `info`, `success`, `warning`, `danger`, `caution`, `neutral`, `subtle`, `emphasis`, `accent`, and `outline`.
+
+Typst draws eight of them.
+`caution` and `neutral` fall through to the `subtle` panel there, so a document rendered to both formats should avoid those two.
+
+## The title comes from the first heading
 
 A panel with no `title` attribute takes its title from the first heading inside it, and that heading is removed from the body.
 
@@ -39,31 +44,60 @@ The heading above becomes the panel title.
 :::
 ```
 
-The same rule applies to a card and to an executive summary.
-
 ## Card
 
 A card is a titled box.
 
 ```markdown
-::: {.card title="Coverage" style="outlined"}
+::: {.card style="outlined"}
+
+## Coverage
 
 Ninety-nine per cent of lines are covered.
 
 :::
 ```
 
-`style` takes `subtle`, `outlined`, or `filled`, and defaults to `subtle`.
+`style` takes `subtle`, `outlined`, or `filled`.
 
 `colour` takes a hex code or a colour name, and it is honoured in both HTML and Typst output.
 In HTML it becomes the `--card-accent` custom property.
 
+::: {.callout-important}
+
+A card takes its title from a heading in every format.
+The `title` attribute works in HTML and in a Reveal.js deck, and Typst ignores it: the Typst card reads the first heading and nothing else.
+
+Write the heading form, as above, for a card that has to render in both.
+A card that carries a `title` attribute and a heading takes the heading in Typst and the attribute in HTML, so the two outputs disagree.
+
+:::
+
 ## The two ways to give a card a footer
 
-A card footer can be written as an explicit div:
+A card footer can be written as a horizontal rule.
+Everything after the rule becomes the footer:
 
 ```markdown
-::: {.card title="Release"}
+::: {.card}
+
+## Release
+
+The body of the card.
+
+---
+
+Published on 1 March.
+
+:::
+```
+
+It can also be written as an explicit div:
+
+```markdown
+::: {.card}
+
+## Release
 
 The body of the card.
 
@@ -76,23 +110,14 @@ Published on 1 March.
 :::
 ```
 
-It can also be written as a horizontal rule.
-Everything after the rule becomes the footer:
+::: {.callout-important}
 
-```markdown
-::: {.card title="Release"}
+The two forms are equivalent in HTML and in a Reveal.js deck only.
+Typst splits the body from the footer on the horizontal rule alone, so a `.card-footer` div is rendered as part of the body there.
 
-The body of the card.
-
----
-
-Published on 1 March.
+Use the horizontal rule for a card that has to render in both.
 
 :::
-```
-
-The two forms produce the same markup.
-Use the rule when the footer is one line, and the div when the footer holds more than one block.
 
 ## Card grid
 
@@ -101,13 +126,17 @@ A card grid lays cards out in columns.
 ```markdown
 ::: {.card-grid columns="2"}
 
-::: {.card title="First"}
+::: {.card}
+
+## First
 
 The first card.
 
 :::
 
-::: {.card title="Second"}
+::: {.card}
+
+## Second
 
 The second card.
 
@@ -152,8 +181,6 @@ Three sentences on what the report found.
 :::
 ```
 
-`title` defaults to `Executive Summary`.
-
 `show-corner-brackets` removes the brackets, and only the literal `false` does so:
 
 ```markdown
@@ -163,7 +190,3 @@ Three sentences on what the report found.
 
 :::
 ```
-
-## Where the containers appear
-
-The [rendered report](../preview.pdf) on this site carries a panel, and it is built by `mcanouil-typst` as the site publishes.

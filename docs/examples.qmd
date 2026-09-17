@@ -6,7 +6,7 @@ description: "How to configure the three formats, write the components, and orga
 
 The [rendered report](preview.pdf) on this site is built by the format as the site is published.
 
-An option belongs in one of three places, and the pages below are grouped the same way.
+An option belongs in one of three places.
 
 - A format option goes under `format: mcanouil-html:`, `mcanouil-typst:`, or `mcanouil-revealjs:`.
 - A document option goes under `extensions: mcanouil:`.
@@ -17,9 +17,9 @@ An option belongs in one of three places, and the pages below are grouped the sa
 | Page | What it covers |
 | --- | --- |
 | [Components](examples/components.qmd) | The `divider`, `value-box`, `progress`, and `badge` shortcodes, and the colour and icon values they accept. |
-| [Panels and cards](examples/panels-and-cards.qmd) | The container divs, the two ways a card gets a footer, and where a title comes from. |
-| [Special sections](examples/special-sections.qmd) | Appendices, supplementary material, references, and tabsets in Typst output. |
-| [HTML format](examples/html-format.qmd) | The layout style, the three title block groups, and what a standalone document must set for itself. |
+| [Containers](examples/panels-and-cards.qmd) | Panels, cards, highlights, and the executive summary, and the two ways a card gets a footer. |
+| [Special sections and tabsets](examples/special-sections.qmd) | What the Typst filters move, renumber, and unwrap. |
+| [HTML format](examples/html-format.qmd) | The layout style, the title block groups, and where each default comes from. |
 | [Typst format](examples/typst-format.qmd) | Document types, page decoration, section pages, and sending a class to a Typst function. |
 | [Reveal.js format](examples/revealjs-format.qmd) | Section outlines, ordinal dates, and the two options for laying a deck out. |
 | [Code windows](examples/code-windows.qmd) | Window chrome per project and per block, and the three Typst hot-fixes. |
@@ -33,28 +33,10 @@ project:
   type: mcanouil
 ```
 
-The project type supplies the navbar, sidebar, footer, and favicon, and sets `mcanouil-html` as the default format, so a site needs nothing else to be branded.
-It also supplies a value for several document options, which a standalone document has to set for itself.
+The project type supplies a branded navbar, a page footer, and a favicon, and it sets `mcanouil-html` as the default format, so a site needs nothing else to be branded.
 
-## A document
-
-```yaml
----
-title: "My Document"
-format: mcanouil-html
----
-```
-
-## A presentation
-
-```yaml
----
-title: "My Presentation"
-format:
-  mcanouil-revealjs:
-    brand-mode: dark
----
-```
+It also supplies a value for several document options.
+A standalone document has no project type, so some of its options resolve differently, which [HTML format](examples/html-format.qmd#where-a-default-comes-from) sets out.
 
 ## Source
 

@@ -69,9 +69,9 @@ website:
           - href: examples/components.qmd
             text: "Components"
           - href: examples/panels-and-cards.qmd
-            text: "Panels and cards"
+            text: "Containers"
           - href: examples/special-sections.qmd
-            text: "Special sections"
+            text: "Special sections and tabsets"
           - href: examples/html-format.qmd
             text: "HTML format"
           - href: examples/typst-format.qmd

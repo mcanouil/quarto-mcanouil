@@ -1,11 +1,13 @@
 ---
-title: "Special sections"
-subtitle: "Appendices, supplementary material, and tabsets in Typst."
+title: "Special sections and tabsets"
+subtitle: "What the Typst filters move, renumber, and unwrap."
 description: "Worked examples of the references, appendix, and supplementary headings, and of what a panel-tabset becomes in Typst output."
 ---
 
 Two filters reorganise a document for Typst output.
 Neither one acts on HTML or on a Reveal.js deck.
+
+The options of the format itself are on [Typst format](typst-format.qmd).
 
 ## The classes go on a heading
 

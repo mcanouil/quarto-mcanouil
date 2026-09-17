@@ -1,7 +1,7 @@
 ---
 title: "Components"
 subtitle: "The four shortcodes, and the attributes that shape them."
-description: "Worked examples of the divider, value-box, progress, and badge shortcodes, with the defaults the code applies and the colour and icon values it accepts."
+description: "Worked examples of the divider, value-box, progress, and badge shortcodes, with the colour and icon values each accepts and the parts that differ by output format."
 ---
 
 A component is written once and rendered by the format you produce.
@@ -24,11 +24,7 @@ A divider draws a horizontal rule across part of the page.
 {{{< divider style="ornamental" thickness="3pt" >}}}
 ```
 
-The `style` attribute takes `solid`, `dashed`, `dotted`, `ornamental`, or `gradient`.
-
-`thickness` and `width` become CSS custom properties in HTML output, `--divider-thickness` and `--divider-width`.
-A thickness is any CSS length, and it defaults to `1pt`.
-A width is a length or a percentage, and it defaults to `50%`.
+In HTML, `thickness` and `width` become the `--divider-thickness` and `--divider-width` custom properties, so either takes any CSS length and `width` also takes a percentage.
 
 The `label` attribute changes the markup, not only the text.
 A divider with no label is an `<hr>` element.
@@ -59,9 +55,13 @@ A name that is not one of the three is used as the character itself.
 
 ### Colours
 
-`colour` accepts one of ten theme names: `info`, `success`, `warning`, `danger`, `caution`, `neutral`, `subtle`, `emphasis`, `accent`, and `outline`.
-It also accepts a colour value such as `#74aadb`.
-`color` is accepted as a spelling of the same attribute.
+HTML and a Reveal.js deck draw ten theme names: `info`, `success`, `warning`, `danger`, `caution`, `neutral`, `subtle`, `emphasis`, `accent`, and `outline`.
+Either also takes a colour value such as `#74aadb`.
+
+Typst draws five of the names: `success`, `warning`, `danger`, `info`, and `neutral`.
+It reads any other value as a colour, so `#74aadb` works there too, and a name it cannot resolve as a colour, such as `accent`, gives the foreground colour instead.
+
+Write a theme name from the first five, or a colour value, for a document rendered to both.
 
 ## Progress
 
@@ -75,19 +75,21 @@ A progress bar shows a percentage.
 {{{< progress value="95" height="0.6em" colour="success" >}}}
 ```
 
-The `value` is clamped to the range 0 to 100, so a value outside it produces a full or an empty bar rather than an error.
-
 `show-value` writes the percentage inside the bar, and is on unless the attribute is exactly `false`.
 
 `height` is a CSS length.
 Its default depends on the format: `1.5em` in HTML output, and `1.2em` in a Reveal.js deck.
 
-A colour that is not a theme name and is a real colour value, such as a hex code, is passed through as the `--custom-colour` property instead of a theme class.
+A colour that is a colour value rather than a theme name is passed through as the `--custom-colour` property.
+
+Keep `value` inside 0 to 100.
+Typst clamps it.
+HTML clamps the width of the bar only, so `value="150"` draws a full bar labelled `150%`, and reports `150` to assistive technology.
 
 ## Badge
 
 A badge is an inline label.
-It is the one component with two spellings, and the spelling depends on the output format.
+It is the one component with two spellings, and which one works depends on the output format.
 
 ```markdown
 The build is {{{< badge text="passing" colour="success" >}}} today.
@@ -102,14 +104,3 @@ The build is [passing]{.badge colour="success"} today.
 
 The span takes `colour` and `icon`, and the badge text is the content of the span.
 The shortcode takes the same two, and `text` carries the label.
-
-::: {.callout-tip}
-
-Use the span form everywhere if a document is rendered to more than one format.
-It is the only form that survives all three.
-
-:::
-
-## Where the components appear
-
-The [rendered report](../preview.pdf) on this site is built by `mcanouil-typst` as the site publishes, and it carries a value box, a progress bar, a divider, and a panel.
