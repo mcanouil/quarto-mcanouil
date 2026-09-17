@@ -134,8 +134,8 @@ The content this function receives.
 A mapping is written either as a plain function name, or as a table with a `function:` key.
 A table with no `function:` key is reported as a warning and ignored, and the render carries on.
 
-`arguments: true` forces the parenthesised call form for an element that carries no attributes.
-An element that does carry attributes passes them as named arguments either way, so `arguments` changes nothing for it.
+`arguments` changes nothing today.
+An element that carries attributes passes them as named arguments whether or not `arguments` is set, and an element with no attributes is always wrapped as `#function[…]`, so there is nothing for the setting to add.
 
 ::: {.callout-note}
 

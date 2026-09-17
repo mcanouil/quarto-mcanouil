@@ -55,13 +55,16 @@ A name that is not one of the three is used as the character itself.
 
 ### Colours
 
-HTML and a Reveal.js deck draw ten theme names: `info`, `success`, `warning`, `danger`, `caution`, `neutral`, `subtle`, `emphasis`, `accent`, and `outline`.
-Either also takes a colour value such as `#74aadb`.
+The reference lists ten theme names, and a value box draws fewer of them.
 
-Typst draws five of the names: `success`, `warning`, `danger`, `info`, and `neutral`.
-It reads any other value as a colour, so `#74aadb` works there too, and a name it cannot resolve as a colour, such as `accent`, gives the foreground colour instead.
+HTML and a Reveal.js deck style five: `info`, `success`, `warning`, `danger`, and `caution`.
+A colour value such as `#74aadb` works as well, and any other name gives an unstyled box.
 
-Write a theme name from the first five, or a colour value, for a document rendered to both.
+Typst draws five too, and not the same five: `info`, `success`, `warning`, `danger`, and `neutral`.
+It reads any other value as a colour, so `#74aadb` works there too, and a name it cannot read as a colour gives the foreground colour instead.
+
+Four names work in every format: `info`, `success`, `warning`, and `danger`.
+Use one of those, or a colour value, for a document rendered to more than one format.
 
 ## Progress
 
@@ -75,7 +78,16 @@ A progress bar shows a percentage.
 {{{< progress value="95" height="0.6em" colour="success" >}}}
 ```
 
-`show-value` writes the percentage inside the bar, and is on unless the attribute is exactly `false`.
+`show-value` writes the percentage inside the bar, and is on unless the attribute is `false`.
+
+::: {.callout-warning}
+
+`show-value` stops a Typst build.
+The shortcode passes the attribute through under its own name, and the Typst function expects `show-percentage`, so the compile fails with `unexpected argument: show-value`.
+
+Leave the attribute out of a document that is rendered to PDF, until the extension maps the two names.
+
+:::
 
 `height` is a CSS length.
 Its default depends on the format: `1.5em` in HTML output, and `1.2em` in a Reveal.js deck.

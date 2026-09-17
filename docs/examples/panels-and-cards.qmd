@@ -25,10 +25,13 @@ The body of the panel.
 
 An `icon` attribute puts one character before the title.
 
-`style` takes one of ten theme names in HTML and in a Reveal.js deck: `info`, `success`, `warning`, `danger`, `caution`, `neutral`, `subtle`, `emphasis`, `accent`, and `outline`.
+The reference lists ten theme names for `style`, and a panel draws nine of them.
 
-Typst draws eight of them.
-`caution` and `neutral` fall through to the `subtle` panel there, so a document rendered to both formats should avoid those two.
+HTML and a Reveal.js deck style every name except `neutral`, which gives the plain panel.
+Typst styles every name except `neutral` and `caution`, and draws both as the `subtle` panel.
+
+So `neutral` is unthemed everywhere, and `caution` differs between the two.
+Avoid both in a document rendered to more than one format.
 
 ## The title comes from the first heading
 
@@ -181,7 +184,7 @@ Three sentences on what the report found.
 :::
 ```
 
-`show-corner-brackets` removes the brackets, and only the literal `false` does so:
+`show-corner-brackets` removes the brackets, and it is read as a boolean, so `false` and `False` both work:
 
 ```markdown
 ::: {.executive-summary title="In brief" show-corner-brackets="false"}
