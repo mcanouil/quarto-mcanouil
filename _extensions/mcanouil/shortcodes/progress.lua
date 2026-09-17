@@ -58,9 +58,17 @@ return {
     if format == 'typst' then
       -- Typst rendering
       local spellings = typst_utils.accepted_attributes(checker.schema, 'progress')
+      -- `render-progress` (typst/partials/libs/progress.typ:15) declares
+      -- `show-percentage`, not the schema's `show-value`, with no `..rest`
+      -- to absorb an extra named argument, so passing `show-value` straight
+      -- through fails the whole Typst compile rather than being ignored.
+      -- Map the schema name onto the Typst parameter name.
+      local param_mapping = { ['show-value'] = 'show-percentage' }
       return pandoc.RawBlock(
         'typst',
-        typst_utils.build_shortcode_function_call('mcanouil-progress', kwargs, nil, spellings)
+        typst_utils.build_shortcode_function_call(
+          'mcanouil-progress', kwargs, param_mapping, spellings
+        )
       )
     elseif format == 'html' or format == 'revealjs' then
       -- HTML-based rendering
