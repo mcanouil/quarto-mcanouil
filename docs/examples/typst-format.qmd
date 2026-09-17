@@ -1,0 +1,147 @@
+---
+title: "Typst format"
+subtitle: "Document types, page decoration, and section pages."
+description: "Worked examples of the mcanouil-typst options, and of the mapping that sends a div or span class to a Typst function."
+---
+
+`mcanouil-typst` produces a PDF through Typst.
+The [rendered report](../preview.pdf) on this site is built by it as the site publishes, and it carries a value box, a progress bar, a divider, and a panel.
+
+The [Reference](../reference.qmd#mcanouil-typst) lists every option and its default.
+This page shows what each one changes.
+
+Typst also rearranges a document, which [Special sections and tabsets](special-sections.qmd) covers.
+
+## The report on this site
+
+```yaml
+---
+title: "The Typst format"
+subtitle: "Rendered by the documentation site"
+author: "Mickaël CANOUIL"
+date: last-modified
+format:
+  mcanouil-typst:
+    style: professional
+    brand-mode: light
+---
+```
+
+## Document type
+
+```yaml
+format:
+  mcanouil-typst:
+    document-type: letter
+```
+
+`document-type` chooses the template the document is built from, so it changes the structure of the page rather than its colours.
+
+::: {.callout-warning}
+
+Write the value in lower case.
+The template tests it against `report`, `invoice`, `letter`, and `cv` exactly, and renders a report on any other value, silently.
+So `Letter` gives a report.
+
+The schema accepts any case, so nothing warns about it either.
+
+:::
+
+## Page decoration
+
+Five options control the decoration, and each is on unless the document says otherwise.
+
+```yaml
+format:
+  mcanouil-typst:
+    show-corner-brackets: false
+    show-margin-decoration: false
+    show-title-page-background: false
+    show-heading-underlines: false
+    show-logo: false
+```
+
+Turning all five off gives a plain document that keeps the typography and the palette.
+That is the setting to use when a document must be printed in one colour.
+
+## Section pages
+
+`section-page` puts a title page before each top-level section.
+
+```yaml
+format:
+  mcanouil-typst:
+    section-page: false
+```
+
+A short document reads better without them, because a two-page note does not need a title page for each of its sections.
+
+::: {.callout-note}
+
+`section-pagebreak` applies only where a section title page does not.
+A section page always begins on a new page, whatever `section-pagebreak` says, and the option is read only for a level 1 heading that gets no section page, either because `section-page` is off or because the heading is not in the outline.
+
+:::
+
+## Lists of figures and tables
+
+```yaml
+format:
+  mcanouil-typst:
+    list-of: false
+```
+
+`list-of` includes the list of figures and the list of tables after the table of contents.
+
+## Brand mode
+
+```yaml
+format:
+  mcanouil-typst:
+    brand-mode: dark
+```
+
+`brand-mode` chooses between the light and the dark palette.
+A document defaults to `light` and a Reveal.js deck defaults to `dark`, so a report and a deck built from one brand do not match unless one of them sets the option.
+
+## Sending a class to a Typst function
+
+The extension maps a div or a span class to a Typst function.
+The built-in mappings cover the components, and a document can add its own:
+
+```yaml
+extensions:
+  mcanouil:
+    typst-markdown:
+      divs:
+        note: my-note
+      spans:
+        sidenote:
+          function: my-sidenote
+          arguments: true
+```
+
+The class is then written as an ordinary fenced div:
+
+```markdown
+::: {.note}
+
+The content this function receives.
+
+:::
+```
+
+A mapping is written either as a plain function name, or as a table with a `function:` key.
+A table with no `function:` key is reported as a warning and ignored, and the render carries on.
+
+`arguments` changes nothing today.
+An element that carries attributes passes them as named arguments whether or not `arguments` is set, and an element with no attributes is always wrapped as `#function[…]`, so there is nothing for the setting to add.
+
+::: {.callout-note}
+
+`tables:` and `images:` are read and then never used.
+The filter's table and image handlers return the element unchanged, so only `divs:` and `spans:` do anything today.
+
+:::
+
+The function has to exist in the template scope, so this is for a document that already supplies its own Typst partials.

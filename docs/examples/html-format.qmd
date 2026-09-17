@@ -1,0 +1,90 @@
+---
+title: "HTML format"
+subtitle: "The title block, the navbar, and the grid."
+description: "Worked examples of the mcanouil-html options, and of the options whose value depends on whether a document is part of a website."
+---
+
+The [Reference](../reference.qmd#mcanouil-html) lists the format options.
+The [Reference](../reference.qmd#options-under-extensions.mcanouil) lists the document options.
+
+## A document
+
+```yaml
+---
+title: "My Document"
+format: mcanouil-html
+---
+```
+
+## The layout style
+
+```yaml
+---
+title: "My Document"
+format:
+  mcanouil-html:
+    style: academic
+---
+```
+
+`style` is matched without regard to case, so `Academic` works, and any value that is not `academic` gives the professional layout.
+
+## The title block
+
+The title block is built from three groups, and each one can be switched off.
+
+```yaml
+---
+title: "A paper"
+author: "Mickaël CANOUIL"
+date: last-modified
+abstract: "One paragraph."
+format:
+  mcanouil-html:
+    title-block-abstract: false
+    title-block-meta: false
+---
+```
+
+Switch off the groups whose metadata a page does not carry.
+A landing page with one author and no abstract reads better with `title-block-abstract` and `title-block-meta` off, which leaves the authors group alone.
+
+## Where a default comes from
+
+A default is supplied by the project type or by the format, not by the filter that reads it.
+So the same option can differ between a website and a standalone document.
+
+| Option | In a website | In a standalone document |
+| --- | --- | --- |
+| `hide-navbar-title` | `true`, from the project type. | No value, so the navbar title stays visible. |
+| `grid-background` | `false`, from the project type. | `true`, from the format. |
+
+: Where each value comes from. {.striped .hover tbl-colwidths="[30,35,35]"}
+
+A standalone document that wants the website behaviour writes it:
+
+```yaml
+---
+title: "My Document"
+format: mcanouil-html
+extensions:
+  mcanouil:
+    hide-navbar-title: true
+    grid-background: false
+---
+```
+
+## The grid background
+
+`grid-background` draws a faint grid behind the content.
+
+```yaml
+extensions:
+  mcanouil:
+    grid-background: true
+```
+
+The option is read as text, so only the value `true` turns it on.
+One setting covers an HTML page and a Reveal.js slide background.
+
+The [Reference](../reference.qmd#options-under-extensions.mcanouil) explains the order the three values are applied in.

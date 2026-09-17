@@ -15,6 +15,7 @@
 - fix: Remove the card-grid alt attribute, which no renderer implemented, from the schema and from the documentation and worked example that described it. (#136)
 - fix: Read code-window-no-auto-filename as a real boolean, so a value of false no longer suppresses the automatic filename in the same way as true. (#136)
 - fix: Gate the options check on the html, typst and revealjs formats so non-acting formats stay silent. (#136)
+- fix: Report that nested key as a warning rather than an error, so the typo does not invalidate the whole configuration. (#136)
 
 ### Documentation
 
@@ -22,12 +23,13 @@
 - docs: Remove the value-box alt parameter from the feature reference table, which no renderer implemented. (#136)
 - docs: Remove the value-box alt, background, show-border, and alignment parameters from the worked example, which no renderer implemented. (#136)
 - docs: Remove three remaining claims that card grids or value box grids support an alt parameter, keeping the true claim that maths does. (#136)
+- docs: Split the examples page into seven per-topic pages, and add worked examples for the options and behaviours that had none.
 
 ### Refactoring
 
 - build: Update the vendored Lua modules to 2.3.0. A module no longer carries a version line in its header, so its checksum changes only when its code changes. (#133)
 - build: Fetch the schema validator from a Quarto Wizard release asset rather than a raw path inside its repository, which a refactor could move without notice. The vendored file is unchanged. (#135)
-- build: Update the vendored Lua modules to 2.5.0, which adds the accessors that read what the schema resolves an option, an element's attributes and a format's options to. The schema validator moves to its own release train and is pinned at `schema-v2.1.0`, which accepts only `true` and `false` as a boolean. (#136)
+- build: Update the vendored Lua modules to 2.5.0, which adds the accessors that read what the schema resolves an option, an element's attributes and a format's options to. The schema validator moves to its own release train and is pinned at `schema-v2.2.0`, which accepts only `true` and `false` as a boolean. (#136)
 
 ## 0.21.1 (2026-09-07)
 

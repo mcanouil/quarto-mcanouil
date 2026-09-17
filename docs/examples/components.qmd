@@ -1,0 +1,120 @@
+---
+title: "Components"
+subtitle: "The four shortcodes, and the attributes that shape them."
+description: "Worked examples of the divider, value-box, progress, and badge shortcodes, with the colour and icon values each accepts and the parts that differ by output format."
+---
+
+A component is written once and rendered by the format you produce.
+The same source gives a Typst panel in a report and a styled `div` on a page.
+
+The [Reference](../reference.qmd#shortcodes) lists every attribute and its default.
+This page shows how each one is used, and what the code does with the value.
+
+## Divider
+
+A divider draws a horizontal rule across part of the page.
+
+```markdown
+{{{< divider >}}}
+
+{{{< divider style="dashed" width="80%" >}}}
+
+{{{< divider style="gradient" label="Results" >}}}
+
+{{{< divider style="ornamental" thickness="3pt" >}}}
+```
+
+In HTML, `thickness` and `width` become the `--divider-thickness` and `--divider-width` custom properties, so either takes any CSS length and `width` also takes a percentage.
+
+The `label` attribute changes the markup, not only the text.
+A divider with no label is an `<hr>` element.
+A divider with a label is a `<div>` with `role="separator"`, and the label becomes the accessible name.
+
+## Value box
+
+A value box shows one number, with an optional unit, label, and icon.
+
+```markdown
+{{{< value-box value="99" unit="%" label="Coverage" colour="success" >}}}
+
+{{{< value-box value="1240" label="Downloads" icon="up" colour="info" >}}}
+
+{{{< value-box value="3" unit="ms" label="Latency" icon="down" colour="#74aadb" >}}}
+```
+
+### Icons
+
+The `icon` attribute takes any text, and a symbol or an emoji is what it is for.
+A longer value is drawn as written, so `icon="new"` puts the word `new` where the symbol goes.
+
+Three names are shortcuts:
+
+- `up` gives an upward arrow.
+- `down` gives a downward arrow.
+- `stable` gives a horizontal bar.
+
+A name that is not one of the three is used as the character itself.
+
+### Colours
+
+The reference lists ten theme names, and a value box draws fewer of them.
+
+HTML and a Reveal.js deck style five: `info`, `success`, `warning`, `danger`, and `caution`.
+A colour value such as `#74aadb` works as well, and any other name gives an unstyled box.
+
+Typst draws five too, and not the same five: `info`, `success`, `warning`, `danger`, and `neutral`.
+It reads any other value as a colour, so `#74aadb` works there too, and a name it cannot read as a colour gives the foreground colour instead.
+
+Four names work in every format: `info`, `success`, `warning`, and `danger`.
+Use one of those, or a colour value, for a document rendered to more than one format.
+
+## Progress
+
+A progress bar shows a percentage.
+
+```markdown
+{{{< progress value="72" label="Progress" colour="info" >}}}
+
+{{{< progress value="40" show-value="false" >}}}
+
+{{{< progress value="95" height="0.6em" colour="success" >}}}
+```
+
+`show-value` writes the percentage inside the bar, and is on unless the attribute is `false`.
+
+::: {.callout-warning}
+
+`show-value` stops a Typst build.
+The shortcode passes the attribute through under its own name, and the Typst function expects `show-percentage`, so the compile fails with `unexpected argument: show-value`.
+
+Leave the attribute out of a document that is rendered to PDF, until the extension maps the two names.
+
+:::
+
+`height` is a CSS length.
+Its default depends on the format: `1.5em` in HTML output, and `1.2em` in a Reveal.js deck.
+
+A colour that is a colour value rather than a theme name is passed through as the `--custom-colour` property.
+
+Keep `value` inside 0 to 100.
+Typst clamps it.
+HTML clamps the width of the bar only, so `value="150"` draws a full bar labelled `150%`, and reports `150` to assistive technology.
+
+## Badge
+
+A badge is an inline label.
+It is the one component with two spellings, and which one works depends on the output format.
+
+```markdown
+The build is {{{< badge text="passing" colour="success" >}}} today.
+```
+
+The shortcode produces nothing at all in Typst output.
+Write the span form instead, which works in every format:
+
+```markdown
+The build is [passing]{.badge colour="success"} today.
+```
+
+The span takes `colour` and `icon`, and the badge text is the content of the span.
+The shortcode takes the same two, and `text` carries the label.
