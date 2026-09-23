@@ -24,7 +24,7 @@
 - docs: Remove the value-box alt parameter from the feature reference table, which no renderer implemented. (#136)
 - docs: Remove the value-box alt, background, show-border, and alignment parameters from the worked example, which no renderer implemented. (#136)
 - docs: Remove three remaining claims that card grids or value box grids support an alt parameter, keeping the true claim that maths does. (#136)
-- docs: Split the examples page into seven per-topic pages, and add worked examples for the options and behaviours that had none.
+- docs: Split the examples page into seven per-topic pages, and add worked examples for the options and behaviours that had none. (#137)
 
 ### Refactoring
 
