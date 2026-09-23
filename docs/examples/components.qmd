@@ -82,15 +82,6 @@ A progress bar shows a percentage.
 
 `show-value` writes the percentage inside the bar, and is on unless the attribute is `false`.
 
-::: {.callout-warning}
-
-`show-value` stops a Typst build.
-The shortcode passes the attribute through under its own name, and the Typst function expects `show-percentage`, so the compile fails with `unexpected argument: show-value`.
-
-Leave the attribute out of a document that is rendered to PDF, until the extension maps the two names.
-
-:::
-
 `height` is a CSS length.
 Its default depends on the format: `1.5em` in HTML output, and `1.2em` in a Reveal.js deck.
 

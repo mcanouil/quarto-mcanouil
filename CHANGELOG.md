@@ -12,6 +12,7 @@
 
 - fix: Accept a Typst colour name, such as `blue`, in the `colour` attribute of `value-box` and `.card` in Typst output. Both stopped the build on a name rather than colouring anything, and a malformed hex code stopped it as well. A value that names no colour now uses the component's fallback colour instead of stopping the build. (#134)
 - fix: Stop a Typst badge written with the color alias from crashing the render, by dropping the raw alias once the declared colour name has a resolved value. (#136)
+- fix: Honour the progress shortcode's `show-value` attribute in Typst output. Using it stopped the build, because the attribute was passed through under its own name while the Typst function expects `show-percentage`.
 - fix: Remove the card-grid alt attribute, which no renderer implemented, from the schema and from the documentation and worked example that described it. (#136)
 - fix: Read code-window-no-auto-filename as a real boolean, so a value of false no longer suppresses the automatic filename in the same way as true. (#136)
 - fix: Gate the options check on the html, typst and revealjs formats so non-acting formats stay silent. (#136)
