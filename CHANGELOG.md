@@ -4,9 +4,9 @@
 
 ### Breaking Changes
 
-- refactor: Remove the `typst-title` hot-fix and its `code-window.hotfix.typst-title` option, as Quarto renders theorem titles as Typst markup since 1.10.
-- refactor: Stop rewriting `_extensions/` logo and `orcid-icon` paths in Typst output, as Quarto resolves extension paths from subdirectories since 1.9.24.
-- build: Require Quarto 1.10.19 or later.
+- refactor: Remove the `typst-title` hot-fix and its `code-window.hotfix.typst-title` option, as Quarto renders theorem titles as Typst markup since 1.10. (#140)
+- refactor: Stop rewriting `_extensions/` logo and `orcid-icon` paths in Typst output, as Quarto resolves extension paths from subdirectories since 1.9.24. (#140)
+- build: Require Quarto 1.10.19 or later. (#140)
 
 ## 0.22.0 (2026-09-23)
 
