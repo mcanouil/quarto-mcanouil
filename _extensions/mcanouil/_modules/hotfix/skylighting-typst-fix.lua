@@ -233,12 +233,15 @@ function Pandoc(doc)
 end
 
 --- Walk the document tree and convert inline Code to RawInline with
---- background styling, theorem titles included.
+--- background styling, theorem titles included. Metadata such as the
+--- document title is left alone: the template writes it before the
+--- definitions the box relies on.
 local function process_inline_code(doc)
   if not quarto.doc.is_format('typst') then
     return doc
   end
-  return doc:walk({ Code = process_typst_inline })
+  doc.blocks = doc.blocks:walk({ Code = process_typst_inline })
+  return doc
 end
 
 return {
