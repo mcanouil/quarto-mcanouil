@@ -17,6 +17,17 @@ The full documentation lives at <https://m.canouil.dev/quarto-mcanouil/>: the pr
 
 [`example.qmd`](example.qmd) is a starting point you can copy.
 
+## Quarto workarounds
+
+The extension works around a few Quarto CLI bugs and gaps.
+Each workaround goes once its issue is fixed in a Quarto release the extension requires.
+
+- Typst logo paths lose the backslashes Pandoc adds to metadata strings ([quarto-dev/quarto-cli#15056](https://github.com/quarto-dev/quarto-cli/issues/15056)).
+- External links from `format-links` open in a new window ([quarto-dev/quarto-cli#10730](https://github.com/quarto-dev/quarto-cli/issues/10730)).
+- The code annotation line highlight keeps to the code block ([quarto-dev/quarto-cli#13448](https://github.com/quarto-dev/quarto-cli/issues/13448)).
+- The copy button stays clear of the code annotation markers ([quarto-dev/quarto-cli#13444](https://github.com/quarto-dev/quarto-cli/issues/13444)).
+- Typst output shows code annotations and filenames, which Quarto does not render there yet ([quarto-dev/quarto-cli#9768](https://github.com/quarto-dev/quarto-cli/issues/9768), with a fix proposed in [quarto-dev/quarto-cli#14170](https://github.com/quarto-dev/quarto-cli/pull/14170)).
+
 ## Licence
 
 [MIT](https://github.com/mcanouil/quarto-mcanouil?tab=MIT-1-ov-file#readme).
