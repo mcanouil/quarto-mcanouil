@@ -362,8 +362,9 @@ pre.code-annotation-code {
 }
 
 // Code annotation workaround
-// Workaround: Quarto PR #13429 (still open as of 2026-01)
-// Remove this block once the PR is merged
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/13448
+// (fix proposed in https://github.com/quarto-dev/quarto-cli/pull/13429).
+// Remove this block once the fix ships.
 #code-annotation-line-highlight {
   margin-left: unset;
   width: 100%;

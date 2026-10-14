@@ -3,15 +3,12 @@
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
 --- @brief Typst skylighting styling override and inline code background.
---- Pandoc 3.8+ generates correct token colours and bgcolor from the theme,
---- but the generated Skylighting block lacks styling properties (width, inset,
---- radius, stroke) and ignores its own fill parameter. This module overrides
---- the Skylighting function with better block styling and adds inline code
---- background support for Typst output.
+--- This module redefines the Skylighting function to draw code annotation
+--- markers, and adds inline code background support for Typst output.
 --- Quarto patches the block styling of its own Skylighting function since
---- 1.9.27 (https://github.com/quarto-dev/quarto-cli/issues/14126). This module
---- redefines that function to draw annotation markers, so it keeps the block
---- styling as well.
+--- 1.9.27 (https://github.com/quarto-dev/quarto-cli/issues/14126), but the
+--- redefinition replaces that function, so it carries the block styling
+--- (width, inset, radius, stroke) and honours its fill parameter itself.
 
 local _wrapper_prefix = 'mcanouil-code-window'
 
@@ -22,10 +19,9 @@ local function set_wrapper(prefix)
   _wrapper_prefix = prefix
 end
 
---- Build a Skylighting override with improved block styling.
---- Pandoc 3.8+ generates correct bgcolor but the block call lacks width,
---- inset, radius, and stroke properties. The fill parameter is also ignored.
---- This override fixes both issues.
+--- Build a Skylighting override that draws annotation markers.
+--- It replaces Quarto's patched function, so it sets the block width, inset,
+--- radius and stroke itself, and honours its fill parameter.
 --- @return string|nil Typst #let Skylighting(...) definition, or nil
 local function build_skylighting_override()
   local hm = PANDOC_WRITER_OPTIONS and PANDOC_WRITER_OPTIONS.highlight_method
