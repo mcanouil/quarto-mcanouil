@@ -8,6 +8,10 @@
 --- radius, stroke) and ignores its own fill parameter. This module overrides
 --- the Skylighting function with better block styling and adds inline code
 --- background support for Typst output.
+--- Quarto patches the block styling of its own Skylighting function since
+--- 1.9.27 (https://github.com/quarto-dev/quarto-cli/issues/14126). This module
+--- redefines that function to draw annotation markers, so it keeps the block
+--- styling as well.
 
 local _wrapper_prefix = 'mcanouil-code-window'
 
@@ -251,10 +255,8 @@ end
 
 --- Walk the document tree and convert inline Code to RawInline with
 --- background styling. Code in title scaffolds is converted to plain
---- Typst backtick code to avoid Skylighting tokens with inner quotes
---- that would break the string parameter Quarto generates.
---- The typst-title-fix post-quarto filter then evaluates the string
---- as markup so the backtick code renders with proper inline styling.
+--- Typst backtick code, which renders inside the title content Quarto
+--- writes since 1.10.18.
 local function process_inline_code(doc)
   if not quarto.doc.is_format('typst') then
     return doc

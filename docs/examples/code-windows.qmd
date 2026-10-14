@@ -63,7 +63,7 @@ Leave `enabled` on and switch off the individual blocks when most blocks need ch
 
 ## The Typst hot-fixes
 
-Three toggles work around Typst output problems, and each is on unless the document says otherwise.
+Two toggles work around Typst output problems, and each is on unless the document says otherwise.
 
 ```yaml
 extensions:
@@ -75,7 +75,6 @@ extensions:
 
 - `code-annotations` processes the annotations on a code block so they survive into Typst output.
 - `skylighting` fixes the styling of a highlighted block in Typst.
-- `typst-title` evaluates a theorem title as Typst markup rather than as plain text.
 
 Switch one off when a document supplies its own handling of the same thing, and leave the rest on.
 A toggle accepts an object as well as a boolean, for a fix that carries its own settings.

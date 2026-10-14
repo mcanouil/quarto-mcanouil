@@ -1,7 +1,7 @@
 title: Mickaël Canouil's Brand
 author: Mickaël Canouil
 version: 0.22.0
-quarto-required: ">=1.9.36"
+quarto-required: ">=1.10.19"
 contributes:
   metadata:
     project:
@@ -105,8 +105,6 @@ contributes:
           path: filters/components.lua
         - at: pre-quarto
           path: filters/math-alt-text.lua
-        - at: post-render
-          path: filters/normalise-extension-paths.lua
       extensions:
         mcanouil:
           # Grid background
@@ -230,8 +228,6 @@ contributes:
           path: filters/logo-metadata.lua
         - at: pre-quarto
           path: filters/special-sections.lua
-        - at: post-quarto
-          path: _modules/hotfix/typst-title-fix.lua
       # Typography
       mainfont: "Alegreya Sans"
       sansfont: "Alegreya Sans"

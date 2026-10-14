@@ -47,7 +47,6 @@ local DEFAULTS = {
 local HOTFIX_DEFAULTS = {
   ['code-annotations'] = true,
   ['skylighting'] = true,
-  ['typst-title'] = true,
 }
 
 local CURRENT_FORMAT = nil
@@ -311,18 +310,8 @@ function Meta(meta)
     typst_wrapper = opts['wrapper'],
     hotfix_code_annotations = hotfix['code-annotations'],
     hotfix_skylighting = hotfix['skylighting'],
-    hotfix_typst_title = hotfix['typst-title'],
     code_annotations = annotations_enabled,
   }
-
-  -- Store hotfix state in metadata so the post-quarto typst-title-fix filter
-  -- can read it (it runs as a separate filter and has no access to CONFIG).
-  if not meta['_code-window-hotfix'] then
-    meta['_code-window-hotfix'] = pandoc.MetaMap({})
-  end
-  meta['_code-window-hotfix']['typst-title'] = pandoc.MetaString(
-    CONFIG.enabled and hotfix['typst-title'] and 'true' or 'false'
-  )
 
   -- Cache syntax highlighting background colour for Typst contrast-aware annotations.
   if CURRENT_FORMAT == 'typst' then

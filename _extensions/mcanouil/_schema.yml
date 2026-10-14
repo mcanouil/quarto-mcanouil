@@ -72,10 +72,6 @@ options:
             type: [boolean, object]
             default: true
             description: "Fix Typst Skylighting block styling."
-          typst-title:
-            type: [boolean, object]
-            default: true
-            description: "Evaluate theorem title strings as Typst markup."
 
 shortcodes:
   divider:
