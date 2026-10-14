@@ -355,6 +355,7 @@ pre.code-annotation-code {
 }
 
 // Prevent copy button overlap with code annotation gutter
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/13444
 .code-copy-outer-scaffold:has(.code-annotated)>.code-copy-button {
   right: 1.5em;
   margin-right: 0;

@@ -192,6 +192,7 @@
       none
     }
     // Note: .replace("\\", "") removes backslash escapes from paths (Quarto escaping workaround)
+    // See https://github.com/quarto-dev/quarto-cli/issues/15056
     header-logo = if header-logo != none {
       header-logo.replace("\\", "")
     } else {
@@ -216,6 +217,7 @@
       none
     }
     // Note: .replace("\\", "") removes backslash escapes from paths (Quarto escaping workaround)
+    // See https://github.com/quarto-dev/quarto-cli/issues/15056
     header-logo = if header-logo != none {
       header-logo.replace("\\", "")
     } else {
