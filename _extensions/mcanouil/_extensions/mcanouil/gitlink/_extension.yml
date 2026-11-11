@@ -6,3 +6,5 @@ contributes:
   filters:
     - path: gitlink.lua
       at: post-quarto
+source: mcanouil/quarto-gitlink@1.12.0
+source-type: github

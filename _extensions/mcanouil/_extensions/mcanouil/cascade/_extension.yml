@@ -6,3 +6,5 @@ contributes:
   filters:
     - path: cascade.lua
       at: pre-ast
+source: mcanouil/quarto-revealjs-cascade@2.1.1
+source-type: github

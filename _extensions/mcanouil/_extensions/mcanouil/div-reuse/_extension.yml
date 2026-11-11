@@ -6,3 +6,5 @@ contributes:
   filters:
     - path: div-reuse.lua
       at: post-quarto
+source: mcanouil/quarto-div-reuse@1.5.1
+source-type: github

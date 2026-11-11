@@ -16,3 +16,5 @@ contributes:
         - veil.js
       stylesheet:
         - veil.css
+source: mcanouil/quarto-veil@0.1.0
+source-type: github

@@ -6,3 +6,5 @@ contributes:
   filters:
     - at: pre-quarto
       path: main.lua
+source: mcanouil/quarto-code-window@1.8.2
+source-type: github

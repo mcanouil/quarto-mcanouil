@@ -6,3 +6,5 @@ contributes:
   filters:
     - path: prism.lua
       at: pre-ast
+source: mcanouil/quarto-prism@0.5.1
+source-type: github

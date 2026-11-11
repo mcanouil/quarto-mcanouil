@@ -8,3 +8,5 @@ contributes:
       path: typst-render.lua
     - at: post-quarto
       path: typst-math.lua
+source: mcanouil/quarto-typst-render@0.22.7
+source-type: github

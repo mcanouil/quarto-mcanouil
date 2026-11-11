@@ -11,3 +11,5 @@ contributes:
         - codefrag.js
       stylesheet:
         - codefrag.css
+source: mcanouil/quarto-revealjs-codefrag@1.2.1
+source-type: github

@@ -7,3 +7,5 @@ contributes:
     - name: RevealJsTabset
       script:
         - tabset.js
+source: mcanouil/quarto-revealjs-tabset@1.5.0
+source-type: github

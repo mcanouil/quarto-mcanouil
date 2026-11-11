@@ -6,3 +6,5 @@ contributes:
   filters:
     - path: offset-headings.lua
       at: pre-ast
+source: mcanouil/quarto-offset-headings@0.5.1
+source-type: github
