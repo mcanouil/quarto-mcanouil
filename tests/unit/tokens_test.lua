@@ -59,7 +59,15 @@ cases['tokens-complete'] = function()
   for _, name in ipairs({ 'gold', 'mono', 'terminal' }) do
     local data = preset.read(name)
     for _, mode in ipairs(MODES) do
-      assert_equal(data[mode].chrome, data[mode].accent, name .. '.' .. mode .. '.chrome')
+      assert_equal(data[mode].chrome, data[mode]['ground-1'], name .. '.' .. mode .. '.chrome')
+    end
+  end
+  for _, name in ipairs(preset.PRESETS) do
+    local data = preset.read(name)
+    for _, mode in ipairs(MODES) do
+      if contrast('#ffffff', data[mode].chrome) < 4.5 then
+        error(string.format('%s.%s white on chrome is below 4.5:1', name, mode))
+      end
     end
   end
   assert_equal(preset.read('terminal').dark.link, '#6cb6ff', 'terminal link')
