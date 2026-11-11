@@ -55,8 +55,8 @@ output_extension() {
 # any stderr output counts as a failure, and stops the run.
 # $1 fixture base name. $2 format, html, typst or revealjs. $3 preset base name.
 render() {
-	local name="$1-$2-$3"
-	local output="${work_dir}/${name}.$(output_extension "$2")"
+	local name="$1-$2-$3" output
+	output="${work_dir}/${name}.$(output_extension "$2")"
 	if [ ! -f "${output}" ]; then
 		if ! (cd "${work_dir}" && quarto render "$1.qmd" --to "mcanouil-$2" \
 			--metadata-file "${tests_dir}/presets/$3.yml" \
