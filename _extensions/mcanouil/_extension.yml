@@ -5,6 +5,7 @@ quarto-required: ">=1.12.1"
 contributes:
   formats:
     common:
+      language: _language.yml
       shortcodes:
         - iconify
       filters:

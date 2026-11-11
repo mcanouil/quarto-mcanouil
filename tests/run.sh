@@ -525,6 +525,60 @@ check_no_hex_outside_presets() {
 	fi
 }
 
+check_label_en() {
+	local typst
+	typst="$(render labels-en typst gold)"
+	if has "${typst%.pdf}.typ" 'mcanouil-in-this-chapter: "In this chapter"' &&
+		has "${typst%.pdf}.typ" 'mcanouil-solution-page: "Solution: page {page}"'; then
+		report pass label-en ""
+	else
+		report fail label-en "the English labels in the mc-labels dictionary of the Typst output"
+	fi
+}
+
+check_label_fr() {
+	local typst
+	typst="$(render labels-fr typst gold)"
+	if has "${typst%.pdf}.typ" 'mcanouil-in-this-chapter: "Dans ce chapitre"' &&
+		lacks "${typst%.pdf}.typ" 'mcanouil-in-this-chapter: "In this chapter"'; then
+		report pass label-fr ""
+	else
+		report fail label-fr "the French label 'Dans ce chapitre', and not the English one"
+	fi
+}
+
+check_label_fallback() {
+	local typst
+	typst="$(render labels-es typst gold)"
+	if has "${typst%.pdf}.typ" 'mcanouil-in-this-chapter: "In this chapter"'; then
+		report pass label-fallback ""
+	else
+		report fail label-fallback "the English label for lang: es, with no warning"
+	fi
+}
+
+check_label_override() {
+	local typst
+	typst="$(render labels-override/labels typst gold)"
+	if has "${typst%.pdf}.typ" 'mcanouil-exercise: "Task"' &&
+		has "${typst%.pdf}.typ" 'mcanouil-solution: "Solution"'; then
+		report pass label-override ""
+	else
+		report fail label-override "the label 'Task' from the user language file, and the other labels unchanged"
+	fi
+}
+
+check_no_label_text_outside_language_files() {
+	local found
+	found="$(grep -rEn 'In this chapter|Dans ce chapitre|Invoice number|Postscript' \
+		"${repo_dir}/_extensions/mcanouil/lua" "${repo_dir}/_extensions/mcanouil/typst" || true)"
+	if [ -z "${found}" ]; then
+		report pass no-label-text-outside-language-files ""
+	else
+		report fail no-label-text-outside-language-files "no label text in lua/ or typst/, found: ${found}"
+	fi
+}
+
 CHECKS=(
 	smoke-renders
 	tool-active
@@ -545,6 +599,11 @@ CHECKS=(
 	partial-user-brand
 	fonts-embedded
 	no-hex-outside-presets
+	label-en
+	label-fr
+	label-fallback
+	label-override
+	no-label-text-outside-language-files
 )
 
 for name in "${CHECKS[@]}"; do

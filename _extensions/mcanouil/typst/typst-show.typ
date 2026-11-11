@@ -3,6 +3,11 @@ $for(mcanouil-tokens/pairs)$
   $it.key$: rgb("#$it.value$"),
 $endfor$
 )
+#let mc-labels = (
+$for(mcanouil-labels/pairs)$
+  $it.key$: $it.value$,
+$endfor$
+)
 #let mc-fonts = (
   base: ($for(mcanouil-fonts.base)$"$it$", $endfor$),
   headings: ($for(mcanouil-fonts.headings)$"$it$", $endfor$),
