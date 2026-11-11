@@ -1,0 +1,13 @@
+title: Reveal.js Code Annotation Fragments
+author: Mickaël Canouil
+version: 1.2.1
+quarto-required: ">=1.9.36"
+contributes:
+  filters:
+    - schema-filter.lua
+  revealjs-plugins:
+    - name: RevealJsCodefrag
+      script:
+        - codefrag.js
+      stylesheet:
+        - codefrag.css

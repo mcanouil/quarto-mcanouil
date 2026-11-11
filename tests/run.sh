@@ -126,6 +126,42 @@ lacks() {
 	! grep -qF -- "$2" "$1"
 }
 
+# Count the lines of a file that hold a fixed string.
+# $1 file. $2 string.
+count() {
+	grep -cF -- "$2" "$1" || true
+}
+
+# Report that one embedded tool ran, from the outcome of a command.
+# $1 tool name. The rest is the command that succeeds when the tool ran.
+tool_active() {
+	local name="$1"
+	shift
+	if "$@"; then
+		report pass "tool-${name}-active" ""
+	else
+		report fail "tool-${name}-active" "the marker of ${name} in the output of tests/fixtures/tools.qmd"
+	fi
+}
+
+# Succeed when a file holds a fixed string on exactly two lines.
+# $1 file. $2 string.
+twice() {
+	[ "$(count "$1" "$2")" = 2 ]
+}
+
+# Succeed when the text of a PDF holds a fixed string on exactly two lines.
+# $1 PDF file. $2 string.
+pdf_twice() {
+	[ "$(pdf_text "$1" | grep -cF -- "$2" || true)" = 2 ]
+}
+
+# Succeed when the table of contents of an HTML file lacks a link target.
+# $1 file. $2 link target, for example "#section".
+toc_lacks() {
+	has "$1" 'id="TOC"' && lacks "$1" "href=\"$2\" id=\"toc-"
+}
+
 check_smoke_renders() {
 	local file ok=1
 	render_all_presets smoke typst
@@ -147,8 +183,64 @@ check_smoke_renders() {
 	fi
 }
 
+check_tool_active() {
+	local html revealjs typst
+	html="$(render tools html gold)"
+	revealjs="$(render tools revealjs gold)"
+	typst="$(render tools typst gold)"
+	tool_active offset-headings has "${html}" '<section id="offset" class="level3">'
+	tool_active div-reuse twice "${html}" '<p>Reusable content.</p>'
+	tool_active toc-depth toc_lacks "${html}" '#hidden-from-contents'
+	tool_active highlight-text has "${html}" 'class="light-content"'
+	tool_active iconify has "${html}" '<iconify-icon'
+	tool_active prism has "${html}" 'data-prism="yes"'
+	tool_active code-window has "${html}" 'sourceCode python cw-auto'
+	tool_active veil has "${revealjs}" 'data-veil-hidden'
+	tool_active veil-plugin has "${revealjs}" 'RevealVeil'
+	tool_active typst-render has "${html}" 'assets/typst-render/'
+	tool_active gitlink has "${html}" 'gitlink-badge'
+	tool_active mobile-toc has "${html}" 'mobile-toc/mobile-toc.css'
+	tool_active cascade twice "${revealjs}" '<h2>Cascade</h2>'
+	tool_active codefrag has "${revealjs}" 'RevealJsCodefrag'
+	tool_active tabset has "${revealjs}" 'RevealJsTabset'
+	tool_active div-reuse-typst pdf_twice "${typst}" 'Reusable content.'
+}
+
+check_tool_optin_off() {
+	local file ok=1
+	for file in "$(render tools html gold)" "$(render tools revealjs gold)"; do
+		lacks "${file}" 'preview-colour' || ok=0
+		lacks "${file}" 'collapse-output' || ok=0
+		lacks "${file}" 'quarto-remember' || ok=0
+	done
+	if [ "${ok}" = 1 ]; then
+		report pass tool-optin-off ""
+	else
+		report fail tool-optin-off "no preview-colour, collapse-output or remember marker without their options"
+	fi
+}
+
+check_tool_quiet() {
+	local file marker ok=1
+	for file in "$(render smoke html gold)" "$(render smoke revealjs gold)"; do
+		for marker in 'class="light-content"' '<iconify-icon' 'data-prism=' 'sourceCode python cw-auto' \
+			'data-veil-hidden' 'assets/typst-render/' 'gitlink-badge' 'mobile-toc/' 'preview-colour' \
+			'collapse-output' 'quarto-remember'; do
+			lacks "${file}" "${marker}" || ok=0
+		done
+	done
+	if [ "${ok}" = 1 ]; then
+		report pass tool-quiet ""
+	else
+		report fail tool-quiet "no tool marker in the output of tests/fixtures/smoke.qmd"
+	fi
+}
+
 CHECKS=(
 	smoke-renders
+	tool-active
+	tool-optin-off
+	tool-quiet
 )
 
 for name in "${CHECKS[@]}"; do

@@ -1,0 +1,31 @@
+# _schema.yml for "tabset" revealjs-plugin extension
+# Documents the per-slide and per-tabset attributes the plugin recognises.
+
+$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json
+
+options: {}
+
+attributes:
+  panel-tabset:
+    tab-active:
+      type: integer
+      description: >
+        Zero-based index of the tab to activate when the tabset first appears.
+        Emitted as `data-tab-active`.
+        Only applies to a tabset with the `.no-tabset-fragments` class, because a tabset that steps always opens on its first tab.
+        Out-of-range or non-integer values fall back to `0`.
+      default: 0
+  _any:
+    tabset-skip-pdf-clone:
+      type: boolean
+      description: >
+        Set on a slide to opt out of per-tab PDF cloning.
+        Emitted as `data-tabset-skip-pdf-clone`.
+        The first tab is shown and remaining tabs are hidden on that slide only.
+        Has no effect when `pdf-separate-fragments: true` is set globally.
+
+classes:
+  no-tabset-fragments:
+    description: "Leave this tabset out of the stepping, so its tabs are clicked and a PDF export prints it on one page."
+  tabset-fragments:
+    description: "Step through this tabset even when it also carries `.no-tabset-fragments`. Ignored, with a console warning, inside a tabset that does not step."

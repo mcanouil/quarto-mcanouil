@@ -1,0 +1,2695 @@
+--- Typst Render - Filter
+--- @module "typst-render"
+--- @license MIT
+--- @copyright 2026 Mickaël Canouil
+--- @author Mickaël Canouil
+--- @brief Compiles {typst} code blocks to images for non-Typst output formats.
+--- @description Intercepts ```{typst} CodeBlock elements and compiles them to
+---   images (PNG, SVG, or PDF) using the Typst binary bundled with Quarto,
+---   making Typst diagrams, figures, and tables usable across all output formats.
+
+--- Extension name constant
+local EXTENSION_NAME = 'typst-render'
+
+--- Load modules
+local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
+local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
+local paths = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/paths.lua'):gsub('%.lua$', ''))
+local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))
+local typst_cli = require(quarto.utils.resolve_path('_modules/typst-cli.lua'):gsub('%.lua$', ''))
+local code_cell = require(quarto.utils.resolve_path('_modules/code-cell.lua'):gsub('%.lua$', ''))
+local schema = require(quarto.utils.resolve_path('_vendor/quarto-wizard/schema.lua'):gsub('%.lua$', ''))
+local check = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/schema-check.lua'):gsub('%.lua$', ''))
+local cell = code_cell.new({ language = '{typst}', comment_prefix = '//|', comment_chars = '//' })
+
+--- The schema check, built once for the render. It reads `_schema.yml` on the
+--- way in and checks the document configuration once. The extension contributes
+--- no shortcode, so there is no call to check.
+---
+--- The validator is injected rather than required by the check module, so the
+--- two vendored sources stay independent of where the other was placed.
+---
+--- The extension contributes two filters, and the check runs from the earlier
+--- one so that a render reads the schema once. Both filters read the same
+--- `extensions.typst-render` namespace, so this one call covers every option.
+---
+--- A schema that cannot be read is reported by the module as an error and the
+--- render carries on: a configuration file must not stop a document.
+local checker = check.new(schema, EXTENSION_NAME)
+
+-- ============================================================================
+-- CONSTANTS
+-- ============================================================================
+
+--- Valid output format set for O(1) lookup. `html` is a native (non-image)
+--- target available with Typst >= 0.15; the others compile to image files.
+local VALID_FORMAT_SET = { png = true, svg = true, pdf = true, html = true }
+
+--- Valid alignment values
+local VALID_ALIGN_SET = { left = true, center = true, right = true, default = true }
+
+--- Default option values
+local DEFAULTS = {
+  format = nil,
+  dpi = 144,
+  width = 'auto',
+  height = 'auto',
+  margin = '0.5em',
+  background = 'none',
+  foreground = nil,
+  preamble = '',
+  cache = true,
+  ['cache-refresh'] = false,
+  file = nil,
+  ['output-directory'] = './assets/typst-render',
+  ['output-filename'] = nil,
+  ['output-source'] = false,
+  input = nil,
+  echo = false,
+  ['code-fold'] = false,
+  ['code-summary'] = nil,
+  ['code-line-numbers'] = false,
+  eval = true,
+  include = true,
+  output = true,
+  ['output-location'] = nil,
+  classes = nil,
+  label = nil,
+  pages = 'all',
+  ['layout-ncol'] = nil,
+  align = nil,
+}
+
+--- Keys consumed by the filter; any other option is forwarded as an HTML attribute.
+--- NOTE: pairs(DEFAULTS) skips nil-valued keys, so all keys with nil defaults
+--- must be listed explicitly here to prevent them leaking as HTML attributes.
+--- Keys the filter sets on itself are not listed: `is_known_key` claims every
+--- name starting with an underscore.
+local KNOWN_KEYS = {
+  cap = true,
+  alt = true,
+  ['code-summary'] = true,
+  ['code-line-numbers'] = true,
+  root = true,
+  ['font-path'] = true,
+  ['package-path'] = true,
+  math = true,
+  format = true,
+  foreground = true,
+  file = true,
+  ['output-directory'] = true,
+  ['output-filename'] = true,
+  ['output-source'] = true,
+  input = true,
+  ['output-location'] = true,
+  classes = true,
+  label = true,
+  ['layout-ncol'] = true,
+  align = true,
+}
+for k in pairs(DEFAULTS) do
+  KNOWN_KEYS[k] = true
+end
+
+--- Check whether a key is consumed by the filter (not forwarded as an attribute).
+--- Matches keys the filter sets on itself (leading underscore), exact known keys,
+--- and prefix-specific cross-ref keys (e.g. fig-cap, tbl-alt).
+--- The underscore rule is what `serialise_opts` uses to keep internal keys out of
+--- the cache key, so one convention covers both and a new internal key is safe by
+--- its name alone.
+--- @param key string
+--- @return boolean
+local function is_known_key(key)
+  if key:sub(1, 1) == '_' then
+    return true
+  end
+  if KNOWN_KEYS[key] then
+    return true
+  end
+  return key:match('^%a+%-cap$') ~= nil or key:match('^%a+%-alt$') ~= nil
+end
+
+--- Per-document cache subdirectory (set during Meta pass)
+local cache_subdir = nil
+
+-- ============================================================================
+-- MODULE STATE
+-- ============================================================================
+
+--- Global configuration from document metadata
+local global_config = {}
+
+--- Detected brand mode ("light" or "dark")
+local global_brand_mode = 'light'
+
+--- Whether the document disables Quarto code-annotations (set during Meta pass).
+--- When true, annotation markers must be stripped from echoed source because
+--- Quarto's own pass leaves them literal instead of removing them.
+local code_annotations_disabled = false
+
+--- Whether Quarto's markdown reader is ready (set during Meta pass).
+--- False when the filter runs at `pre-ast`, before Quarto captures its reader
+--- options, where `quarto.utils.string_to_inlines` fails.
+local quarto_reader_ready = true
+
+--- Quarto's reader options at `pre-ast` (set during Meta pass), used to parse
+--- captions with Quarto's own reader there; nil once Quarto's reader is ready.
+local pre_ast_reader_options = nil
+
+--- Resolved Typst binary path (cached)
+local typst_bin = nil
+
+--- Whether Typst binary availability has been checked
+local typst_checked = false
+
+--- Block counter for auto-numbering unlabelled blocks
+local block_counter = 0
+
+--- Inline counter for auto-numbering inline expressions
+local inline_counter = 0
+
+--- Whether the PPTX inline warning has been shown
+local pptx_inline_warned = false
+
+--- Set of cache filenames produced or hit during this render (for cleanup)
+local used_cache_files = {}
+
+--- Set of image format extensions produced during this render (for cleanup)
+local used_cache_formats = {}
+
+--- Cache of file contents read during this render pass (keyed by absolute path)
+local read_file_cache = {}
+
+--- Document-wide `typst_define()` payload, accumulated by the collect pass.
+--- Maps name -> raw value (Lua representation of the JSON-decoded payload).
+local typst_define_dict = {}
+
+--- Declaration order of names in `typst_define_dict`, preserved across calls.
+local typst_define_order = {}
+
+--- Cached preamble line; built once per Meta pass after ingestion completes,
+--- then reused for every {typst} block in this render.
+local typst_define_preamble_cache = nil
+
+-- ============================================================================
+-- TYPST DEFINE — INGEST FROM `typst-define:` METADATA BLOCK
+-- ============================================================================
+
+--- Decode a hex-encoded UTF-8 string back to its raw bytes.
+--- WHY: pandoc's smart-quote, dash, and ellipsis transforms would corrupt the
+--- JSON payload during YAML metadata block parsing. Hex is transform-free.
+--- @param hex string Hex string (lowercase or uppercase, no separators)
+--- @return string|nil Decoded string, or nil on malformed input
+local function hex_decode(hex)
+  if type(hex) ~= 'string' then return nil end
+  if #hex % 2 ~= 0 then return nil end
+  if hex:match('[^%x]') then return nil end
+  return (hex:gsub('(%x%x)', function(byte)
+    return string.char(tonumber(byte, 16))
+  end))
+end
+
+--- Decode a JSON payload and merge its `contents` into the document-wide dict.
+--- Last-write-wins on duplicate names; first-seen index in declaration order.
+--- @param json_str string JSON payload carried by the metadata block
+local function ingest_define_payload(json_str)
+  local ok, parsed = pcall(pandoc.json.decode, json_str)
+  if not ok or type(parsed) ~= 'table' or type(parsed.contents) ~= 'table' then
+    log.log_warning(EXTENSION_NAME, 'Failed to decode typst-define payload; ignoring.')
+    return
+  end
+  for _, entry in ipairs(parsed.contents) do
+    if type(entry) == 'table' and entry.name then
+      if typst_define_dict[entry.name] == nil then
+        typst_define_order[#typst_define_order + 1] = entry.name
+      end
+      typst_define_dict[entry.name] = entry.value
+    end
+  end
+end
+
+-- ============================================================================
+-- TYPST DEFINE — JSON → TYPST LITERAL CONVERSION
+-- ============================================================================
+
+--- Format a Lua number for Typst output.
+--- Integers print without a decimal point; doubles use `%.17g` for lossless
+--- round-trip of the original IEEE-754 value.
+--- @param n number
+--- @return string
+local function format_number(n)
+  if math.type(n) == 'integer' then return tostring(n) end
+  return string.format('%.17g', n)
+end
+
+--- Detect whether a value is a `pandoc.List` (used for JSON arrays).
+--- @param v any
+--- @return boolean
+local function is_pandoc_list(v)
+  return pandoc.utils.type(v) == 'List'
+end
+
+--- Convert a JSON-decoded Lua value to a Typst literal source fragment.
+--- @param v any Decoded value (nil/boolean/number/string/table/pandoc.List/pandoc.json.null)
+--- @return string Typst source
+local function to_typst_literal(v)
+  if v == nil or v == pandoc.json.null then return 'none' end
+  local t = type(v)
+  if t == 'boolean' then return tostring(v) end
+  if t == 'number' then return format_number(v) end
+  if t == 'string' then return '"' .. str.escape_typst_string(v) .. '"' end
+  if t == 'table' then
+    if is_pandoc_list(v) then
+      local parts = {}
+      for _, x in ipairs(v) do parts[#parts + 1] = to_typst_literal(x) end
+      if #parts == 0 then return '()' end
+      if #parts == 1 then return '(' .. parts[1] .. ',)' end
+      return '(' .. table.concat(parts, ', ') .. ')'
+    end
+    local entries = {}
+    for k, x in pairs(v) do
+      entries[#entries + 1] = { key = tostring(k), value = x }
+    end
+    table.sort(entries, function(a, b) return a.key < b.key end)
+    local parts = {}
+    for _, e in ipairs(entries) do
+      parts[#parts + 1] = '"' .. str.escape_typst_string(e.key) .. '": ' .. to_typst_literal(e.value)
+    end
+    if #parts == 0 then return '(:)' end
+    return '(' .. table.concat(parts, ', ') .. ')'
+  end
+  return 'none'
+end
+
+--- Build the `#let typst_define = (...)` preamble line from accumulated
+--- payloads, memoised across all blocks in a single render.
+--- @return string|nil
+local function build_define_preamble()
+  if typst_define_preamble_cache ~= nil then
+    return typst_define_preamble_cache
+  end
+  if #typst_define_order == 0 then return nil end
+  local parts = {}
+  for _, name in ipairs(typst_define_order) do
+    parts[#parts + 1] = '"' .. str.escape_typst_string(name) .. '": '
+        .. to_typst_literal(typst_define_dict[name])
+  end
+  typst_define_preamble_cache = '#let typst_define = (' .. table.concat(parts, ', ') .. ')'
+  return typst_define_preamble_cache
+end
+
+-- ============================================================================
+-- BRAND / THEME COLOUR RESOLUTION
+-- ============================================================================
+
+--- Cached brand module (nil = not yet attempted, false = unavailable)
+local brand_module = nil
+
+--- Memoised `_typst_render_brand` let-bindings, keyed by brand mode.
+local brand_binding_cache = {}
+
+--- Whether the non-hex colour omission has been reported for this document.
+local brand_omission_warned = false
+
+--- Load the Quarto brand module if available.
+--- @return table|nil The brand module, or nil if unavailable
+local function get_brand_module()
+  if brand_module == false then
+    return nil
+  end
+  if brand_module ~= nil then
+    return brand_module
+  end
+  local ok, mod = pcall(require, 'modules/brand/brand')
+  if ok and mod then
+    brand_module = mod
+    return mod
+  end
+  brand_module = false
+  return nil
+end
+
+--- Convert a CSS colour string to a Typst colour literal.
+--- Wraps hex values like "#fdfdfd" as rgb("#fdfdfd") for Typst.
+--- Wraps bare CSS functional notation (`rgb(255, 0, 0)`, `hsl(...)`) so Typst's
+--- string-form `rgb()` constructor can parse it.
+--- Passes through values that are already Typst-native, including Typst
+--- colour constructors that take a quoted string (`rgb("#fff")`, `hsl("...")`)
+--- or non-functional names (`"blue"`, `"luma(240)"`, `"oklch(...)"`).
+--- @param css_colour string CSS colour string
+--- @return string Typst-compatible colour string
+local function css_colour_to_typst(css_colour)
+  if css_colour:match('^#') then
+    return 'rgb("' .. css_colour .. '")'
+  end
+  -- Distinguish bare CSS form (`rgb(255, 0, 0)`) from Typst form (`rgb("...")`).
+  -- A Typst-form argument list contains a quote; a bare CSS one never does.
+  local args = css_colour:match('^rgb%((.+)%)$') or css_colour:match('^hsl%((.+)%)$')
+  if args and not args:find('[\'"]') then
+    return 'rgb("' .. css_colour .. '")'
+  end
+  return css_colour
+end
+
+--- Semantic brand colour roles carried by `_typst_render_brand`, in brand.yml order.
+--- These are the roles a Typst theme can act on: ink, paper, and the discrete
+--- data palette. Palette entries and logos stay out.
+local BRAND_COLOUR_ROLES = {
+  'foreground', 'background', 'primary', 'secondary', 'tertiary',
+  'success', 'info', 'warning', 'danger',
+}
+
+--- Brand typography entries carried by `_typst_render_brand`.
+--- Only the family survives: Typst can use a font family only when the compiler
+--- already has it, and brand sizes are relative units with no pt equivalent.
+local BRAND_TYPOGRAPHY_ENTRIES = { 'base', 'headings' }
+
+--- Keep a brand colour when it is a CSS hex string, the form a brand.yml reader
+--- expects.
+--- The brand dictionary carries brand.yml *values*, not Typst expressions, so a
+--- consumer reads them the same way it reads the file itself. Such a consumer
+--- takes hex only, and would read any other notation as a palette entry name.
+--- @param css string Colour string from the brand module
+--- @return string|nil The value unchanged when it is hex, else nil
+local function brand_colour_to_hex(css)
+  local digits = css:match('^#(%x+)$')
+  if not digits then return nil end
+  local count = #digits
+  -- Valid CSS hex colours are exactly 3, 4, 6, or 8 digits.
+  if count == 3 or count == 4 or count == 6 or count == 8 then return css end
+  return nil
+end
+
+--- Keep a brand typography entry when it names a font family.
+--- @param font any Value from the brand module
+--- @return string|nil The family name, or nil when the entry names none
+local function brand_font_family(font)
+  if type(font) ~= 'table' then return nil end
+  if type(font.family) ~= 'string' or font.family == '' then return nil end
+  return font.family
+end
+
+--- Read one brand entry, scanning the wanted mode first and then the other.
+--- The scan is per entry, not per brand: Quarto marks a brand as carrying a dark
+--- mode as soon as any one role declares a dark value, so a role written for
+--- light only would otherwise vanish in dark mode. `background: auto` falls back
+--- the same way, and the two must agree. A mode that holds the entry in a form
+--- the dictionary cannot carry does not stop the scan either, so one unusable
+--- side never hides a usable one.
+--- @param accessor function Brand module accessor taking (mode, name)
+--- @param mode string "light" or "dark"
+--- @param name string Colour role or typography entry name
+--- @param kind string Word for the log message, "colour" or "typography entry"
+--- @param keep function Maps a raw value to the value to carry, or nil to reject
+--- @return any|nil The kept value, or nil when neither mode offers one
+--- @return any|nil The first rejected value, for reporting
+local function brand_lookup(accessor, mode, name, kind, keep)
+  local other = mode == 'light' and 'dark' or 'light'
+  local rejected = nil
+  for _, side in ipairs({ mode, other }) do
+    local ok, value = pcall(accessor, side, name)
+    if not ok then
+      log.log_debug(
+        EXTENSION_NAME,
+        'Brand ' .. kind .. ' "' .. name .. '" could not be read for ' .. side
+        .. ' mode: ' .. tostring(value)
+      )
+    elseif value ~= nil and value ~= '' then
+      local kept = keep(value)
+      if kept ~= nil then return kept end
+      rejected = rejected or value
+    end
+  end
+  return nil, rejected
+end
+
+--- Build the brand dictionary for one mode, in brand.yml shape.
+--- Quarto's brand module has already followed palette aliases and light/dark
+--- variants, so a downstream resolver has nothing left to do.
+--- `color` and `typography` are always present, empty when the brand says
+--- nothing under them, so consuming code has one shape to read.
+--- @param mode string "light" or "dark"
+--- @return table Table with `color` and `typography` keys
+local function build_brand_dict(mode)
+  local colours = {}
+  local typography = {}
+  local dict = { color = colours, typography = typography }
+  local brand = get_brand_module()
+  if not brand or not brand.get_color_css then return dict end
+
+  local omitted = {}
+  for _, role in ipairs(BRAND_COLOUR_ROLES) do
+    local hex, rejected = brand_lookup(brand.get_color_css, mode, role, 'colour', brand_colour_to_hex)
+    if hex then
+      colours[role] = hex
+    elseif rejected then
+      omitted[#omitted + 1] = role
+    end
+  end
+
+  -- One line per document rather than one per role per mode: the brand file is
+  -- the same on both sides, and a brand written in another notation would
+  -- otherwise report every role it defines, twice.
+  if #omitted > 0 and not brand_omission_warned then
+    brand_omission_warned = true
+    log.log_warning(
+      EXTENSION_NAME,
+      '_typst_render_brand carries hex colours only, so these roles are left out of it: '
+      .. table.concat(omitted, ', ') .. '. Colour options such as `background: auto` are unaffected.'
+    )
+  end
+
+  for _, name in ipairs(BRAND_TYPOGRAPHY_ENTRIES) do
+    local family = brand_lookup(brand.get_typography, mode, name, 'typography entry', brand_font_family)
+    if family then
+      typography[name] = { family = family }
+    end
+  end
+
+  return dict
+end
+
+--- Return the `_typst_render_brand` let-binding for a mode, memoised per render.
+--- The whole line is cached rather than the dictionary alone: it is byte-identical
+--- for every block, and the caller runs once per block and inline expression.
+--- @param mode string "light" or "dark"
+--- @return string Typst let-binding, holding `(:)` without a brand
+local function brand_binding(mode)
+  local cached = brand_binding_cache[mode]
+  if cached then return cached end
+  local binding = '#let _typst_render_brand = ' .. to_typst_literal(build_brand_dict(mode))
+  brand_binding_cache[mode] = binding
+  return binding
+end
+
+--- Resolve a colour option to a config value preserving both modes when available.
+--- Returns a {light=..., dark=...} table when both modes are present,
+--- or a plain string when only one value is available.
+--- @param raw any Raw value from config (string, MetaInlines, or MetaMap)
+--- @param colour_name string Brand colour name ("foreground" or "background")
+--- @return string|table|nil Resolved config value
+local function resolve_colour_config(raw, colour_name)
+  if raw == nil then
+    return nil
+  end
+
+  -- Handle MetaMap / table with light/dark keys
+  if type(raw) == 'table' and not pandoc.utils.type(raw):match('Inlines') then
+    local light = raw['light'] and css_colour_to_typst(pandoc.utils.stringify(raw['light'])) or nil
+    local dark = raw['dark'] and css_colour_to_typst(pandoc.utils.stringify(raw['dark'])) or nil
+    if light and dark then
+      return { light = light, dark = dark }
+    end
+    return light or dark
+  end
+
+  local str = pandoc.utils.stringify(raw)
+
+  if str == 'auto' then
+    local brand = get_brand_module()
+    if brand and brand.get_color then
+      local ok_l, light = pcall(brand.get_color, 'light', colour_name)
+      local ok_d, dark = pcall(brand.get_color, 'dark', colour_name)
+      local have_light = ok_l and light and light ~= ''
+      local have_dark = ok_d and dark and dark ~= ''
+      if have_light and have_dark and light ~= dark then
+        return { light = css_colour_to_typst(light), dark = css_colour_to_typst(dark) }
+      end
+      if have_light then
+        return css_colour_to_typst(light)
+      end
+      if have_dark then
+        return css_colour_to_typst(dark)
+      end
+    end
+    log.log_warning(
+      EXTENSION_NAME,
+      colour_name .. ': auto requires a _brand.yml with "' .. colour_name
+      .. '" defined; falling back to default.'
+    )
+    return nil
+  end
+
+  if str ~= '' then
+    return css_colour_to_typst(str)
+  end
+  return nil
+end
+
+--- Extract a single colour string from a colour config value for a given mode.
+--- @param config string|table|nil Colour config (string or {light, dark} table)
+--- @param brand_mode string "light" or "dark"
+--- @return string|nil Resolved colour string
+local function resolve_colour_value(config, brand_mode)
+  if type(config) == 'string' then
+    return config
+  end
+  if type(config) == 'table' then
+    local other = brand_mode == 'light' and 'dark' or 'light'
+    return config[brand_mode] or config[other]
+  end
+  return nil
+end
+
+--- Check whether a colour config has both light and dark values.
+--- @param config string|table|nil Colour config
+--- @return boolean
+local function is_dual_colour(config)
+  return type(config) == 'table' and config.light ~= nil and config.dark ~= nil
+end
+
+-- ============================================================================
+-- HELPER FUNCTIONS
+-- ============================================================================
+
+--- Read the entire contents of a file.
+--- Read a file's full contents (shared with the math filter).
+--- @param path string The file path to read
+--- @return string|nil File contents, or nil if the file cannot be opened
+local read_file = typst_cli.read_file
+
+--- Serialise all merged options as a sorted, deterministic string for cache hashing.
+--- Handles string, number, boolean, and nested table values.
+--- @param opts table Merged options
+--- @return string Serialised string
+local function serialise_opts(opts)
+  local function serialise_value(v)
+    local t = type(v)
+    if t == 'boolean' or t == 'number' then return tostring(v) end
+    if t == 'string' then return v end
+    if t == 'table' then
+      local keys = {}
+      for k in pairs(v) do keys[#keys + 1] = k end
+      table.sort(keys)
+      local parts = {}
+      for _, k in ipairs(keys) do
+        parts[#parts + 1] = tostring(k) .. '=' .. serialise_value(v[k])
+      end
+      return '{' .. table.concat(parts, ',') .. '}'
+    end
+    return ''
+  end
+  local keys = {}
+  for k in pairs(opts) do keys[#keys + 1] = k end
+  table.sort(keys)
+  local parts = {}
+  for _, k in ipairs(keys) do
+    -- Skip internal implementation keys (prefixed with '_'); they are not user-visible
+    -- rendering parameters and change independently (e.g. _source is a code preview,
+    -- _block_input is already captured by input_serial).
+    if opts[k] ~= nil and k:sub(1, 1) ~= '_' then
+      parts[#parts + 1] = tostring(k) .. '=' .. serialise_value(opts[k])
+    end
+  end
+  return table.concat(parts, '|')
+end
+
+--- Extract local file paths referenced by #import and #include statements.
+--- Skips package imports (paths starting with @).
+--- @param source string Typst source to scan
+--- @return table List of unique local file path strings
+local function extract_local_file_refs(source)
+  local refs, seen = {}, {}
+  local function add(path)
+    if path:sub(1, 1) ~= '@' and not seen[path] then
+      seen[path] = true
+      refs[#refs + 1] = path
+    end
+  end
+  for p in source:gmatch('#import%s*"([^"]+)"') do add(p) end
+  for p in source:gmatch("#import%s*'([^']+)'") do add(p) end
+  for p in source:gmatch('#include%s*"([^"]+)"') do add(p) end
+  for p in source:gmatch("#include%s*'([^']+)'") do add(p) end
+  return refs
+end
+
+--- Resolve an import path the way Typst does: a leading `/` is relative to the
+--- project root, anything else to the folder of the file that imports it.
+--- @param ref string Path as written in the #import or #include
+--- @param root string Absolute Typst project root path
+--- @param base_dir string Absolute folder of the importing file
+--- @return string Absolute path with `.` and `..` collapsed
+local function resolve_import_path(ref, root, base_dir)
+  local joined = ref:sub(1, 1) == '/' and (root .. ref) or pandoc.path.join({ base_dir, ref })
+  -- pandoc.path.normalize keeps `..`, so collapse it here: one file must map to
+  -- one path, or a cycle spelt through `..` would never be seen as visited.
+  -- An absolute path clamps `..` at its root component; a relative one, as when
+  -- the root is not a project directory, keeps the `..` it cannot pop.
+  local absolute = pandoc.path.is_absolute(joined)
+  local segments = {}
+  for _, part in ipairs(pandoc.path.split(pandoc.path.normalize(joined))) do
+    if part == '..' then
+      local last = segments[#segments]
+      if last and last ~= '..' and not (absolute and #segments == 1) then
+        segments[#segments] = nil
+      elseif not absolute then
+        segments[#segments + 1] = '..'
+      end
+    elseif part ~= '.' then
+      segments[#segments + 1] = part
+    end
+  end
+  if #segments == 0 then return '.' end
+  return pandoc.path.join(segments)
+end
+
+--- Recursively collect the content of locally imported Typst files for cache hashing.
+--- The block itself compiles from stdin, which Typst places at the root, so its
+--- imports resolve against the root; a nested file's imports resolve against its
+--- own folder.
+--- Missing files are silently skipped; cycles are prevented via visited table.
+--- @param source string Typst source to scan for imports
+--- @param root string Absolute Typst project root path
+--- @param base_dir string Absolute folder that relative imports in source resolve against
+--- @param visited table Set of already-visited absolute paths (prevents cycles)
+--- @return string Concatenated path+content string for all reachable local imports
+local function collect_import_content(source, root, base_dir, visited)
+  local parts = {}
+  for _, ref in ipairs(extract_local_file_refs(source)) do
+    local abs_path = resolve_import_path(ref, root, base_dir)
+    if not visited[abs_path] then
+      visited[abs_path] = true
+      local content = read_file_cache[abs_path]
+      if content == nil then
+        content = read_file(abs_path)
+        read_file_cache[abs_path] = content or false
+      elseif content == false then
+        content = nil
+      end
+      if content then
+        parts[#parts + 1] = ref .. '\0' .. content
+        local sub = collect_import_content(content, root, pandoc.path.directory(abs_path), visited)
+        if sub ~= '' then parts[#parts + 1] = sub end
+      end
+    end
+  end
+  return table.concat(parts, '\n')
+end
+
+--- Resolve the Typst binary path.
+--- @return string|nil Path to the Typst binary, or nil if not found
+local function resolve_typst_bin()
+  if typst_checked then
+    return typst_bin
+  end
+  typst_checked = true
+
+  typst_bin = typst_cli.resolve_bin()
+  if not typst_bin then
+    log.log_error(EXTENSION_NAME, 'Typst binary not found. Ensure Quarto >= 1.10.18 is installed.')
+  end
+  return typst_bin
+end
+
+--- Whether the resolved Typst binary supports HTML export (Typst >= 0.15).
+--- @return boolean
+local function typst_supports_html()
+  local bin = resolve_typst_bin()
+  if not bin then
+    return false
+  end
+  return typst_cli.supports_html(bin)
+end
+
+-- Forward declaration; defined after get_image_format_for_output.
+local get_image_format_for_output
+
+--- Resolve the requested format, downgrading `html` to an image format when it
+--- cannot be honoured (non-HTML output, or Typst < 0.15), with a warning.
+--- @param img_format string Requested format
+--- @return string Effective format
+local function resolve_html_format(img_format)
+  if img_format ~= 'html' then
+    return img_format
+  end
+  if not quarto.format.is_html_output() then
+    log.log_warning(
+      EXTENSION_NAME,
+      'format "html" is only available for HTML-based output; falling back to an image.'
+    )
+    return get_image_format_for_output()
+  end
+  if not typst_supports_html() then
+    log.log_warning(EXTENSION_NAME, 'Native HTML output requires Typst >= 0.15.')
+    return 'svg'
+  end
+  return 'html'
+end
+
+--- Determine the best image format for the current output.
+--- @return string Image format: "svg", "pdf", or "png"
+function get_image_format_for_output()
+  if quarto.format.is_html_output() then
+    return 'svg'
+  elseif quarto.format.is_latex_output() then
+    return 'pdf'
+  elseif quarto.format.is_docx_output() or quarto.format.is_powerpoint_output() then
+    return 'png'
+  elseif quarto.format.is_typst_output() then
+    return 'png'
+  else
+    return 'png'
+  end
+end
+
+--- Resolve a single preamble entry to Typst code.
+--- If the value ends with `.typ`, it is treated as a file path and its contents
+--- are read; otherwise the value is used as inline Typst code.
+--- @param value string Inline Typst code or path to a `.typ` file
+--- @return string|nil Resolved Typst code, or nil on read failure
+local function resolve_preamble_entry(value)
+  if not value or value == '' then
+    return nil
+  end
+  if value:match('%.typ$') then
+    -- Every block and every inline expression resolves the preamble, so the
+    -- file is read once per document through the shared cache rather than once
+    -- per unit. It is cleared for each document during the Meta pass.
+    local file_path = paths.resolve_project_path(value)
+    local content = read_file_cache[file_path]
+    if content == nil then
+      content = read_file(file_path)
+      read_file_cache[file_path] = content or false
+    end
+    if content then
+      return content
+    end
+    log.log_error(EXTENSION_NAME, 'Could not read preamble file: ' .. value)
+    return nil
+  end
+  return value
+end
+
+--- Resolve a preamble option to Typst code.
+--- Accepts a string, a list of strings, or nil.
+--- Each entry is resolved individually via resolve_preamble_entry.
+--- @param value string|table|nil Preamble option value
+--- @return string|nil Concatenated Typst code, or nil if empty
+local function resolve_preamble(value)
+  if not value then
+    return nil
+  end
+  if type(value) == 'string' then
+    return resolve_preamble_entry(value)
+  end
+  if type(value) == 'table' then
+    local parts = {}
+    for _, entry in ipairs(value) do
+      local resolved = resolve_preamble_entry(entry)
+      if resolved then
+        parts[#parts + 1] = resolved
+      end
+    end
+    if #parts > 0 then
+      return table.concat(parts, '\n')
+    end
+  end
+  return nil
+end
+
+--- Parse a comma-separated string of key=value pairs into a table.
+--- @param str string Input string like "key1=val1,key2=val2"
+--- @return table Parsed key-value table
+local function parse_input_string(str)
+  local result = {}
+  if not str or str == '' then
+    return result
+  end
+  for pair in str:gmatch('[^,]+') do
+    local k, v = pair:match('^%s*(.-)%s*=%s*(.-)%s*$')
+    if k and k ~= '' then
+      result[k] = v or ''
+    end
+  end
+  return result
+end
+
+--- Merge global and per-block input maps. Per-block values override global ones.
+--- @param global_input table|nil Global input map from YAML
+--- @param block_input string|nil Per-block comma-separated input string
+--- @return table Merged input map (may be empty)
+local function merge_inputs(global_input, block_input)
+  local merged = {}
+  if type(global_input) == 'table' then
+    for k, v in pairs(global_input) do
+      merged[k] = v
+    end
+  end
+  if type(block_input) == 'string' then
+    for k, v in pairs(parse_input_string(block_input)) do
+      merged[k] = v
+    end
+  end
+  return merged
+end
+
+--- Serialise an input map as a sorted, deterministic string for cache hashing.
+--- @param input_map table Key-value table
+--- @return string Serialised string like "key1=val1|key2=val2"
+local function serialise_inputs(input_map)
+  local keys = {}
+  for k in pairs(input_map) do
+    keys[#keys + 1] = k
+  end
+  table.sort(keys)
+  local parts = {}
+  for _, k in ipairs(keys) do
+    parts[#parts + 1] = k .. '=' .. input_map[k]
+  end
+  return table.concat(parts, '|')
+end
+
+--- Parse a pages specification string into a sorted, deduplicated list of page numbers.
+--- Supports: "all", single numbers ("3"), ranges ("1-3"), open-ended ranges ("3-"),
+--- and comma-separated combinations ("1,3-5,8").
+--- @param pages_str string Pages specification
+--- @param total_pages number Total number of pages available
+--- @return table List of valid page numbers (sorted, deduplicated)
+local function parse_pages(pages_str, total_pages)
+  if pages_str == 'all' then
+    local result = {}
+    for i = 1, total_pages do
+      result[i] = i
+    end
+    return result
+  end
+
+  local seen = {}
+  local result = {}
+  for raw_part in pages_str:gmatch('[^,]+') do
+    local part = raw_part:match('^%s*(.-)%s*$')
+    local lo, hi = part:match('^(%d+)%-(%d+)$')
+    if not lo then
+      local open_lo = part:match('^(%d+)%-$')
+      if open_lo then
+        lo = open_lo
+        hi = tostring(total_pages)
+      else
+        local single = part:match('^(%d+)$')
+        if single then
+          lo = single
+          hi = single
+        end
+      end
+    end
+    if lo then
+      lo = tonumber(lo)
+      hi = tonumber(hi)
+      for i = lo, hi do
+        if i >= 1 and i <= total_pages then
+          if not seen[i] then
+            seen[i] = true
+            result[#result + 1] = i
+          end
+        else
+          log.log_warning(
+            EXTENSION_NAME,
+            'Page ' .. tostring(i) .. ' is out of range (1-' .. tostring(total_pages) .. '); skipping.'
+          )
+        end
+      end
+    else
+      log.log_warning(
+        EXTENSION_NAME,
+        'Invalid page specification "' .. part .. '"; skipping.'
+      )
+    end
+  end
+
+  table.sort(result)
+  return result
+end
+
+--- Check whether opts contain any dual-mode colour values requiring dual rendering.
+--- @param opts table Merged options
+--- @return boolean
+local function has_dual_mode_colours(opts)
+  return is_dual_colour(opts.background) or is_dual_colour(opts.foreground)
+end
+
+--- Resolve table-valued colours in opts to strings for a specific mode.
+--- Returns a shallow copy of opts with background/foreground as plain strings.
+--- Records the mode so the brand dictionary is built for the same side of the
+--- pair; paths that never split keep `_brand_mode` unset and fall back to the
+--- document-wide mode.
+--- @param opts table Merged options (may contain table-valued colours)
+--- @param mode string "light" or "dark"
+--- @return table Copy of opts with colours resolved to strings
+local function resolve_opts_colours(opts, mode)
+  local resolved = {}
+  for k, v in pairs(opts) do
+    resolved[k] = v
+  end
+  resolved.background = resolve_colour_value(opts.background, mode) or DEFAULTS.background
+  resolved.foreground = resolve_colour_value(opts.foreground, mode)
+  resolved._brand_mode = mode
+  return resolved
+end
+
+--- Extract a raw hex value from a Typst rgb() expression, e.g. rgb("#F4EDDF") -> "#F4EDDF".
+--- Returns nil for non-hex expressions (oklch, named colours, etc.).
+--- @param typst_expr string|nil Typst colour expression
+--- @return string|nil Hex string or nil
+local function typst_colour_to_hex(typst_expr)
+  if not typst_expr then return nil end
+  return typst_expr:match('^rgb%("(#[%x]+)"%)$')
+end
+
+--- Prepend the Typst let-bindings every block and inline expression receives:
+--- the render background and foreground, and the document brand dictionary.
+--- These make document colours and brand data available to library code under
+--- predictable names. All three are always bound, so consuming code compiles
+--- whether or not the document sets colours or carries a brand.
+--- @param parts table String parts list to append to
+--- @param opts table Options containing background, optional foreground, and
+---   optionally `_brand_mode` when compiling one side of a light/dark pair
+local function inject_render_bindings(parts, opts)
+  parts[#parts + 1] = '#let _typst_render_background = ' .. opts.background
+  if opts.foreground then
+    parts[#parts + 1] = '#let _typst_render_foreground = ' .. opts.foreground
+  else
+    parts[#parts + 1] = '#let _typst_render_foreground = none'
+  end
+  parts[#parts + 1] = brand_binding(opts._brand_mode or global_brand_mode)
+end
+
+--- Build the `#set page(...)` directive from options (for image compilation).
+--- @param opts table Merged options
+--- @return string Typst page directive
+local function build_page_directive(opts)
+  return string.format(
+    '#set page(width: %s, height: %s, margin: %s, fill: %s)',
+    opts.width, opts.height, opts.margin, opts.background
+  )
+end
+
+--- Check whether block-level options differ from defaults for native Typst output.
+--- Background, foreground, and margin are propagated.
+--- @param opts table Merged options
+--- @return boolean
+local function has_custom_block_options(opts)
+  return opts.background ~= DEFAULTS.background
+      or opts.foreground ~= DEFAULTS.foreground
+      or opts.margin ~= DEFAULTS.margin
+end
+
+--- Build the full Typst source.
+--- @param code string User Typst code
+--- @param opts table Merged options
+--- @param include_page boolean|nil Emit `#set page(...)` (default true). HTML
+---   export ignores page geometry, so callers targeting HTML pass false.
+--- @return string Complete Typst source
+local function build_typst_source(code, opts, include_page)
+  local parts = {}
+  inject_render_bindings(parts, opts)
+  local define_preamble = build_define_preamble()
+  if define_preamble then
+    parts[#parts + 1] = define_preamble
+  end
+  if include_page ~= false then
+    parts[#parts + 1] = build_page_directive(opts)
+  end
+  if opts.foreground then
+    parts[#parts + 1] = '#set text(fill: ' .. opts.foreground .. ')'
+  end
+  local preamble = resolve_preamble(opts.preamble)
+  if preamble then
+    parts[#parts + 1] = preamble
+  end
+  parts[#parts + 1] = code
+  return table.concat(parts, '\n')
+end
+
+--- Build the inner Typst source for `output: asis` pass-through.
+--- There is no `#set page(...)`: the code is emitted into the document Typst is
+--- already laying out, so it inherits the page.
+--- @param code string User Typst code
+--- @param opts table Merged options (colours must be plain strings)
+--- @return string Typst source to place inside a `#[ ... ]` scope
+local function build_asis_inner(code, opts)
+  return build_typst_source(code, opts, false)
+end
+
+--- Build a human-readable cache file stem from label or block number and a
+--- content hash.  Returns e.g. "typst-fig-my-diagram-a1b2c3d4" or "typst-block-3-a1b2c3d4".
+--- @param source string Full Typst source
+--- @param fmt string Image format
+--- @param dpi string DPI value
+--- @param label string|nil Cross-reference label
+--- @return string File stem (without extension)
+local function compute_cache_stem(source, fmt, dpi, label, inline)
+  local hash = pandoc.utils.sha1(source .. '|' .. fmt .. '|' .. dpi):sub(1, 8)
+  if type(label) == 'string' and label ~= '' then
+    -- Sanitise the label before using it as a filename component so an unusual
+    -- label cannot escape the cache directory; valid cross-ref labels are
+    -- unaffected (only [%w-_] survive).
+    local safe_label = label:gsub('[^%w%-_]', '_')
+    return 'typst-' .. safe_label .. '-' .. hash
+  end
+  if inline then
+    return 'typst-inline-' .. inline_counter .. '-' .. hash
+  end
+  return 'typst-block-' .. block_counter .. '-' .. hash
+end
+
+--- Ensure the cache directory exists.
+--- @return string|nil Absolute path to the cache directory, or nil on failure
+--- @return string|nil Relative path to the cache directory (for image references)
+local function ensure_cache_dir()
+  if not cache_subdir then
+    log.log_error(EXTENSION_NAME, 'Cache subdirectory not initialised.')
+    return nil, nil
+  end
+  local abs_path = pandoc.path.join({ quarto.project.directory, cache_subdir })
+  local ok, err = pcall(pandoc.system.make_directory, abs_path, true)
+  if not ok then
+    log.log_error(EXTENSION_NAME, 'Could not create cache directory: ' .. tostring(err))
+    return nil, nil
+  end
+  local rel_path = cache_subdir
+  if quarto.project.offset and quarto.project.offset ~= '' and quarto.project.offset ~= '.' then
+    rel_path = pandoc.path.join({ quarto.project.offset, cache_subdir })
+  end
+  return abs_path, rel_path
+end
+
+--- Discover page-numbered output files produced by Typst CLI.
+--- Typst generates {stem}1.{ext}, {stem}2.{ext}, ... for PNG/SVG.
+--- @param abs_cache string Absolute path to cache directory
+--- @param rel_cache string Relative path to cache directory
+--- @param stem string File stem (without extension)
+--- @param ext string File extension (e.g., "png", "svg")
+--- @return table List of relative paths to discovered page files
+local function discover_page_files(abs_cache, rel_cache, stem, ext)
+  local pages = {}
+  local i = 1
+  while true do
+    local page_name = stem .. tostring(i) .. '.' .. ext
+    local page_path = pandoc.path.join({ abs_cache, page_name })
+    local f = io.open(page_path, 'r')
+    if not f then
+      break
+    end
+    f:close()
+    used_cache_files[page_name] = true
+    pages[#pages + 1] = pandoc.path.join({ rel_cache, page_name })
+    i = i + 1
+  end
+  return pages
+end
+
+--- Copy a file in binary mode.
+--- @param src string Source file path
+--- @param dst string Destination file path
+--- @return boolean True on success
+local function copy_file(src, dst)
+  local f_in = io.open(src, 'rb')
+  if not f_in then
+    log.log_warning(EXTENSION_NAME, 'output-file: could not read source file: ' .. src)
+    return false
+  end
+  local data = f_in:read('*a')
+  f_in:close()
+  if not data then
+    log.log_warning(EXTENSION_NAME, 'output-file: failed to read data from ' .. src)
+    return false
+  end
+  local f_out = io.open(dst, 'wb')
+  if not f_out then
+    log.log_warning(EXTENSION_NAME, 'output-file: could not write to destination: ' .. dst)
+    return false
+  end
+  f_out:write(data)
+  f_out:close()
+  return true
+end
+
+--- Resolve a path to absolute, accounting for document directory.
+--- Leading '/' paths are resolved relative to the project root.
+--- Other paths are resolved relative to the document directory.
+--- @param path string The path to resolve
+--- @return string Absolute path
+local function resolve_to_absolute(path)
+  -- Leading '/' means project root
+  if path:sub(1, 1) == '/' then
+    return paths.resolve_project_path(path)
+  end
+  -- Relative path: resolve against the document's directory
+  local input_file = quarto.doc.input_file
+  if input_file and input_file ~= '' then
+    local doc_dir = pandoc.path.directory(input_file)
+    if doc_dir and doc_dir ~= '' and doc_dir ~= '.' then
+      return pandoc.path.join({ quarto.project.directory, doc_dir, path })
+    end
+  end
+  -- Document is at project root
+  if quarto.project.directory then
+    return pandoc.path.join({ quarto.project.directory, path })
+  end
+  return path
+end
+
+--- Resolve the output path for saving compiled images.
+--- @param global_dir string|nil Global output-directory value
+--- @param block_dir string|nil Per-block output-directory value
+--- @param block_filename string|nil Per-block output-filename value
+--- @param label string|nil Block label (e.g., "fig-diagram")
+--- @param counter_name string Auto-generated name (e.g., "typst-block-3")
+--- @param img_format string Image format extension (e.g., "png")
+--- @return string|nil Resolved absolute path, or nil if no output path
+local function resolve_output_path(global_dir, block_dir, block_filename, label, counter_name, img_format)
+  -- Determine the filename
+  local filename = block_filename
+  local auto_named = not filename or filename == ''
+  if auto_named then
+    -- Auto-generate from label or counter
+    local stem = (type(label) == 'string' and label ~= '') and label or counter_name
+    filename = stem .. '.' .. img_format
+  end
+
+  -- If filename starts with '/', it is a project-root path; ignore directory
+  if filename:sub(1, 1) == '/' then
+    return resolve_to_absolute(filename)
+  end
+
+  -- Determine the directory (per-block overrides global)
+  local dir = block_dir or global_dir
+  if not dir or dir == '' then
+    -- No directory and filename was explicitly set (not auto-generated)
+    if block_filename and block_filename ~= '' then
+      return resolve_to_absolute(filename)
+    end
+    return nil
+  end
+
+  -- Labels and block counters are unique within a document only, so images
+  -- named from them go in a per-document subdirectory; two documents in the
+  -- same directory would otherwise overwrite each other's images. An explicit
+  -- output-filename is the author's own path and is left alone.
+  local joined = auto_named
+      and pandoc.path.join({ dir, typst_cli.doc_stem(), filename })
+      or pandoc.path.join({ dir, filename })
+
+  return resolve_to_absolute(joined)
+end
+
+--- Compute a document-relative path from an absolute path.
+--- Uses the same approach as ensure_cache_dir: paths are relative to the
+--- project root, then prepended with quarto.project.offset when the document
+--- lives in a subdirectory.
+--- @param abs_path string Absolute path
+--- @return string Document-relative path suitable for pandoc Image elements
+local function make_doc_relative(abs_path)
+  local rel = pandoc.path.make_relative(abs_path, quarto.project.directory)
+  if quarto.project.offset and quarto.project.offset ~= '' and quarto.project.offset ~= '.' then
+    rel = pandoc.path.join({ quarto.project.offset, rel })
+  end
+  return rel
+end
+
+--- Save compiled image files to the resolved output path.
+--- Copies from the cache to the output location and returns
+--- document-relative paths so the pandoc elements can reference them.
+--- @param page_paths table List of relative page paths from compilation
+--- @param output_path string Resolved absolute output path
+--- @param mode_suffix string|nil Optional suffix for dual-mode ("-light", "-dark")
+--- @param img_format string Image format (e.g., "png")
+--- @return table|nil List of document-relative destination paths, or nil on failure
+local function save_output_files(page_paths, output_path, mode_suffix, img_format)
+  if not page_paths or #page_paths == 0 or not output_path then
+    return nil
+  end
+
+  local dir = pandoc.path.directory(output_path)
+  local filename = pandoc.path.filename(output_path)
+  local stem, ext = filename:match('^(.+)%.([^.]+)$')
+  if not stem then
+    stem = filename
+    ext = img_format
+  end
+
+  if ext ~= img_format then
+    log.log_warning(
+      EXTENSION_NAME,
+      'output-filename extension ".' .. ext .. '" does not match output format "' .. img_format .. '".'
+    )
+  end
+
+  -- Create intermediate directories
+  if dir and dir ~= '' and dir ~= '.' then
+    local ok, err = pcall(pandoc.system.make_directory, dir, true)
+    if not ok then
+      log.log_warning(EXTENSION_NAME, 'output-directory: could not create directory: ' .. tostring(err))
+      return nil
+    end
+  end
+
+  mode_suffix = mode_suffix or ''
+  local result_paths = {}
+
+  -- page_paths are document-relative; resolve to absolute via the document directory
+  local doc_abs_dir = quarto.project.directory
+  local input_file = quarto.doc.input_file
+  if input_file and input_file ~= '' then
+    local doc_subdir = pandoc.path.directory(input_file)
+    if doc_subdir and doc_subdir ~= '' and doc_subdir ~= '.' then
+      doc_abs_dir = pandoc.path.join({ quarto.project.directory, doc_subdir })
+    end
+  end
+
+  if #page_paths == 1 then
+    local src = pandoc.path.normalize(pandoc.path.join({ doc_abs_dir, page_paths[1] }))
+    local dst = pandoc.path.join({ dir, stem .. mode_suffix .. '.' .. ext })
+    if copy_file(src, dst) then
+      log.log_debug(EXTENSION_NAME, 'Saved image to ' .. dst)
+      result_paths[1] = make_doc_relative(dst)
+    else
+      return nil
+    end
+  else
+    for i, page_path in ipairs(page_paths) do
+      local src = pandoc.path.normalize(pandoc.path.join({ doc_abs_dir, page_path }))
+      local dst = pandoc.path.join({ dir, stem .. mode_suffix .. tostring(i) .. '.' .. ext })
+      if copy_file(src, dst) then
+        log.log_debug(EXTENSION_NAME, 'Saved image to ' .. dst)
+        result_paths[#result_paths + 1] = make_doc_relative(dst)
+      else
+        return nil
+      end
+    end
+  end
+
+  return result_paths
+end
+
+--- Write the full compiled Typst source next to a saved output image for
+--- traceability and reproducibility. Uses the image's stem and directory,
+--- replacing the extension with `.typ` (and adding the mode suffix when set).
+--- @param source string Full Typst source actually compiled
+--- @param output_path string Resolved absolute image output path
+--- @param mode_suffix string|nil Optional suffix for dual-mode ("-light", "-dark")
+--- @return boolean True on success
+local function save_source_file(source, output_path, mode_suffix)
+  if not source or source == '' or not output_path then
+    return false
+  end
+  local dir = pandoc.path.directory(output_path)
+  local filename = pandoc.path.filename(output_path)
+  local stem = filename:match('^(.+)%.[^.]+$') or filename
+  if dir and dir ~= '' and dir ~= '.' then
+    local ok, err = pcall(pandoc.system.make_directory, dir, true)
+    if not ok then
+      log.log_warning(EXTENSION_NAME, 'output-source: could not create directory: ' .. tostring(err))
+      return false
+    end
+  end
+  local dst = pandoc.path.join({ dir or '.', stem .. (mode_suffix or '') .. '.typ' })
+  local f, ferr = io.open(dst, 'wb')
+  if not f then
+    log.log_warning(EXTENSION_NAME, 'output-source: could not write to ' .. dst .. ': ' .. tostring(ferr))
+    return false
+  end
+  f:write(source)
+  f:close()
+  log.log_debug(EXTENSION_NAME, 'Saved Typst source to ' .. dst)
+  return true
+end
+
+--- Build the cache-key material shared by every compile path.
+--- @param source string Full Typst source
+--- @param opts table Merged options
+--- @param resolved_root string Resolved compilation root
+--- @param merged_input table Merged input variables
+--- @return string Hash material (source + inputs + options + imported file contents)
+local function build_hash_source(source, opts, resolved_root, merged_input)
+  local input_serial = serialise_inputs(merged_input)
+  local hash_source = source
+  if input_serial ~= '' then
+    hash_source = hash_source .. '|input:' .. input_serial
+  end
+  hash_source = hash_source .. '|opts:' .. serialise_opts(opts)
+  local import_content = collect_import_content(source, resolved_root, resolved_root, {})
+  if import_content ~= '' then
+    hash_source = hash_source .. '|imports:' .. import_content
+  end
+  return hash_source
+end
+
+--- Append the CLI flags common to every compile path: --font-path, --package-path,
+--- and a deterministically-ordered --input for each merged input variable.
+--- @param args table Argument list to append to (modified in place)
+--- @param merged_input table Merged input variables
+local function append_cli_common_args(args, merged_input)
+  local font_paths = global_config['font-path']
+  if font_paths then
+    for _, p in ipairs(font_paths) do
+      args[#args + 1] = '--font-path'
+      args[#args + 1] = paths.resolve_project_path(p)
+    end
+  end
+  if global_config['package-path'] then
+    args[#args + 1] = '--package-path'
+    args[#args + 1] = paths.resolve_project_path(global_config['package-path'])
+  end
+  local sorted_keys = {}
+  for k in pairs(merged_input) do
+    sorted_keys[#sorted_keys + 1] = k
+  end
+  table.sort(sorted_keys)
+  for _, k in ipairs(sorted_keys) do
+    args[#args + 1] = '--input'
+    args[#args + 1] = k .. '=' .. merged_input[k]
+  end
+end
+
+--- Compile Typst source to an image file (or multiple files for multi-page output).
+--- Uses stdin to pass source code, avoiding temporary .typ files.
+--- @param source string Full Typst source code
+--- @param opts table Merged options
+--- @param img_format string Target image format
+--- @return table|nil List of paths to compiled images, or nil on failure
+--- @return boolean|nil true when compilation failed (Typst prints its own diagnostic)
+local function compile_typst(source, opts, img_format)
+  local bin = resolve_typst_bin()
+  if not bin then
+    return nil
+  end
+
+  -- An invalid dpi is already named by the schema check, for both the
+  -- document option and the block attribute; falling back here is silent.
+  local dpi = tonumber(opts.dpi)
+  if not dpi or dpi <= 0 or dpi ~= math.floor(dpi) then
+    dpi = DEFAULTS.dpi
+  end
+  dpi = tostring(math.floor(dpi))
+
+  -- Resolve root early: needed for import scanning before cache key is built.
+  -- Defaults to the document's directory; a relative root resolves against it,
+  -- a leading '/' means the project root (see resolve_to_absolute).
+  local resolved_root = pandoc.path.normalize(resolve_to_absolute(global_config.root or '.'))
+
+  -- Merge global and per-block input variables
+  local merged_input = merge_inputs(opts.input, opts._block_input)
+  local hash_source = build_hash_source(source, opts, resolved_root, merged_input)
+
+  local use_cache = opts.cache ~= false
+  local stem = compute_cache_stem(hash_source, img_format, dpi, opts.label, opts._inline)
+  local abs_cache, rel_cache = ensure_cache_dir()
+  if not abs_cache then
+    return nil
+  end
+  used_cache_formats[img_format] = true
+
+  -- PDF uses a direct output path; PNG/SVG use a page-number template
+  -- so Typst CLI can produce one file per page ({stem}{p}.{ext}).
+  local is_paged = img_format ~= 'pdf'
+  local abs_output, rel_output
+  if is_paged then
+    abs_output = pandoc.path.join({ abs_cache, stem .. '{p}.' .. img_format })
+    rel_output = nil -- not used directly; discover_page_files builds paths
+  else
+    abs_output = pandoc.path.join({ abs_cache, stem .. '.' .. img_format })
+    rel_output = pandoc.path.join({ rel_cache, stem .. '.' .. img_format })
+  end
+
+  if use_cache then
+    if is_paged then
+      local first_page = pandoc.path.join({ abs_cache, stem .. '1.' .. img_format })
+      local f = io.open(first_page, 'r')
+      if f then
+        f:close()
+        local pages = discover_page_files(abs_cache, rel_cache, stem, img_format)
+        if #pages > 0 then
+          return pages
+        end
+      end
+    else
+      local f = io.open(abs_output, 'r')
+      if f then
+        f:close()
+        used_cache_files[stem .. '.' .. img_format] = true
+        return { rel_output }
+      end
+    end
+  end
+
+  local args = { 'compile', '--format', img_format, '--ppi', dpi, '--root', resolved_root }
+  append_cli_common_args(args, merged_input)
+
+  -- Expose document colours to library theme functions via sys.inputs.
+  -- Only hex colours (rgb("#RRGGBB")) can be round-tripped through a CLI flag;
+  -- other expressions (oklch, named colours) are available via the #let bindings
+  -- injected by inject_render_bindings and do not need a separate --input flag.
+  local fg_hex = typst_colour_to_hex(opts.foreground)
+  local bg_hex = typst_colour_to_hex(opts.background)
+  if fg_hex then
+    args[#args + 1] = '--input'
+    args[#args + 1] = 'typst-render-foreground=' .. fg_hex
+  end
+  if bg_hex then
+    args[#args + 1] = '--input'
+    args[#args + 1] = 'typst-render-background=' .. bg_hex
+  end
+
+  -- Use stdin ('-') instead of a temp file
+  args[#args + 1] = '-'
+  args[#args + 1] = abs_output
+
+  local ok = pcall(pandoc.pipe, bin, args, source)
+  if not ok then
+    return nil, true
+  end
+
+  if is_paged then
+    -- PNG/SVG: Typst CLI generates {stem}1.{ext}, {stem}2.{ext}, ...
+    local pages = discover_page_files(abs_cache, rel_cache, stem, img_format)
+    if #pages > 0 then
+      return pages
+    end
+    log.log_error(EXTENSION_NAME, 'No compiled page files found for stem: ' .. stem)
+    return nil
+  else
+    -- PDF: single file at the exact output path
+    local f = io.open(abs_output, 'r')
+    if f then
+      f:close()
+      used_cache_files[stem .. '.' .. img_format] = true
+      return { rel_output }
+    end
+    log.log_error(EXTENSION_NAME, 'Compiled file not found: ' .. abs_output)
+    return nil
+  end
+end
+
+--- Compile Typst source to native HTML (Typst >= 0.15, experimental).
+--- Caches the compiled `.html` alongside the image cache and injects the
+--- Typst head CSS once. Returns the inner `<body>` content.
+--- @param source string Full Typst source (from build_typst_source(code, opts, false))
+--- @param opts table Merged options
+--- @return string|nil Body inner HTML, or nil on failure
+--- @return boolean|nil true when compilation failed
+local function compile_typst_html(source, opts)
+  local bin = resolve_typst_bin()
+  if not bin then
+    return nil
+  end
+
+  local resolved_root = pandoc.path.normalize(resolve_to_absolute(global_config.root or '.'))
+  local merged_input = merge_inputs(opts.input, opts._block_input)
+  local hash_source = build_hash_source(source, opts, resolved_root, merged_input)
+
+  local use_cache = opts.cache ~= false
+  local stem = compute_cache_stem(hash_source, 'html', '0', opts.label, opts._inline)
+  local abs_cache = ensure_cache_dir()
+  if not abs_cache then
+    return nil
+  end
+  used_cache_formats['html'] = true
+  local abs_output = pandoc.path.join({ abs_cache, stem .. '.html' })
+
+  if use_cache then
+    local cached = typst_cli.read_file(abs_output)
+    if cached then
+      used_cache_files[stem .. '.html'] = true
+      typst_cli.inject_head_style_once(cached)
+      return typst_cli.extract_body(cached)
+    end
+  end
+
+  local args = { 'compile', '--format', 'html', '--features', 'html', '--root', resolved_root }
+  append_cli_common_args(args, merged_input)
+  args[#args + 1] = '-'
+  args[#args + 1] = abs_output
+
+  local ok = pcall(pandoc.pipe, bin, args, source)
+  if not ok then
+    return nil, true
+  end
+
+  local html = typst_cli.read_file(abs_output)
+  if not html then
+    log.log_error(EXTENSION_NAME, 'Compiled HTML not found: ' .. abs_output)
+    return nil
+  end
+  used_cache_files[stem .. '.html'] = true
+  typst_cli.inject_head_style_once(html)
+  return typst_cli.extract_body(html)
+end
+
+--- Map from cross-reference prefix to Quarto FloatRefTarget type name.
+--- Built-in types are pre-populated; custom types are added from metadata
+--- during the Meta pass (see get_configuration).
+local REF_TYPE_NAMES = {
+  fig = 'Figure',
+  tbl = 'Table',
+  lst = 'Listing',
+}
+
+--- Create a Pandoc Image element from a compiled image.
+--- @param img_path string Path to the image file
+--- @param opts table Merged options
+--- @return pandoc.Para Para containing the image
+local function create_image_element(img_path, opts)
+  -- Without an explicit alt, a labelled block's caption already describes the
+  -- figure, so it gets no alt, as Quarto's own figures do. An unlabelled
+  -- caption is shown nowhere else, so it becomes the alt as plain text.
+  local caption_text = cell.resolve_caption(opts)
+  local fallback = opts._source or ''
+  if caption_text ~= '' and cell.ref_type(opts.label) then
+    fallback = ''
+  elseif caption_text ~= '' then
+    fallback = pandoc.utils.stringify(pandoc.read(caption_text, 'markdown').blocks)
+  end
+  local alt_text = cell.resolve_alt(opts, fallback)
+
+  local classes = {}
+  if quarto.format.is_html_output() then
+    classes[#classes + 1] = 'img-fluid'
+  end
+  if type(opts.classes) == 'string' and opts.classes ~= '' then
+    for cls in opts.classes:gmatch('%S+') do
+      classes[#classes + 1] = cls
+    end
+  end
+
+  local kvpairs = {}
+  for k, v in pairs(opts) do
+    if not is_known_key(k) and type(v) == 'string' then
+      kvpairs[#kvpairs + 1] = { k, v }
+    end
+  end
+
+  -- Carry the alt text as `fig-alt` so Quarto's figure pipeline copies it onto
+  -- the rendered `<img alt>` (and LaTeX/Typst equivalents). When the image is
+  -- wrapped in a FloatRefTarget, its caption inlines are consumed as the
+  -- caption, so the attribute is the only path that reaches the image alt.
+  if alt_text ~= '' then
+    kvpairs[#kvpairs + 1] = { 'fig-alt', alt_text }
+  end
+
+  -- HTML and Typst take the alt from `fig-alt`, so the description stays empty
+  -- there: at `pre-ast`, a lone image with a description becomes an implicit
+  -- figure captioned by it. Other formats (docx, LaTeX) read the alt from the
+  -- description only.
+  local description = { pandoc.Str(alt_text) }
+  if alt_text == '' or quarto.format.is_html_output() or quarto.format.is_typst_output() then
+    description = {}
+  end
+
+  local img = pandoc.Image(
+    description,
+    img_path,
+    '',
+    pandoc.Attr('', classes, kvpairs)
+  )
+
+  -- Quarto only promotes a Para holding a lone image with a description, so
+  -- a Plain keeps the description as alt without the implicit figure.
+  if not quarto_reader_ready and #description > 0 then
+    return pandoc.Plain({ img })
+  end
+  return pandoc.Para({ img })
+end
+
+--- Create a Pandoc element from one or more compiled page images.
+--- Single-page output returns a Para; multi-page output returns a Div
+--- with optional layout-ncol for Quarto's layout processing.
+--- @param page_paths table List of image paths
+--- @param opts table Merged options
+--- @return pandoc.Block Para (single page) or Div (multiple pages)
+local function create_multi_page_element(page_paths, opts)
+  if #page_paths == 1 then
+    return create_image_element(page_paths[1], opts)
+  end
+
+  local blocks = {}
+  for _, path in ipairs(page_paths) do
+    blocks[#blocks + 1] = create_image_element(path, opts)
+  end
+
+  local div_attrs = {}
+  if opts['layout-ncol'] then
+    div_attrs[#div_attrs + 1] = { 'layout-ncol', tostring(opts['layout-ncol']) }
+  end
+
+  return pandoc.Div(blocks, pandoc.Attr('', {}, div_attrs))
+end
+
+--- Wrap a block in an alignment container if the `align` option is set.
+--- Returns the block unchanged when alignment is nil or "default".
+--- @param block pandoc.Block The content block
+--- @param opts table Merged options
+--- @return pandoc.Block The original or wrapped block
+local function wrap_alignment(block, opts)
+  local align = opts.align
+  if not align or align == 'default' then
+    return block
+  end
+  -- An invalid align is already named by the schema check; ignoring it here
+  -- is silent.
+  if not VALID_ALIGN_SET[align] then
+    return block
+  end
+  if quarto.format.is_typst_output() then
+    local raw = pandoc.RawBlock('typst', '#align(' .. align .. ')[')
+    local raw_close = pandoc.RawBlock('typst', ']')
+    return pandoc.Div(pandoc.Blocks({ raw, block, raw_close }))
+  end
+  local style = 'text-align: ' .. align .. ';'
+  return pandoc.Div(
+    pandoc.Blocks({ block }),
+    pandoc.Attr('', {}, { { 'style', style } })
+  )
+end
+
+--- Build a message identifying the failing unit by its identifier.
+--- @param id string Unit identifier (e.g. fig-foo, typst-block-3, typst-inline-2)
+--- @return string Headline message
+local function compilation_failed_message(id)
+  return "Compilation failed for '" .. id .. "'."
+end
+
+--- Create an error block for failed Typst compilation.
+--- @param id string Block identifier (e.g. fig-foo, typst-block-3)
+--- @return pandoc.Div Error block
+local function create_error_block(id)
+  return pandoc.Div(
+    pandoc.Blocks({
+      pandoc.Para({
+        pandoc.Strong({ pandoc.Str('[typst-render] ' .. compilation_failed_message(id)) }),
+      }),
+    }),
+    pandoc.Attr('', { 'typst-render-error' }, {})
+  )
+end
+
+--- Resolve the image format to compile for, from the requested one and the
+--- output being written. Shared by blocks and inline expressions so the two
+--- cannot drift: `html` downgrades when it cannot be honoured, and `pdf` is
+--- unusable in HTML output.
+--- @param requested string|nil Format asked for by the options
+--- @return string Effective image format
+local function resolve_compile_format(requested)
+  -- An invalid format is already named by the schema check; auto-detecting
+  -- here is silent.
+  local img_format = requested
+  if img_format and not VALID_FORMAT_SET[img_format] then
+    img_format = nil
+  end
+  if not img_format then
+    img_format = get_image_format_for_output()
+  end
+
+  -- Native HTML output requires HTML-based output and Typst >= 0.15; otherwise
+  -- fall back to an image format with a warning.
+  img_format = resolve_html_format(img_format)
+
+  if img_format == 'pdf' and quarto.format.is_html_output() then
+    log.log_warning(
+      EXTENSION_NAME,
+      'PDF images are not supported in HTML output. Falling back to PNG.'
+    )
+    img_format = 'png'
+  end
+  return img_format
+end
+
+--- Create an inline error marker for failed Typst compilation.
+--- The inline counterpart of create_error_block; the expression it replaces is
+--- part of a sentence, so the marker has to be an inline element.
+--- @param id string Inline identifier (e.g. typst-inline-2)
+--- @return pandoc.Span Error span
+local function create_error_inline(id)
+  return pandoc.Span(
+    { pandoc.Strong({ pandoc.Str('[typst-render] ' .. compilation_failed_message(id)) }) },
+    pandoc.Attr('', { 'typst-render-error' }, {})
+  )
+end
+
+--- Compile Typst code and produce a result block (image element with alignment).
+--- @param code string User Typst code
+--- @param opts table Resolved options (colours must be plain strings)
+--- @param img_format string Target image format
+--- @return pandoc.Block|nil Result block, or nil on failure
+--- @return table|nil List of selected page paths, or nil on failure
+--- @return boolean|nil true when compilation failed
+--- @return string|nil Full Typst source actually compiled (preamble + colour vars + code)
+local function compile_to_result(code, opts, img_format)
+  if img_format == 'html' then
+    local html_source = build_typst_source(code, opts, false)
+    local body, compile_err = compile_typst_html(html_source, opts)
+    if not body then
+      return nil, nil, compile_err, html_source
+    end
+    local classes = { 'typst-html' }
+    if type(opts.classes) == 'string' and opts.classes ~= '' then
+      for cls in opts.classes:gmatch('%S+') do
+        classes[#classes + 1] = cls
+      end
+    end
+    local block = pandoc.Div(
+      pandoc.Blocks({ pandoc.RawBlock('html', body) }),
+      pandoc.Attr('', classes, {})
+    )
+    return wrap_alignment(block, opts), nil, nil, html_source
+  end
+
+  local full_source = build_typst_source(code, opts)
+  local all_pages, compile_err = compile_typst(full_source, opts, img_format)
+
+  if not all_pages then
+    return nil, nil, compile_err, full_source
+  end
+
+  local selected_pages
+  if img_format == 'pdf' and opts.pages ~= 'all' then
+    log.log_warning(
+      EXTENSION_NAME,
+      'Page selection is not supported for PDF format; embedding the full PDF.'
+    )
+    selected_pages = all_pages
+  else
+    local page_indices = parse_pages(opts.pages, #all_pages)
+    selected_pages = {}
+    for _, idx in ipairs(page_indices) do
+      selected_pages[#selected_pages + 1] = all_pages[idx]
+    end
+  end
+
+  if #selected_pages == 0 then
+    return nil, nil, nil, full_source
+  end
+
+  return wrap_alignment(create_multi_page_element(selected_pages, opts), opts),
+    selected_pages,
+    nil,
+    full_source
+end
+
+--- Read an external `.typ` file, resolving relative to the project directory.
+--- @param file_opt string Path from the `file` option
+--- @return string|nil File contents, or nil on failure
+local function read_external_file(file_opt)
+  local file_path = paths.resolve_project_path(file_opt)
+  local content = read_file(file_path)
+  if content then
+    return content
+  end
+  log.log_error(EXTENSION_NAME, 'Could not read file: ' .. file_opt)
+  return nil
+end
+
+-- ============================================================================
+-- FILTER FUNCTIONS
+-- ============================================================================
+
+--- Register custom cross-reference categories from document metadata.
+--- Reads `crossref.custom` entries and adds their `key` -> `reference-prefix`
+--- mappings to REF_TYPE_NAMES so that wrap_crossref can look them up.
+--- @param meta pandoc.Meta
+local function register_custom_crossref_types(meta)
+  local cr = meta['crossref']
+  if not cr then
+    return
+  end
+  local custom = cr['custom']
+  if not custom or type(custom) ~= 'table' then
+    return
+  end
+  for _, entry in ipairs(custom) do
+    local key = entry['key'] and pandoc.utils.stringify(entry['key'])
+    local name = entry['reference-prefix'] and pandoc.utils.stringify(entry['reference-prefix'])
+    if key and name then
+      REF_TYPE_NAMES[key] = name
+    end
+  end
+end
+
+--- Extract global configuration from document metadata.
+--- @param meta pandoc.Meta
+--- @return pandoc.Meta
+local function get_configuration(meta)
+  register_custom_crossref_types(meta)
+  read_file_cache = {}
+  -- Quarto gives each document its own Lua state, so nothing built here reaches
+  -- the next document of a project render and no brand binding can leak into
+  -- it. The resets are kept because they cost nothing and the lifetime is
+  -- Quarto's to change rather than this filter's.
+  brand_binding_cache = {}
+  brand_omission_warned = false
+  -- Re-inject the Typst head CSS for each document that produces native HTML
+  -- output.
+  typst_cli.reset_head_injection()
+
+  -- Build per-document cache subdirectory from the input file stem
+  cache_subdir = typst_cli.doc_cache_subdir()
+
+  -- Detect brand mode from document metadata (used for colour resolution)
+  global_brand_mode = (meta['brand-mode'] and pandoc.utils.stringify(meta['brand-mode']) == 'dark')
+      and 'dark' or 'light'
+
+  -- Detect whether code-annotations are disabled document-wide. When set to
+  -- false, Quarto's annotation pass is a no-op and leaves `// <N>` markers
+  -- literal, so the filter must strip them from echoed source itself. Set
+  -- unconditionally so the flag never carries over from a previous document.
+  local code_annotations_meta = meta['code-annotations']
+  code_annotations_disabled = code_annotations_meta ~= nil
+    and pandoc.utils.stringify(code_annotations_meta) == 'false'
+
+  -- Quarto removes `quarto_pandoc_reader_opts` from the metadata when it
+  -- captures its reader options, so the key is only present at `pre-ast`.
+  quarto_reader_ready = meta['quarto_pandoc_reader_opts'] == nil
+  pre_ast_reader_options = nil
+  if not quarto_reader_ready then
+    pre_ast_reader_options = require('readqmd').meta_to_options(meta['quarto_pandoc_reader_opts'])
+  end
+
+  checker:options(meta)
+
+  local ext_config = meta_mod.get_extension_config(meta, EXTENSION_NAME) or meta['typst-render']
+
+  if ext_config then
+    -- Iterate all DEFAULTS keys explicitly; pairs() skips nil-valued keys,
+    -- so we use a separate key list to ensure 'format' etc. are not missed.
+    local config_keys = {
+      'format', 'dpi', 'width', 'height', 'margin',
+      'cache', 'cache-refresh', 'echo', 'code-fold', 'code-summary', 'code-line-numbers',
+      'eval', 'include', 'output', 'output-location', 'classes',
+      'root', 'package-path', 'pages', 'layout-ncol', 'align',
+      'output-directory', 'output-source',
+    }
+    for _, k in ipairs(config_keys) do
+      local default_val = DEFAULTS[k]
+      if ext_config[k] ~= nil then
+        local val = ext_config[k]
+        if k == 'echo' then
+          if type(val) == 'boolean' then
+            global_config[k] = val
+          else
+            local str = pandoc.utils.stringify(val)
+            if str == 'fenced' then
+              global_config[k] = 'fenced'
+            else
+              global_config[k] = str == 'true'
+            end
+          end
+        elseif k == 'code-fold' then
+          if type(val) == 'boolean' then
+            global_config[k] = val
+          else
+            local str = pandoc.utils.stringify(val)
+            if str == 'show' then
+              global_config[k] = 'show'
+            elseif str == 'true' then
+              global_config[k] = true
+            elseif str == 'false' then
+              global_config[k] = false
+            else
+              -- An invalid code-fold is already named by the schema check
+              -- above; disabling it here is silent.
+              global_config[k] = false
+            end
+          end
+        elseif k == 'code-line-numbers' then
+          -- Boolean stays as-is; "true"/"false" map to booleans; any other
+          -- string (e.g. "1|3-4") is kept verbatim for Quarto's line-numbers pass.
+          if type(val) == 'boolean' then
+            global_config[k] = val
+          else
+            local str = pandoc.utils.stringify(val)
+            if str == 'true' then
+              global_config[k] = true
+            elseif str == 'false' then
+              global_config[k] = false
+            else
+              global_config[k] = str
+            end
+          end
+        elseif k == 'output' then
+          if type(val) == 'boolean' then
+            global_config[k] = val
+          else
+            local str = pandoc.utils.stringify(val)
+            if str == 'asis' then
+              global_config[k] = 'asis'
+            else
+              global_config[k] = str == 'true'
+            end
+          end
+        elseif k == 'code-summary' then
+          -- Preserve Markdown markup; stringify would flatten it. Per-block
+          -- summaries keep their raw string, so global ones must match.
+          -- Only inline metadata round-trips through the Markdown writer;
+          -- other shapes (bool, list, map, blocks) fall back to stringify.
+          if type(val) == 'string' then
+            global_config[k] = val
+          elseif pandoc.utils.type(val) == 'Inlines' then
+            global_config[k] = pandoc.write(
+              pandoc.Pandoc(pandoc.Blocks({ pandoc.Plain(val) })),
+              'markdown'
+            ):gsub('%s+$', '')
+          else
+            global_config[k] = pandoc.utils.stringify(val)
+          end
+        elseif type(default_val) == 'number' then
+          local n = tonumber(pandoc.utils.stringify(val))
+          if n then
+            global_config[k] = n
+          end
+        elseif type(default_val) == 'boolean' then
+          if type(val) == 'boolean' then
+            global_config[k] = val
+          else
+            local str = pandoc.utils.stringify(val)
+            global_config[k] = str == 'true'
+          end
+        else
+          global_config[k] = pandoc.utils.stringify(val)
+        end
+      end
+    end
+
+    -- Handle 'font-path' separately: accept a string or list of strings
+    if ext_config['font-path'] ~= nil then
+      local raw = ext_config['font-path']
+      local raw_type = pandoc.utils.type(raw)
+      if raw_type == 'List' then
+        local paths = {}
+        for _, v in ipairs(raw) do
+          paths[#paths + 1] = pandoc.utils.stringify(v)
+        end
+        global_config['font-path'] = paths
+      else
+        global_config['font-path'] = { pandoc.utils.stringify(raw) }
+      end
+    end
+
+    -- Handle 'preamble' separately: accept a string or list of strings
+    if ext_config['preamble'] ~= nil then
+      local raw = ext_config['preamble']
+      local raw_type = pandoc.utils.type(raw)
+      if raw_type == 'List' then
+        local items = {}
+        for _, v in ipairs(raw) do
+          items[#items + 1] = pandoc.utils.stringify(v)
+        end
+        global_config['preamble'] = items
+      else
+        local str = pandoc.utils.stringify(raw)
+        global_config['preamble'] = str ~= '' and { str } or {}
+      end
+    end
+
+    -- Handle 'input' separately: store as a key-value table (YAML map)
+    if ext_config['input'] ~= nil then
+      local raw = ext_config['input']
+      if type(raw) == 'table' then
+        local input_map = {}
+        for k, v in pairs(raw) do
+          input_map[tostring(k)] = pandoc.utils.stringify(v)
+        end
+        global_config['input'] = input_map
+      else
+        log.log_warning(
+          EXTENSION_NAME,
+          'Global "input" must be a YAML map (e.g., input: {key: value}), not a string.'
+        )
+      end
+    end
+
+    -- Handle 'background' and 'foreground' separately: support string, "auto", or {light, dark} map
+    for _, colour_key in ipairs({ 'background', 'foreground' }) do
+      if ext_config[colour_key] ~= nil then
+        local resolved = resolve_colour_config(ext_config[colour_key], colour_key)
+        if resolved then
+          global_config[colour_key] = resolved
+        end
+      end
+    end
+  end
+
+  -- Ingest any `typst-define:` payload emitted by the R/Python helpers.
+  -- The helpers write a YAML metadata block whose value is a hex-encoded
+  -- JSON payload; we hex-decode, JSON-decode, and strip the key so it does
+  -- not leak to downstream filters.
+  local define_meta = meta['typst-define']
+  if define_meta then
+    local hex = pandoc.utils.stringify(define_meta)
+    local json_str = hex and hex_decode(hex)
+    if json_str and json_str ~= '' then
+      ingest_define_payload(json_str)
+    elseif hex and hex ~= '' then
+      log.log_warning(EXTENSION_NAME, 'typst-define metadata payload is not valid hex; ignoring.')
+    end
+    meta['typst-define'] = nil
+  end
+
+  return meta
+end
+
+--- Process a {typst} CodeBlock element.
+--- @param el pandoc.CodeBlock
+--- @return pandoc.Block|pandoc.Blocks|nil
+local function process_codeblock(el)
+  -- The knitr engine in `typst_define.R` emits `{.typst-render-cell}`
+  -- instead of `{typst}`; see the comment there for why.
+  if not (cell.is_code_block(el) or el.classes:includes('typst-render-cell')) then
+    return nil
+  end
+
+  block_counter = block_counter + 1
+
+  local block_opts, clean_code, option_lines = cell.parse_options(el.text)
+
+  -- The schema resolves the comment-pipe options against the `typst`
+  -- cells group before anything below strips or rewrites them; every
+  -- read from this point on uses the resolved table, never `block_opts`.
+  local resolved = checker:cells(block_opts, 'typst')
+
+  if resolved['cache-refresh'] ~= nil then
+    log.log_warning(
+      EXTENSION_NAME,
+      'Per-block "cache-refresh" is not supported; use the global option instead.'
+    )
+    resolved['cache-refresh'] = nil
+  end
+
+  -- Stash per-block input string before merge overwrites it with global table
+  local block_input_str = nil
+  if type(resolved.input) == 'string' then
+    block_input_str = resolved.input
+    resolved.input = nil
+  end
+
+  local opts = cell.merge_options(resolved, global_config, DEFAULTS)
+  opts._block_input = block_input_str
+
+  local block_id = (type(opts.label) == 'string' and opts.label ~= '')
+      and opts.label
+      or ('typst-block-' .. block_counter)
+
+  -- Resolve per-block colour overrides only. Values inherited from global_config
+  -- are already resolved (e.g. 'rgb("#FAF6EE")') and must not be re-wrapped.
+  for _, colour_key in ipairs({ 'background', 'foreground' }) do
+    local block_val = resolved[colour_key]
+    if block_val == 'auto' then
+      opts[colour_key] = resolve_colour_config('auto', colour_key) or DEFAULTS[colour_key]
+    elseif type(block_val) == 'string' and block_val ~= DEFAULTS[colour_key] then
+      opts[colour_key] = css_colour_to_typst(block_val)
+    end
+  end
+
+  local do_include = cell.should_include(opts)
+  local do_eval = opts.eval ~= false
+  local do_echo = opts.echo == true or opts.echo == 'fenced'
+  local is_fenced = opts.echo == 'fenced'
+  local output_mode = cell.resolve_output_mode(opts)
+
+  -- Code-fold collapses only the echoed source via Quarto's native attribute-driven
+  -- fold (rendered as a <details> for HTML output only). An invalid value is
+  -- already named by the schema check above; disabling it here is silent.
+  local cf = opts['code-fold']
+  if cf ~= nil and cf ~= false and cf ~= true and cf ~= 'show' then
+    cf = false
+  end
+  local fold = nil
+  if quarto.format.is_html_output() and (cf == true or cf == 'show') then
+    fold = { open = cf == 'show', summary = opts['code-summary'] }
+  end
+
+  -- Code line numbers: attach the value to the echoed source so Quarto's
+  -- line-numbers pre-filter adds `number-lines` and reveal.js animation steps.
+  local cln = opts['code-line-numbers']
+  local line_numbers = nil
+  if cln ~= nil and cln ~= false then
+    line_numbers = tostring(cln)
+  end
+
+  -- Handle eval/echo matrix: both false means hidden block
+  if not do_eval and not do_echo then
+    return pandoc.Null()
+  end
+
+  -- Resolve source code
+  local code = clean_code
+  if opts.file then
+    code = read_external_file(opts.file)
+    if not code then
+      return do_include and el or pandoc.Null()
+    end
+  end
+
+  -- _source is the fallback for alt text; annotation markers never belong there.
+  opts._source = cell.strip_annotations(code):sub(1, 200)
+
+  -- Code annotations are honoured only for `echo: true` and when not disabled
+  -- document-wide. Other echo modes strip the markers in create_echo_block.
+  local annotate = opts.echo == true
+    and not code_annotations_disabled
+    and cell.has_annotations(code)
+
+  -- Echo-only: show source listing without compilation
+  if not do_eval then
+    if not do_include then
+      return pandoc.Null()
+    end
+    return cell.create_echo_block(code, is_fenced, option_lines, fold, nil, annotate, line_numbers)
+  end
+
+  -- Output suppressed: skip compilation, show echo block only
+  if output_mode == 'false' then
+    if do_echo and do_include then
+      return cell.create_echo_block(code, is_fenced, option_lines, fold, nil, annotate, line_numbers)
+    end
+    return pandoc.Null()
+  end
+
+  -- Native Typst output: pass through as scoped RawBlock, wrapped in crossref if needed
+  if quarto.format.is_typst_output() and output_mode == 'asis' then
+    if not do_include then
+      return pandoc.Null()
+    end
+    local typst_opts = has_dual_mode_colours(opts)
+        and resolve_opts_colours(opts, global_brand_mode)
+        or opts
+    local inner = build_asis_inner(code, typst_opts)
+    local scoped_code
+    if has_custom_block_options(typst_opts) then
+      local params = { 'width: 100%' }
+      if typst_opts.margin ~= DEFAULTS.margin then
+        params[#params + 1] = 'inset: ' .. typst_opts.margin
+      end
+      if typst_opts.background ~= DEFAULTS.background then
+        params[#params + 1] = 'fill: ' .. typst_opts.background
+      end
+      scoped_code = '#[\n#block(' .. table.concat(params, ', ') .. ')[\n' .. inner .. '\n]\n]'
+    else
+      scoped_code = '#[\n' .. inner .. '\n]'
+    end
+    if opts.align and opts.align ~= 'default' and VALID_ALIGN_SET[opts.align] then
+      scoped_code = '#align(' .. opts.align .. ')[\n' .. scoped_code .. '\n]'
+    end
+    local result = cell.wrap_crossref(pandoc.RawBlock('typst', scoped_code), opts, REF_TYPE_NAMES, pre_ast_reader_options)
+    if do_echo then
+      -- Native Typst pass-through does not support annotations; strip markers.
+      return cell.create_echo_block(code, is_fenced, option_lines, fold, result, false, line_numbers)
+    end
+    return result
+  end
+
+  local img_format = resolve_compile_format(opts.format)
+
+  -- Dual-mode rendering for HTML/Reveal.js when both light and dark colours are present.
+  -- Native HTML output renders once (colours apply via the Typst source, not CSS classes).
+  local dual_mode = img_format ~= 'html'
+    and quarto.format.is_html_output()
+    and has_dual_mode_colours(opts)
+  if img_format == 'html' and has_dual_mode_colours(opts) then
+    log.log_warning(
+      EXTENSION_NAME,
+      'Dual light/dark colours are not supported with format "html"; using the document brand mode.'
+    )
+  end
+
+  local result
+  if dual_mode then
+    local light_opts = resolve_opts_colours(opts, 'light')
+    local dark_opts = resolve_opts_colours(opts, 'dark')
+    local light_content, light_pages, _, light_source = compile_to_result(code, light_opts, img_format)
+    local dark_content, dark_pages, _, dark_source = compile_to_result(code, dark_opts, img_format)
+
+    if not light_content and not dark_content then
+      log.log_warning(EXTENSION_NAME, compilation_failed_message(block_id))
+      if not do_include then
+        return pandoc.Null()
+      end
+      local error_block = create_error_block(block_id)
+      if do_echo then
+        return cell.create_echo_block(code, is_fenced, option_lines, fold, error_block, annotate, line_numbers)
+      end
+      return error_block
+    end
+
+    local output_path = resolve_output_path(
+      global_config['output-directory'], opts['output-directory'],
+      opts['output-filename'], opts.label,
+      'typst-block-' .. block_counter, img_format
+    )
+
+    -- Save to output directory and rebuild elements using output paths
+    if output_path then
+      local save_source = opts['output-source'] == true
+      if light_pages then
+        local out_pages = save_output_files(light_pages, output_path, '-light', img_format)
+        if out_pages then
+          light_content = wrap_alignment(create_multi_page_element(out_pages, light_opts), light_opts)
+        end
+        if save_source then
+          save_source_file(light_source, output_path, '-light')
+        end
+      end
+      if dark_pages then
+        local out_pages = save_output_files(dark_pages, output_path, '-dark', img_format)
+        if out_pages then
+          dark_content = wrap_alignment(create_multi_page_element(out_pages, dark_opts), dark_opts)
+        end
+        if save_source then
+          save_source_file(dark_source, output_path, '-dark')
+        end
+      end
+    end
+
+    local blocks = {}
+    if light_content then
+      blocks[#blocks + 1] = pandoc.Div(
+        pandoc.Blocks({ light_content }),
+        pandoc.Attr('', { 'light-content' }, {})
+      )
+    end
+    if dark_content then
+      blocks[#blocks + 1] = pandoc.Div(
+        pandoc.Blocks({ dark_content }),
+        pandoc.Attr('', { 'dark-content' }, {})
+      )
+    end
+    result = cell.wrap_crossref(pandoc.Div(blocks), opts, REF_TYPE_NAMES, pre_ast_reader_options)
+  else
+    -- Single-mode: resolve colours to brand mode
+    local resolved_opts = has_dual_mode_colours(opts)
+        and resolve_opts_colours(opts, global_brand_mode)
+        or opts
+    local content, selected_pages, compile_err, full_source = compile_to_result(code, resolved_opts, img_format)
+
+    if not content then
+      if compile_err then
+        log.log_warning(EXTENSION_NAME, compilation_failed_message(block_id))
+        if not do_include then
+          return pandoc.Null()
+        end
+        local error_block = create_error_block(block_id)
+        if do_echo then
+          return cell.create_echo_block(code, is_fenced, option_lines, fold, error_block, annotate, line_numbers)
+        end
+        return error_block
+      end
+      log.log_warning(EXTENSION_NAME, 'No pages matched the selection; returning empty block.')
+      return pandoc.Null()
+    end
+
+    local output_path = resolve_output_path(
+      global_config['output-directory'], opts['output-directory'],
+      opts['output-filename'], opts.label,
+      'typst-block-' .. block_counter, img_format
+    )
+
+    -- Save to output directory and rebuild element using output paths
+    if output_path and selected_pages then
+      local out_pages = save_output_files(selected_pages, output_path, nil, img_format)
+      if out_pages then
+        content = wrap_alignment(create_multi_page_element(out_pages, resolved_opts), resolved_opts)
+      end
+      if opts['output-source'] == true then
+        save_source_file(full_source, output_path, nil)
+      end
+    end
+
+    result = cell.wrap_crossref(content, opts, REF_TYPE_NAMES, pre_ast_reader_options)
+  end
+
+  -- Compilation and file-save side effects have run; suppress embedding if include is false.
+  if not do_include then
+    return pandoc.Null()
+  end
+
+  local output_location = cell.resolve_output_location(opts)
+  if output_location then
+    -- Reveal.js output-location layout does not support annotations; strip markers.
+    local echo_block = do_echo
+      and cell.create_echo_block(code, is_fenced, option_lines, fold, nil, false, line_numbers)
+      or nil
+    return cell.apply_output_location(echo_block, result, output_location)
+  end
+
+  if do_echo then
+    return cell.create_echo_block(code, is_fenced, option_lines, fold, result, annotate, line_numbers)
+  end
+
+  return result
+end
+
+--- Wrap inline native-HTML output in a typst-inline span.
+--- @param inner string Inline HTML (paragraph wrapper already stripped)
+--- @param opts table Merged options
+--- @return pandoc.Inline Inline raw HTML element
+local function create_inline_html_element(inner, opts)
+  local extra_classes = ''
+  if type(opts.classes) == 'string' and opts.classes ~= '' then
+    extra_classes = ' ' .. opts.classes
+  end
+  return pandoc.RawInline(
+    'html',
+    '<span class="typst-inline' .. extra_classes .. '">' .. inner .. '</span>'
+  )
+end
+
+--- Create a bare inline Image element from a compiled image.
+--- Emits format-specific raw markup to size the image to match
+--- surrounding text (height: 1em, auto width, vertical centring).
+--- @param img_path string Path to the image file
+--- @param opts table Merged options
+--- @return pandoc.Inline Inline image element
+local function create_inline_image_element(img_path, opts)
+  if quarto.format.is_typst_output() then
+    local escaped_alt = str.escape_typst_string(opts._alt or '')
+    return pandoc.RawInline(
+      'typst',
+      '#box(height: 1.1em, baseline: 20%, image("' .. img_path .. '", alt: "' .. escaped_alt .. '"))'
+    )
+  end
+
+  if quarto.format.is_latex_output() then
+    return pandoc.RawInline(
+      'latex',
+      '\\raisebox{-0.3em}{\\includegraphics[height=1.3em]{' .. img_path .. '}}'
+    )
+  end
+
+  if not quarto.format.is_html_output() then
+    local img = pandoc.Image(
+      { pandoc.Str(opts._alt or '') },
+      img_path
+    )
+    if quarto.format.is_docx_output() then
+      img.attr = pandoc.Attr('', {}, { { 'height', '1em' } })
+    end
+    -- At `pre-ast`, Quarto promotes a Para holding only this image to a figure
+    -- captioned by its alt; the Span keeps the image out of that pattern.
+    if not quarto_reader_ready then
+      return pandoc.Span({ img })
+    end
+    return img
+  end
+
+  local extra_classes = ''
+  if type(opts.classes) == 'string' and opts.classes ~= '' then
+    extra_classes = ' ' .. opts.classes
+  end
+
+  local style
+  if quarto.doc.is_format('revealjs') then
+    style = 'height: 1.1em; width: auto; vertical-align: -0.55em;'
+  else
+    style = 'height: 1.15em; width: auto; vertical-align: -0.35em;'
+  end
+
+  return pandoc.RawInline(
+    'html',
+    '<span class="typst-inline' .. extra_classes .. '">'
+    .. '<img src="' .. str.escape_attribute(img_path) .. '"'
+    .. ' alt="' .. str.escape_attribute(opts._alt or '') .. '"'
+    .. ' style="' .. style .. '"'
+    .. '></span>'
+  )
+end
+
+--- Attributes accepted on an inline `{typst}` element, beyond `alt`.
+--- Only options that shape the compilation: everything describing a block
+--- (label, caption, echo, pages, layout, alignment) stays a block option.
+local INLINE_ATTRIBUTES = {
+  'format', 'dpi', 'background', 'foreground', 'cache', 'classes', 'preamble', 'input',
+}
+
+--- Fold the accepted attributes of an inline Code element into merged options.
+--- Values arrive as strings, so `cache` is mapped to a boolean and the colours
+--- go through the same resolution as a per-block override.
+--- @param attrs table|nil Element attributes
+--- @param opts table Merged options, modified in place
+local function apply_inline_attributes(attrs, opts)
+  if not attrs then
+    return
+  end
+  for _, key in ipairs(INLINE_ATTRIBUTES) do
+    local value = attrs[key]
+    if type(value) == 'string' and value ~= '' then
+      if key == 'cache' then
+        opts.cache = value ~= 'false'
+      elseif key == 'input' then
+        opts._block_input = value
+      elseif key == 'background' or key == 'foreground' then
+        -- `auto` reads _brand.yml and may resolve to nothing, so the branches
+        -- stay explicit: an `x and y or z` chain would fall through to the
+        -- literal "auto" when both the brand colour and the default are nil.
+        if value == 'auto' then
+          opts[key] = resolve_colour_config('auto', key) or DEFAULTS[key]
+        else
+          opts[key] = css_colour_to_typst(value)
+        end
+      else
+        opts[key] = value
+      end
+    end
+  end
+end
+
+--- Build the `output: asis` pass-through for an inline expression.
+--- Scoped in `#[ ... ]` so that `#let` and `#set` inside stay local, as they do
+--- for a block. No newline pads the scope: Typst swallows the break after a
+--- code statement but renders one after `#[` as a space in the sentence.
+--- @param code string User Typst code
+--- @param opts table Merged options (colours must be plain strings)
+--- @return pandoc.RawInline Raw Typst inline
+local function create_inline_asis_element(code, opts)
+  -- A blank line inside inline content starts a paragraph; the preamble is the
+  -- one part that can carry them, so runs of newlines collapse to one.
+  local inner = (build_asis_inner(code, opts):gsub('\n%s*\n+', '\n'))
+  local scoped = '#[' .. inner .. ']'
+  if has_custom_block_options(opts) then
+    local params = {}
+    if opts.margin ~= DEFAULTS.margin then
+      params[#params + 1] = 'inset: ' .. opts.margin
+    end
+    if opts.background ~= DEFAULTS.background then
+      params[#params + 1] = 'fill: ' .. opts.background
+    end
+    if #params > 0 then
+      scoped = '#box(' .. table.concat(params, ', ') .. ')[' .. scoped .. ']'
+    end
+  end
+  return pandoc.RawInline('typst', scoped)
+end
+
+--- Process a {typst} inline Code element.
+--- Compiles inline Typst expressions to tightly-cropped images.
+--- @param el pandoc.Code
+--- @return pandoc.Inline|pandoc.List|nil
+local function process_inline_code(el)
+  if not cell.is_inline_code(el) then
+    return nil
+  end
+
+  inline_counter = inline_counter + 1
+  local inline_id = 'typst-inline-' .. inline_counter
+
+  if quarto.format.is_powerpoint_output() then
+    if not pptx_inline_warned then
+      pptx_inline_warned = true
+      log.log_warning(
+        EXTENSION_NAME,
+        'Inline Typst is not supported for PowerPoint output; '
+        .. 'inline code will be kept as-is. '
+        .. 'Pandoc cannot embed images inside text runs in PPTX slides, '
+        .. 'so block-level `{typst}` code blocks work normally but '
+        .. 'inline `{typst}` expressions cannot be rendered.'
+      )
+    end
+    return nil
+  end
+
+  local code = cell.inline_code_text(el)
+  if not code or code:match('^%s*$') then
+    return nil
+  end
+
+  local opts = cell.merge_options({}, global_config, DEFAULTS)
+  opts._inline = true
+  opts._alt = (el.attributes and el.attributes['alt'] and el.attributes['alt'] ~= '')
+      and el.attributes['alt']
+      or code
+  apply_inline_attributes(el.attributes, opts)
+
+  local do_include = cell.should_include(opts)
+  local output_mode = cell.resolve_output_mode(opts)
+
+  if output_mode == 'false' then
+    return {}
+  end
+
+  -- Nothing to compile: leave the expression as inline code, so the source
+  -- stays readable rather than vanishing from the sentence. With include off
+  -- there is nothing to show at all, as for a block that neither evaluates
+  -- nor echoes.
+  if opts.eval == false then
+    return do_include and el or {}
+  end
+
+  -- Native Typst output: pass through as a scoped RawInline. Any other writer
+  -- drops raw Typst, so those fall through and compile an image, as blocks do.
+  if output_mode == 'asis' and quarto.format.is_typst_output() then
+    if not do_include then
+      return {}
+    end
+    local typst_opts = has_dual_mode_colours(opts)
+        and resolve_opts_colours(opts, global_brand_mode)
+        or opts
+    return create_inline_asis_element(code, typst_opts)
+  end
+
+  -- Geometry for the compiled image: a page just big enough for the expression,
+  -- sitting on the text baseline. Set after the pass-through, which uses the
+  -- configured margin instead.
+  opts.width = 'auto'
+  opts.height = 'auto'
+  opts.margin = '(x: 0.5pt, top: 0.5pt, bottom: 0.25em)'
+
+  local img_format = resolve_compile_format(opts.format)
+
+  --- Compile one colour mode and build its inline element.
+  --- Inline expressions carry no label or output-filename, so the image is named
+  --- from the inline counter. A failed copy falls back to the cache path so the
+  --- render still produces an image.
+  --- @param mode_opts table Options with colours resolved to strings
+  --- @param mode_suffix string|nil "-light", "-dark", or nil
+  --- @return pandoc.Inline|nil
+  local function compile_inline(mode_opts, mode_suffix)
+    local source = build_typst_source(code, mode_opts)
+    local pages = compile_typst(source, mode_opts, img_format)
+    if not pages or #pages == 0 then
+      return nil
+    end
+    local img_path = pages[1]
+    local output_path = resolve_output_path(
+      global_config['output-directory'], mode_opts['output-directory'],
+      nil, nil, inline_id, img_format
+    )
+    if output_path then
+      local out_pages = save_output_files({ img_path }, output_path, mode_suffix, img_format)
+      if out_pages then
+        img_path = out_pages[1]
+      end
+      if mode_opts['output-source'] == true then
+        save_source_file(source, output_path, mode_suffix)
+      end
+    end
+    return create_inline_image_element(img_path, mode_opts)
+  end
+
+  local element
+  if img_format == 'html' then
+    if has_dual_mode_colours(opts) then
+      log.log_warning(
+        EXTENSION_NAME,
+        'Dual light/dark colours are not supported with format "html"; using the document brand mode.'
+      )
+      opts = resolve_opts_colours(opts, global_brand_mode)
+    end
+    local html_source = build_typst_source(code, opts, false)
+    local body = compile_typst_html(html_source, opts)
+    element = body and create_inline_html_element(typst_cli.strip_paragraph(body), opts) or nil
+  elseif quarto.format.is_html_output() and has_dual_mode_colours(opts) then
+    -- Dual-mode rendering when both light and dark colours are present. Quarto's
+    -- own `light-content` / `dark-content` classes hide the mode that does not
+    -- match the page, and work on inline elements too.
+    local light = compile_inline(resolve_opts_colours(opts, 'light'), '-light')
+    local dark = compile_inline(resolve_opts_colours(opts, 'dark'), '-dark')
+    local inlines = {}
+    if light then
+      inlines[#inlines + 1] = pandoc.Span({ light }, pandoc.Attr('', { 'light-content' }, {}))
+    end
+    if dark then
+      inlines[#inlines + 1] = pandoc.Span({ dark }, pandoc.Attr('', { 'dark-content' }, {}))
+    end
+    element = #inlines > 0 and pandoc.Inlines(inlines) or nil
+  else
+    local resolved_opts = has_dual_mode_colours(opts)
+        and resolve_opts_colours(opts, global_brand_mode)
+        or opts
+    element = compile_inline(resolved_opts, nil)
+  end
+
+  -- Compilation and file-save side effects have run; report a failure once,
+  -- then suppress embedding if include is false.
+  if not element then
+    log.log_warning(EXTENSION_NAME, compilation_failed_message(inline_id))
+    return create_error_inline(inline_id)
+  end
+  if not do_include then
+    return {}
+  end
+  return element
+end
+
+--- Remove stale cache files after all blocks have been processed.
+--- Only runs when `cache-refresh` is `true`. Only removes files whose
+--- extension matches a format produced during the current render, so an HTML
+--- render (producing `.svg`) will not wipe `.png` files from a previous PDF render.
+--- @param doc pandoc.Pandoc
+--- @return nil
+local function cleanup_cache(doc) -- luacheck: ignore 212
+  if not global_config['cache-refresh'] or not cache_subdir then
+    return nil
+  end
+  local abs_cache = pandoc.path.join({ quarto.project.directory, cache_subdir })
+  local ok, entries = pcall(pandoc.system.list_directory, abs_cache)
+  if not ok then
+    return nil
+  end
+
+  local removed = 0
+  for _, filename in ipairs(entries) do
+    -- Skip `typst-math-*` files: they are owned by the typst-math filter and not
+    -- tracked here, so this cleanup must not treat them as stale.
+    if filename:match('^typst%-')
+        and not filename:match('^typst%-math%-')
+        and not used_cache_files[filename] then
+      local ext = filename:match('%.(%w+)$')
+      if ext and used_cache_formats[ext] then
+        local filepath = pandoc.path.join({ abs_cache, filename })
+        local rm_ok, rm_err = os.remove(filepath)
+        if rm_ok then
+          removed = removed + 1
+          log.log_output(EXTENSION_NAME, 'Removed stale cache file: ' .. filename)
+        else
+          log.log_warning(
+            EXTENSION_NAME,
+            'Could not remove cache file: ' .. filename .. ' (' .. tostring(rm_err) .. ')'
+          )
+        end
+      end
+    end
+  end
+
+  if removed > 0 then
+    log.log_output(
+      EXTENSION_NAME,
+      'Cache cleanup: removed ' .. removed .. ' stale file(s).'
+    )
+  end
+
+  -- Reset typst_define state in case the Lua VM is reused for another document
+  -- (e.g. batch render). Each document's payloads must not leak into the next.
+  typst_define_dict = {}
+  typst_define_order = {}
+  typst_define_preamble_cache = nil
+
+  return nil
+end
+
+-- ============================================================================
+-- FILTER EXPORT
+-- ============================================================================
+
+return {
+  { Meta = get_configuration },
+  { CodeBlock = process_codeblock, Code = process_inline_code },
+  { Pandoc = cleanup_cache },
+}

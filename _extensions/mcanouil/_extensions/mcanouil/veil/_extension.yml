@@ -1,0 +1,18 @@
+title: Veil
+author: Mickaël Canouil
+version: 0.1.0
+quarto-required: ">=1.6"
+contributes:
+  filters:
+    - path: veil.lua
+      at: pre-quarto
+  revealjs-plugins:
+    - name: RevealVeil
+      script:
+        - veil-state.js
+        - veil-ui.js
+        - veil-html.js
+        - veil-reveal.js
+        - veil.js
+      stylesheet:
+        - veil.css
