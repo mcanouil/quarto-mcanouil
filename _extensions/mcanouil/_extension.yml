@@ -45,6 +45,10 @@ contributes:
         - cascade
         - codefrag
         - collapse-output
+        - remember
+      extensions:
+        remember:
+          enabled: false
       revealjs-plugins:
         - veil
         - tabset
