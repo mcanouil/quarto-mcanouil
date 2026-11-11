@@ -8,4 +8,4 @@ options:
       - quarto
       - terminal
     default: gold
-    description: "Preset for every format: colours, fonts and style. Set it as `mcanouil: { preset: <name> }` in the front matter or in `_quarto.yml`."
+    description: "Preset for every format: colours, fonts and style. Set it as `extensions: { mcanouil: { preset: <name> } }` in the front matter or in `_quarto.yml`."

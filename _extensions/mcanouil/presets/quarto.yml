@@ -16,10 +16,13 @@ light:
   accent-high: "#9cc4ea"
   accent-low: "#2a4d6e"
   accent-text: "#406993"
+  link: "#406993"
   ground-1: "#0f1b2a"
   ground-2: "#2a4d6e"
   on-ground-accent: "#cfe3f5"
   on-ground-text: "#e8edf2"
+  on-ground-title: "#ffffff"
+  chrome: "#365f84"
   note: "#0066cc"
   tip: "#009955"
   warning: "#cc6600"
@@ -41,10 +44,13 @@ dark:
   accent-high: "#9cc4ea"
   accent-low: "#2a4d6e"
   accent-text: "#74aadb"
+  link: "#74aadb"
   ground-1: "#0f1b2a"
   ground-2: "#2a4d6e"
   on-ground-accent: "#cfe3f5"
   on-ground-text: "#e8edf2"
+  on-ground-title: "#ffffff"
+  chrome: "#365f84"
   note: "#66aaff"
   tip: "#66cc99"
   warning: "#ffaa44"
@@ -60,6 +66,10 @@ fonts:
   base: Alegreya Sans
   headings: Alegreya Sans
   monospace: Fira Code
+  generic:
+    base: sans-serif
+    headings: sans-serif
+    monospace: monospace
 
 logo:
   light: logos/logo-light.svg

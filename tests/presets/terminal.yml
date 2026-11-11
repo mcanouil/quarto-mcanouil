@@ -1,3 +1,4 @@
-mcanouil:
-  preset: terminal
+extensions:
+  mcanouil:
+    preset: terminal
 keep-typ: true

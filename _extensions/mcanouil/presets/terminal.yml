@@ -17,10 +17,13 @@ light:
   accent-high: "#7ee08a"
   accent-low: "#1d4a24"
   accent-text: "#7ee08a"
+  link: "#6cb6ff"
   ground-1: "#101216"
   ground-2: "#13261a"
   on-ground-accent: "#7ee08a"
   on-ground-text: "#d8dee9"
+  on-ground-title: "#ffffff"
+  chrome: "#3fa34d"
   note: "#66aaff"
   tip: "#66cc99"
   warning: "#ffaa44"
@@ -42,10 +45,13 @@ dark:
   accent-high: "#7ee08a"
   accent-low: "#1d4a24"
   accent-text: "#7ee08a"
+  link: "#6cb6ff"
   ground-1: "#101216"
   ground-2: "#13261a"
   on-ground-accent: "#7ee08a"
   on-ground-text: "#d8dee9"
+  on-ground-title: "#ffffff"
+  chrome: "#3fa34d"
   note: "#66aaff"
   tip: "#66cc99"
   warning: "#ffaa44"
@@ -61,6 +67,10 @@ fonts:
   base: JetBrains Mono
   headings: JetBrains Mono
   monospace: JetBrains Mono
+  generic:
+    base: monospace
+    headings: monospace
+    monospace: monospace
 
 logo:
   light: logos/logo-light.svg

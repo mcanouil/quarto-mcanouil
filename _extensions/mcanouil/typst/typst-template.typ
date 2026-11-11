@@ -15,7 +15,7 @@
   set page(paper: "a4", fill: tokens.paper)
   show heading: set text(font: fonts.headings)
   show raw: set text(font: fonts.monospace)
-  show link: set text(fill: tokens.accent-text)
+  show link: set text(fill: tokens.link)
   if title != none {
     align(center, text(size: 1.5em, weight: "bold", font: fonts.headings, title))
   }

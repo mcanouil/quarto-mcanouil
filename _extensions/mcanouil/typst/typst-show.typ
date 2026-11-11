@@ -4,9 +4,9 @@ $for(mcanouil-tokens/pairs)$
 $endfor$
 )
 #let mc-fonts = (
-  base: "$mcanouil-fonts.base$",
-  headings: "$mcanouil-fonts.headings$",
-  monospace: "$mcanouil-fonts.monospace$",
+  base: ($for(mcanouil-fonts.base)$"$it$", $endfor$),
+  headings: ($for(mcanouil-fonts.headings)$"$it$", $endfor$),
+  monospace: ($for(mcanouil-fonts.monospace)$"$it$", $endfor$),
 )
 
 #show: doc => article(

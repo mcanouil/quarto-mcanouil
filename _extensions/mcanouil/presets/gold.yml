@@ -16,10 +16,13 @@ light:
   accent-high: "#e8c65a"
   accent-low: "#6b4a05"
   accent-text: "#876208"
+  link: "#876208"
   ground-1: "#111827"
   ground-2: "#3a2a06"
   on-ground-accent: "#e8c65a"
   on-ground-text: "#f0dfa8"
+  on-ground-title: "#ffffff"
+  chrome: "#b5830a"
   note: "#0066cc"
   tip: "#009955"
   warning: "#cc6600"
@@ -41,10 +44,13 @@ dark:
   accent-high: "#e8c65a"
   accent-low: "#6b4a05"
   accent-text: "#c9971f"
+  link: "#c9971f"
   ground-1: "#111827"
   ground-2: "#3a2a06"
   on-ground-accent: "#e8c65a"
   on-ground-text: "#f0dfa8"
+  on-ground-title: "#ffffff"
+  chrome: "#b5830a"
   note: "#66aaff"
   tip: "#66cc99"
   warning: "#ffaa44"
@@ -60,6 +66,10 @@ fonts:
   base: Source Serif 4
   headings: Source Serif 4
   monospace: Fira Code
+  generic:
+    base: serif
+    headings: serif
+    monospace: monospace
 
 logo:
   light: logos/logo-light.svg

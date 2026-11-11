@@ -6,8 +6,8 @@ body {
   --bs-body-bg: var(--mc-paper);
   --bs-body-color: var(--mc-ink);
   --bs-primary: var(--mc-accent);
-  --bs-link-color: var(--mc-accent-text);
-  --bs-link-hover-color: var(--mc-accent-text);
+  --bs-link-color: var(--mc-link);
+  --bs-link-hover-color: var(--mc-link);
   --bs-secondary-color: var(--mc-muted);
   --bs-border-color: var(--mc-line);
   --bs-body-font-family: var(--mc-font-base);
@@ -18,7 +18,7 @@ body {
 }
 
 a {
-  color: var(--mc-accent-text);
+  color: var(--mc-link);
 }
 
 h1,

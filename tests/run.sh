@@ -383,6 +383,33 @@ check_html_dark_tokens() {
 	fi
 }
 
+check_user_background_dark() {
+	local output ok=1
+	output="$(render user-background/background html gold)"
+	css_rule "${output}" 'body.quarto-dark' | grep -qF -- '--mc-paper: #202020;' || ok=0
+	css_rule "${output}" 'body.quarto-light' | grep -qF -- '--mc-paper: #ffffff;' || ok=0
+	has "${output}" 'quarto-color-alternate" id="quarto-bootstrap" data-mode="dark"' || ok=0
+	if [ "${ok}" = 1 ]; then
+		report pass user-background-dark ""
+	else
+		report fail user-background-dark "user dark background in body.quarto-dark, and a dark stylesheet that Quarto marks dark"
+	fi
+}
+
+check_link_token() {
+	local output css ok=1
+	output="$(render smoke html terminal)"
+	css_rule "${output}" 'body.quarto-light' | grep -qF -- "--mc-link: $(preset_value terminal dark link);" || ok=0
+	css="$(dirname "${output}")/$(grep -oE 'href="[^"]*bootstrap-[0-9a-f]+\.min\.css"' "${output}" | head -n 1 | sed -E 's/^href="(.*)"$/\1/')"
+	[ -f "${css}" ] && grep -qF 'color:var(--mc-link)' "${css}" || ok=0
+	typ_token "$(render smoke typst terminal)" link "$(preset_value terminal dark link)" || ok=0
+	if [ "${ok}" = 1 ]; then
+		report pass link-token ""
+	else
+		report fail link-token "terminal --mc-link $(preset_value terminal dark link) in HTML and Typst, and links coloured by var(--mc-link)"
+	fi
+}
+
 check_no_sass_colour_fns() {
 	local found
 	# shellcheck disable=SC2016 # the $ in the pattern is a literal Sass variable prefix
@@ -452,7 +479,7 @@ check_fonts_embedded() {
 	pdffonts "$(render smoke typst terminal)" | grep -q 'JetBrainsMono' || ok=0
 	html_fonts_local "$(render smoke html gold)" || ok=0
 	html_fonts_local "$(render smoke revealjs mono)" || ok=0
-	css_rule "$(render smoke html mono)" 'body.quarto-light' | grep -qF -- '--mc-font-base: "Alegreya Sans";' || ok=0
+	css_rule "$(render smoke html mono)" 'body.quarto-light' | grep -qF -- '--mc-font-base: "Alegreya Sans", sans-serif;' || ok=0
 	if [ "${ok}" = 1 ]; then
 		report pass fonts-embedded ""
 	else
@@ -484,6 +511,8 @@ CHECKS=(
 	preset-default-gold
 	reveal-dark-tokens
 	html-dark-tokens
+	user-background-dark
+	link-token
 	no-sass-colour-fns
 	terminal-light-warns
 	partial-user-brand
