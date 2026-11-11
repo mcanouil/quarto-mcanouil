@@ -441,6 +441,31 @@ check_terminal_light_warns() {
 	fi
 }
 
+check_contrast_presets_pass() {
+	local format ok=1
+	for format in html revealjs typst; do
+		render_all_presets smoke "${format}"
+	done
+	if [ "${ok}" = 1 ]; then
+		report pass contrast-presets-pass ""
+	else
+		report fail contrast-presets-pass "all four presets to render in every format"
+	fi
+}
+
+check_contrast_fail_message() {
+	local dir="${work_dir}/bad-contrast" code=0 ratio message
+	cp -R "${repo_dir}/_extensions" "${dir}/_extensions"
+	(cd "${dir}" && quarto render bad.qmd --to mcanouil-html >bad.out 2>bad.err) || code=$?
+	ratio="$(grep -oE 'accent-text on paper \(light\) is [0-9]+\.[0-9]{2}:1' "${dir}/bad.err" | head -n 1 | grep -oE '[0-9]+\.[0-9]{2}' || true)"
+	message="mcanouil: contrast check failed: accent-text on paper (light) is ${ratio}:1, below 4.50:1. Change accent-text or paper in _brand.yml."
+	if [ "${code}" != 0 ] && [ -n "${ratio}" ] && has "${dir}/bad.err" "${message}" && [ ! -f "${dir}/bad.html" ]; then
+		report pass contrast-fail-message ""
+	else
+		report fail contrast-fail-message "a non-zero exit, no output, and the message '${message}'"
+	fi
+}
+
 check_partial_user_brand() {
 	local html typst ok=1 ground
 	ground="$(preset_value gold light ground-1)"
@@ -515,6 +540,8 @@ CHECKS=(
 	link-token
 	no-sass-colour-fns
 	terminal-light-warns
+	contrast-presets-pass
+	contrast-fail-message
 	partial-user-brand
 	fonts-embedded
 	no-hex-outside-presets
