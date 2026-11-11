@@ -1,7 +1,7 @@
 name: Quarto Extensions Updates
 
-# Keeps the documentation website's own dependencies current: atelier, iconify,
-# and gitlink under docs/_extensions/.
+# Keeps the extensions current: the documentation website's own dependencies
+# under docs/_extensions/, and the tools embedded in _extensions/mcanouil/.
 on:
   workflow_dispatch:
   # schedule:
@@ -21,3 +21,4 @@ jobs:
       gh-app-id: ${{ vars.APP_ID }}
       scan-directories: |
         docs
+        _extensions/mcanouil
