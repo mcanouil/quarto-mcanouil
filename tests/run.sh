@@ -211,11 +211,12 @@ check_tool_optin_off() {
 	for file in "$(render tools html gold)" "$(render tools revealjs gold)"; do
 		lacks "${file}" 'preview-colour' || ok=0
 		lacks "${file}" 'collapse-output' || ok=0
+		lacks "${file}" 'quarto-remember' || ok=0
 	done
 	if [ "${ok}" = 1 ]; then
 		report pass tool-optin-off ""
 	else
-		report fail tool-optin-off "no preview-colour or collapse-output marker without their options"
+		report fail tool-optin-off "no preview-colour, collapse-output or remember marker without their options"
 	fi
 }
 
@@ -224,7 +225,7 @@ check_tool_quiet() {
 	for file in "$(render smoke html gold)" "$(render smoke revealjs gold)"; do
 		for marker in 'class="light-content"' '<iconify-icon' 'data-prism=' 'sourceCode python cw-auto' \
 			'data-veil-hidden' 'assets/typst-render/' 'gitlink-badge' 'mobile-toc/' 'preview-colour' \
-			'collapse-output'; do
+			'collapse-output' 'quarto-remember'; do
 			lacks "${file}" "${marker}" || ok=0
 		done
 	done
@@ -235,11 +236,22 @@ check_tool_quiet() {
 	fi
 }
 
+check_tool_remember_optin() {
+	local file
+	file="$(render remember html gold)"
+	if has "${file}" 'quarto-remember'; then
+		report pass tool-remember-optin ""
+	else
+		report fail tool-remember-optin "the marker 'quarto-remember' in the output of tests/fixtures/remember.qmd"
+	fi
+}
+
 CHECKS=(
 	smoke-renders
 	tool-active
 	tool-optin-off
 	tool-quiet
+	tool-remember-optin
 )
 
 for name in "${CHECKS[@]}"; do

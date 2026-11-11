@@ -30,6 +30,10 @@ contributes:
       filters:
         - mobile-toc
         - collapse-output
+        - remember
+      extensions:
+        remember:
+          enabled: false
       theme:
         - html/base.scss
     typst:
