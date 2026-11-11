@@ -11,14 +11,19 @@
 ---   The `format` prefix is matched against the Quarto target format,
 ---   resolved from `quarto.format.format_identifier()["target-format"]`
 ---   (falling back to the Pandoc `FORMAT` global). The target format is the
----   user-declared format name and includes Quarto custom formats, so a
----   custom format such as `mcanouil-typst` is distinct from its base writer
----   `typst`. Matching is exact for individual format names, so `html:`
+---   user-declared format name and includes Quarto custom formats, such as
+---   `mcanouil-typst`.
+---
+---   A custom format also matches the prefix of its base format, read from
+---   `quarto.format.format_identifier()["base-format"]`, so `typst:` applies
+---   under `mcanouil-typst` and `html:` applies under `foo-html`. The custom
+---   format name stays more specific: `mcanouil-typst:` wins over `typst:`
+---   for the same attribute name. Matching is otherwise exact, so `html:`
 ---   targets HTML output without also affecting revealjs.
 ---
----   In addition to exact format names, the `slide` alias matches every HTML
----   slide format (revealjs, slidy, s5, dzslides, slideous), so `slide:` can
----   target the whole group at once.
+---   In addition to format names, the `slide` alias matches every HTML slide
+---   format (revealjs, slidy, s5, dzslides, slideous), and every custom format
+---   based on one of them, so `slide:` can target the whole group at once.
 ---
 ---   A `default:name` prefix provides a fallback value, applied only when no
 ---   format-specific variant of the same `name` matched the active format.
@@ -36,15 +41,15 @@
 ---   `typst:` key stays prism's, since the writer splices it unvalidated and
 ---   Typst rejects it. See <https://pandoc.org/typst-property-output.html>.
 ---
----   Precedence for a given `name`: exact format match > alias match >
----   default fallback > unprefixed pass-through.
+---   Precedence for a given `name`: exact format match > base format match >
+---   alias match > default fallback > unprefixed pass-through.
 ---
 ---   Promoted attributes override static ones with the same name. When two
 ---   format-scoped attributes share the same target name on the same element
 ---   (e.g. two `html:style` keys), the last one in source order wins.
 ---
----   Unknown prefixes (neither an exact format name, a known group alias,
----   nor `default`) are treated as non-matching and the attribute is dropped.
+---   Unknown prefixes (neither the target format, its base format, a known
+---   group alias, nor `default`) are treated as non-matching and the attribute is dropped.
 ---   Enable `extensions.prism.warn-on-drop` to emit a `quarto.log.warning`
 ---   each time a format-scoped attribute is dropped, which surfaces typos in
 ---   prefixes that would otherwise vanish silently.
@@ -87,22 +92,30 @@ local check = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/sche
 --- render carries on: a configuration file must not stop a document.
 local checker = check.new(schema, EXTENSION_NAME)
 
---- Resolve the active Quarto target format name once per render.
+--- Read a format name from the Quarto format identifier, falling back when
+--- the field is missing or empty.
 --- Strips Pandoc format variants (e.g. `html+raw_attribute` -> `html`) so
 --- prefixes can be written without flag suffixes.
+--- @param key string The identifier field, e.g. "target-format".
+--- @param fallback string The name to use when the field is missing or empty.
 --- @return string
-local function resolve_target_format()
+local function resolve_format(key, fallback)
   local ok, identifier = pcall(function()
     return quarto.format.format_identifier()
   end)
-  local target = ok and identifier and identifier["target-format"] or nil
-  if target == nil or target == "" then
-    target = FORMAT
+  local format = ok and type(identifier) == "table" and identifier[key] or nil
+  if format == nil or format == "" then
+    format = fallback
   end
-  return target:match("^[^+]+") or target
+  return format:match("^[^+]+") or format
 end
 
-local TARGET_FORMAT = resolve_target_format()
+--- The active Quarto target format name, e.g. `foo-html` for a custom format.
+local TARGET_FORMAT = resolve_format("target-format", FORMAT)
+
+--- The base format of the target, e.g. `html` for `foo-html`. Equal to
+--- `TARGET_FORMAT` when the target is a built-in format.
+local BASE_FORMAT = resolve_format("base-format", TARGET_FORMAT)
 
 --- Whether Pandoc writes this render with its Typst writer.
 --- Asks Quarto rather than the target format, because a custom format such as
@@ -189,17 +202,29 @@ end
 --- @type boolean
 local warn_on_drop = false
 
+--- The rank of each match kind. A higher rank wins for the same name.
+--- @type table<string, integer>
+local MATCH_RANK = {
+  exact = 3,
+  base = 2,
+  alias = 1,
+}
+
 --- Resolve how a prefix matches the active target format.
---- Exact format names match identically; group aliases match when the active
---- target format is a member of the alias set.
+--- The target format name matches as "exact"; the base format of a custom
+--- format matches as "base"; group aliases match when the target format or
+--- its base format is a member of the alias set.
 --- @param prefix string The attribute key prefix (the part before the colon).
---- @return "exact"|"alias"|nil The match kind, or nil when the prefix does not match.
+--- @return "exact"|"base"|"alias"|nil The match kind, or nil when the prefix does not match.
 local function match_prefix(prefix)
   if prefix == TARGET_FORMAT then
     return "exact"
   end
+  if prefix == BASE_FORMAT then
+    return "base"
+  end
   local alias = FORMAT_ALIASES[prefix]
-  if alias and alias[TARGET_FORMAT] then
+  if alias and (alias[TARGET_FORMAT] or alias[BASE_FORMAT]) then
     return "alias"
   end
   return nil
@@ -252,14 +277,14 @@ local function process(el)
         default_value[name] = value
       else
         local kind = match_prefix(prefix)
-        -- An exact match always wins over an alias match for the same name.
-        if kind == "exact" or (kind == "alias" and promoted_kind[name] ~= "exact") then
+        -- A more specific match wins for the same name: exact, then base, then alias.
+        if kind and MATCH_RANK[kind] >= (MATCH_RANK[promoted_kind[name]] or 0) then
           if promoted_value[name] == nil then
             table.insert(promoted_order, name)
           end
           promoted_value[name] = value
           promoted_kind[name] = kind
-        else
+        elseif kind == nil then
           table.insert(dropped, key)
         end
       end
@@ -295,7 +320,8 @@ local function process(el)
       EXTENSION_NAME,
       "Dropped attribute(s) '" .. table.concat(dropped, "', '") ..
         "' on " .. describe_element(el) ..
-        " because no prefix matched target format '" .. TARGET_FORMAT .. "'."
+        " because no prefix matched target format '" .. TARGET_FORMAT .. "'" ..
+        (BASE_FORMAT ~= TARGET_FORMAT and " (base format '" .. BASE_FORMAT .. "')" or "") .. "."
     )
   end
 

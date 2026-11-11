@@ -41,7 +41,7 @@ print("hello")
 #strong[Rendered by Typst]
 ```
 
-::: {default:data-prism="yes"}
+::: {html:data-prism="yes"}
 Conditional attributes.
 :::
 
