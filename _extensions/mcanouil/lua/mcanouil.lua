@@ -6,7 +6,11 @@
 --- @description Returns the list of filter steps. Later steps are added by
 --- requiring their module and appending it to STEPS.
 
+local preset = require(quarto.utils.resolve_path('preset.lua'):gsub('%.lua$', ''))
+
 --- @type table[] The filter steps, run in order.
-local STEPS = {}
+local STEPS = {
+  preset.filter,
+}
 
 return STEPS

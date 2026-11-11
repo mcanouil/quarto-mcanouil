@@ -1,0 +1,11 @@
+$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json
+options:
+  preset:
+    type: string
+    enum:
+      - gold
+      - mono
+      - quarto
+      - terminal
+    default: gold
+    description: "Preset for every format: colours, fonts and style. Set it as `mcanouil: { preset: <name> }` in the front matter or in `_quarto.yml`."

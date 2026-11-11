@@ -34,9 +34,17 @@ contributes:
       extensions:
         remember:
           enabled: false
+      respect-user-color-scheme: true
       theme:
-        - html/base.scss
+        light:
+          - html/tokens.scss
+          - html/base.scss
+        dark:
+          - html/tokens.scss
+          - html/base.scss
+          - html/scheme-dark.scss
     typst:
+      font-paths: fonts
       template-partials:
         - typst/typst-template.typ
         - typst/typst-show.typ

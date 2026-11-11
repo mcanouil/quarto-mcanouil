@@ -1,0 +1,6 @@
+---
+title: Terminal with a light request
+brand-mode: light
+---
+
+A paragraph.

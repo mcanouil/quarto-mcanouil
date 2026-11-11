@@ -1,0 +1,66 @@
+# mcanouil - mono preset
+# Colour tokens for the light and dark schemes, fonts and logos of the mono preset.
+# This file and the other preset files are the only files of the extension with colour values.
+#
+# @license MIT
+# @copyright 2026 Mickaël Canouil
+# @author Mickaël Canouil
+
+light:
+  paper: "#fafafa"
+  ink: "#333333"
+  muted: "#595959"
+  tint: "#f0f0f0"
+  line: "#dddddd"
+  accent: "#4d4d4d"
+  accent-high: "#bdbdbd"
+  accent-low: "#262626"
+  accent-text: "#2b5f8a"
+  ground-1: "#3a3a3a"
+  ground-2: "#1f1f1f"
+  on-ground-accent: "#fafafa"
+  on-ground-text: "#d9d9d9"
+  note: "#0066cc"
+  tip: "#009955"
+  warning: "#cc6600"
+  important: "#cc0000"
+  caution: "#b38f00"
+  note-text: "#0055b3"
+  tip-text: "#00723f"
+  warning-text: "#964c00"
+  important-text: "#b00000"
+  caution-text: "#7a6300"
+
+dark:
+  paper: "#333333"
+  ink: "#fafafa"
+  muted: "#c4c4c4"
+  tint: "#2a2a2a"
+  line: "#4a4a4a"
+  accent: "#9a9a9a"
+  accent-high: "#bdbdbd"
+  accent-low: "#262626"
+  accent-text: "#8fb8e0"
+  ground-1: "#3a3a3a"
+  ground-2: "#1f1f1f"
+  on-ground-accent: "#fafafa"
+  on-ground-text: "#d9d9d9"
+  note: "#66aaff"
+  tip: "#66cc99"
+  warning: "#ffaa44"
+  important: "#ff6666"
+  caution: "#ddcc66"
+  note-text: "#66aaff"
+  tip-text: "#66cc99"
+  warning-text: "#ffaa44"
+  important-text: "#ff6666"
+  caution-text: "#ddcc66"
+
+fonts:
+  base: Alegreya Sans
+  headings: Alegreya Sans
+  monospace: Fira Code
+
+logo:
+  light: logos/logo-light.svg
+  dark: logos/logo-dark.svg
