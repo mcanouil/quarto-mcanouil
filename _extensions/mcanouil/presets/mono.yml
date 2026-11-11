@@ -27,7 +27,7 @@ light:
   tip: "#009955"
   warning: "#cc6600"
   important: "#cc0000"
-  caution: "#b38f00"
+  caution: "#a58300"
   note-text: "#0055b3"
   tip-text: "#00723f"
   warning-text: "#964c00"
