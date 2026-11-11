@@ -20,7 +20,8 @@ contributes:
         - typst-render
         - gitlink
         - preview-colour
-        - lua/mcanouil-post.lua
+        - path: lua/mcanouil-post.lua
+          at: post-quarto
       extensions:
         preview-colour:
           text: false
