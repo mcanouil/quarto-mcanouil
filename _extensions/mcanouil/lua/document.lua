@@ -29,13 +29,25 @@ local ALIASES = { center = 'centre' }
 --- @type string Document type used when `extensions.mcanouil.type` is not set.
 M.DEFAULT_TYPE = 'report'
 
---- @type string Layout used when `extensions.mcanouil.layout` is not set.
-M.DEFAULT_LAYOUT = 'compact'
-
 --- @type table<string, string[]> The document types that Typst renders, with the layouts of each.
 M.TYPES = {
   report = { 'compact', 'full' },
+  article = { 'standard' },
 }
+
+--- @type table<string, table<string, string>> Margin note columns of the types that set one, as the
+--- `margin-geometry` metadata of Quarto: the distance to the page edge, the width and the separation
+--- from the text, for the inner (left) and outer (right) margin.
+M.MARGIN_GEOMETRY = {
+  article = {
+    inner = { far = '12mm', width = '0mm', separation = '8mm' },
+    outer = { far = '8mm', width = '42mm', separation = '8mm' },
+    clearance = '12pt',
+  },
+}
+
+--- @type table<string, table<string, string>> Page margin above and below the text of the types that set a margin note column.
+M.MARGIN_VERTICAL = { article = { top = '25mm', bottom = '25mm' } }
 
 --- @type string[] Document types that only `mcanouil-typst` renders.
 M.PDF_ONLY = { 'letter', 'invoice' }
@@ -51,6 +63,10 @@ local FORMAT_NAMES = { typst = 'mcanouil-typst', revealjs = 'mcanouil-revealjs',
 M.DEFAULTS = {
   report = {
     header = { left = 'title', centre = '', right = 'chapter' },
+    footer = { left = 'author', centre = 'version', right = 'page' },
+  },
+  article = {
+    header = { left = 'title', centre = '', right = '' },
     footer = { left = 'author', centre = 'version', right = 'page' },
   },
 }
@@ -268,13 +284,26 @@ function M.resolve(meta, format)
   if not layouts then
     return nil, string.format('mcanouil: unknown type "%s"; use %s.', doc_type, table.concat(sorted_keys(M.TYPES), ', '))
   end
-  local layout = option(options, 'layout') or M.DEFAULT_LAYOUT
+  local layout = option(options, 'layout') or layouts[1]
   if not contains(layouts, layout) then
     return nil, string.format(
       'mcanouil: unknown layout "%s" for type "%s"; use %s.', layout, doc_type, table.concat(layouts, ', ')
     )
   end
   return { type = doc_type, layout = layout, kind = option(options, 'kind') }
+end
+
+--- Set the margin note column of a document type that has one, so Quarto sets up the margin
+--- layout whether or not the document has a margin note.
+--- @param meta table Document metadata
+--- @param doc_type string Document type
+local function deliver_margin(meta, doc_type)
+  local geometry = M.MARGIN_GEOMETRY[doc_type]
+  if geometry == nil then
+    return
+  end
+  meta['margin-geometry'] = geometry
+  meta.margin = meta.margin or M.MARGIN_VERTICAL[doc_type]
 end
 
 --- Deliver the type and the resolved slots to Typst as `mcanouil-type`,
@@ -296,6 +325,7 @@ local function deliver(meta)
   meta['mcanouil-type'] = resolved.type
   meta['mcanouil-layout'] = resolved.layout
   meta['mcanouil-kind'] = resolved.kind
+  deliver_margin(meta, resolved.type)
   local furniture = M.furniture(meta)
   for _, part in ipairs(M.PARTS) do
     local delivered = {}

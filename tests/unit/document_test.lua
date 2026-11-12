@@ -133,7 +133,7 @@ end
 
 cases['resolve-unknown-type'] = function()
   fails_with(
-    type_options({ type = 'poster' }), 'mcanouil-typst', 'mcanouil: unknown type "poster"; use report.', 'unknown type'
+    type_options({ type = 'poster' }), 'mcanouil-typst', 'mcanouil: unknown type "poster"; use article, report.', 'unknown type'
   )
 end
 

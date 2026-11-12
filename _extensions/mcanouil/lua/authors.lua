@@ -60,6 +60,34 @@ local function affiliation_line(affiliation)
   return table.concat(parts, ', ')
 end
 
+--- @type string Separator that the CRediT terms put in a role, such as `writing – original draft`.
+local CREDIT_SEPARATOR = ' \u{2013} '
+
+--- Answer a role term for display: the separator of the CRediT terms becomes a comma.
+--- @param term string
+--- @return string
+local function role_label(term)
+  return (term:gsub(CREDIT_SEPARATOR, ', '))
+end
+
+--- Answer the CRediT roles of an author, each with its degree of contribution.
+--- @param author table Author metadata
+--- @return table[] Roles: `role` is the term, `degree` is `lead`, `equal`, `supporting` or `''`
+local function roles_of(author)
+  local roles = {}
+  for _, entry in ipairs(author.roles or {}) do
+    if pandoc.utils.type(entry) == 'Inlines' then
+      roles[#roles + 1] = { role = role_label(text(entry)), degree = '' }
+    else
+      roles[#roles + 1] = {
+        role = role_label(text(entry['vocab-term'] or entry.role)),
+        degree = text(entry['degree-of-contribution']):lower(),
+      }
+    end
+  end
+  return roles
+end
+
 --- Read the authors of a document.
 --- @param meta table Document metadata, after Quarto normalised the authors
 --- @return table|nil `authors`, `affiliations` (lines) and `email` of the corresponding author, or nil without authors
@@ -93,6 +121,7 @@ function M.collect(meta)
       corresponding = flag(author, 'corresponding'),
       equal = flag(author, 'equal-contributor'),
       deceased = flag(author, 'deceased'),
+      roles = roles_of(author),
     }
     if record.corresponding and result.email == '' then
       result.email = text(author.email)
@@ -124,6 +153,10 @@ function M.typst(collected)
     for _, number in ipairs(author.affiliations) do
       numbers[#numbers + 1] = tostring(number)
     end
+    local roles = {}
+    for _, role in ipairs(author.roles or {}) do
+      roles[#roles + 1] = string.format('(role: %s, degree: %s)', quote(role.role), quote(role.degree))
+    end
     people[#people + 1] = table.concat({
       '(name: ', quote(author.name),
       ', degrees: ', array(degrees),
@@ -132,7 +165,8 @@ function M.typst(collected)
       ', email: ', quote(author.email or ''),
       ', corresponding: ', tostring(author.corresponding),
       ', equal: ', tostring(author.equal),
-      ', deceased: ', tostring(author.deceased), ')',
+      ', deceased: ', tostring(author.deceased),
+      ', roles: ', array(roles), ')',
     })
   end
   local lines = {}
@@ -143,6 +177,102 @@ function M.typst(collected)
     '(authors: ', array(people),
     ', affiliations: ', array(lines),
     ', email: ', quote(collected.email), ')',
+  })
+end
+
+--- @type table<string, string> Mark of each degree of contribution.
+M.CREDIT_MARKS = { lead = 'L', equal = 'E', supporting = 'S' }
+
+--- @type string[] Degrees of contribution, in legend order.
+local CREDIT_DEGREES = { 'lead', 'equal', 'supporting' }
+
+--- @type string Mark of a role with no degree of contribution.
+local CREDIT_CONTRIBUTED = '\u{2022}'
+
+--- Answer the initials of a name, for example `AA` for `Ana Author`.
+--- @param name string
+--- @return string
+local function initials(name)
+  local letters = {}
+  for word in name:gmatch('%S+') do
+    letters[#letters + 1] = pandoc.text.upper(pandoc.text.sub(word, 1, 1))
+  end
+  return table.concat(letters)
+end
+
+--- Answer the CRediT table of the authors: the roles as rows and the authors as columns.
+--- @param collected table Result of `M.collect`
+--- @param label fun(key: string): string Label of a key in the document language
+--- @return table|nil `columns` (initials), `rows` (`role` and `marks`, one mark for each author) and `legend`; nil when no author has a role
+function M.credit_matrix(collected, label)
+  local columns, rows, index, degrees = {}, {}, {}, {}
+  for _, author in ipairs(collected.authors) do
+    columns[#columns + 1] = initials(author.name)
+  end
+  for number, author in ipairs(collected.authors) do
+    for _, entry in ipairs(author.roles) do
+      if index[entry.role] == nil then
+        local marks = {}
+        for position = 1, #collected.authors do
+          marks[position] = ''
+        end
+        rows[#rows + 1] = {
+          role = pandoc.text.upper(pandoc.text.sub(entry.role, 1, 1)) .. pandoc.text.sub(entry.role, 2),
+          marks = marks,
+        }
+        index[entry.role] = #rows
+      end
+      rows[index[entry.role]].marks[number] = M.CREDIT_MARKS[entry.degree] or CREDIT_CONTRIBUTED
+      degrees[M.CREDIT_MARKS[entry.degree] and entry.degree or CREDIT_CONTRIBUTED] = true
+    end
+  end
+  if #rows == 0 then
+    return nil
+  end
+  local legend = {}
+  for _, degree in ipairs(CREDIT_DEGREES) do
+    if degrees[degree] then
+      legend[#legend + 1] = M.CREDIT_MARKS[degree] .. ' ' .. label('mcanouil-credit-' .. degree)
+    end
+  end
+  if degrees[CREDIT_CONTRIBUTED] then
+    legend[#legend + 1] = CREDIT_CONTRIBUTED .. ' ' .. label('mcanouil-credit-contributed')
+  end
+  return { columns = columns, rows = rows, legend = table.concat(legend, ' \u{b7} ') }
+end
+
+--- Answer the blocks of the CRediT table for an HTML document: a heading, the table with header cells for
+--- the authors and for the roles, and the legend line.
+--- @param matrix table Result of `M.credit_matrix`
+--- @param label fun(key: string): string Label of a key in the document language
+--- @return pandoc.Blocks
+function M.credit_blocks(matrix, label)
+  local function cell(text, alignment)
+    return pandoc.Cell({ pandoc.Plain({ pandoc.Str(text) }) }, alignment or pandoc.AlignCenter)
+  end
+  local head = { cell(label('mcanouil-credit-role'), pandoc.AlignLeft) }
+  local specs = { { pandoc.AlignLeft, nil } }
+  for _, column in ipairs(matrix.columns) do
+    head[#head + 1] = cell(column)
+    specs[#specs + 1] = { pandoc.AlignCenter, nil }
+  end
+  local rows = {}
+  for _, row in ipairs(matrix.rows) do
+    local cells = { cell(row.role, pandoc.AlignLeft) }
+    for _, mark in ipairs(row.marks) do
+      cells[#cells + 1] = cell(mark)
+    end
+    rows[#rows + 1] = pandoc.Row(cells)
+  end
+  local table_block = pandoc.Table(
+    pandoc.Caption({}), specs, pandoc.TableHead({ pandoc.Row(head) }),
+    { { attr = pandoc.Attr(), row_head_columns = 1, head = {}, body = rows } },
+    pandoc.TableFoot()
+  )
+  return pandoc.Blocks({
+    pandoc.Header(1, { pandoc.Str(label('mcanouil-credit-title')) }, pandoc.Attr('credit', { 'unnumbered' })),
+    table_block,
+    pandoc.Para({ pandoc.Str(matrix.legend) }),
   })
 end
 
@@ -160,7 +290,26 @@ local function deliver(meta)
   return meta
 end
 
+--- Append the CRediT table to an HTML article, after the references.
+--- @param doc pandoc.Pandoc
+--- @return pandoc.Pandoc
+local function append_credit_table(doc)
+  local options = doc.meta.extensions and doc.meta.extensions.mcanouil or {}
+  if not quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') or text(options.type) ~= 'article' then
+    return doc
+  end
+  local collected = M.collect(doc.meta)
+  local matrix = collected and M.credit_matrix(collected, labels.get)
+  if matrix then
+    doc.blocks:extend(M.credit_blocks(matrix, labels.get))
+  end
+  return doc
+end
+
 --- @type table Filter step of the entry filter.
 M.filter = { Meta = fail.guard(deliver) }
+
+--- @type table Filter step of the closing filter, after Quarto's own filters.
+M.post_filter = { Pandoc = fail.guard(append_credit_table) }
 
 return M

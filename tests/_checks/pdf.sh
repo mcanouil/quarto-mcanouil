@@ -26,27 +26,6 @@ need pdfinfo
 need pdffonts
 need pdftoppm
 
-# Motif sample points of each preset, in motif units: "x,y" pairs inside a
-# shape. The first pair is the shape nearest the corner, the last one is on the
-# right edge at mid motif height or the nearest shape to it.
-motif_points() {
-	case "$1" in
-	gold) printf '99.5,0.5 99.5,50' ;;
-	mono) printf '99.5,0.5 81,0.5 99.5,32 99.5,50' ;;
-	quarto) printf '46,0.5 99.5,54' ;;
-	terminal) printf '96,4 96,53' ;;
-	esac
-}
-
-# Answer the token of the colour that a preset motif uses on its page: a light
-# page uses accent, a dark page accent-high.
-motif_token() {
-	case "$1" in
-	terminal) printf 'accent-high' ;;
-	*) printf 'accent' ;;
-	esac
-}
-
 # Answer the shapes of the motifs of the Typst library, one line each:
 # "<motif> <kind> <numbers...> <opacity>".
 typst_motif_shapes() {

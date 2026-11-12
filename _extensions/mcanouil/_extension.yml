@@ -59,6 +59,7 @@ contributes:
         - typst/lib/title.typ
         - typst/lib/toc.typ
         - typst/types/report.typ
+        - typst/types/article.typ
         - typst/typst-template.typ
         - typst/typst-show.typ
     revealjs:

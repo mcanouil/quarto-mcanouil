@@ -32,10 +32,12 @@
 // - motif: corner motif of page 1, from motif(), or none. Page 1 then has no
 //   header and no edge, so the motif never meets the header.
 // - paper: paper size.
+// - margin: page margins, or none to keep the margins that the page already has, for example
+//   those of the margin notes of an article.
 // - surfaces: dictionary of the page kinds that mc-surface() marks. Each kind
 //   has `header` (true or false), `footer` (content, or auto for the footer)
 //   and `background` (content, or auto for the gilded edge of body pages).
-#let chrome-page(header, footer, edge: true, motif: none, paper: "a4", surfaces: (:), body) = {
+#let chrome-page(header, footer, edge: true, motif: none, paper: "a4", margin: mc-page-margin, surfaces: (:), body) = {
   let colours = tokens()
   let body-page = (header: true, footer: auto, background: auto)
   let surface() = {
@@ -47,9 +49,9 @@
     }
   }
   let furniture(content) = text(size: 8pt, fill: colours.muted, content)
+  set page(margin: margin) if margin != none
   set page(
     paper: paper,
-    margin: mc-page-margin,
     fill: colours.paper,
     header: context if surface().header {
       block(width: 100%, inset: (bottom: 3pt), stroke: (bottom: 0.5pt + colours.line), furniture(header))

@@ -359,11 +359,19 @@ local function meta_text(meta, key)
   return meta[key] ~= nil and pandoc.utils.stringify(meta[key]) or ''
 end
 
---- Arrange the chapters and special sections of a Typst report.
+--- Arrange a Typst document by its type. A report gets its chapters and special sections; an article
+--- gets its bibliography placed.
 --- @param doc pandoc.Pandoc
 --- @return pandoc.Pandoc
 local function arrange(doc)
-  if not quarto.doc.is_format('typst') or meta_text(doc.meta, 'mcanouil-type') ~= 'report' then
+  if not quarto.doc.is_format('typst') then
+    return doc
+  end
+  local doc_type = meta_text(doc.meta, 'mcanouil-type')
+  if doc_type == 'article' then
+    return place_bibliography(doc)
+  end
+  if doc_type ~= 'report' then
     return doc
   end
   doc.blocks = number_book(doc.blocks) or M.reorder(doc.blocks)
