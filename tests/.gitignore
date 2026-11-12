@@ -4,3 +4,7 @@
 /_results/
 /generated/
 /tools/assets/
+*_files/
+*.html
+*.pdf
+*.typ
