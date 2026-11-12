@@ -1,5 +1,0 @@
----
-title: User brand
----
-
-A paragraph.

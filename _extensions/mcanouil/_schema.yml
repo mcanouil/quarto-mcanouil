@@ -11,7 +11,7 @@ options:
     description: "Preset for every format: colours, fonts and style. Set it as `extensions: { mcanouil: { preset: <name> } }` in the front matter or in `_quarto.yml`."
   header:
     type: object
-    additional-properties: false
+    additionalProperties: false
     description: "Content of the three header slots of Typst pages. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter and page. An empty string leaves the slot empty. A slot that is not set takes the default of the document type."
     properties:
       left:
@@ -26,7 +26,7 @@ options:
         description: "Content of the right header slot, aligned right."
   footer:
     type: object
-    additional-properties: false
+    additionalProperties: false
     description: "Content of the three footer slots of Typst pages. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter and page. An empty string leaves the slot empty. A slot that is not set takes the default of the document type."
     properties:
       left:
