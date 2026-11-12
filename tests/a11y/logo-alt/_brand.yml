@@ -1,0 +1,6 @@
+logo:
+  images:
+    mark:
+      path: figure.svg
+      alt: A grey rectangle.
+  medium: mark
