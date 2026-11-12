@@ -25,12 +25,13 @@ page1_matches() {
 }
 
 # The PDF text may hold the diaeresis of Mickaël as a combining mark, so the name is matched loosely.
+# pdftotext may also drop the narrow space between bold words, so the space in a name is optional.
 # Succeed when every author name of the fixture is on page 1, with degrees in
 # small type after the name, and the affiliation numbers are superscript.
 authors_render() {
 	local name
 	for name in 'Micka.{1,4}l Canouil' 'Ana Author' 'Ben Writer' 'Cleo Reader' 'Dan Plotter' 'Eve Fitter' 'Finn Checker' 'Gus Elder'; do
-		page1_matches "${name}" || return 1
+		page1_matches "${name// / ?}" || return 1
 	done
 	page1_matches 'Micka.{1,4}l Canouil[^A-Za-z]*Ph\.D\.' &&
 		page1_matches 'Ben ?Writer[[:space:]]*M\.D\., Ph\.D\.' &&

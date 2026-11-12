@@ -31,6 +31,22 @@ $if(abstract)$
     abstract: [$abstract$],
     abstract-title: [$labels.abstract$],
 $endif$
+$if(version)$
+    version: [$version$],
+$endif$
+$if(license.text)$
+    licence: [$license.text$],
+$elseif(license)$
+    licence: [$license$],
+$endif$
+$if(copyright.holder)$
+    copyright: [© $copyright.year$ $copyright.holder$],
+$elseif(copyright)$
+    copyright: [$copyright$],
+$endif$
+$if(toc-depth)$
+    toc-depth: $toc-depth$,
+$endif$
 $if(keywords)$
     keywords: ($for(keywords)$[$it$], $endfor$),
 $endif$

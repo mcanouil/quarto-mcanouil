@@ -38,6 +38,7 @@
 // - keywords: array of content.
 // - abstract-title: heading of the abstract.
 // - font: font family of the title and the subtitle, or none for the text font.
+// - title-size: size of the title.
 // - motif-space: width that the shapes of the corner motif take beside the text, or none.
 // - motif-bottom: distance from the top of the page to the bottom of those shapes, or none.
 #let title-block(
@@ -52,6 +53,7 @@
   abstract-title: none,
   keywords: (),
   font: none,
+  title-size: 1.9em,
   motif-space: none,
   motif-bottom: none,
 ) = {
@@ -63,7 +65,7 @@
     row(0.6em, text(size: 0.75em, weight: "bold", tracking: 0.14em, fill: colours.at("accent-text"), upper(kicker)))
   }
   if title != none {
-    row(0.5em, text(size: 1.9em, weight: "bold", in-font(title)))
+    row(0.5em, text(size: title-size, weight: "bold", in-font(title)))
   }
   row(0.8em, gilded(45%, 2.5pt))
   if subtitle != none {

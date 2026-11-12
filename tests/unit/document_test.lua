@@ -79,6 +79,24 @@ cases['furniture-resolve-authors'] = function()
   assert_equal(pandoc.utils.stringify(inlines), 'Ana, Ben', 'author names')
 end
 
+cases['furniture-resolve-two-authors'] = function()
+  local meta = { author = pandoc.MetaList({ pandoc.MetaInlines({ pandoc.Str('Ana') }), pandoc.MetaInlines({ pandoc.Str('Ben') }) }) }
+  local inlines = document.resolve_slot({ kind = 'field', value = 'author' }, meta, 'et al.')
+  assert_equal(pandoc.utils.stringify(inlines), 'Ana, Ben', 'two authors are both named')
+end
+
+cases['furniture-resolve-et-al'] = function()
+  local meta = {
+    author = pandoc.MetaList({
+      pandoc.MetaInlines({ pandoc.Str('Ana') }),
+      pandoc.MetaInlines({ pandoc.Str('Ben') }),
+      pandoc.MetaInlines({ pandoc.Str('Cleo') }),
+    }),
+  }
+  local inlines = document.resolve_slot({ kind = 'field', value = 'author' }, meta, 'et al.')
+  assert_equal(pandoc.utils.stringify(inlines), 'Ana et al.', 'first author and the et al. label')
+end
+
 cases['furniture-resolve-page'] = function()
   local inlines = document.resolve_slot({ kind = 'field', value = 'page' }, {})
   assert_equal(inlines[1].format, 'typst', 'raw Typst')
@@ -108,6 +126,11 @@ cases['resolve-reads-options'] = function()
   assert_equal(resolved.layout, 'compact', 'layout')
 end
 
+cases['resolve-full-layout'] = function()
+  local resolved = document.resolve(type_options({ type = 'report', layout = 'full' }), 'mcanouil-typst')
+  assert_equal(resolved.layout, 'full', 'full layout')
+end
+
 cases['resolve-unknown-type'] = function()
   fails_with(
     type_options({ type = 'poster' }), 'mcanouil-typst', 'mcanouil: unknown type "poster"; use report.', 'unknown type'
@@ -118,7 +141,7 @@ cases['resolve-unknown-layout'] = function()
   fails_with(
     type_options({ layout = 'wide' }),
     'mcanouil-typst',
-    'mcanouil: unknown layout "wide" for type "report"; use compact.',
+    'mcanouil: unknown layout "wide" for type "report"; use compact, full.',
     'unknown layout'
   )
 end

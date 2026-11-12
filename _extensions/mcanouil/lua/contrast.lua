@@ -24,6 +24,9 @@ local TEXT = 4.5
 --- @type number Minimum ratio of non-text elements: rules, edges, focus rings.
 local NON_TEXT = 3.0
 
+--- @type number Minimum ratio of large text, such as the chapter number of a divider page.
+local LARGE_TEXT = 3.0
+
 --- @type string[] Semantic colour tokens, which are also callout edges.
 local SEMANTICS = { 'note', 'tip', 'warning', 'important', 'caution' }
 
@@ -47,6 +50,8 @@ local function build_pairs()
     add(fg, 'ground-2', TEXT)
   end
   add('on-ground-title', 'chrome', TEXT)
+  add('accent-high', 'ground-1', LARGE_TEXT)
+  add('accent-high', 'ground-2', LARGE_TEXT)
   add('accent', 'paper', NON_TEXT)
   add('link', 'paper', NON_TEXT)
   for _, semantic in ipairs(SEMANTICS) do

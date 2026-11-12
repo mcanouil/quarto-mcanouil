@@ -52,6 +52,7 @@ cases['contrast-pairs-cover-the-spec'] = function()
     'note-text on paper 4.5', 'caution-text on tint 4.5',
     'on-ground-text on ground-2 4.5', 'on-ground-accent on ground-1 4.5', 'on-ground-title on chrome 4.5',
     'accent on paper 3', 'link on paper 3', 'warning on paper 3',
+    'accent-high on ground-1 3', 'accent-high on ground-2 3',
   }) do
     assert_equal(seen[name], true, 'pair ' .. name)
   end

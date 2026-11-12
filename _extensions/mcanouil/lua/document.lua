@@ -10,6 +10,7 @@
 --- and delivers the resolved content of each slot to Typst.
 
 local fail = require('lib.fail')
+local labels = require('lib.labels')
 
 local M = {}
 
@@ -33,7 +34,7 @@ M.DEFAULT_LAYOUT = 'compact'
 
 --- @type table<string, string[]> The document types that Typst renders, with the layouts of each.
 M.TYPES = {
-  report = { 'compact' },
+  report = { 'compact', 'full' },
 }
 
 --- @type string[] Document types that only `mcanouil-typst` renders.
@@ -147,24 +148,39 @@ local function author_name(entry)
   return entry
 end
 
---- Answer the author names of a document, joined by commas.
+--- @type integer Most authors that a slot names; with more, it names the first one and "et al.".
+M.MAX_SLOT_AUTHORS = 2
+
+--- Answer the author names of a document, joined by commas. With more than
+--- `M.MAX_SLOT_AUTHORS` authors, answer the first name and the "et al." label,
+--- so the slot stays on one line.
 --- @param meta table Document metadata
+--- @param et_al string|nil Label that follows the first name; nil reads it in the document language
 --- @return pandoc.Inlines Names
-local function authors(meta)
+local function authors(meta, et_al)
   local value = meta.author
-  local inlines = pandoc.Inlines({})
   if value == nil then
-    return inlines
+    return pandoc.Inlines({})
   end
   local entries = pandoc.utils.type(value) == 'List' and value or { value }
+  local names = {}
   for _, entry in ipairs(entries) do
     local name = author_name(entry)
     if name ~= nil and pandoc.utils.stringify(name) ~= '' then
-      if #inlines > 0 then
-        inlines:extend({ pandoc.Str(','), pandoc.Space() })
-      end
-      inlines:extend(pandoc.Inlines(name))
+      names[#names + 1] = pandoc.Inlines(name)
     end
+  end
+  local inlines = pandoc.Inlines({})
+  if #names > M.MAX_SLOT_AUTHORS then
+    inlines:extend(names[1])
+    inlines:extend({ pandoc.Space(), pandoc.Str(et_al or labels.get('mcanouil-et-al')) })
+    return inlines
+  end
+  for index, name in ipairs(names) do
+    if index > 1 then
+      inlines:extend({ pandoc.Str(','), pandoc.Space() })
+    end
+    inlines:extend(name)
   end
   return inlines
 end
@@ -172,8 +188,9 @@ end
 --- Answer the content of a slot. A field with no value gives empty inlines.
 --- @param slot table Slot from `M.furniture`
 --- @param meta table Document metadata
+--- @param et_al string|nil Label that follows the first of many authors; nil reads it in the document language
 --- @return pandoc.Inlines Content
-function M.resolve_slot(slot, meta)
+function M.resolve_slot(slot, meta, et_al)
   if slot.kind == 'empty' then
     return pandoc.Inlines({})
   end
@@ -185,7 +202,7 @@ function M.resolve_slot(slot, meta)
     return pandoc.Inlines({ pandoc.RawInline('typst', call) })
   end
   if slot.value == 'author' then
-    return authors(meta)
+    return authors(meta, et_al)
   end
   local value = meta[slot.value]
   if value == nil then

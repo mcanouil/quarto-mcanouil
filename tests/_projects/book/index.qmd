@@ -1,0 +1,3 @@
+# Preface {.unnumbered}
+
+This report follows the clinical study report demonstration: the same sources render as a Typst book and as single documents.

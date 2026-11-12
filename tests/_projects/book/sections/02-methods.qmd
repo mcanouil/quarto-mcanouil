@@ -1,0 +1,15 @@
+---
+description: The statistical methods, from the analysis sets to the handling of missing data.
+---
+
+# Statistical methods
+
+Analyses followed the statistical analysis plan.
+
+## Analysis sets
+
+{{< lipsum 1 >}}
+
+## Missing data
+
+{{< lipsum 2 >}}

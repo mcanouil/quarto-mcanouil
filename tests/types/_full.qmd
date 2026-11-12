@@ -1,0 +1,64 @@
+# Introduction {description="Why the study was run and what it set out to show."}
+
+The study followed a cohort of patients for 24 weeks [@doe2020].
+
+{{< lipsum 1 >}}
+
+## Background
+
+{{< lipsum 1 >}}
+
+### History
+
+{{< lipsum 1 >}}
+
+### Prior work
+
+{{< lipsum 1 >}}
+
+## Objectives
+
+{{< lipsum 2 >}}
+
+# Study design
+
+How the study was set up, who took part, and how the data were analysed.
+
+{{< lipsum 1 >}}
+
+## Overall design
+
+{{< lipsum 1 >}}
+
+### Rationale
+
+{{< lipsum 1 >}}
+
+## Population
+
+{{< lipsum 1 >}}
+
+### Inclusion criteria
+
+{{< lipsum 1 >}}
+
+# References {.references}
+
+::: {#refs}
+:::
+
+# Listings {.appendix}
+
+The listings of every subject.
+
+## Subject listings
+
+{{< lipsum 1 >}}
+
+# Extra tables {.supplementary}
+
+The tables that did not fit in the body.
+
+## Extra table
+
+{{< lipsum 1 >}}

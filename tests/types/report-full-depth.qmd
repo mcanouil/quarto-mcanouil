@@ -1,0 +1,21 @@
+---
+title: Clinical study report
+author: Test Author
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: report
+    layout: full
+    chapter-toc-depth: 1
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With chapter-toc-depth 1, the chapter contents page lists the sections of the chapter and hides the subsections.
+        check: bash _checks/types.sh full-depth
+---
+
+{{< include _full.qmd >}}

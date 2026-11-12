@@ -9,6 +9,11 @@ options:
       - terminal
     default: gold
     description: "Preset for every format: colours, fonts and style. Set it as `extensions: { mcanouil: { preset: <name> } }` in the front matter or in `_quarto.yml`."
+  chapter-toc-depth:
+    type: number
+    minimum: 1
+    default: 2
+    description: "Number of heading levels under a chapter that the chapter contents page of a full report lists. 1 lists the sections only, 2 adds the subsections. Set it as `extensions: { mcanouil: { chapter-toc-depth: <n> } }`."
   header:
     type: object
     additionalProperties: false

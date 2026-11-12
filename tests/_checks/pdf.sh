@@ -8,6 +8,8 @@ set -euo pipefail
 #        pdf.sh report-no-author
 #        pdf.sh center-alias
 #        pdf.sh subdir
+#        pdf.sh footer-et-al
+#        pdf.sh running-header
 #
 # Exits 77 for a format other than Typst.
 #
@@ -231,6 +233,28 @@ subdir_assets() {
 	shows_motif "$(motif_pixel "${image}" "${side}" 99.5 0.5)" "${paper}" "${colour}"
 }
 
+# Succeed when the page 1 footer reads 'First Author et al. | Version 1.2 | 1 / <total>' on one line.
+footer_et_al() {
+	pdf_footer "${output}" 1 | grep -qE '^[[:space:]]*First Author et al\.[[:space:]]+Version 1\.2[[:space:]]+1 ?/ ?[0-9]+[[:space:]]*$'
+}
+
+# Succeed when the page on which chapter Beta starts below the top has Alpha in its header, and the
+# next page has Beta.
+running_header_in_force() {
+	local page total lines
+	total="$(pdf_page_count "${output}")"
+	for ((page = 1; page <= total; page++)); do
+		lines="$(pdf_page_text "${output}" "${page}" | grep -v '^[[:space:]]*$')"
+		if grep -qE '^[[:space:]]*Beta[[:space:]]*$' <<<"${lines}"; then
+			[ "$(grep -nE '^[[:space:]]*Beta[[:space:]]*$' <<<"${lines}" | head -n 1 | cut -d: -f1)" -gt 3 ] &&
+				pdf_header "${output}" "${page}" | grep -qE 'Survival analysis[[:space:]]+Alpha[[:space:]]*$' &&
+				pdf_header "${output}" $((page + 1)) | grep -qE 'Survival analysis[[:space:]]+Beta[[:space:]]*$'
+			return
+		fi
+	done
+	return 1
+}
+
 case "${1:-}" in
 report) check_report "${2:?report needs a preset}" ;;
 report-no-author)
@@ -241,6 +265,13 @@ center-alias)
 	;;
 subdir)
 	expect "subdir-assets" "Source Serif 4 and the motif on page 1 of a document in a subdirectory" subdir_assets
+	;;
+footer-et-al)
+	expect "footer-et-al" "the page 1 footer 'First Author et al. | Version 1.2 | 1 / <total>' on one line" footer_et_al
+	;;
+running-header)
+	expect "running-header-in-force" "Alpha in the header of the page where Beta starts below the top, and Beta on the next page" \
+		running_header_in_force
 	;;
 *)
 	printf 'Bail out! unknown case %s\n' "${1:-}"
