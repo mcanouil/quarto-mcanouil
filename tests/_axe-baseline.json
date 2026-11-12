@@ -1,0 +1,12 @@
+{
+  "signatureScheme": 1,
+  "findings": [
+    {
+      "signature": "aria-allowed-attr :: .collapsed",
+      "pages": ["components-gold.html", "components-mono.html", "components-quarto.html", "components-terminal.html"],
+      "impact": "critical",
+      "note": "tracked upstream: quarto-cli#4934 (the header of a collapsed callout is a div with aria-expanded and no role)",
+      "rule": "aria-allowed-attr"
+    }
+  ]
+}

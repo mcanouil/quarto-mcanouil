@@ -34,6 +34,23 @@ function M.motif_svg(motif)
   return (svg:gsub('%s+$', ''))
 end
 
+--- Answer a motif as a CSS image for a mask: a data URL of the SVG with the
+--- custom properties removed, since an image cannot read the custom properties
+--- of the page. A mask reads only the alpha channel, so the shapes keep their
+--- opacity and the page paints them in the colour it chooses.
+--- @param motif string Motif name, for example `facets`
+--- @return string CSS `url()` value
+function M.motif_mask(motif)
+  local svg = M.motif_svg(motif)
+    :gsub('var%(%-%-[%w%-]+,%s*([^)]+)%)', '%1')
+    :gsub('currentColor', 'black')
+    :gsub('%s+', ' ')
+  local encoded = svg:gsub('[^%w%-%._~:/=,;]', function(char)
+    return string.format('%%%02X', char:byte())
+  end)
+  return 'url("data:image/svg+xml,' .. encoded .. '")'
+end
+
 --- Answer the kicker of a document: the `kicker` metadata, or the label of the
 --- document type when the type has one, as in the Typst title block.
 --- @param meta table Document metadata
@@ -85,6 +102,8 @@ local function deliver(meta)
   if meta['mcanouil-motif'] ~= nil then
     local svg = M.motif_svg(pandoc.utils.stringify(meta['mcanouil-motif']))
     meta['mcanouil-motif-svg'] = pandoc.MetaBlocks({ pandoc.RawBlock('html', svg) })
+    quarto.doc.include_text('in-header', '<style id="mcanouil-motif-mask">:root { --mc-motif-mask: '
+      .. M.motif_mask(pandoc.utils.stringify(meta['mcanouil-motif'])) .. '; }</style>')
   end
   meta['mcanouil-kicker'] = kicker(meta)
   local collected = authors.collect(meta)

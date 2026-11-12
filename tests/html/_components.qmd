@@ -1,0 +1,81 @@
+## Callouts
+
+Label a figure, then cite it with `@fig-plot`. Five callout types follow.
+
+::: {.callout-note}
+Hazard ratios are adjusted for age and sex.
+:::
+
+::: {.callout-tip}
+Use `strata()` to relax proportional hazards.
+:::
+
+::: {.callout-warning}
+Small cells make the estimate unstable.
+:::
+
+::: {.callout-important}
+## Database lock
+
+Do not unblind before the database lock.
+:::
+
+::: {.callout-caution collapse="true"}
+Interim results are not for publication.
+:::
+
+## Tabsets
+
+::: {.panel-tabset}
+
+### R
+
+```{.r filename="analysis.R"}
+fit <- coxph(Surv(t, e) ~ arm, data = adsl)
+summary(fit)
+```
+
+### Python
+
+```{.python filename="analysis.py"}
+fit = CoxPHFitter().fit(adsl, duration_col="t", event_col="e")
+```
+
+### Julia
+
+```{.julia filename="analysis.jl"}
+fit = coxph(@formula(Surv(t, e) ~ arm), adsl)
+```
+
+:::
+
+## Code
+
+A code window with a long line that scrolls:
+
+```{.r filename="long.R"}
+model <- coxph(Surv(time_to_event_in_days, event_indicator) ~ treatment_arm + age_at_baseline + sex + region + baseline_score, data = analysis_data_set)
+```
+
+A code block without a window:
+
+```r
+summary(model)
+```
+
+| Arm     | Events | Hazard ratio |
+|---------|-------:|-------------:|
+| Placebo |     42 |         1.00 |
+| Active  |     27 |         0.61 |
+
+: Events per arm.
+
+## Quotes
+
+> Design for the reader who cannot see the colours, and every reader benefits.
+>
+> -- Mickaël Canouil, 2026
+
+A paragraph between the two quotes.
+
+> A quote without attribution stays a plain quote, with *emphasis* inside.

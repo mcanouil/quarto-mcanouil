@@ -62,4 +62,96 @@ $mc-terminal-radius: 0px !default;
     border: 1px dashed var(--mc-accent);
     background-color: transparent;
   }
+
+  // Callouts: dashed boxes with a [!NOTE] label and a dot field. The title
+  // names the type, so the icon goes.
+  div.callout.callout-style-default,
+  div.callout.callout-style-simple {
+    border: 1px dashed var(--mc-callout);
+    border-radius: 0;
+  }
+
+  div.callout.callout-style-default > .callout-header,
+  div.callout.callout-style-simple > .callout-header {
+    font-family: var(--mc-font-mono);
+    text-transform: uppercase;
+  }
+
+  div.callout .callout-icon-container {
+    display: none;
+  }
+
+  // A flex container drops the white space around the title text, so the
+  // brackets sit close to it.
+  div.callout .callout-title-container {
+    display: flex;
+  }
+
+  div.callout .callout-title-container::before {
+    content: "[!";
+    content: "[!" / "";
+  }
+
+  div.callout .callout-title-container::after {
+    content: "]";
+    content: "]" / "";
+  }
+
+  // Tabs: [ R ], the active tab in the accent text colour.
+  .panel-tabset .nav-tabs {
+    --bs-nav-tabs-border-color: transparent;
+    --bs-nav-tabs-link-active-color: var(--mc-accent-text);
+    --bs-nav-tabs-link-active-bg: transparent;
+    --bs-nav-tabs-link-active-border-color: transparent;
+    font-family: var(--mc-font-mono);
+  }
+
+  .panel-tabset .nav-tabs .nav-link {
+    padding-inline: 0.5rem;
+  }
+
+  .panel-tabset .nav-tabs .nav-link::before {
+    content: "[ ";
+    content: "[ " / "";
+  }
+
+  .panel-tabset .nav-tabs .nav-link::after {
+    content: " ]";
+    content: " ]" / "";
+  }
+
+  // Code: dashed windows.
+  div.sourceCode {
+    border-style: dashed;
+    border-radius: 0;
+  }
+
+  body .code-with-filename {
+    border: 1px dashed var(--mc-accent);
+    border-radius: 0;
+  }
+
+  body .code-with-filename .code-with-filename-file {
+    border-bottom-style: dashed;
+  }
+
+  // Block quotes: a dashed box with a [QUOTE] label on its top edge.
+  blockquote.mc-quote {
+    margin-top: 2rem;
+    padding: 1rem 0.75rem 0.5rem;
+    border: 1px dashed var(--mc-line);
+  }
+
+  blockquote.mc-quote::before {
+    content: "[" attr(data-mc-label) "]";
+    content: "[" attr(data-mc-label) "]" / "";
+    position: absolute;
+    top: -0.75em;
+    inset-inline-start: 0.6rem;
+    padding: 0 0.4rem;
+    background-color: var(--mc-paper);
+    color: var(--mc-accent-text);
+    font-size: 0.85em;
+    text-transform: uppercase;
+  }
 }

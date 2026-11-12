@@ -42,4 +42,98 @@ $mc-quarto-radius: 9px !default;
     background-color: var(--mc-card);
     box-shadow: 0 1px 3px color-mix(in srgb, var(--mc-ink) 14%, transparent);
   }
+
+  // Callouts: cards with a soft shadow and a ribbon in the corner, the title
+  // in a pill.
+  div.callout.callout-style-default,
+  div.callout.callout-style-simple {
+    border-inline-start-width: 1px;
+    border-color: var(--mc-line);
+    border-radius: 10px;
+    background-color: var(--mc-card);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--mc-ink) 12%, transparent);
+  }
+
+  div.callout.callout-style-default .callout-title-container,
+  div.callout.callout-style-simple .callout-title-container {
+    max-width: fit-content;
+    margin-block: 0.2rem;
+    padding: 0 0.6rem;
+    border-radius: 999px;
+    background-color: color-mix(in srgb, var(--mc-callout) 10%, var(--mc-card));
+  }
+
+  div.callout .callout-btn-toggle {
+    margin-inline-start: auto;
+  }
+
+  div.callout.callout-titled .callout-icon::before,
+  div.callout:not(.callout-titled) .callout-icon::before {
+    border-radius: 6px;
+  }
+
+  div.callout.callout-style-default::after,
+  div.callout.callout-style-simple::after {
+    opacity: 0.55;
+  }
+
+  // Tabs: a pill segmented control.
+  .panel-tabset .nav-tabs {
+    --bs-nav-tabs-border-width: 0;
+    --bs-nav-tabs-link-active-color: var(--mc-accent-text);
+    --bs-nav-tabs-link-active-bg: var(--mc-card);
+    gap: 0.2rem;
+    width: max-content;
+    max-width: 100%;
+    padding: 3px;
+    border-radius: 999px;
+    background-color: var(--mc-tint);
+  }
+
+  .panel-tabset .nav-tabs .nav-link {
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+  }
+
+  .panel-tabset .nav-tabs .nav-link.active {
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--mc-ink) 15%, transparent);
+  }
+
+  // Code: rounded windows.
+  body .code-with-filename,
+  div.sourceCode {
+    border-radius: #{$mc-quarto-radius};
+  }
+
+  // Block quotes: a card with a round quote icon, the attribution in a pill.
+  blockquote.mc-quote {
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    border-inline-start: 0;
+    border-radius: #{$mc-quarto-radius};
+    background-color: var(--mc-card);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--mc-ink) 12%, transparent);
+  }
+
+  blockquote.mc-quote::before {
+    content: "\201C";
+    content: "\201C" / "";
+    position: absolute;
+    inset-inline-start: 0.75rem;
+    top: 0.85rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background-color: var(--mc-chrome);
+    color: var(--mc-on-ground-title);
+    font: 700 1rem/1.6 Georgia, serif;
+    text-align: center;
+  }
+
+  blockquote.mc-quote .mc-quote-attribution {
+    display: inline-block;
+    padding: 0.05rem 0.6rem;
+    border-radius: 999px;
+    background-color: var(--mc-tint);
+    color: var(--mc-accent-text);
+  }
 }

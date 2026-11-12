@@ -51,6 +51,7 @@ local function build_pairs()
   end
   add('on-ground-title', 'chrome', TEXT)
   add('ink', 'card', TEXT)
+  add('accent-text', 'card', TEXT)
   add('paper', 'accent', TEXT, 'mono', 'quote-label: paper on accent')
   add('accent-high', 'ground-1', LARGE_TEXT)
   add('accent-high', 'ground-2', LARGE_TEXT)

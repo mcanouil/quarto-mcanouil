@@ -5,11 +5,15 @@ set -euo pipefail
 # Check hook: the base of the HTML format, from the rendered page.
 #
 # Usage: html.sh title <preset>
+#        html.sh components <preset>
 #        html.sh subdir
 #
 # The title case checks the schemes, the landmarks, the skip link, the title
 # block and its corner motif, the local fonts and the preset style rules of one
-# preset, and runs axe-core on the page with quarto call axe. The motif
+# preset, and runs axe-core on the page with quarto call axe. The components
+# case checks the callouts, tabsets, code, tables and block quotes of one
+# preset: labels, the tab pattern, colours in both schemes, decoration in
+# forced colours, and axe-core. The motif
 # geometry is measured in a headless Chromium browser: CHROME_PATH,
 # QUARTO_CHROMIUM, Brave, Chrome or Chromium.
 #
@@ -239,75 +243,27 @@ find_browser() {
 	done
 }
 
-# Measure the title block, its motif, the scheme toggle and the decorations in
-# the browser, in a frame of one size, and print the measures as JSON. The page
-# runs in a frame because a headless window is never narrower than 500 pixels.
-# With "forced", the page uses copies of its stylesheets in which the
+# Measure the page in the browser, in a frame of one size, with one of the
+# measure scripts (html-measure-<kind>.js), and print the measures as JSON. The
+# page runs in a frame because a headless window is never narrower than 500
+# pixels. With "forced", the page uses copies of its stylesheets in which the
 # forced-colors media query always applies, so the computed styles are those
-# of forced colours mode.
-# $1 width. $2 height. $3 "forced", or nothing.
+# of forced colours mode. With "dark", the browser prefers the dark scheme, so
+# Quarto loads the dark stylesheets; otherwise it prefers the light scheme.
+# $1 width. $2 height. $3 "forced", "dark" or nothing. $4 kind: title (default)
+# or components.
 measure() {
-	local page frame dump
+	local page frame dump scheme=light
 	page="$(dirname "${output}")/.measure-$$-page.html"
 	frame="$(dirname "${output}")/.measure-$$-frame.html"
-	python3 -I - "${output}" "${page}" "${frame}" "$1" "$2" "${3:-}" <<'PY'
+	[ "${3:-}" = dark ] && scheme=dark
+	python3 -I - "${output}" "${page}" "${frame}" "$1" "$2" "${3:-}" "${tests_dir}/_checks/html-measure-${4:-title}.js" <<'PY'
 import os
 import re
 import sys
 
-source, page, frame, width, height, mode = sys.argv[1:7]
-script = """<script>
-window.addEventListener("load", () => document.fonts.ready.then(() => {
-  const header = document.getElementById("title-block-header");
-  const motif = header && header.querySelector(":scope > svg.mc-motif");
-  const out = { viewport: document.documentElement.clientWidth, overlaps: [] };
-  const intersects = (a, b) => a.right > b.left && a.left < b.right && a.bottom > b.top && a.top < b.bottom;
-  const textOver = (rect, label) => {
-    const walker = document.createTreeWalker(header, NodeFilter.SHOW_TEXT);
-    while (walker.nextNode()) {
-      const node = walker.currentNode;
-      if (!node.textContent.trim() || motif.contains(node)) continue;
-      const range = document.createRange();
-      range.selectNodeContents(node);
-      for (const r of range.getClientRects()) {
-        if (intersects(r, rect)) out.overlaps.push(label + ": " + node.textContent.trim().slice(0, 30));
-      }
-    }
-  };
-  if (header && motif) {
-    const h = header.getBoundingClientRect();
-    const m = motif.getBoundingClientRect();
-    const style = getComputedStyle(motif);
-    out.header = [h.top + window.scrollY, h.right];
-    out.motif = [m.top + window.scrollY, m.right, m.width, m.height];
-    out.box = [style.marginTop, style.marginRight, style.paddingTop, style.paddingRight].join(" ");
-    textOver(m, "motif");
-    const toggle = document.querySelector(".quarto-color-scheme-toggle");
-    if (toggle && toggle.getClientRects().length) {
-      const t = toggle.getBoundingClientRect();
-      out.toggle = [t.left, t.top, t.right, t.bottom];
-      out.toggleOverMotif = intersects(t, m);
-      textOver(t, "toggle");
-    }
-  }
-  const h2 = document.querySelector("main.content h2");
-  const title = header && header.querySelector(".title");
-  const show = (el, pseudo) => {
-    if (!el) return "missing";
-    const style = getComputedStyle(el, pseudo);
-    return pseudo && (style.content === "none" || style.content === "normal") ? "none" : style.display;
-  };
-  out.decorations = {
-    motif: show(motif, null),
-    rule: show(header && header.querySelector(".mc-title-rule"), null),
-    "h2::before": show(h2, "::before"),
-    "h2::after": show(h2, "::after"),
-    "title::before": show(title, "::before"),
-    "title::after": show(title, "::after"),
-  };
-  parent.postMessage(JSON.stringify(out), "*");
-}));
-</script>"""
+source, page, frame, width, height, mode, script_file = sys.argv[1:8]
+script = "<script>" + open(script_file, encoding="utf-8").read() + "</script>"
 html = open(source, encoding="utf-8").read()
 if mode == "forced":
     def forced_copy(match):
@@ -328,6 +284,7 @@ open(frame, "w", encoding="utf-8").write(f"""<!DOCTYPE html><html><body style="m
 </body></html>""")
 PY
 	dump="$("${browser}" --headless=new --disable-gpu --no-first-run --hide-scrollbars \
+		"--blink-settings=preferredColorScheme=$([ "${scheme}" = dark ] && echo 0 || echo 1)" \
 		--window-size=1600,1000 --virtual-time-budget=8000 --dump-dom "file://${frame}" 2>/dev/null || true)"
 	rm -f "${page}" "${frame}"
 	find "$(dirname "${output}")" -name '.forced-*.css' -delete
@@ -482,6 +439,204 @@ check_title() {
 	esac
 }
 
+# Run the structure checks of the components of the HTML output: the ARIA tab
+# pattern of each tabset, and the block quotes with their attribution. Print
+# one "name ok" or "name fail: reason" line for each.
+components_report() {
+	python3 -I - "${output}" <<'PY'
+import sys
+from html.parser import HTMLParser
+
+VOID = {"br", "img", "hr", "input", "meta", "link", "source", "wbr"}
+
+
+class Page(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.tablists = []
+        self.tabs = []
+        self.panels = set()
+        self.quotes = []
+        self.depth = []
+        self.footer = None
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        role = attrs.get("role")
+        if role == "tablist":
+            self.tablists.append(attrs)
+        if role == "tab":
+            self.tabs.append(attrs)
+        if role == "tabpanel" and attrs.get("id"):
+            self.panels.add(attrs["id"])
+        if tag == "blockquote":
+            self.quotes.append({"attrs": attrs, "children": [], "footer": None})
+            self.depth.append(0)
+        elif self.depth and tag not in VOID:
+            if self.depth[-1] == 0:
+                self.quotes[-1]["children"].append(tag)
+                if tag == "footer":
+                    self.quotes[-1]["footer"] = ""
+                    self.footer = self.quotes[-1]
+            self.depth[-1] += 1
+
+    def handle_endtag(self, tag):
+        if tag == "blockquote" and self.depth:
+            self.depth.pop()
+        elif self.depth and tag not in VOID:
+            self.depth[-1] -= 1
+            if tag == "footer":
+                self.footer = None
+
+    def handle_data(self, data):
+        if self.footer is not None:
+            self.footer["footer"] += data
+
+
+page = Page()
+page.feed(open(sys.argv[1], encoding="utf-8").read())
+
+
+def report(name, ok, reason):
+    print(f"{name} ok" if ok else f"{name} fail: {reason}")
+
+
+selected = [t for t in page.tabs if t.get("aria-selected") == "true"]
+controls = [t.get("aria-controls") for t in page.tabs]
+report(
+    "tabset-aria",
+    len(page.tablists) >= 1
+    and len(page.tabs) >= 2
+    and len(selected) == len(page.tablists)
+    and all(t.get("aria-selected") in {"true", "false"} for t in page.tabs)
+    and all(c in page.panels for c in controls),
+    "role=tablist, role=tab with aria-selected (one true per list) and aria-controls to a role=tabpanel; "
+    f"found {len(page.tablists)} lists, {len(page.tabs)} tabs, {len(selected)} selected, "
+    f"controls {controls}, panels {sorted(page.panels)}",
+)
+attributed = [q for q in page.quotes if q["footer"] is not None]
+report(
+    "quote-attribution",
+    len(attributed) == 1
+    and attributed[0]["children"][-1] == "footer"
+    and attributed[0]["footer"].strip() == "Mickaël Canouil, 2026",
+    "one blockquote whose last child is a footer with the attribution, dash dropped; found "
+    + repr([(q["children"], q["footer"]) for q in page.quotes]),
+)
+report(
+    "quote-label",
+    len(page.quotes) == 2 and all(q["attrs"].get("data-mc-label") for q in page.quotes),
+    "a data-mc-label on every block quote",
+)
+PY
+}
+
+# Succeed when the measures pass a test. The test is a Python expression over
+# m, the measures; the reason, a Python expression too, is printed when the
+# test fails.
+# $1 measures, as JSON. $2 test. $3 reason.
+measured() {
+	python3 -I -c '
+import json, sys
+m = json.loads(sys.argv[1])
+if not m:
+    sys.exit("# no measures")
+if not eval(sys.argv[2]):
+    print("# " + str(eval(sys.argv[3])))
+    sys.exit(1)
+' "$1" "$2" "$3"
+}
+
+# Succeed when every component text has a contrast of 4.5:1 or more with the
+# colour behind it, and every background belongs to the scheme: dark
+# (relative luminance below 0.2) or light (above 0.4). An active tab may be
+# inverted, so only its contrast counts.
+# $1 measures, as JSON. $2 expected scheme: light or dark.
+component_colours() {
+	python3 -I -c '
+import json, sys
+m = json.loads(sys.argv[1])
+scheme = sys.argv[2]
+if not m.get("colours"):
+    sys.exit("# no measures")
+problems = []
+seen = set()
+for c in m["colours"]:
+    dark = c["bgLuminance"] < 0.2
+    light = c["bgLuminance"] > 0.4
+    inverted = c["label"] == "active tab"
+    wrong = c["ratio"] < 4.5 or (not inverted and ((scheme == "dark" and not dark) or (scheme == "light" and not light)))
+    key = (c["label"], c["fg"], c["bg"])
+    if wrong and key not in seen:
+        seen.add(key)
+        problems.append("%s %r: %s on %s = %.2f" % (c["label"], c["text"], c["fg"], c["bg"], c["ratio"]))
+for problem in problems[:12]:
+    print("# " + problem)
+sys.exit(1 if problems else 0)
+' "$1" "$2"
+}
+
+# Succeed when no stylesheet of the extension uses !important, except on a
+# line whose comment names an upstream Quarto issue (quarto-cli#<number>).
+# Comment lines do not count.
+no_important() {
+	local found
+	found="$(grep -rn '!important' "${ext_dir}/html" | grep -vE '^[^:]+:[0-9]+:[[:space:]]*//' |
+		grep -v 'quarto-cli#[0-9]' || true)"
+	[ -z "${found}" ] || {
+		printf '# %s\n' "${found}"
+		return 1
+	}
+}
+
+# Check the components page of one preset.
+# $1 preset.
+check_components() {
+	local preset="$1" light_css scheme expected size measures
+	structure="$(components_report)"
+	light_css="$(linked_css quarto-bootstrap 0)"
+
+	expect "html-tabset-aria-${preset}" "the ARIA tab pattern, see the line above" structure_ok tabset-aria
+	expect "html-quote-attribution-${preset}" "the attribution in a footer, see the line above" structure_ok quote-attribution
+	expect "html-quote-label-${preset}" "the label of the quote decoration on every quote" structure_ok quote-label
+	expect "html-no-important-${preset}" "no !important in the extension stylesheets without an upstream issue" no_important
+
+	browser="$(find_browser)"
+	if [ -z "${browser}" ]; then
+		printf 'Bail out! no Chromium browser; set CHROME_PATH\n'
+		exit 1
+	fi
+	measures="$(measure 1440 900 "" components)"
+	expect "html-callout-label-text-${preset}" "a visible text title on each of the five callouts" \
+		measured "${measures}" 'len(m["callouts"]) == 5 and all(c["title"] for c in m["callouts"])' 'm["callouts"]'
+	expect "html-callout-icon-decorative-${preset}" "callout icons with no text and silent generated content" \
+		measured "${measures}" 'm["icons"] and all(not i["text"] and i["silent"] for i in m["icons"])' 'm["icons"]'
+	for size in 1440,900 320,568; do
+		measures="$(measure "${size%,*}" "${size#*,}" "" components)"
+		expect "html-callout-motif-${preset}-${size%,*}" "a corner motif on each callout, with no text over it" \
+			measured "${measures}" 'm["motifs"] == 5 and not m["motifOverlaps"]' '(m["motifs"], m["motifOverlaps"])'
+	done
+	for scheme in light dark; do
+		expected="${scheme}"
+		[ "${preset}" = terminal ] && expected=dark
+		measures="$(measure 1440 900 "$([ "${scheme}" = dark ] && echo dark || true)" components)"
+		expect "html-component-scheme-${preset}-${scheme}" "the ${scheme} stylesheet when the browser prefers ${scheme}" \
+			measured "${measures}" "m['scheme'] == '${scheme}' or '${preset}' == 'terminal'" 'm["scheme"]'
+		expect "html-component-colours-${preset}-${scheme}" "component text at 4.5:1 or more on ${expected} backgrounds" \
+			component_colours "${measures}" "${expected}"
+	done
+	measures="$(measure 1440 900 forced components)"
+	expect "html-component-decoration-forced-colors-${preset}" "component decorations hidden in forced colours" \
+		decorations_hidden "${measures}"
+	expect "html-tab-active-forced-colors-${preset}" "the active tab marked by more than colour in forced colours" \
+		measured "${measures}" '"underline" in m["activeTab"]["decoration"] or m["activeTab"]["border"].startswith("solid")' 'm["activeTab"]'
+
+	expect "html-axe-components-${preset}" "no axe-core finding in light and dark, at 1440 and 320 pixels" axe_clean
+
+	expect "html-components-style-${preset}" "callout rules scoped to the ${preset} preset" \
+		preset_rule "${light_css}" "${preset}" '\.callout'
+}
+
 # Check that a document in a subdirectory of a project finds the fonts and the motif.
 check_subdir() {
 	structure="$(structure_report)"
@@ -493,6 +648,7 @@ structure=""
 browser=""
 case "${1:-}" in
 title) check_title "${2:?title needs a preset}" ;;
+components) check_components "${2:?components needs a preset}" ;;
 subdir) check_subdir ;;
 *)
 	printf 'Bail out! unknown case %s\n' "${1:-}"

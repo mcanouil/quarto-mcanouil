@@ -2,14 +2,20 @@
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
---- @brief Attribution of block quotes in Typst
+--- @brief Attribution of block quotes in Typst and HTML
 --- @description A block quote whose last paragraph starts with an em dash, an
---- en dash or `--` has an attribution. The dash is dropped, and the quote is
---- written as `#quote(block: true, attribution: [...])[...]`, so that the
---- Typst show rule styles the attribution. A quote without that paragraph is
---- left to Pandoc.
+--- en dash or `--` has an attribution, and the dash is dropped. In Typst, the
+--- quote is written as `#quote(block: true, attribution: [...])[...]`, so that
+--- the Typst show rule styles the attribution; a quote without that paragraph
+--- is left to Pandoc. In HTML, every quote is written as
+--- `<blockquote class="mc-quote" data-mc-label="...">`, with the attribution
+--- as its last child, a `<footer class="mc-quote-attribution">`. The label is
+--- for the decoration that the preset style sheet draws as generated content
+--- with an empty alternative text. A GitHub alert (`> [!NOTE]`) is left to
+--- Quarto, which makes it a callout.
 
 local fail = require('lib.fail')
+local labels = require('lib.labels')
 
 local M = {}
 
@@ -74,21 +80,70 @@ local function convert(quote)
   return blocks
 end
 
---- Answer a filter step that works for Typst only.
---- @param fn function Block quote function
---- @return function Function that skips every other format
-local function typst_only(fn)
-  return function(quote)
-    if quarto.doc.is_format('typst') then
-      return fn(quote)
-    end
+--- Escape a string for an HTML attribute value.
+--- @param text string
+--- @return string
+local function escape_attribute(text)
+  return (text:gsub('&', '&amp;'):gsub('"', '&quot;'):gsub('<', '&lt;'):gsub('>', '&gt;'))
+end
+
+--- Answer whether a block quote is a GitHub alert, such as `> [!NOTE]`.
+--- @param quote pandoc.BlockQuote Block quote
+--- @return boolean
+local function is_alert(quote)
+  local first = quote.content[1]
+  if first == nil or (first.t ~= 'Para' and first.t ~= 'Plain') then
+    return false
+  end
+  return pandoc.utils.stringify(first.content):match('^%[!%a+%]') ~= nil
+end
+
+--- Rewrite a block quote as HTML with the label of its decoration and, when
+--- it has one, its attribution in a footer.
+--- @param quote pandoc.BlockQuote Block quote
+--- @param label string Text of the quote label, for example `Quote`
+--- @return pandoc.Blocks|nil Raw HTML around the content, or nil to keep the quote
+function M.html(quote, label)
+  if not quote.content or #quote.content == 0 or is_alert(quote) then
     return nil
   end
+  local data = ' data-mc-label="' .. escape_attribute(label) .. '"'
+  local last = quote.content[#quote.content]
+  local attribution = nil
+  if #quote.content >= 2 and last.t == 'Para' then
+    attribution = M.attribution(last.content)
+  end
+  local blocks = pandoc.Blocks({ pandoc.RawBlock('html', '<blockquote class="mc-quote"' .. data .. '>') })
+  local body_end = attribution and #quote.content - 1 or #quote.content
+  for index = 1, body_end do
+    blocks:insert(quote.content[index])
+  end
+  if attribution then
+    blocks:insert(pandoc.RawBlock('html', '<footer class="mc-quote-attribution"' .. data .. '>'))
+    blocks:insert(pandoc.Plain(attribution))
+    blocks:insert(pandoc.RawBlock('html', '</footer>'))
+  end
+  blocks:insert(pandoc.RawBlock('html', '</blockquote>'))
+  return blocks
+end
+
+--- Rewrite a block quote for the output format: Typst, or HTML other than
+--- Reveal.js. Other formats keep the quote.
+--- @param quote pandoc.BlockQuote Block quote
+--- @return pandoc.Blocks|nil
+local function rewrite(quote)
+  if quarto.doc.is_format('typst') then
+    return convert(quote)
+  end
+  if quarto.doc.is_format('html') and not quarto.doc.is_format('revealjs') then
+    return M.html(quote, labels.get('mcanouil-quote'))
+  end
+  return nil
 end
 
 M.convert = convert
 
 --- @type table Filter step of the entry filter.
-M.filter = { BlockQuote = fail.guard(typst_only(convert)) }
+M.filter = { BlockQuote = fail.guard(rewrite) }
 
 return M

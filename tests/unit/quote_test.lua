@@ -41,4 +41,37 @@ cases['quote-attribution-empty'] = function()
   assert_equal(tostring(err):find('holds only a dash', 1, true) ~= nil, true, 'message says what is wrong')
 end
 
+local function html_of(text, label)
+  local block = pandoc.read(text, 'markdown+smart').blocks[1]
+  local result = quote.html(block, label or 'Quote')
+  return result and pandoc.write(pandoc.Pandoc(result), 'html')
+end
+
+cases['quote-html-attribution'] = function()
+  local html = html_of('> Design for the reader.\n>\n> -- *Name*, 2026')
+  assert_equal(html:find('<blockquote class="mc-quote" data-mc-label="Quote">', 1, true) ~= nil, true, 'blockquote with the label')
+  assert_equal(html:find('<p>Design for the reader.</p>', 1, true) ~= nil, true, 'content kept')
+  assert_equal(
+    html:find('<footer class="mc%-quote%-attribution" data%-mc%-label="Quote">%s*<em>Name</em>, 2026%s*</footer>') ~= nil,
+    true,
+    'attribution in a footer, dash dropped, markup kept: ' .. html
+  )
+  assert_equal(html:find('</footer>%s*</blockquote>') ~= nil, true, 'footer is the last child')
+end
+
+cases['quote-html-plain'] = function()
+  local html = html_of('> A plain quote.')
+  assert_equal(html:find('<blockquote class="mc-quote" data-mc-label="Quote">', 1, true) ~= nil, true, 'label on every quote')
+  assert_equal(html:find('footer', 1, true), nil, 'no footer without attribution')
+end
+
+cases['quote-html-label-escaped'] = function()
+  local html = html_of('> A quote.', 'Say "hi" & <go>')
+  assert_equal(html:find('data-mc-label="Say &quot;hi&quot; &amp; &lt;go&gt;"', 1, true) ~= nil, true, 'escaped label: ' .. html)
+end
+
+cases['quote-html-alert-left-alone'] = function()
+  assert_equal(html_of('> [!NOTE]\n> A GitHub alert.'), nil, 'an alert stays for Quarto')
+end
+
 return cases

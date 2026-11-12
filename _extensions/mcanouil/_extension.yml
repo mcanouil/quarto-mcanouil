@@ -44,6 +44,7 @@ contributes:
           - html/tokens.scss
           - html/base.scss
           - html/motifs.scss
+          - html/components.scss
           - html/presets/_gold.scss
           - html/presets/_mono.scss
           - html/presets/_quarto.scss
@@ -53,6 +54,7 @@ contributes:
           - html/tokens.scss
           - html/base.scss
           - html/motifs.scss
+          - html/components.scss
           - html/presets/_gold.scss
           - html/presets/_mono.scss
           - html/presets/_quarto.scss

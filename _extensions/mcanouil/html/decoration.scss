@@ -14,8 +14,24 @@
   .mc-kicker::before,
   .mc-kicker::after,
   main.content h2::before,
-  main.content h2::after {
+  main.content h2::after,
+  div.callout.callout-style-default::after,
+  div.callout.callout-style-simple::after,
+  div.callout .callout-title-container::before,
+  div.callout .callout-title-container::after,
+  .panel-tabset .nav-tabs .nav-link::before,
+  .panel-tabset .nav-tabs .nav-link::after,
+  .panel-tabset .nav-tabs .nav-link.active::after,
+  blockquote.mc-quote::before,
+  blockquote.mc-quote::after,
+  blockquote.mc-quote .mc-quote-attribution::before {
     display: none;
+  }
+
+  // Without its decoration, the active tab keeps a mark that is not colour.
+  .panel-tabset .nav-tabs .nav-link.active {
+    text-decoration: underline 2px;
+    text-underline-offset: 0.3em;
   }
 
   // The toggle icon is a mask over its background colour, which forced
