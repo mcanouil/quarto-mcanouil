@@ -15,7 +15,7 @@
 
 // Gold: a gilded edge on the left, italic text, the attribution in small
 // capitals in the accent text colour.
-#let mc-quote-gold(it, colours, fonts, label, mode) = block(
+#let mc-quote-gold(it, colours, label) = block(
   width: 100%,
   above: 1.2em,
   below: 1.2em,
@@ -38,7 +38,7 @@
 
 // Mono: a thick rule in the accent colour above, a hairline below, heavy text,
 // and the attribution after an inverted label.
-#let mc-quote-mono(it, colours, fonts, label, mode) = block(
+#let mc-quote-mono(it, colours, label) = block(
   width: 100%,
   above: 1.2em,
   below: 1.2em,
@@ -65,15 +65,15 @@
 
 // Quarto: a card with rounded corners, a round quote icon in the chrome
 // colour, and the attribution in a pill. Typst draws no shadow, so the card
-// has a stroke in the line colour.
-#let mc-quote-quarto(it, colours, fonts, label, mode) = block(
+// has a stroke in the line colour, and the fill is the card token.
+#let mc-quote-quarto(it, colours, label) = block(
   width: 100%,
   above: 1.2em,
   below: 1.2em,
   inset: (left: 38pt, right: 14pt, y: 12pt),
   radius: 9pt,
   stroke: 0.5pt + colours.line,
-  fill: if mode == "dark" { colours.tint } else { white },
+  fill: colours.card,
   {
     place(top + left, dx: -28pt, dy: -3pt, pdf.artifact(circle(
       radius: 9pt,
@@ -96,7 +96,7 @@
 
 // Terminal: a dashed box in the line colour, a bracketed label on the top
 // edge, and the attribution in the muted colour.
-#let mc-quote-terminal(it, colours, fonts, label, mode) = block(
+#let mc-quote-terminal(it, colours, label) = block(
   width: 100%,
   above: 1.9em,
   below: 1.2em,
@@ -129,6 +129,6 @@
 // - body: the content of the document.
 #let mc-quotes(meta, body) = {
   let style = mc-quote-styles.at(mc-preset)
-  show quote.where(block: true): it => style(it, meta.tokens, meta.fonts, mc-labels.at("mcanouil-quote"), meta.mode)
+  show quote.where(block: true): it => style(it, meta.tokens, mc-labels.at("mcanouil-quote"))
   body
 }

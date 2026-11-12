@@ -31,11 +31,11 @@ local LARGE_TEXT = 3.0
 local SEMANTICS = { 'note', 'tip', 'warning', 'important', 'caution' }
 
 --- Build the pair table.
---- @return table[] Rows of `name`, `fg_token`, `bg_token` and `threshold`
+--- @return table[] Rows of `name`, `fg_token`, `bg_token`, `threshold` and, for a pair of one preset, `only` (a `label` names the row)
 local function build_pairs()
   local rows = {}
-  local function add(fg, bg, threshold)
-    rows[#rows + 1] = { name = fg .. ' on ' .. bg, fg_token = fg, bg_token = bg, threshold = threshold }
+  local function add(fg, bg, threshold, only, label)
+    rows[#rows + 1] = { name = label or (fg .. ' on ' .. bg), fg_token = fg, bg_token = bg, threshold = threshold, only = only }
   end
   for _, fg in ipairs({ 'ink', 'muted', 'link', 'accent-text' }) do
     add(fg, 'paper', TEXT)
@@ -50,6 +50,8 @@ local function build_pairs()
     add(fg, 'ground-2', TEXT)
   end
   add('on-ground-title', 'chrome', TEXT)
+  add('ink', 'card', TEXT)
+  add('paper', 'accent', TEXT, 'mono', 'quote-label: paper on accent')
   add('accent-high', 'ground-1', LARGE_TEXT)
   add('accent-high', 'ground-2', LARGE_TEXT)
   add('accent', 'paper', NON_TEXT)
@@ -64,16 +66,18 @@ end
 M.PAIRS = build_pairs()
 
 --- Check the pairs in each scheme.
---- @param pairs table[] Rows of `name`, `fg_token`, `bg_token` and `threshold`
+--- @param pairs table[] Rows of `name`, `fg_token`, `bg_token`, `threshold` and optionally `only`, the preset the pair applies to
 --- @param get_colour fun(mode: string, token: string): string Hex colour of a token
 --- @param modes string[] Schemes to check
+--- @param preset_name string|nil Preset of the document; a pair with `only` is skipped for the others
 --- @return table[] Failures, in order, each with `mode`, `ratio`, `threshold` and `message`
-function M.check(pairs, get_colour, modes)
+function M.check(pairs, get_colour, modes, preset_name)
   local failures = {}
   for _, mode in ipairs(modes) do
     for _, pair in ipairs(pairs) do
       local ratio = contrast_math.ratio(get_colour(mode, pair.fg_token), get_colour(mode, pair.bg_token))
-      if ratio < pair.threshold then
+      local applies = pair.only == nil or pair.only == preset_name
+      if applies and ratio < pair.threshold then
         failures[#failures + 1] = {
           mode = mode,
           ratio = ratio,
@@ -93,7 +97,8 @@ end
 --- @param meta table Document metadata
 local function run(meta)
   local tokens = preset.tokens(meta)
-  local failures = M.check(M.PAIRS, function(mode, token) return tokens[mode][token] end, preset.resolve(meta).scheme_modes)
+  local resolved = preset.resolve(meta)
+  local failures = M.check(M.PAIRS, function(mode, token) return tokens[mode][token] end, resolved.scheme_modes, resolved.name)
   if #failures > 0 then
     local lines = {}
     for index, failure in ipairs(failures) do

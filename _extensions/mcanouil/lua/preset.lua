@@ -24,7 +24,7 @@ M.DEFAULT = 'gold'
 
 --- @type string[] Colour tokens of every preset, in each scheme.
 M.TOKENS = {
-  'paper', 'ink', 'muted', 'tint', 'line',
+  'paper', 'ink', 'muted', 'tint', 'card', 'line',
   'accent', 'accent-high', 'accent-low', 'accent-text', 'link',
   'ground-1', 'ground-2', 'on-ground-accent', 'on-ground-text', 'on-ground-title', 'chrome',
   'note', 'tip', 'warning', 'important', 'caution',

@@ -112,7 +112,7 @@ decoration_drawn() {
 	quarto)
 		middle="$(awk -v a="${y0}" -v b="${y1}" 'BEGIN { print (a + b) / 2 }')"
 		inside="$(page_pixel "$(awk -v x="${x0}" 'BEGIN { print x - 6 }')" "${middle}")"
-		near "${inside}" "$(hex_rgb "$(preset_value quarto light on-ground-title)")" && differs "${inside}" "${paper}"
+		near "${inside}" "$(hex_rgb "$(preset_value quarto light card)")" && differs "${inside}" "${paper}"
 		;;
 	terminal)
 		pdf_text "${output}" | grep -qF '[QUOTE]'
@@ -130,14 +130,15 @@ label_shown() {
 	esac
 }
 
-# Succeed when the tag tree holds the quote text and the attribution, and none of the decoration.
+# Succeed when the tag tree has a BlockQuote for each quote, holding the text and the attribution, and none of the decoration.
 tags_clean() {
 	local struct="${output%.pdf}.struct"
 	pdfinfo -struct-text "${output}" >"${struct}"
 	local text
 	text="$(tr -s '[:space:]' ' ' <"${struct}")"
 	[[ "${text}" == *"${QUOTE_TEXT}"* ]] && [[ "${text}" == *"${ATTRIBUTION}"* ]] &&
-		! grep -qE 'Q ?U ?O ?T ?E|Figure|Artifact|Shape' "${struct}"
+		! grep -qE 'Q ?U ?O ?T ?E|Figure|Artifact|Shape' "${struct}" &&
+		[ "$(grep -cE '^  BlockQuote' "${struct}")" -eq 2 ]
 }
 
 # Answer the contrast ratio of two hex colours.
@@ -167,7 +168,7 @@ contrast_ok() {
 	case "${preset}" in
 	gold) readable gold light ink paper && readable gold light accent-text paper ;;
 	mono) readable mono light ink paper && readable mono light muted paper && readable mono light paper accent ;;
-	quarto) readable quarto light ink on-ground-title && readable quarto light accent-text tint ;;
+	quarto) readable quarto light ink card && readable quarto light accent-text tint ;;
 	terminal) readable terminal "${mode}" ink paper && readable terminal "${mode}" muted paper && readable terminal "${mode}" accent-text paper ;;
 	esac
 }

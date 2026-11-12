@@ -42,6 +42,13 @@ cases['contrast-check-passes-clean-pairs'] = function()
   assert_equal(#failures, 0, 'failure count')
 end
 
+cases['contrast-pair-of-one-preset'] = function()
+  local pairs_to_check = { { name = 'fg on bg', fg_token = 'fg', bg_token = 'bg', threshold = 4.5, only = 'mono' } }
+  local function get_colour(_, token) return token == 'fg' and '#cccccc' or '#ffffff' end
+  assert_equal(#contrast.check(pairs_to_check, get_colour, { 'light' }, 'mono'), 1, 'checked for its preset')
+  assert_equal(#contrast.check(pairs_to_check, get_colour, { 'light' }, 'gold'), 0, 'skipped for another preset')
+end
+
 cases['contrast-pairs-cover-the-spec'] = function()
   local seen = {}
   for _, pair in ipairs(contrast.PAIRS) do
