@@ -1,0 +1,27 @@
+---
+title: Quarto extensions
+author: Mickaël Canouil
+format: mcanouil-revealjs
+extensions:
+  mcanouil:
+    speakers:
+      - photo: speaker.svg
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A speaker photo without alt text warns once, and the photo keeps an empty alt.
+        warnings: exhaustive
+    mcanouil-revealjs:
+      noErrors: true
+      printsMessage:
+        level: WARN
+        regex: 'mcanouil: the speaker photo "speaker\.svg" has no alt text'
+        count: 1
+      ensureFileRegexMatches:
+        - ['class="mc-speaker-photo" src="data:image/svg\+xml;base64,[^"]+" alt=""']
+---
+
+## A slide
+
+A paragraph.

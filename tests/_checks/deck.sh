@@ -5,9 +5,10 @@ set -euo pipefail
 # Check hook: the slide types of a Reveal.js deck, read from the HTML, from a
 # headless browser and from axe-core.
 #
-# Usage: deck.sh <preset>              slide types, footer, motif, closing slide and axe
-#        deck.sh long-title <preset>   title and section text clear of the motif
+# Usage: deck.sh <preset>              slide types, footer, motif, closing slide, axe and painted contrast
+#        deck.sh long-title <preset>   title, section and closing text clear of the motif
 #        deck.sh dark <preset>         axe on a brand-mode: dark deck
+#        deck.sh closing-refs          the bibliography stays off the closing slide
 #
 # Exits 77 for a format other than Reveal.js.
 #
@@ -154,12 +155,12 @@ ground_slides() {
 	[ "$(awk -F '\t' '$2 ~ /(^| )mc-ground( |$)/' <<<"${slides}" | wc -l | tr -d ' ')" = 4 ]
 }
 
-# Succeed when the title and closing slides hide the footer and the slide
-# number, and a section slide keeps them.
+# Succeed when the title and closing slides hide the footer, the slide number
+# and the menu button, and a section slide keeps them.
 bare_slides() {
 	local id
 	for id in title-slide mc-closing; do
-		[ "$(slide_field "${id}" 5)" = false ] && [ "$(slide_field "${id}" 6)" = mc-bare ] || return 1
+		[ "$(slide_field "${id}" 5)" = false ] && [[ " $(slide_field "${id}" 6) " == *" mc-bare "* ]] || return 1
 	done
 	[ -z "$(slide_field brand-presets 5)" ]
 }
@@ -224,13 +225,19 @@ title_slide() {
 	local text
 	text="$(slide_field title-slide 10)"
 	[[ "${text}" == *'useR! 2026 · Warwick'* ]] && [[ "${text}" == *'Build, share and maintain your own formats'* ]] &&
-		[[ "${text}" == *'Mickaël Canouil'* ]] && has "${output}" 'class="mc-speaker-photo" src="data:image/svg+xml;base64,'
+		[[ "${text}" == *'Mickaël Canouil'* ]] && grep -qE 'class="mc-speaker-photo" src="data:image/svg\+xml;base64,[^"]+" alt="Portrait of Mickaël Canouil"' "${output}"
 }
 
 # Succeed when the last paragraph of the quote, without its dash, is the caption of the quote figure.
 quote_attribution() {
 	tr -s '\n' ' ' <"${output}" | grep -qE '<figcaption class="mc-quote-attribution"[^>]*> ?Mickaël Canouil, 2026 ?</figcaption> ?</figure>' &&
 		lacks "${output}" '– Mickaël Canouil, 2026' && lacks "${output}" '-- Mickaël Canouil, 2026'
+}
+
+# Succeed when the bibliography is in the deck, and the closing slide holds none of it.
+closing_without_refs() {
+	has "${output}" 'id="refs"' && [[ "$(slide_field mc-closing 10)" != *'cohort study'* ]] &&
+		[ "$(slide_field mc-closing 10)" = 'Thank you mickael.canouil.fr' ]
 }
 
 # Set browser_bin to a Chromium-based browser: CHROME_PATH, QUARTO_CHROMIUM,
@@ -252,79 +259,56 @@ find_browser() {
 	exit 1
 }
 
-# Answer the boxes that the deck draws on a slide, measured in the browser
-# after the fonts load: one line "shape x0 y0 x1 y1" for each shape of the
-# motif, and one line "text x0 y0 x1 y1" for each line box of the slide
-# headings and the section number, in slide pixels.
-# $1 slide id.
-slide_boxes() {
+# Run the probe of deck-probe.js on slides of the deck in a headless browser,
+# and answer its lines: "<slide> shape x0 y0 x1 y1" for each motif shape,
+# "<slide> text x0 y0 x1 y1" for each line box of text and each image, in slide
+# pixels, and "<slide> colour <name> <ratio> <threshold>" for each text and
+# mark that the probe reads.
+# $@ slide ids.
+probe_slides() {
 	local probe="${output%.html}-probe.html"
-	python3 -I - "${output}" "${probe}" "$1" <<'PY'
+	python3 -I - "${output}" "${probe}" "$(dirname "${BASH_SOURCE[0]}")/deck-probe.js" "$@" <<'PY'
+import json
 import sys
 
-source, probe, slide = sys.argv[1:4]
-script = """
-<script>
-(function () {
-  function measure() {
-    var section = document.getElementById(%r);
-    var indices = Reveal.getIndices(section);
-    Reveal.slide(indices.h, indices.v);
-    document.fonts.ready.then(function () {
-      requestAnimationFrame(function () {
-        var scale = Reveal.getScale();
-        var origin = section.getBoundingClientRect();
-        var lines = [];
-        function add(name, rect) {
-          lines.push([name, (rect.left - origin.left) / scale, (rect.top - origin.top) / scale,
-            (rect.right - origin.left) / scale, (rect.bottom - origin.top) / scale].join(" "));
-        }
-        section.querySelectorAll(".mc-motif path, .mc-motif rect, .mc-motif circle").forEach(function (shape) {
-          add("shape", shape.getBoundingClientRect());
-        });
-        section.querySelectorAll("h1, h2, .mc-section-number").forEach(function (heading) {
-          var range = document.createRange();
-          range.selectNodeContents(heading);
-          Array.prototype.forEach.call(range.getClientRects(), function (rect) {
-            if (rect.width > 0 && rect.height > 0) { add("text", rect); }
-          });
-        });
-        var out = document.createElement("pre");
-        out.id = "mc-probe";
-        out.textContent = lines.join("\\n");
-        document.body.appendChild(out);
-      });
-    });
-  }
-  function wait() { if (window.Reveal && Reveal.isReady()) { measure(); } else { setTimeout(wait, 50); } }
-  wait();
-})();
-</script>
-""" % slide
+source, probe, script = sys.argv[1:4]
+with open(script, encoding="utf-8") as handle:
+    code = handle.read()
+inject = "<script>window.MC_PROBE_SLIDES = %s;</script><script>%s</script>" % (json.dumps(sys.argv[4:]), code)
 with open(source, encoding="utf-8") as handle:
     html = handle.read()
 with open(probe, "w", encoding="utf-8") as handle:
-    handle.write(html.replace("</body>", script + "</body>"))
+    handle.write(html.replace("</body>", inject + "</body>"))
 PY
-	"${browser_bin}" --headless --disable-gpu --hide-scrollbars --window-size=1600,1000 \
-		--virtual-time-budget=10000 --dump-dom "file://${probe}" 2>/dev/null |
+	"${browser_bin}" --headless --disable-gpu --hide-scrollbars --window-size=1600,900 \
+		--virtual-time-budget=20000 --dump-dom "file://${probe}" 2>/dev/null |
 		python3 -I -c 'import html, re, sys; m = re.search(r"<pre id=\"mc-probe\">(.*?)</pre>", sys.stdin.read(), re.S); print(html.unescape(m.group(1)) if m else "")'
 	rm -f "${probe}"
 }
 
-# Succeed when the heading text of a slide is clear of its motif: every line
-# box is below or left of the bounding box of every motif shape. A slide with
+# Succeed when the text of a slide is clear of its motif: every line box and
+# image is below or left of the bounding box of every motif shape. A slide with
 # no motif or no text fails.
 # $1 slide id.
 text_clear_of_motif() {
 	local boxes
-	boxes="$(slide_boxes "$1")"
-	grep -q '^shape ' <<<"${boxes}" && grep -q '^text ' <<<"${boxes}" &&
+	boxes="$(awk -v id="$1" '$1 == id' <<<"${probe_lines}")"
+	grep -q ' shape ' <<<"${boxes}" && grep -q ' text ' <<<"${boxes}" &&
 		awk '
-			$1 == "shape" { n++; sx0[n] = $2; sy1[n] = $5 }
-			$1 == "text" { for (i = 1; i <= n; i++) if (!($3 >= sy1[i] || $4 <= sx0[i])) { print "# overlap: " $0 > "/dev/stderr"; bad = 1 } }
+			$2 == "shape" { n++; sx0[n] = $3; sy1[n] = $6 }
+			$2 == "text" { for (i = 1; i <= n; i++) if (!($4 >= sy1[i] || $5 <= sx0[i])) { print "# overlap: " $0; bad = 1 } }
 			END { exit bad }
 		' <<<"${boxes}"
+}
+
+# Succeed when every text and mark that the probe read meets its contrast
+# ratio (4.5:1 for text, 3:1 for large text and marks), and the probe read the
+# kicker, the footer and the menu button.
+colours_readable() {
+	local colours
+	colours="$(awk '$2 == "colour"' <<<"${probe_lines}")"
+	grep -q ' \.mc-kicker ' <<<"${colours}" && grep -q ' footer' <<<"${colours}" && grep -q ' menu-button ' <<<"${colours}" &&
+		awk '$4 + 0 < $5 + 0 { print "# low contrast: " $0; bad = 1 } END { exit bad }' <<<"${colours}"
 }
 
 # Succeed when axe-core finds no violation in the deck. The scan runs on a
@@ -357,11 +341,19 @@ gold | mono | quarto | terminal)
 	expect "deck-closing-links-text-${1}" "closing links and licence as text, no link element" closing_links_text
 	expect "deck-quote-attribution-${1}" "the attribution of the quote without its dash" quote_attribution
 	expect "deck-axe-light-${1}" "no axe-core violation in the ${1} deck" axe_clean
+	find_browser
+	probe_lines="$(probe_slides title-slide brand-presets why-presets one-rule why-presets-after-dark mc-closing)"
+	expect "deck-computed-contrast-${1}" "4.5:1 for text, 3:1 for large text and marks, as the browser paints them" colours_readable
 	;;
 long-title)
 	find_browser
+	probe_lines="$(probe_slides title-slide a-section-title-long-enough-to-wrap-over-several-lines-of-the-slide mc-closing)"
 	expect "long-title-no-overlap-title-${2:?long-title needs a preset}" "title slide text clear of the ${2} motif" text_clear_of_motif title-slide
 	expect "long-title-no-overlap-section-${2}" "section slide text clear of the ${2} motif" text_clear_of_motif a-section-title-long-enough-to-wrap-over-several-lines-of-the-slide
+	expect "long-title-no-overlap-closing-${2}" "closing slide text clear of the ${2} motif" text_clear_of_motif mc-closing
+	;;
+closing-refs)
+	expect "deck-closing-no-refs" "the bibliography in the deck, and not on the closing slide" closing_without_refs
 	;;
 dark)
 	expect "deck-axe-dark-${2:?dark needs a preset}" "no axe-core violation in the ${2} brand-mode: dark deck" axe_clean

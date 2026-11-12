@@ -1,9 +1,7 @@
 ---
 title: Quarto extensions
 subtitle: Build, share and maintain your own formats
-author:
-  - name: Mickaël Canouil
-    photo: speaker.svg
+author: Mickaël Canouil
 date: 2026-07-08
 brand-mode: dark
 format: mcanouil-revealjs
@@ -11,6 +9,9 @@ extensions:
   mcanouil:
     preset: quarto
     event: useR! 2026 · Warwick
+    speakers:
+      - photo: speaker.svg
+        alt: Portrait of Mickaël Canouil
     closing:
       links:
         - mickael.canouil.fr

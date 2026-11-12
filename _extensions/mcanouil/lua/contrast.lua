@@ -59,6 +59,10 @@ local function build_pairs()
   add('paper', 'accent-text', TEXT, nil, 'code annotation: paper on accent-text')
   add('ground-1', 'on-ground-accent', TEXT, 'mono', 'deck kicker: ground-1 on on-ground-accent')
   add('on-ground-text', 'paper', TEXT, nil, 'deck footer on a dark slide: on-ground-text on paper', 'dark')
+  add('muted', 'paper', NON_TEXT, nil, 'deck menu button: muted on paper')
+  add('on-ground-text', 'ground-1', NON_TEXT, nil, 'deck menu button: on-ground-text on ground-1')
+  add('on-ground-text', 'ground-2', NON_TEXT, nil, 'deck menu button: on-ground-text on ground-2')
+  add('on-ground-text', 'paper', NON_TEXT, nil, 'deck menu button on a dark slide: on-ground-text on paper', 'dark')
   for _, fg in ipairs({ 'ink', 'muted', 'link', 'accent-text' }) do
     add(fg, 'ground-2', TEXT, 'terminal', 'deck slide: ' .. fg .. ' on ground-2')
   end

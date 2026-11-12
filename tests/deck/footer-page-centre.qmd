@@ -1,0 +1,29 @@
+---
+title: Quarto extensions
+author: Mickaël Canouil
+format: mcanouil-revealjs
+extensions:
+  mcanouil:
+    footer:
+      centre: page
+      right: title
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A deck with page in the centre footer slot turns the slide number off, with one warning, since Reveal.js draws it on the right only.
+        warnings: exhaustive
+    mcanouil-revealjs:
+      noErrors: true
+      printsMessage:
+        level: WARN
+        regex: 'mcanouil: the deck footer has no "page" in its right slot, so the slide number is off'
+        count: 1
+      ensureFileRegexMatches:
+        - ['slideNumber: false', '<span class="mc-slot mc-slot-centre"></span>', '<span class="mc-slot mc-slot-right">Quarto extensions</span>']
+        - ['mc-slot-page', "slideNumber: 'c/t'"]
+---
+
+## A slide
+
+A paragraph.

@@ -15,7 +15,7 @@ $if(mcanouil-speakers)$
 $for(mcanouil-speakers)$
 <div class="mc-speaker">
 $if(it.photo)$
-<img class="mc-speaker-photo" src="$it.photo$" alt="">
+<img class="mc-speaker-photo" src="$it.photo$" alt="$it.photo-alt$">
 $endif$
 <p class="mc-speaker-text"><span class="mc-speaker-name">$it.name$</span>$if(it.degrees)$, $it.degrees$$endif$$if(it.affiliation)$<br><span class="mc-speaker-affiliation">$it.affiliation$</span>$endif$</p>
 </div>

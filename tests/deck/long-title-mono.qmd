@@ -7,11 +7,16 @@ extensions:
   mcanouil:
     preset: mono
     event: useR! 2026 · Warwick
+    closing:
+      title: A closing title long enough to wrap over two lines of the closing slide
+      links:
+        - mickael.canouil.fr
+      licence: "Slides: m.canouil.dev/user2026 · CC BY 4.0"
 _quarto:
   tests:
     run:
       extension-test:
-        description: A long title and a long section title in the mono deck stay clear of the corner motif.
+        description: A long title, a long section title and a long closing title in the mono deck stay clear of the corner motif.
         check: bash _checks/deck.sh long-title mono
     mcanouil-revealjs:
       noErrorsOrWarnings: true

@@ -61,7 +61,7 @@
   width: 1.3em;
   height: 1.3em;
   border-radius: 50%;
-  font-family: Georgia, serif;
+  font-family: var(--mc-font-headings);
   font-weight: 700;
   line-height: 1.5em;
   text-align: center;

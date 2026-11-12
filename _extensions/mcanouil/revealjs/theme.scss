@@ -345,6 +345,18 @@ $mc-semantics: note, tip, warning, important, caution;
   color: var(--mc-on-ground-text);
 }
 
+// Menu button: the icon of Quarto, drawn as a mask in the muted colour, or in
+// the ground text colour on a slide with a dark background.
+.reveal .slide-menu-button .fas.fa-bars::before {
+  background-image: none;
+  background-color: var(--mc-muted);
+  mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill="black" fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg>') center / contain no-repeat;
+}
+
+.mc-dark .reveal .slide-menu-button .fas.fa-bars::before {
+  background-color: var(--mc-on-ground-text);
+}
+
 // Progress bar: thin and gilded.
 .reveal .progress {
   height: 3px;
@@ -355,10 +367,11 @@ $mc-semantics: note, tip, warning, important, caution;
   background: var(--mc-gilded);
 }
 
-// The title and closing slides have no footer, no slide number and no progress bar.
-// Reveal.js sets the display of the slide number inline, so this rule needs
-// the priority.
+// The title and closing slides have no footer, no slide number, no menu button
+// and no progress bar. Reveal.js sets the display of the slide number inline,
+// so this rule needs the priority.
 .mc-bare .reveal .slide-number,
+.mc-bare .reveal .slide-menu-button,
 .mc-bare .reveal .progress {
   display: none !important;
 }

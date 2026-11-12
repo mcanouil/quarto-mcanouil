@@ -27,8 +27,18 @@ M.DARK_CLASS = 'dark'
 --- @type string Class that tells Reveal.js and Quarto that a slide has a dark background, so the footer and the slide number follow.
 M.DARK_BACKGROUND_CLASS = 'has-dark-background'
 
---- @type string Value of `data-state` on the slides with no footer and no slide number.
+--- @type string Value of `data-state` on the slides with no footer, no slide number and no menu button.
 M.BARE_STATE = 'mc-bare'
+
+--- @type string Value of `data-state` on the slides with a dark background, so the menu button follows.
+M.DARK_STATE = 'mc-dark'
+
+--- @type string Warning when the footer has no slide number in its right slot.
+M.SLIDE_NUMBER_WARNING = 'mcanouil: the deck footer has no "page" in its right slot, so the slide number is off; '
+  .. 'set extensions.mcanouil.footer.right to page to show it.'
+
+--- @type string Warning for a speaker photo without alt text.
+M.PHOTO_ALT_WARNING = 'mcanouil: the speaker photo "%s" has no alt text; add alt next to photo in extensions.mcanouil.speakers.'
 
 --- @type string Identifier of the closing slide.
 M.CLOSING_ID = 'mc-closing'
@@ -124,7 +134,9 @@ local function photo_uri(path)
   return 'data:' .. mime .. ';base64,' .. quarto.base64.encode(read_file(full, 'speaker photo'))
 end
 
---- Answer the speakers of the title slide: name, degrees, first affiliation and photo.
+--- Answer the speakers of the title slide: name, degrees, first affiliation,
+--- and the photo and its alt text from `extensions.mcanouil.speakers`, matched
+--- to the authors by order. A photo without alt text warns.
 --- @param meta table Document metadata
 --- @return table List of speaker maps
 local function speakers(meta)
@@ -132,10 +144,10 @@ local function speakers(meta)
   if collected == nil then
     return {}
   end
+  local extras = option(meta, 'speakers') or {}
   local list = {}
   for index, record in ipairs(collected.authors) do
-    local author = meta.authors[index]
-    local photo = author.metadata and author.metadata.photo
+    local extra = extras[index] or {}
     local speaker = { name = pandoc.MetaString(record.name) }
     if #record.degrees > 0 then
       speaker.degrees = pandoc.MetaString(table.concat(record.degrees, ', '))
@@ -143,8 +155,14 @@ local function speakers(meta)
     if record.affiliations[1] ~= nil and collected.affiliations[record.affiliations[1]] ~= nil then
       speaker.affiliation = pandoc.MetaString(collected.affiliations[record.affiliations[1]])
     end
-    if photo ~= nil then
-      speaker.photo = pandoc.MetaString(photo_uri(pandoc.utils.stringify(photo)))
+    if extra.photo ~= nil then
+      local path = pandoc.utils.stringify(extra.photo)
+      local alt = extra.alt and pandoc.utils.stringify(extra.alt) or ''
+      if alt == '' then
+        quarto.log.warning(string.format(M.PHOTO_ALT_WARNING, path))
+      end
+      speaker.photo = pandoc.MetaString(photo_uri(path))
+      speaker['photo-alt'] = pandoc.MetaString(alt)
     end
     list[#list + 1] = speaker
   end
@@ -156,12 +174,26 @@ end
 --- @param bare boolean True for a slide with no footer and no slide number
 --- @return table<string, string> Attributes
 local function ground_attributes(state, bare)
-  local attributes = { ['background-gradient'] = M.ground_gradient(state.dark) }
+  local attributes = { ['background-gradient'] = M.ground_gradient(state.dark), ['data-state'] = M.DARK_STATE }
   if bare then
     attributes['data-footer'] = 'false'
-    attributes['data-state'] = M.BARE_STATE
+    attributes['data-state'] = M.BARE_STATE .. ' ' .. M.DARK_STATE .. ' ' .. M.DARK_STATE
   end
   return attributes
+end
+
+--- Add states to the `data-state` of a slide, after the states the author set.
+--- @param attr pandoc.Attr Attribute set of the slide heading
+--- @param states string States, separated by spaces
+local function add_state(attr, states)
+  local list, seen = {}, {}
+  for state in ((attr.attributes['data-state'] or '') .. ' ' .. states):gmatch('%S+') do
+    if not seen[state] then
+      seen[state] = true
+      list[#list + 1] = state
+    end
+  end
+  attr.attributes['data-state'] = table.concat(list, ' ')
 end
 
 --- Add classes and attributes to an attribute set.
@@ -175,7 +207,11 @@ local function extend_attr(attr, classes, attributes)
     end
   end
   for key, value in pairs(attributes) do
-    attr.attributes[key] = value
+    if key == 'data-state' then
+      add_state(attr, value)
+    else
+      attr.attributes[key] = value
+    end
   end
 end
 
@@ -187,18 +223,30 @@ local function motif_block(state)
   return pandoc.RawBlock('html', M.motif_svg(state.motif, tostring(state.motifs)))
 end
 
---- Answer the content of the three footer slots, as spans.
+--- Answer whether the right footer slot of a deck holds the slide number.
+--- Reveal.js draws the slide number in one place only, over the right slot.
+--- @param furniture table Furniture from `document.furniture`
+--- @return boolean
+function M.page_on_right(furniture)
+  local right = furniture.footer.right
+  return right.kind == 'field' and right.value == 'page'
+end
+
+--- Answer the content of the three footer slots, as spans. `page` gives an
+--- empty slot; in the right slot, the slide number of Reveal.js sits over it.
 --- @param meta table Document metadata
+--- @param furniture table Furniture from `document.furniture`
 --- @return pandoc.Inlines Footer content
-local function footer_slots(meta)
-  local furniture = document.furniture(meta, 'deck')
+local function footer_slots(meta, furniture)
   local inlines = pandoc.Inlines({})
   for _, slot in ipairs(document.SLOTS) do
     local value = furniture.footer[slot]
     local classes = { 'mc-slot', 'mc-slot-' .. slot }
     local content
     if value.kind == 'field' and value.value == 'page' then
-      classes[#classes + 1] = 'mc-slot-page'
+      if slot == 'right' then
+        classes[#classes + 1] = 'mc-slot-page'
+      end
       content = pandoc.Inlines({})
     elseif value.kind == 'field' and value.value == 'chapter' then
       content = pandoc.Inlines({})
@@ -255,11 +303,12 @@ end
 --- Fill the footer of the deck that Quarto adds, unless the author set a footer.
 --- @param div pandoc.Div The `footer-default` division
 --- @param meta table Document metadata
-local function fill_footer(div, meta)
+--- @param furniture table Furniture from `document.furniture`
+local function fill_footer(div, meta, furniture)
   if pandoc.utils.stringify(div.content) ~= '' then
     return
   end
-  div.content = { pandoc.Plain(footer_slots(meta)) }
+  div.content = { pandoc.Plain(footer_slots(meta, furniture)) }
   div.classes:insert('mc-footer')
 end
 
@@ -278,18 +327,33 @@ local function arrange(doc)
     motifs = 0,
     sections = 0,
   }
+  local furniture = document.furniture(doc.meta, 'deck')
+  local slide_number = doc.meta.slideNumber
+  local number_off = slide_number == false or (slide_number ~= nil and pandoc.utils.stringify(slide_number) == 'false')
+  if not M.page_on_right(furniture) and not number_off then
+    quarto.log.warning(M.SLIDE_NUMBER_WARNING)
+    doc.meta.slideNumber = false
+  end
+  local has_refs, has_cites = false, false
+  doc:walk({
+    Div = function(div) has_refs = has_refs or div.identifier == 'refs' end,
+    Cite = function() has_cites = true end,
+  })
   local blocks = pandoc.Blocks({})
   for _, block in ipairs(doc.blocks) do
     if block.t == 'Header' and block.level == 1 then
       blocks:extend(section_slide(block, state))
     elseif block.t == 'Header' and block.classes:includes(M.DARK_CLASS) then
-      extend_attr(block.attr, { M.DARK_BACKGROUND_CLASS }, { ['background-color'] = state.dark.paper })
+      extend_attr(block.attr, { M.DARK_BACKGROUND_CLASS }, {
+        ['background-color'] = state.dark.paper,
+        ['data-state'] = M.DARK_STATE,
+      })
       blocks:insert(block)
     elseif block.t == 'Div' and block.classes:includes('quarto-auto-generated-content') then
       block = block:walk({
         Div = function(div)
           if div.classes:includes('footer-default') then
-            fill_footer(div, doc.meta)
+            fill_footer(div, doc.meta, furniture)
             return div
           end
         end,
@@ -301,6 +365,9 @@ local function arrange(doc)
   end
   local closing = option(doc.meta, 'closing')
   if closing ~= nil and closing ~= false then
+    if has_cites and not has_refs then
+      blocks:insert(pandoc.Div({}, { id = 'refs' }))
+    end
     blocks:extend(closing_slide(closing, state))
   end
   doc.blocks = blocks
@@ -320,7 +387,7 @@ local function arrange(doc)
   local attributes = meta['title-slide-attributes'] or {}
   attributes['data-background-gradient'] = M.ground_gradient(state.dark)
   attributes['data-footer'] = 'false'
-  attributes['data-state'] = M.BARE_STATE
+  attributes['data-state'] = M.BARE_STATE .. ' ' .. M.DARK_STATE
   meta['title-slide-attributes'] = attributes
   quarto.doc.include_text('in-header', table.concat({
     '<style id="mcanouil-deck-preset">',

@@ -66,6 +66,7 @@ cases['contrast-pairs-cover-the-deck'] = function()
   for _, name in ipairs({
     'paper on accent-text 4.5 all', 'ground-1 on on-ground-accent 4.5 all', 'on-ground-text on paper 4.5 dark',
     'ink on ground-2 4.5 all', 'muted on ground-2 4.5 all',
+    'muted on paper 3 all', 'on-ground-text on ground-1 3 all', 'on-ground-text on paper 3 dark',
   }) do
     assert_equal(seen[name], true, 'pair ' .. name)
   end

@@ -1,0 +1,23 @@
+---
+title: Quarto extensions
+author: Mickaël Canouil
+format: mcanouil-revealjs
+bibliography: ../types/references.bib
+extensions:
+  mcanouil:
+    closing:
+      links:
+        - mickael.canouil.fr
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A deck with a citation and no refs division keeps its bibliography off the closing slide.
+        check: bash _checks/deck.sh closing-refs
+    mcanouil-revealjs:
+      noErrorsOrWarnings: true
+---
+
+## Evidence
+
+A cohort study [@doe2020] backs the claim.
