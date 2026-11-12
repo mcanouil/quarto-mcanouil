@@ -36,13 +36,26 @@ contributes:
         remember:
           enabled: false
       respect-user-color-scheme: true
+      title-block-banner: true
+      template-partials:
+        - html/partials/title-block.html
       theme:
         light:
           - html/tokens.scss
           - html/base.scss
+          - html/motifs.scss
+          - html/presets/_gold.scss
+          - html/presets/_mono.scss
+          - html/presets/_quarto.scss
+          - html/presets/_terminal.scss
         dark:
           - html/tokens.scss
           - html/base.scss
+          - html/motifs.scss
+          - html/presets/_gold.scss
+          - html/presets/_mono.scss
+          - html/presets/_quarto.scss
+          - html/presets/_terminal.scss
           - html/scheme-dark.scss
     typst:
       font-paths: fonts

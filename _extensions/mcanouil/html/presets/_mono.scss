@@ -1,0 +1,45 @@
+/*-- scss:defaults --*/
+
+// mono, Swiss: inverted label kicker, heavy title, uppercase H2 under a top
+// rule, no box fills (left border only), square corners.
+$mc-mono-radius: 0px !default;
+
+/*-- scss:rules --*/
+
+@include mc-preset(mono) {
+  body {
+    --mc-radius: #{$mc-mono-radius};
+  }
+
+  .mc-kicker {
+    display: inline-block;
+    padding: 0.1rem 0.45rem;
+    background-color: var(--mc-ink);
+    color: var(--mc-paper);
+  }
+
+  .mc-title-block .title {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .mc-title-rule {
+    height: 4px;
+    border-radius: 0;
+    background-image: none;
+    background-color: var(--mc-accent);
+  }
+
+  main.content h2 {
+    padding-top: 0.4rem;
+    border-top: 2px solid var(--mc-ink);
+    font-size: 1.15rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .mc-abstract {
+    border-inline-start-width: 4px;
+    background-color: transparent;
+  }
+}

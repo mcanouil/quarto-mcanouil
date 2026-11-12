@@ -1,0 +1,39 @@
+/*-- scss:defaults --*/
+
+// gold, editorial: small-caps kicker, gilded rules under the title and H2,
+// warm boxes with a thin gold edge.
+$mc-gold-radius: 5px !default;
+
+/*-- scss:rules --*/
+
+@include mc-preset(gold) {
+  body {
+    --mc-radius: #{$mc-gold-radius};
+    --mc-font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .mc-kicker {
+    font-size: 0.95rem;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.12em;
+    text-transform: none;
+  }
+
+  .mc-byline .mc-author-degrees {
+    font-variant-caps: all-small-caps;
+  }
+
+  main.content h2::after {
+    content: "";
+    display: block;
+    width: 2.5rem;
+    height: 2px;
+    margin-top: 0.35rem;
+    background-image: linear-gradient(90deg, var(--mc-accent), var(--mc-accent-high));
+  }
+
+  .mc-abstract {
+    border: 1px solid var(--mc-line);
+    border-inline-start: 3px solid var(--mc-accent);
+  }
+}

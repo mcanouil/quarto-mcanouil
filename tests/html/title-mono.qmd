@@ -1,0 +1,19 @@
+---
+metadata-files: [_title-meta.yml]
+format: mcanouil-html
+extensions:
+  mcanouil:
+    preset: mono
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The mono HTML document has the title block, the corner motif, the landmarks, the skip link and both schemes.
+        check: bash _checks/html.sh title mono
+    mcanouil-html:
+      ensureFileRegexMatches:
+        - ['<header id="title-block-header"[^>]*mc-title-block', '<meta name="mcanouil-preset" content="mono">']
+        - ['fonts.googleapis.com', 'fonts.gstatic.com']
+---
+
+{{< include _title.qmd >}}

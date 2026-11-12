@@ -6,10 +6,16 @@
 --- @description Reads the authors and affiliations that Quarto normalises
 --- (`authors` and `affiliations`) and delivers them to Typst as the
 --- `mcanouil-authors` metadata: one record for each author, with the number of
---- each affiliation, and the list of affiliation lines.
+--- each affiliation, and the list of affiliation lines. For HTML, it builds the
+--- same display as markup for the title block.
 
 local fail = require('lib.fail')
 local labels = require('lib.labels')
+
+--- @type string Directory of the extension, the parent of `lua/`.
+local EXTENSION_DIR = debug.getinfo(1, 'S').source:match('^@(.*)[/\\]lua[/\\][^/\\]+$')
+
+local str = dofile(EXTENSION_DIR .. '/_vendor/quarto-lua-modules/string.lua')
 
 local M = {}
 
@@ -178,6 +184,128 @@ function M.typst(collected)
     ', affiliations: ', array(lines),
     ', email: ', quote(collected.email), ')',
   })
+end
+
+--- @type string Path data of the ORCID disc, in a 32 by 32 view box.
+local ORCID_DISC = 'M32 16c0 8.837-7.163 16-16 16-8.838 0-16-7.163-16-16C0 7.162 7.162 0 16 0c8.837 0 16 7.162 16 16Z'
+
+--- @type string Path data of the ORCID glyph, in a 32 by 32 view box.
+local ORCID_GLYPH = 'M18.813 9.637h-5.45v13.9h5.474c4.555 0 7.35-3.378 7.35-6.95 0-1.635-.562-3.372-1.77-4.704-1.215-1.336-3.065-2.246-5.605-2.246ZM18.6 21.3h-2.813v-9.425H18.5c1.823 0 3.12.552 3.96 1.4.842.849 1.252 2.021 1.252 3.312 0 .784-.239 1.967-.993 2.948-.745.969-2.01 1.765-4.119 1.765ZM8.363 9.675v13.887h2.425V9.675H8.363ZM9.575 8.65c.84 0 1.513-.689 1.513-1.513 0-.823-.673-1.512-1.513-1.512-.838 0-1.512.674-1.512 1.513 0 .823.672 1.512 1.512 1.512Z'
+
+--- @type table<string, string> Visible mark of each author attribute, hidden from screen readers.
+local HTML_MARKS = {
+  corresponding = '\u{2709}\u{FE0E}',
+  equal = '*',
+  deceased = '\u{2020}',
+}
+
+--- @type table<string, string> Label key of each author attribute.
+local MARK_LABELS = {
+  corresponding = 'mcanouil-author-corresponding',
+  equal = 'mcanouil-author-equal',
+  deceased = 'mcanouil-author-deceased',
+}
+
+--- @type string[] Author attributes, in display order.
+local MARK_ORDER = { 'corresponding', 'equal', 'deceased' }
+
+--- Answer a mark that screen readers read as its label.
+--- @param mark string Attribute name, for example `corresponding`
+--- @param label fun(key: string): string Label lookup
+--- @return string HTML
+local function html_mark(mark, label)
+  return '<span class="mc-author-mark mc-author-' .. mark .. '"><span aria-hidden="true">'
+    .. HTML_MARKS[mark] .. '</span><span class="visually-hidden">' .. str.escape_html(label(MARK_LABELS[mark]))
+    .. '</span></span>'
+end
+
+--- Answer the ORCID link of an author, with a name that reads "ORCID <id>".
+--- @param orcid string ORCID identifier
+--- @param label fun(key: string): string Label lookup
+--- @return string HTML
+local function html_orcid(orcid, label)
+  local id = str.escape_attribute(orcid)
+  return '<a class="mc-orcid" href="https://orcid.org/' .. id .. '" aria-label="'
+    .. str.escape_attribute(label('mcanouil-author-orcid')) .. ' ' .. id .. '">'
+    .. '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">'
+    .. '<path class="mc-orcid-disc" d="' .. ORCID_DISC .. '"/>'
+    .. '<path class="mc-orcid-glyph" fill-rule="evenodd" d="' .. ORCID_GLYPH .. '"/></svg></a>'
+end
+
+--- Answer the markup of one author: the name, the degrees in small type, the
+--- affiliation numbers, the marks and the ORCID link.
+--- @param author table Author record from `M.collect`
+--- @param label fun(key: string): string Label lookup
+--- @return string HTML
+local function html_author(author, label)
+  local parts = { '<span class="mc-author-name">' .. str.escape_html(author.name) .. '</span>' }
+  if #author.degrees > 0 then
+    parts[#parts + 1] = '<span class="mc-author-degrees">' .. str.escape_html(table.concat(author.degrees, ', ')) .. '</span>'
+  end
+  if #author.affiliations > 0 then
+    local numbers = {}
+    for _, number in ipairs(author.affiliations) do
+      numbers[#numbers + 1] = tostring(number)
+    end
+    parts[#parts + 1] = '<sup class="mc-author-affiliations">' .. table.concat(numbers, ',') .. '</sup>'
+  end
+  for _, mark in ipairs(MARK_ORDER) do
+    if author[mark] then
+      parts[#parts + 1] = html_mark(mark, label)
+    end
+  end
+  if author.orcid ~= '' then
+    parts[#parts + 1] = html_orcid(author.orcid, label)
+  end
+  return '<span class="mc-author">' .. table.concat(parts) .. '</span>'
+end
+
+--- Answer the legend lines of the marks that the authors use.
+--- @param collected table Result of `M.collect`
+--- @param label fun(key: string): string Label lookup
+--- @return string[] Lines, as HTML
+local function html_legends(collected, label)
+  local lines = {}
+  for _, mark in ipairs(MARK_ORDER) do
+    local used = false
+    for _, author in ipairs(collected.authors) do
+      used = used or author[mark]
+    end
+    if used then
+      local line = '<span aria-hidden="true">' .. HTML_MARKS[mark] .. '</span> ' .. str.escape_html(label(MARK_LABELS[mark]))
+      if mark == 'corresponding' and collected.email ~= '' then
+        local email = str.escape_html(collected.email)
+        line = line .. ': <a href="mailto:' .. str.escape_attribute(collected.email) .. '">' .. email .. '</a>'
+      end
+      lines[#lines + 1] = '<li>' .. line .. '</li>'
+    end
+  end
+  return lines
+end
+
+--- Answer the author display of the HTML title block: the author line, the
+--- numbered affiliations and the legend of the marks, as in the Typst title block.
+--- @param collected table Result of `M.collect`
+--- @param label fun(key: string): string Label lookup
+--- @return string HTML
+function M.html(collected, label)
+  local people = {}
+  for _, author in ipairs(collected.authors) do
+    people[#people + 1] = html_author(author, label)
+  end
+  local blocks = { '<p class="mc-authors">' .. table.concat(people, '<span class="mc-author-separator">, </span>') .. '</p>' }
+  if #collected.affiliations > 0 then
+    local items = {}
+    for number, line in ipairs(collected.affiliations) do
+      items[#items + 1] = '<li><sup>' .. number .. '</sup> ' .. str.escape_html(line) .. '</li>'
+    end
+    blocks[#blocks + 1] = '<ol class="mc-affiliations">' .. table.concat(items) .. '</ol>'
+  end
+  local legends = html_legends(collected, label)
+  if #legends > 0 then
+    blocks[#blocks + 1] = '<ul class="mc-author-legends">' .. table.concat(legends) .. '</ul>'
+  end
+  return table.concat(blocks, '\n')
 end
 
 --- @type table<string, string> Mark of each degree of contribution.

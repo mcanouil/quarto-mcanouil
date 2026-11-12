@@ -1,0 +1,36 @@
+title: Survival analysis of a cohort of adults followed for twenty-four weeks
+subtitle: A 24-week cohort follow-up
+date: 2026-11-11
+author:
+  - name:
+      given: Mickaël
+      family: Canouil
+    degrees: [PhD]
+    orcid: 0000-0002-3396-4549
+    email: contact@example.org
+    corresponding: true
+    affiliations:
+      - ref: inserm
+  - name: Ana Author
+    degrees: [MSc]
+    equal-contributor: true
+    affiliations:
+      - ref: inserm
+      - ref: imperial
+  - name: Ben Writer
+    equal-contributor: true
+    deceased: true
+    affiliations:
+      - ref: imperial
+affiliations:
+  - id: inserm
+    name: Inserm U1283
+    city: Lille
+    country: France
+  - id: imperial
+    name: Imperial College London
+    country: UK
+abstract: Twenty-four weeks of follow-up in a cohort of adults, analysed with a Cox model.
+keywords: [survival, cohort, Cox model]
+toc: true
+number-sections: true

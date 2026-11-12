@@ -144,4 +144,39 @@ cases['credit-matrix-none'] = function()
   assert_equal(authors.credit_matrix(authors.collect(meta_of(NORMALISED)), label), nil, 'no roles, no table')
 end
 
+local AUTHOR_TEXT = { ['mcanouil-author-corresponding'] = 'Corresponding author', ['mcanouil-author-equal'] = 'Equal contribution',
+  ['mcanouil-author-deceased'] = 'Deceased', ['mcanouil-author-orcid'] = 'ORCID' }
+
+local function author_label(key) return AUTHOR_TEXT[key] end
+
+cases['authors-html-names-and-marks'] = function()
+  local html = authors.html(authors.collect(meta_of(NORMALISED)), author_label)
+  assert_equal(html:find('<p class="mc-authors">', 1, true) ~= nil, true, 'authors paragraph')
+  assert_equal(html:find('<span class="mc-author-name">Mickaël Canouil</span>', 1, true) ~= nil, true, 'name')
+  assert_equal(html:find('<span class="mc-author-degrees">Ph.D., M.Sc.</span>', 1, true) ~= nil, true, 'degrees')
+  assert_equal(html:find('<sup class="mc-author-affiliations">1,2</sup>', 1, true) ~= nil, true, 'affiliation numbers')
+  assert_equal(html:find('<a class="mc-orcid" href="https://orcid.org/0000-0002-3396-4549" aria-label="ORCID 0000-0002-3396-4549">', 1, true) ~= nil, true, 'ORCID link with a name')
+  assert_equal(html:find('<span class="visually-hidden">Corresponding author</span>', 1, true) ~= nil, true, 'corresponding mark read as text')
+  assert_equal(html:find('<span class="visually-hidden">Deceased</span>', 1, true) ~= nil, true, 'deceased mark read as text')
+end
+
+cases['authors-html-affiliations-and-legends'] = function()
+  local html = authors.html(authors.collect(meta_of(NORMALISED)), author_label)
+  assert_equal(html:find('<li><sup>1</sup> Inserm U1283, Department of Genomics, Lille, France</li>', 1, true) ~= nil, true, 'numbered affiliation')
+  assert_equal(html:find('<a href="mailto:contact@example.org">contact@example.org</a>', 1, true) ~= nil, true, 'email in the legend')
+  assert_equal(html:find('Equal contribution', 1, true) ~= nil, true, 'equal legend')
+end
+
+cases['authors-html-escapes'] = function()
+  local collected = authors.collect(meta_of([[
+authors:
+  - name:
+      literal: Ann & Bo < Cy
+]]))
+  local html = authors.html(collected, author_label)
+  assert_equal(html:find('Ann &amp; Bo &lt; Cy', 1, true) ~= nil, true, 'escaped name')
+  assert_equal(html:find('mc-affiliations', 1, true), nil, 'no affiliation list without affiliations')
+  assert_equal(html:find('mc-author-legends', 1, true), nil, 'no legend without marks')
+end
+
 return cases

@@ -40,6 +40,10 @@ M.FONT_VARIABLES = { base = '--mc-font-base', headings = '--mc-font-headings', m
 --- @type string Class of the Reveal.js slides that use the dark ground.
 M.GROUND_CLASS = 'mc-ground'
 
+--- @type string Name of the HTML `<meta>` element that carries the preset name.
+--- The SCSS scopes the rules of a preset with `:root:has(meta[name="mcanouil-preset"][content="<preset>"])`.
+M.HTML_META = 'mcanouil-preset'
+
 --- @type table<string, boolean> Presets that have a dark scheme only.
 M.DARK_ONLY = { terminal = true }
 
@@ -303,7 +307,10 @@ local function deliver(meta)
   elseif quarto.doc.is_format('html') then
     render_mode(meta, name)
     add_fonts_dependency()
+    meta['mcanouil-motif'] = data.motif
+    meta['mcanouil-preset'] = name
     quarto.doc.include_text('in-header', table.concat({
+      '<meta name="' .. M.HTML_META .. '" content="' .. name .. '">',
       '<style id="mcanouil-tokens">',
       'body.quarto-light { ' .. declarations(tokens.light, fonts.light) .. ' }',
       'body.quarto-dark { ' .. declarations(tokens.dark, fonts.dark) .. ' }',

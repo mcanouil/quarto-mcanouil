@@ -1,0 +1,65 @@
+/*-- scss:defaults --*/
+
+// terminal, console: a $ prompt and a cursor on the title, [ ] around the
+// kicker, ## before headings, dashed rules and boxes, square corners. The
+// generated text has an empty alternative, so screen readers skip it.
+$mc-terminal-radius: 0px !default;
+
+/*-- scss:rules --*/
+
+@include mc-preset(terminal) {
+  // Dark only: the light tokens repeat the dark ones, so the scheme toggle
+  // has nothing to switch.
+  color-scheme: dark;
+
+  .quarto-color-scheme-toggle {
+    display: none;
+  }
+
+  body {
+    --mc-radius: #{$mc-terminal-radius};
+  }
+
+  .mc-title-block .title::before {
+    content: "$ ";
+    content: "$ " / "";
+    color: var(--mc-accent-high);
+  }
+
+  .mc-title-block .title::after {
+    content: "";
+    display: inline-block;
+    width: 0.55em;
+    height: 0.9em;
+    margin-inline-start: 0.15em;
+    vertical-align: -0.1em;
+    background-color: var(--mc-accent-high);
+  }
+
+  .mc-kicker::before {
+    content: "[ ";
+    content: "[ " / "";
+  }
+
+  .mc-kicker::after {
+    content: " ]";
+    content: " ]" / "";
+  }
+
+  .mc-title-rule {
+    height: 2px;
+    border-radius: 0;
+    background-image: repeating-linear-gradient(90deg, var(--mc-accent-high) 0 6px, transparent 6px 9px);
+  }
+
+  main.content h2::before {
+    content: "## ";
+    content: "## " / "";
+    color: var(--mc-accent-high);
+  }
+
+  .mc-abstract {
+    border: 1px dashed var(--mc-accent);
+    background-color: transparent;
+  }
+}

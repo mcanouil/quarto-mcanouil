@@ -1,0 +1,44 @@
+<header id="title-block-header" class="quarto-title-block mc-title-block page-columns page-full">
+$if(mcanouil-motif-svg)$
+$mcanouil-motif-svg$
+$endif$
+<div class="mc-title-text">
+<span class="mc-motif-clear" aria-hidden="true"></span>
+$if(mcanouil-kicker)$
+<p class="mc-kicker">$mcanouil-kicker$</p>
+$endif$
+$if(title)$
+<h1 class="title">$title$</h1>
+$endif$
+<span class="mc-title-rule" aria-hidden="true"></span>
+$if(subtitle)$
+<p class="subtitle">$subtitle$</p>
+$endif$
+$if(mcanouil-authors-html)$
+<div class="mc-byline">
+$mcanouil-authors-html$
+</div>
+$endif$
+$if(date)$
+<dl class="mc-meta">
+<div><dt>$labels.published$</dt><dd class="date">$date$</dd></div>
+$if(date-modified)$
+<div><dt>$labels.modified$</dt><dd class="date-modified">$date-modified$</dd></div>
+$endif$
+</dl>
+$elseif(date-modified)$
+<dl class="mc-meta">
+<div><dt>$labels.modified$</dt><dd class="date-modified">$date-modified$</dd></div>
+</dl>
+$endif$
+$if(abstract)$
+<div class="mc-abstract">
+<p class="mc-block-title">$labels.abstract$</p>
+$abstract$
+</div>
+$endif$
+$if(keywords)$
+<p class="mc-keywords"><span class="mc-block-title">$labels.keywords$</span> $for(keywords)$$it$$sep$, $endfor$</p>
+$endif$
+</div>
+</header>

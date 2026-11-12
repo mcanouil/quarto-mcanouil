@@ -1,0 +1,47 @@
+/*-- scss:defaults --*/
+
+// Side of the corner motif of the title block: about a fifth of the page width.
+$mc-motif-size: clamp(5.5rem, 20vw, 13rem) !default;
+
+/*-- scss:rules --*/
+
+body {
+  --mc-motif-size: #{$mc-motif-size};
+}
+
+// The motif sits in the top right corner of the title block, with no margin or
+// padding, so its shapes reach the top and the right edges of the page. The
+// column lines span the width of the title block, and the row is left to
+// auto, so the containing block starts at the top edge, above the padding.
+#title-block-header > .mc-motif {
+  display: block;
+  position: absolute;
+  grid-column: 1 / -1;
+  top: 0;
+  right: 0;
+  width: var(--mc-motif-size);
+  height: var(--mc-motif-size);
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+// Decoration is not content: forced colours remove it.
+@media (forced-colors: active) {
+  .mc-motif,
+  .mc-title-rule,
+  main.content h2::before,
+  main.content h2::after {
+    display: none;
+  }
+}
+
+// No decoration moves by default; this keeps it so if a later rule animates it.
+@media (prefers-reduced-motion: reduce) {
+  .mc-motif,
+  .mc-title-rule,
+  .mc-title-block .title::after {
+    animation: none;
+    transition: none;
+  }
+}

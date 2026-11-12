@@ -1,0 +1,13 @@
+---
+title: Document in a subdirectory
+author: Test Author
+format: mcanouil-html
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: An HTML document in a subdirectory of a project finds the fonts and the motif of the extension.
+        check: bash _checks/html.sh subdir
+---
+
+A paragraph.
