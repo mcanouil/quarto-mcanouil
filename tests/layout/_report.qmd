@@ -1,0 +1,11 @@
+# Introduction
+
+{{< lipsum 4 >}}
+
+# Study design
+
+{{< lipsum 6 >}}
+
+# Results
+
+{{< lipsum 6 >}}

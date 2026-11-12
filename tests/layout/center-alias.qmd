@@ -1,0 +1,23 @@
+---
+title: Centre alias
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    header:
+      center: Middle slot
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The center alias fills the centre header slot on page 2.
+        check: bash _checks/pdf.sh center-alias
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['centre: \[Middle slot\]']
+---
+
+# Introduction
+
+{{< lipsum 8 >}}

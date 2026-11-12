@@ -1,0 +1,34 @@
+---
+title: Terminal with a light request
+brand-mode: light
+format:
+  mcanouil-html: default
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: terminal
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A light request on the dark-only terminal preset warns once, and the tokens stay dark.
+        warnings: exhaustive
+        check: bash _checks/tokens.sh terminal-light
+    mcanouil-html:
+      noErrors: true
+      printsMessage:
+        level: WARN
+        regex: 'mcanouil: the terminal preset is dark only; brand-mode: light is ignored\.'
+        count: 1
+    mcanouil-typst:
+      noErrors: true
+      printsMessage:
+        level: WARN
+        regex: 'mcanouil: the terminal preset is dark only; brand-mode: light is ignored\.'
+        count: 1
+      ensureTypstFileRegexMatches:
+        - ['mode: "dark"']
+---
+
+A paragraph.

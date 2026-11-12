@@ -17,8 +17,14 @@ local function list_tests()
 end
 
 for _, file in ipairs(list_tests()) do
-  local cases = dofile(file)
+  local loaded, cases = pcall(dofile, file)
   local names = {}
+  if not loaded then
+    failed = failed + 1
+    print('FAIL  load ' .. file)
+    print('      ' .. tostring(cases))
+    cases = {}
+  end
   for name in pairs(cases) do
     names[#names + 1] = name
   end

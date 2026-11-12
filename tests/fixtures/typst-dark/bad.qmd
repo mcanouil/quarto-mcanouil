@@ -1,6 +1,0 @@
----
-title: Bad dark ink
-brand-mode: dark
----
-
-A paragraph.

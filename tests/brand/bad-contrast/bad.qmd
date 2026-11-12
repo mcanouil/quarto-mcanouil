@@ -1,0 +1,18 @@
+---
+title: Bad contrast
+brand: _brand.yml
+format: mcanouil-html
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A palette that fails the contrast check stops the render with the pair and the ratio.
+        errors: strict
+    mcanouil-html:
+      shouldError: true
+      printsMessage:
+        level: ERROR
+        regex: 'mcanouil: contrast check failed: accent-text on paper \(light\) is [0-9]+\.[0-9][0-9]:1, below 4\.50:1\. Change accent-text or paper in _brand\.yml\.'
+---
+
+A paragraph.

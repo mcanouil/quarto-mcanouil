@@ -1,0 +1,16 @@
+---
+title: User background
+brand: _brand.yml
+format: mcanouil-html
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The dark background of a user brand reaches the dark rules, and Quarto marks the dark stylesheet dark.
+        check: bash _checks/tokens.sh user-background
+    mcanouil-html:
+      ensureFileRegexMatches:
+        - ['quarto-color-alternate" id="quarto-bootstrap" data-mode="dark"']
+---
+
+A paragraph.
