@@ -110,4 +110,31 @@ cases['sections-title-block-description'] = function()
   assert_equal(sections.title_block_description(pandoc.CodeBlock('x')), nil, 'other code block')
 end
 
+local ABBREVIATIONS = { 'e.g.', 'i.e.', 'Dr.', 'etc.', 'Fig.' }
+
+for _, abbreviation in ipairs(ABBREVIATIONS) do
+  cases['sections-intro-abbreviation-' .. abbreviation:gsub('%.', '')] = function()
+    local first = pandoc.Para({
+      pandoc.Str('See'), pandoc.Space(), pandoc.Str(abbreviation), pandoc.Space(), pandoc.Str('here.'),
+      pandoc.Space(), pandoc.Str('Then'), pandoc.Space(), pandoc.Str('more.'),
+    })
+    local intro = sections.intro({ header('Design'), first }, 1)
+    assert_equal(pandoc.utils.stringify(intro), 'See ' .. abbreviation .. ' here.', 'the cut waits for the real full stop')
+  end
+end
+
+cases['sections-intro-abbreviation-bracket'] = function()
+  local first = pandoc.Para({
+    pandoc.Str('Some'), pandoc.Space(), pandoc.Str('(e.g.'), pandoc.Space(), pandoc.Str('this)'), pandoc.Space(),
+    pandoc.Str('apply.'), pandoc.Space(), pandoc.Str('Then.'),
+  })
+  local intro = sections.intro({ header('Design'), first }, 1)
+  assert_equal(pandoc.utils.stringify(intro), 'Some (e.g. this) apply.', 'a bracket before the abbreviation does not matter')
+end
+
+cases['sections-intro-abbreviation-sentence-end'] = function()
+  local first = pandoc.Para({ pandoc.Str('It'), pandoc.Space(), pandoc.Str('ended.'), pandoc.Space(), pandoc.Str('Next.') })
+  assert_equal(pandoc.utils.stringify(sections.intro({ header('Design'), first }, 1)), 'It ended.', 'an ordinary word still ends the sentence')
+end
+
 return cases

@@ -93,16 +93,34 @@ function M.reorder(blocks)
   return kept
 end
 
+--- @type table<string, boolean> Abbreviations that end in a full stop but not a sentence, in lower case.
+M.ABBREVIATIONS = {
+  ['e.g.'] = true, ['i.e.'] = true, ['etc.'] = true, ['cf.'] = true, ['vs.'] = true, ['al.'] = true,
+  ['fig.'] = true, ['figs.'] = true, ['eq.'] = true, ['eqs.'] = true, ['no.'] = true, ['approx.'] = true,
+  ['dr.'] = true, ['mr.'] = true, ['mrs.'] = true, ['ms.'] = true, ['prof.'] = true, ['st.'] = true,
+}
+
+--- Answer whether a string ends a sentence: it ends with a full stop, a
+--- question mark or an exclamation mark, and it is not an abbreviation.
+--- @param text string
+--- @return boolean
+local function ends_sentence(text)
+  if not text:match('[.?!]$') then
+    return false
+  end
+  local word = text:gsub('^[%(%[\'"]+', ''):lower()
+  return not M.ABBREVIATIONS[word]
+end
+
 --- Answer the inlines of the first sentence of a list of inlines: up to and
---- including the first string that ends with a full stop, a question mark or
---- an exclamation mark.
+--- including the first string that ends a sentence, see `ends_sentence`.
 --- @param inlines pandoc.Inlines
 --- @return pandoc.Inlines First sentence
 local function first_sentence(inlines)
   local sentence = pandoc.Inlines({})
   for _, inline in ipairs(inlines) do
     sentence:insert(inline)
-    if inline.t == 'Str' and inline.text:match('[.?!]$') then
+    if inline.t == 'Str' and ends_sentence(inline.text) then
       break
     end
   end
