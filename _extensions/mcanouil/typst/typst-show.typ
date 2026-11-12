@@ -40,7 +40,7 @@ $elseif(license)$
     licence: [$license$],
 $endif$
 $if(copyright.holder)$
-    copyright: [© $copyright.year$ $copyright.holder$],
+    copyright: [© $if(copyright.year)$$copyright.year$ $endif$$copyright.holder$],
 $elseif(copyright)$
     copyright: [$copyright$],
 $endif$

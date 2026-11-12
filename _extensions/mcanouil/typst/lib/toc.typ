@@ -50,7 +50,9 @@
 
 // Answer the contents page of a chapter: the label of the chapter, the
 // heading of the page, and one linked entry for each section, with dot
-// leaders and the page number. A long list flows onto the next pages.
+// leaders and the page number. A long list flows onto the next pages; each
+// entry marks its page as a contents surface, so every page of the list has
+// the same furniture.
 // - chapter: the level 1 heading of the chapter.
 // - depth: how many heading levels under the chapter it lists.
 #let chapter-contents(chapter, depth) = {
@@ -71,10 +73,12 @@
     )
   }
   show link: set text(fill: colours.ink)
+  mc-surface("contents")
   block(below: 0.4em, text(size: 0.75em, weight: "bold", tracking: 0.14em, fill: colours.at("accent-text"), upper(chapter-label(chapter))))
   heading(level: 2, numbering: none, outlined: false, bookmarked: false, mc-labels.at("mcanouil-in-this-chapter"))
   block(above: 0.6em, below: 1em, gilded(30%, 2.5pt))
   for it in chapter-entries(chapter, depth) {
+    mc-surface("contents")
     entry(it)
   }
 }

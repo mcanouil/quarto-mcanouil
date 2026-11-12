@@ -134,6 +134,24 @@ divider_intro_paragraph() {
 	[ -n "${page}" ] && pdf_page_text "${output}" "${page}" | grep -qF 'How the study was set up'
 }
 
+# Succeed when the divider of the second chapter shows the first sentence of its first paragraph,
+# with its citation, and the second sentence stays in the body.
+divider_intro_first_sentence() {
+	local page
+	page="$(page_matching '^[[:space:]]*2[[:space:]]*$')"
+	[ -n "${page}" ] &&
+		pdf_page_text "${output}" "${page}" | tr -s '[:space:]' ' ' | grep -qE 'as in earlier work \[1\]\.' &&
+		! pdf_page_text "${output}" "${page}" | grep -qF 'The second sentence' &&
+		pdf_text "${output}" | tr -s '[:space:]' ' ' | grep -qF 'The second sentence of the opening paragraph'
+}
+
+# Succeed when the references heading and the first reference are on the same page.
+references_same_page() {
+	local page
+	page="$(page_matching '^[[:space:]]*References[[:space:]]*$')"
+	[ -n "${page}" ] && pdf_page_text "${output}" "${page}" | grep -qF '[1] J. Doe'
+}
+
 # Succeed when the closing page holds the contact, the ORCID, the licence and the colophon.
 closing_page() {
 	local text
@@ -186,6 +204,13 @@ chapter_toc_depth_one() {
 	local entries
 	entries="$(contents_entries 4)"
 	grep -qF 'Background' <<<"${entries}" && grep -qF 'Objectives' <<<"${entries}" && ! grep -qF 'History' <<<"${entries}"
+}
+
+# Succeed when the second page of the chapter contents has no running header, as its first page.
+chapter_toc_flows_no_header() {
+	local page
+	page="$(page_matching 'In this chapter')"
+	[ -n "${page}" ] && ! pdf_page_text "${output}" $((page + 1)) | grep -qF 'Clinical study report'
 }
 
 # Succeed when the 40 entries of the chapter contents run over two pages.
@@ -241,6 +266,15 @@ book_description() {
 	[ -n "${page}" ] && pdf_page_text "${output}" "${page}" | grep -qF 'The statistical methods, from the analysis sets'
 }
 
+# Succeed when the book "Appendices" part has a page of its own with no header and no page number.
+book_appendices_divider() {
+	local page text
+	page="$(page_matching '^[[:space:]]*Appendices[[:space:]]*$')"
+	[ -n "${page}" ] || return 1
+	text="$(pdf_page_text "${output}" "${page}")"
+	! grep -qF 'Clinical study report' <<<"${text}" && ! grep -qE '[0-9]+ / [0-9]+' <<<"${text}"
+}
+
 # Succeed when the book appendices are lettered, A.1 for their sections, and the references are unnumbered.
 book_appendix_numbering() {
 	pdf_text "${output}" | grep -qE '(^|[[:space:]])A\.1[[:space:]]+Individual subject data listings' &&
@@ -263,6 +297,8 @@ compact-short)
 full)
 	expect "full-structure" "pages in the order cover, contents, divider, chapter contents, body, and the closing page last" full_structure
 	expect "full-divider-intro" "the first paragraph of a chapter with no description on its divider" divider_intro_paragraph
+	expect "full-divider-first-sentence" "only the first sentence, with its citation, on the divider" divider_intro_first_sentence
+	expect "references-same-page" "the references heading and the first reference on the same page" references_same_page
 	expect "full-closing-page" "the contact, the ORCID, the licence and the colophon on the last page" closing_page
 	expect "chapter-toc-links" "one link annotation for each entry of the chapter contents page" chapter_toc_links 4
 	expect "appendix-numbering" "appendices numbered A.1, supplementary sections I.1, unnumbered references, in that order" appendix_numbering
@@ -272,6 +308,7 @@ full-depth)
 	;;
 full-flows)
 	expect "chapter-toc-flows" "the 40 entries of the chapter contents over two pages" chapter_toc_flows
+	expect "chapter-toc-flows-no-header" "no running header on the second chapter contents page" chapter_toc_flows_no_header
 	;;
 long-title)
 	expect "long-title-no-overlap" "no cover word inside the shapes of the ${2:?long-title needs a preset} motif or in the footer band" long_title_clear "$2"
@@ -281,6 +318,7 @@ book)
 	expect "book-description" "the description of the chapter front matter on its divider" book_description
 	expect "book-chapter-toc-links" "one link annotation for each entry of the first chapter contents page" \
 		chapter_toc_links "$(page_matching 'In this chapter')"
+	expect "book-appendices-divider" "the Appendices part on a divider page with no header and no page number" book_appendices_divider
 	expect "book-appendix-numbering" "lettered appendices, A.1 sections and unnumbered references" book_appendix_numbering
 	;;
 *)

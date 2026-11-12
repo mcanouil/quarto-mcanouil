@@ -11,7 +11,8 @@
 --- Places the bibliography where the `refs` div is. In the full layout, adds
 --- after each numbered chapter heading the call that ends its divider page and
 --- writes its chapter contents page, with the introduction line of the
---- chapter: its `description`, or else its first paragraph.
+--- chapter: its `description`, or else the first sentence of its first
+--- paragraph. Book parts, such as the appendices, get a divider of their own.
 
 local fail = require('lib.fail')
 local labels = require('lib.labels')
@@ -29,6 +30,9 @@ M.DEFAULT_CHAPTER_TOC_DEPTH = 2
 
 --- @type string Class of the code block that holds the front matter of a book chapter.
 local TITLE_BLOCK_CLASS = 'quarto-title-block'
+
+--- @type string Class of the block that Quarto wraps around a book part heading.
+local PART_CLASS = 'quarto-book-part'
 
 --- @type string Pattern of the marker that Quarto writes before each book item.
 local BOOK_MARKER = '^<!%-%- quarto%-file%-metadata: ([^ ]+) %-%->$'
@@ -89,16 +93,32 @@ function M.reorder(blocks)
   return kept
 end
 
+--- Answer the inlines of the first sentence of a list of inlines: up to and
+--- including the first string that ends with a full stop, a question mark or
+--- an exclamation mark.
+--- @param inlines pandoc.Inlines
+--- @return pandoc.Inlines First sentence
+local function first_sentence(inlines)
+  local sentence = pandoc.Inlines({})
+  for _, inline in ipairs(inlines) do
+    sentence:insert(inline)
+    if inline.t == 'Str' and inline.text:match('[.?!]$') then
+      break
+    end
+  end
+  return sentence
+end
+
 --- Answer the introduction line of the chapter whose heading is `blocks[index]`:
---- its `description` attribute, or else the text of its first paragraph
---- before the next heading.
+--- its `description` attribute, or else the first sentence of its first
+--- paragraph before the next heading. The paragraph stays in the body.
 --- @param blocks pandoc.Blocks|table Document blocks
 --- @param index integer Index of the chapter heading
---- @return string|nil Text, or nil when the chapter has neither
+--- @return pandoc.Inlines|nil Inlines, or nil when the chapter has neither
 function M.intro(blocks, index)
   local description = blocks[index].attributes.description
   if description ~= nil and description ~= '' then
-    return description
+    return pandoc.Inlines(description)
   end
   for position = index + 1, #blocks do
     local block = blocks[position]
@@ -106,11 +126,28 @@ function M.intro(blocks, index)
       return nil
     end
     if block.t == 'Para' then
-      local text = pandoc.utils.stringify(block)
-      return text ~= '' and text or nil
+      local sentence = first_sentence(block.content)
+      return pandoc.utils.stringify(sentence) ~= '' and sentence or nil
     end
   end
   return nil
+end
+
+--- Answer inlines as Typst markup, with no surrounding white space.
+--- @param inlines pandoc.Inlines
+--- @return string Markup
+function M.typst_markup(inlines)
+  local markup = pandoc.write(pandoc.Pandoc({ pandoc.Plain(inlines) }), 'typst')
+  return (markup:gsub('^%s+', ''):gsub('%s+$', ''))
+end
+
+--- Answer whether a level 1 heading opens a chapter with a divider and a
+--- contents page: it is numbered, and it is not the references.
+--- @param block pandoc.Block
+--- @return boolean
+function M.opens_chapter(block)
+  return block.t == 'Header' and block.level == 1
+    and not block.classes:includes('unnumbered') and not block.classes:includes('references')
 end
 
 --- Answer `extensions.mcanouil.chapter-toc-depth`: how many heading levels
@@ -251,20 +288,44 @@ local function place_bibliography(doc)
   return doc
 end
 
---- Add, after each numbered chapter heading, the call that ends its divider
---- page and writes its chapter contents page.
+--- Answer the part divider of a book, from the part block that Quarto wraps
+--- around its heading: the heading opens a divider with no number, and the
+--- call after it ends the page.
+--- @param block pandoc.Div Part block
+--- @return pandoc.Div Part block
+local function open_part(block)
+  local content = pandoc.Blocks({})
+  for _, inner in ipairs(block.content) do
+    if inner.t == 'Header' and inner.level == 1 then
+      content:insert(pandoc.RawBlock('typst', '#mc-part-divider.update(true)'))
+      content:insert(inner)
+      content:insert(pandoc.RawBlock('typst', '#part-opening()'))
+    else
+      content:insert(inner)
+    end
+  end
+  block.content = content
+  return block
+end
+
+--- Add, after each chapter heading that opens a chapter, the call that ends
+--- its divider page and writes its chapter contents page, and turn each book
+--- part into a divider.
 --- @param blocks pandoc.Blocks Document blocks
 --- @param depth integer Heading levels under the chapter that its contents page lists
 --- @return pandoc.Blocks Blocks
 local function open_chapters(blocks, depth)
   local result = pandoc.Blocks({})
   for index, block in ipairs(blocks) do
+    if block.t == 'Div' and block.classes:includes(PART_CLASS) then
+      block = open_part(block)
+    end
     result:insert(block)
-    if block.t == 'Header' and block.level == 1 and not block.classes:includes('unnumbered') then
+    if M.opens_chapter(block) then
       local intro = M.intro(blocks, index)
       local arguments = 'depth: ' .. depth
       if intro ~= nil then
-        arguments = arguments .. ', intro: ' .. labels.typst_string(intro)
+        arguments = arguments .. ', intro: [' .. M.typst_markup(intro) .. ']'
       end
       result:insert(pandoc.RawBlock('typst', '#chapter-opening(' .. arguments .. ')'))
     end

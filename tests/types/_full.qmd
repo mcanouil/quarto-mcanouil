@@ -22,7 +22,7 @@ The study followed a cohort of patients for 24 weeks [@doe2020].
 
 # Study design
 
-How the study was set up, who took part, and how the data were analysed.
+How the study was set up, who took part, and how the data were analysed, as in *earlier work* [@doe2020]. The second sentence of the opening paragraph stays in the body.
 
 {{< lipsum 1 >}}
 

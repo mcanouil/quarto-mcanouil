@@ -98,52 +98,69 @@
   if motif-name != none { motif(motif-name, top + right, mc-divider-motif-size, dark: true) }
 }
 
+// Whether the next level 1 heading is a book part, such as the appendices:
+// Lua sets it before the heading, and part-opening() clears it.
+#let mc-part-divider = state("mc-part-divider", false)
+
 // Answer a level 1 heading of a full report. A numbered chapter starts a
 // divider page: its number with a gradient fill, and its title, below the
-// shapes of the motif. An unnumbered one starts a new page with its title.
+// shapes of the motif. A book part starts a divider page with its title and
+// no number. Any other unnumbered heading starts a new page with its title.
 // - it: the heading.
 // - motif-name: motif name, or none.
 #let chapter-divider(it, motif-name) = {
-  let colours = tokens()
   pagebreak(weak: true)
-  if it.numbering == none {
-    block(below: 1em, text(size: 1.9em, weight: "bold", it.body))
-  } else {
-    mc-surface("divider")
-    v(motif-clearance(motif-name, mc-divider-motif-size))
-    v(1fr)
-    let number = context numbering(it.numbering, ..counter(heading).at(it.location()))
-    block(below: 0.2em, box(text(
-      size: mc-chapter-number-size,
-      weight: "bold",
-      fill: gradient.linear(colours.at("accent-high"), colours.at("on-ground-accent"), angle: 90deg),
-      number,
-    )))
-    block(text(size: 2.4em, weight: "bold", fill: colours.at("on-ground-title"), it.body))
+  context {
+    let colours = tokens()
+    if it.numbering == none and not mc-part-divider.get() {
+      block(below: 1em, text(size: 1.9em, weight: "bold", it.body))
+    } else {
+      mc-surface("divider")
+      v(motif-clearance(motif-name, mc-divider-motif-size))
+      v(1fr)
+      if it.numbering != none {
+        block(below: 0.2em, box(text(
+          size: mc-chapter-number-size,
+          weight: "bold",
+          fill: gradient.linear(colours.at("accent-high"), colours.at("on-ground-accent"), angle: 90deg),
+          numbering(it.numbering, ..counter(heading).at(it.location())),
+        )))
+      }
+      block(text(size: 2.4em, weight: "bold", fill: colours.at("on-ground-title"), it.body))
+    }
   }
+}
+
+// End the divider page of a book part, after its heading: the gilded rule,
+// then a new page.
+#let part-opening() = {
+  block(above: 1em, gilded(35%, 2.5pt))
+  v(1fr)
+  mc-part-divider.update(false)
+  pagebreak()
 }
 
 // End the divider page of a chapter, after its heading: the gilded rule and
 // the introduction line. Then write the contents page of the chapter, when it
-// has sections, and start its body on a new page.
+// has sections, and start its body on a new page. It does nothing after an
+// unnumbered heading, such as the references, which has no divider.
 // - depth: how many heading levels under the chapter its contents page lists.
 // - intro: introduction line of the chapter, or none.
-#let chapter-opening(depth: 2, intro: none) = {
+#let chapter-opening(depth: 2, intro: none) = context {
   let colours = tokens()
-  block(above: 1em, below: 1em, gilded(35%, 2.5pt))
-  if intro != none {
-    block(width: 85%, text(size: 1.1em, fill: colours.at("on-ground-text"), intro))
-  }
-  v(1fr)
-  context {
-    let chapter = query(heading.where(level: 1).before(here())).last()
+  let chapter = query(heading.where(level: 1).before(here())).last()
+  if chapter.numbering != none {
+    block(above: 1em, below: 1em, gilded(35%, 2.5pt))
+    if intro != none {
+      block(width: 85%, text(size: 1.1em, fill: colours.at("on-ground-text"), intro))
+    }
+    v(1fr)
     if chapter-entries(chapter, depth).len() > 0 {
       pagebreak()
-      mc-surface("contents")
       chapter-contents(chapter, depth)
     }
+    pagebreak()
   }
-  pagebreak()
 }
 
 // Answer the closing page of a full report: the contact of each author, with

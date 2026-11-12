@@ -26,12 +26,35 @@ end
 
 cases['sections-intro-description'] = function()
   local blocks = { header('Design', {}, { description = 'How it was set up.' }), para('First.') }
-  assert_equal(sections.intro(blocks, 1), 'How it was set up.', 'description wins')
+  assert_equal(pandoc.utils.stringify(sections.intro(blocks, 1)), 'How it was set up.', 'description wins')
 end
 
 cases['sections-intro-paragraph'] = function()
   local blocks = { header('Design'), pandoc.CodeBlock('x'), para('First.'), para('Second.') }
-  assert_equal(sections.intro(blocks, 1), 'First.', 'first paragraph')
+  assert_equal(pandoc.utils.stringify(sections.intro(blocks, 1)), 'First.', 'first paragraph')
+end
+
+cases['sections-intro-first-sentence'] = function()
+  local first = pandoc.Para({
+    pandoc.Str('As'), pandoc.Space(), pandoc.Emph({ pandoc.Str('before') }), pandoc.Space(),
+    pandoc.RawInline('typst', '#cite(<a>)'), pandoc.Str('.'), pandoc.Space(), pandoc.Str('Then'), pandoc.Space(), pandoc.Str('more.'),
+  })
+  local intro = sections.intro({ header('Design'), first }, 1)
+  assert_equal(#intro, 6, 'the inlines up to the first full stop')
+  assert_equal(intro[3].t, 'Emph', 'emphasis kept')
+  assert_equal(intro[5].t, 'RawInline', 'citation kept')
+end
+
+cases['sections-intro-typst'] = function()
+  local markup = sections.typst_markup(pandoc.Inlines({ pandoc.Str('A'), pandoc.Space(), pandoc.Emph({ pandoc.Str('b') }), pandoc.Str('.') }))
+  assert_equal(markup, 'A #emph[b].', 'Typst markup with no trailing space')
+end
+
+cases['sections-opens-chapter'] = function()
+  assert_equal(sections.opens_chapter(header('Design')), true, 'numbered chapter')
+  assert_equal(sections.opens_chapter(header('Preface', { 'unnumbered' })), false, 'unnumbered')
+  assert_equal(sections.opens_chapter(header('References', { 'references' })), false, 'references')
+  assert_equal(sections.opens_chapter(header('Listings', { 'appendix' })), true, 'appendix')
 end
 
 cases['sections-intro-none'] = function()
