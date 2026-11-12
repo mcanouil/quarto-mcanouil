@@ -109,6 +109,52 @@ motif_geometry_match() {
 	done
 }
 
+# Succeed when the shapes on stdin, in the format of typst_motif_shapes, sit as
+# the corner needs: facets, ribbon and steps touch the top edge (y = 0) and the
+# right edge (x = 100), and dots keep the same clear space, above zero, at the
+# top and at the right. A motif that breaks its rule is named on stderr.
+motif_shapes_sit_in_corner() {
+	awk '
+		function abs(v) { return v < 0 ? -v : v }
+		function note(name, x, y) {
+			if (!(name in miny) || y < miny[name]) miny[name] = y
+			if (!(name in maxx) || x > maxx[name]) maxx[name] = x
+		}
+		{
+			name = $1; kind = $2
+			if (kind == "circle") {
+				note(name, $3 + $5, $4 - $5)
+			} else if (kind == "rect") {
+				note(name, $3 + $5, $4)
+			} else {
+				for (i = 3; i < NF - 1; i += 2) note(name, $i, $(i + 1))
+			}
+		}
+		END {
+			status = (length(miny) == 0)
+			for (name in miny) {
+				top = miny[name]; right = 100 - maxx[name]
+				if (name == "dots") ok = (top > 1e-6 && abs(top - right) < 1e-6)
+				else ok = (abs(top) < 1e-6 && abs(right) < 1e-6)
+				if (!ok) {
+					printf "%s: space at the top = %s, space at the right = %s\n", name, top, right > "/dev/stderr"
+					status = 1
+				}
+			}
+			exit status
+		}'
+}
+
+# Succeed when every motif sits in the corner as its rule says, in the Typst
+# library and in the SVG files.
+motif_corner_space() {
+	local name
+	typst_motif_shapes | motif_shapes_sit_in_corner || return 1
+	for name in facets steps ribbon dots; do
+		svg_motif_shapes "${name}" "${ext_dir}/html/motifs/${name}.svg" | motif_shapes_sit_in_corner || return 1
+	done
+}
+
 # Succeed when every slots( call of the Typst source has left:, centre: and right: only.
 slots_three_only() {
 	local calls line
@@ -159,6 +205,8 @@ check_report() {
 		expect "slots-three-only" "every slots( call of the Typst output with left:, centre: and right: only" slots_three_only
 		expect "motif-geometry-match" "the same shapes, points and opacities in typst/lib/motifs.typ and html/motifs/<name>.svg" \
 			motif_geometry_match
+		expect "motif-corner-space" "facets, ribbon and steps touching the top and right edges, and dots with equal clear space at the top and the right, in typst/lib/motifs.typ and html/motifs/<name>.svg" \
+			motif_corner_space
 	fi
 }
 

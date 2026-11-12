@@ -163,10 +163,10 @@ reaches() {
 	esac
 }
 
-# Render page 1 of the PDF to a PPM image at 50 dpi, once, and answer its path.
+# Render page 1 of the PDF to a PPM image at 50 dpi, again when the PDF is newer, and answer its path.
 page1_image() {
 	local image="${output%.pdf}-page1"
-	if [ ! -f "${image}.ppm" ]; then
+	if [ ! -f "${image}.ppm" ] || [ "${output}" -nt "${image}.ppm" ]; then
 		pdftoppm -r 50 -f 1 -l 1 -singlefile "${output}" "${image}"
 	fi
 	printf '%s.ppm' "${image}"
