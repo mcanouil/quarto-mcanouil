@@ -1,8 +1,6 @@
 local script_dir = arg[0]:match('^(.*)/[^/]*$') or '.'
 package.path = script_dir .. '/?.lua;' .. script_dir .. '/../../_extensions/mcanouil/lua/?.lua;' .. package.path
 
-require('lib.fail').raising = true
-
 local passed, failed = 0, 0
 
 local function list_tests()

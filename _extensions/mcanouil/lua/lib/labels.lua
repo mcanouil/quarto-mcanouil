@@ -26,7 +26,7 @@ function M.read(filename)
   local path = EXTENSION_DIR .. '/' .. filename
   local file = io.open(path, 'r')
   if not file then
-    fail.stop('mcanouil: cannot open the language file ' .. path .. '.')
+    fail.raise('mcanouil: cannot open the language file ' .. path .. '.')
   end
   local text = file:read('a')
   file:close()
@@ -58,7 +58,7 @@ function M.lookup(key, language)
   end
   local fallback = english_labels()[key]
   if fallback == nil then
-    fail.stop(string.format('mcanouil: unknown label "%s"; add it to %s and the other language files.', key, ENGLISH_FILE))
+    fail.raise(string.format('mcanouil: unknown label "%s"; add it to %s and the other language files.', key, ENGLISH_FILE))
   end
   return fallback
 end
@@ -94,6 +94,6 @@ local function deliver(meta)
 end
 
 --- @type table Filter step of the entry filter.
-M.filter = { Meta = deliver }
+M.filter = { Meta = fail.guard(deliver) }
 
 return M

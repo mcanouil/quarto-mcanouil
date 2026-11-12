@@ -31,7 +31,7 @@ function M.luminance(hex)
   local full = colour.to_html(hex:lower(), 'hex')
   local red, green, blue = full:match('^#(%x%x)(%x%x)(%x%x)$')
   if not red then
-    fail.stop('mcanouil: cannot read the hex colour "' .. tostring(hex) .. '" for the contrast check.')
+    fail.raise('mcanouil: cannot read the hex colour "' .. tostring(hex) .. '" for the contrast check.')
   end
   return 0.2126 * linear(tonumber(red, 16))
     + 0.7152 * linear(tonumber(green, 16))

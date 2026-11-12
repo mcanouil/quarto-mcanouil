@@ -94,13 +94,13 @@ local function user_slots(part, options)
   for key, value in pairs(options) do
     local slot = ALIASES[key] or key
     if not SLOT_NAMES[slot] then
-      fail.stop(string.format(
+      fail.raise(string.format(
         'mcanouil: unknown slot "%s.%s" in extensions.mcanouil; use left, centre (or center) and right.',
         part, key
       ))
     end
     if slots[slot] ~= nil then
-      fail.stop(string.format(
+      fail.raise(string.format(
         'mcanouil: both "%s.centre" and "%s.center" are set in extensions.mcanouil; keep one.',
         part, part
       ))
@@ -291,6 +291,6 @@ local function deliver(meta)
 end
 
 --- @type table Filter step of the entry filter.
-M.filter = { Meta = deliver }
+M.filter = { Meta = fail.guard(deliver) }
 
 return M

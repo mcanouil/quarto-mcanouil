@@ -8,6 +8,7 @@
 --- `mcanouil-authors` metadata: one record for each author, with the number of
 --- each affiliation, and the list of affiliation lines.
 
+local fail = require('lib.fail')
 local labels = require('lib.labels')
 
 local M = {}
@@ -158,6 +159,6 @@ local function deliver(meta)
 end
 
 --- @type table Filter step of the entry filter.
-M.filter = { Meta = deliver }
+M.filter = { Meta = fail.guard(deliver) }
 
 return M

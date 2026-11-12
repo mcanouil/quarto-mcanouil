@@ -99,6 +99,6 @@ local function run(meta)
 end
 
 --- @type table Filter step of the entry filter.
-M.filter = { Meta = run }
+M.filter = { Meta = fail.guard(run) }
 
 return M
