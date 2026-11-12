@@ -260,13 +260,10 @@ function M.skip_reason(run, probe)
   return nil
 end
 
---- The top-level `output-file` of a document, read from its front matter.
----
---- `quarto inspect` reports a top-level `output-file` and one set inside a
---- format block the same way, so only the document itself tells them apart.
+--- The front matter of a document, read from the file itself.
 --- @param path string
---- @return string|nil
-function M.document_output_file(path)
+--- @return table|nil
+local function read_front_matter(path)
   local text = util.read_file(path)
   if not text then
     return nil
@@ -278,11 +275,30 @@ function M.document_output_file(path)
     return nil
   end
   local ok, parsed = pcall(schema._parse_yaml_text, block)
-  local value = ok and type(parsed) == 'table' and parsed['output-file'] or nil
+  return ok and type(parsed) == 'table' and parsed or nil
+end
+
+--- The top-level `output-file` of a document, read from its front matter.
+---
+--- `quarto inspect` reports a top-level `output-file` and one set inside a
+--- format block the same way, so only the document itself tells them apart.
+--- @param path string
+--- @return string|nil
+function M.document_output_file(path)
+  local parsed = read_front_matter(path)
+  local value = parsed and parsed['output-file'] or nil
   if type(value) == 'string' and value ~= '' then
     return value
   end
   return nil
+end
+
+--- Whether the front matter of a document sets `_quarto.tests`.
+--- @param path string
+--- @return boolean
+function M.declares_tests(path)
+  local parsed = read_front_matter(path)
+  return parsed ~= nil and type(parsed._quarto) == 'table' and parsed._quarto.tests ~= nil
 end
 
 --- What the tests project sets under `_quarto.tests` that it may not.

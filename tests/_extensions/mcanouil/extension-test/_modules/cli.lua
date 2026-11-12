@@ -15,7 +15,7 @@ local M = {}
 --- because `quarto inspect` keeps a key with no value, which the vendored
 --- YAML reader drops.
 --- @param text string
---- @return table|nil info {formats, output_files, output_dir, tests}
+--- @return table|nil info {formats, output_files, output_dir, lib_dir, tests}
 --- @return string|nil error
 function M.parse_inspect(text)
   local ok, parsed = pcall(pandoc.json.decode, text, false)
@@ -43,6 +43,12 @@ function M.parse_inspect(text)
   if settings and type(settings['output-dir']) == 'string' and settings['output-dir'] ~= '' then
     output_dir = settings['output-dir']
   end
+  -- A book or a website writes its support files to one directory for the
+  -- whole project rather than to `<output name>_files`.
+  local lib_dir
+  if settings and type(settings['lib-dir']) == 'string' and settings['lib-dir'] ~= '' then
+    lib_dir = settings['lib-dir']
+  end
 
   local formats = util.sorted_keys(parsed.formats)
   local tests
@@ -57,7 +63,7 @@ function M.parse_inspect(text)
     tests = metadata._quarto.tests
   end
 
-  return { formats = formats, output_files = output_files, output_dir = output_dir, tests = tests }, nil
+  return { formats = formats, output_files = output_files, output_dir = output_dir, lib_dir = lib_dir, tests = tests }, nil
 end
 
 --- Run `quarto inspect` on a document or a project directory.
@@ -88,6 +94,22 @@ function M.inspect(document, cwd)
   return M.parse_inspect(output)
 end
 
+--- The decoded `quarto inspect` output of a project directory.
+--- @param dir string project directory
+--- @param cwd string|nil directory to run it from
+--- @return table|nil parsed, string|nil error
+local function inspect_project(dir, cwd)
+  local output, err = run_inspect(dir, cwd)
+  if not output then
+    return nil, err
+  end
+  local ok, parsed = pcall(pandoc.json.decode, output, false)
+  if not ok or type(parsed) ~= 'table' then
+    return nil, 'quarto inspect returned no project'
+  end
+  return parsed, nil
+end
+
 --- The `_quarto.tests` block of a project, as Quarto resolves it.
 ---
 --- Read from `quarto inspect <dir>`, because the vendored YAML reader drops
@@ -96,22 +118,48 @@ end
 --- @return any block `config._quarto.tests`, or nil
 --- @return string|nil error
 function M.project_tests(dir)
-  local output, err = run_inspect(dir)
-  if not output then
+  local parsed, err = inspect_project(dir)
+  if not parsed then
     return nil, err
-  end
-  local ok, parsed = pcall(pandoc.json.decode, output, false)
-  if not ok or type(parsed) ~= 'table' then
-    return nil, 'quarto inspect returned no project'
   end
   local config = type(parsed.config) == 'table' and parsed.config or {}
   local quarto = type(config._quarto) == 'table' and config._quarto or {}
   return quarto.tests, nil
 end
 
---- The command line that renders one document to one format.
+--- The input documents of a project, in the order Quarto renders them.
+---
+--- A book lists its chapters here, so the first one is the document that
+--- carries the front matter of the whole book.
+--- The paths are made relative to the project directory Quarto reports,
+--- because Quarto can spell that directory differently from the caller, for
+--- example through a symbolic link.
+--- @param dir string project directory
+--- @return string[]|nil inputs paths relative to the project directory
+--- @return string|nil error
+function M.project_inputs(dir)
+  local parsed, err = inspect_project(dir, dir)
+  if not parsed then
+    return nil, err
+  end
+  local inputs = type(parsed.files) == 'table' and parsed.files.input or nil
+  if type(inputs) ~= 'table' or #inputs == 0 then
+    return nil, 'quarto inspect lists no input document for the project'
+  end
+  local prefix = type(parsed.dir) == 'string' and (parsed.dir .. '/') or nil
+  local relative = {}
+  for _, input in ipairs(inputs) do
+    if prefix and input:sub(1, #prefix) == prefix then
+      input = input:sub(#prefix + 1)
+    end
+    relative[#relative + 1] = input
+  end
+  return relative, nil
+end
+
+--- The command line that renders one document, or one project, to one format.
 --- @param cwd string
---- @param document string absolute path
+--- @param document string absolute path of a document or a project directory
 --- @param format string
 --- @param log_path string
 --- @param timeout number seconds

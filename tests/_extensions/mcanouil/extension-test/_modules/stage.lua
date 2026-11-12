@@ -46,47 +46,76 @@ function M.missing_project(tests)
     M.PROJECT_FILES[1])
 end
 
---- Stage every extension a repository ships into the tests project.
+--- The staging directory of a project.
+--- @param dir string tests directory, or a project directory under it
+--- @return string
+local function target_of(dir)
+  return util.join(dir, '_extensions', M.STAGE_OWNER)
+end
+
+--- Stage every extension a repository ships into the tests project, and into
+--- each project directory under it.
+---
+--- A project directory under the tests directory resolves extensions only
+--- inside itself, so a copy in the tests project is not seen by its render.
 ---
 --- The staging directory is removed first. Copying onto an existing directory
 --- nests the new copy inside the old one, which is the failure the
 --- documentation sync scripts document.
 --- @param root string repository root
 --- @param tests string tests directory
+--- @param projects string[]|nil absolute project directories under the tests directory
 --- @return table staged {names, dir}
 --- @return string|nil error
-function M.stage(root, tests)
+function M.stage(root, tests, projects)
   local source = util.join(root, '_extensions')
-  local target = util.join(tests, '_extensions', M.STAGE_OWNER)
+  local dir = target_of(tests)
+  local targets = { dir }
+  for _, project in ipairs(projects or {}) do
+    targets[#targets + 1] = target_of(project)
+  end
 
-  util.remove_tree(target)
+  for _, target in ipairs(targets) do
+    util.remove_tree(target)
+  end
 
   if not util.is_dir(source) then
-    return { names = {}, dir = target }, nil
+    return { names = {}, dir = dir }, nil
   end
 
   local names = {}
   for _, name in ipairs(util.list_dir(source)) do
     local from = util.join(source, name)
     if util.is_dir(from) and util.exists(util.join(from, '_extension.yml')) then
-      local ok, err = util.copy_tree(from, util.join(target, name))
-      if not ok then
-        return { names = names, dir = target }, string.format('cannot stage `%s`: %s', name, tostring(err))
+      for _, target in ipairs(targets) do
+        local ok, err = util.copy_tree(from, util.join(target, name))
+        if not ok then
+          return { names = names, dir = dir }, string.format('cannot stage `%s` into `%s`: %s',
+            name, target, tostring(err))
+        end
       end
       names[#names + 1] = name
     end
   end
 
-  return { names = names, dir = target }, nil
+  return { names = names, dir = dir }, nil
 end
 
---- Remove the staging directory.
+--- Remove the staging directories.
 ---
 --- Only the generated owner directory is touched, never the framework's own
 --- `tests/_extensions/<owner>/` beside it.
 --- @param tests string tests directory
-function M.unstage(tests)
-  util.remove_tree(util.join(tests, '_extensions', M.STAGE_OWNER))
+--- @param projects string[]|nil absolute project directories under the tests directory
+function M.unstage(tests, projects)
+  util.remove_tree(target_of(tests))
+  -- A project's `_extensions/` was created by staging when it held nothing
+  -- else, so it is removed again once empty. The removal is not recursive,
+  -- so a directory that holds the project's own extensions stays.
+  for _, project in ipairs(projects or {}) do
+    util.remove_tree(target_of(project))
+    pcall(pandoc.system.remove_directory, util.join(project, '_extensions'), false)
+  end
 end
 
 --- Stage the extensions and check the project they are staged into.
@@ -95,22 +124,23 @@ end
 --- tree for anything else that looks at it before the next run.
 --- @param root string repository root
 --- @param tests string tests directory
+--- @param projects string[]|nil absolute project directories under the tests directory
 --- @return table|nil staged {names, dir}, nil on failure
 --- @return string|nil reason `staging-failed`, `nothing-to-stage` or `no-project-file`
 --- @return string|nil message
-function M.prepare(root, tests)
-  local staged, stage_err = M.stage(root, tests)
+function M.prepare(root, tests, projects)
+  local staged, stage_err = M.stage(root, tests, projects)
   if stage_err then
-    M.unstage(tests)
+    M.unstage(tests, projects)
     return nil, 'staging-failed', stage_err
   end
   if #staged.names == 0 then
-    M.unstage(tests)
+    M.unstage(tests, projects)
     return nil, 'nothing-to-stage', 'the repository ships no extension to stage'
   end
   local missing = M.missing_project(tests)
   if missing then
-    M.unstage(tests)
+    M.unstage(tests, projects)
     return nil, 'no-project-file', missing
   end
   return staged, nil, nil

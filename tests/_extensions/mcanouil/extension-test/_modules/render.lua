@@ -48,11 +48,16 @@ local function is_ignored(relative)
     or relative:match('/node_modules/')
 end
 
---- Collect `.qmd` documents under a directory, relative to it.
+--- Collect `.qmd` documents and project directories under a directory,
+--- relative to it.
+---
+--- A directory below the base that holds its own project file is one entry,
+--- and its documents are not collected. Each of them renders the whole
+--- project, so a book would otherwise render once for each chapter.
 --- @param base string
 --- @param prefix string|nil
---- @param found string[]|nil
---- @return string[]
+--- @param found table[]|nil
+--- @return table[] entries {relative, project}
 local function collect(base, prefix, found)
   prefix = prefix or ''
   found = found or {}
@@ -61,10 +66,14 @@ local function collect(base, prefix, found)
     local absolute = util.join(base, name)
     if util.is_dir(absolute) then
       if not is_ignored(relative .. '/') then
-        collect(absolute, relative, found)
+        if stage.missing_project(absolute) then
+          collect(absolute, relative, found)
+        else
+          found[#found + 1] = { relative = relative, project = true }
+        end
       end
     elseif name:match('%.qmd$') and not is_ignored(relative) then
-      found[#found + 1] = relative
+      found[#found + 1] = { relative = relative, project = false }
     end
   end
   return found
@@ -79,14 +88,15 @@ end
 --- runner knows nothing about.
 --- @param root string
 --- @param tests string
---- @return table[] documents {relative, absolute, origin, default_policy, ignores_exhaustive}
+--- @return table[] documents {relative, absolute, origin, project, default_policy, ignores_exhaustive}
 function M.discover(root, tests)
   local documents = {}
-  for _, relative in ipairs(collect(tests)) do
+  for _, entry in ipairs(collect(tests)) do
     documents[#documents + 1] = {
-      relative = relative,
-      absolute = util.join(tests, relative),
+      relative = entry.relative,
+      absolute = util.join(tests, entry.relative),
       origin = 'tests',
+      project = entry.project,
     }
   end
   if #documents > 0 then
@@ -108,6 +118,43 @@ function M.discover(root, tests)
   return {}
 end
 
+--- The absolute directories of the project cases among the documents.
+--- @param documents table[] from `M.discover`
+--- @return string[]
+function M.project_dirs(documents)
+  local dirs = {}
+  for _, document in ipairs(documents) do
+    if document.project then
+      dirs[#dirs + 1] = document.absolute
+    end
+  end
+  return dirs
+end
+
+--- The document of a project that carries its `_quarto.tests` block.
+---
+--- Quarto merges the project file into each document, so inspecting this one
+--- reads the block of `_quarto.yml` together with its own front matter. A
+--- book and a website start at `index.qmd`. Without one, the first input that
+--- `quarto inspect` lists is used.
+--- @param dir string project directory
+--- @return string|nil path absolute path
+--- @return string|nil error
+function M.project_main(dir)
+  local index = util.join(dir, 'index.qmd')
+  if util.exists(index) then
+    return index, nil
+  end
+  local inputs, err = cli.project_inputs(dir)
+  if not inputs then
+    return nil, err
+  end
+  if pandoc.path.is_absolute(inputs[1]) then
+    return nil, 'quarto inspect lists `' .. inputs[1] .. '` outside the project directory it reports'
+  end
+  return util.join(dir, inputs[1]), nil
+end
+
 --- Why `q2 call test` cannot judge a document, or nil when it can.
 --- @param options table
 --- @param document table from `M.discover`
@@ -116,6 +163,9 @@ end
 local function q2_reason(options, document, descriptors)
   if document.origin == 'demo' then
     return 'the demo document is outside the tests project'
+  end
+  if document.project then
+    return 'a project renders as a whole, and q2 tests one document at a time'
   end
   local info, inspect_err = cli.inspect(document.absolute, options.tests)
   if not info then
@@ -191,11 +241,40 @@ function M.log_failure(policy, errors, warnings)
 end
 
 --- Where quarto-cli writes a kept `.typ` file: beside the input, named after
---- it, also when `output-file` or `output-dir` is set (measured).
---- @param document table
+--- it, also when `output-file` or `output-dir` is set (measured). A book
+--- keeps one file, named after its main document (measured).
+--- @param input string absolute path of the document, or of the main document of a project
 --- @return string
-function M.kept_typ_path(document)
-  return (document.absolute:gsub('%.qmd$', '.typ'))
+function M.kept_typ_path(input)
+  return (pandoc.path.split_extension(input)) .. '.typ'
+end
+
+--- Where the render of a project put its output.
+---
+--- `quarto inspect` reports no output name for a project, so the path comes
+--- from the `Output created` line of the render log, relative to the project
+--- directory. Only a path the render reports is read, so an older output left
+--- in the project directory is never taken for this one.
+--- @param document table a project case from `M.discover`
+--- @param lines table[] from `log.read`
+--- @return string|nil path
+--- @return string|nil reason `outside-project` when the path climbs out of the project, `output-not-found` otherwise
+function M.project_output(document, lines)
+  local reported = log.output_created(lines)
+  if not reported then
+    return nil, 'output-not-found'
+  end
+  local path = reported
+  if not pandoc.path.is_absolute(path) then
+    path = util.join(document.absolute, path)
+  end
+  if not util.is_within(document.absolute, path) then
+    return nil, 'outside-project'
+  end
+  if not util.exists(path) then
+    return nil, 'output-not-found'
+  end
+  return path, nil
 end
 
 --- The message of a failed render that left no error to quote.
@@ -285,7 +364,7 @@ end
 --- `shouldError` check, and the `printsMessage` entries apply. With
 --- `errors: strict`, the `shouldError` check also needs a non-zero exit and
 --- no output file.
---- @param context table {tests, log_dir, settings, exhaustive, check, document, layer, output_files, output_dir, fallback_output_file}
+--- @param context table {tests, log_dir, settings, exhaustive, check, document, inspected, layer, output_files, output_dir, fallback_output_file, support_dir}
 --- @param target table a format entry from `frontmatter.spec`
 --- @return table case
 local function render_and_grade(context, target, typ)
@@ -305,9 +384,13 @@ local function render_and_grade(context, target, typ)
 
   local output_file = context.output_files[format] or context.fallback_output_file
   -- A previous format wrote into the same directory, so the render clears
-  -- what it left before this one starts.
-  local cleared, refused = M.clear_stale_output(context.tests, document, format, output_file,
-    context.output_dir)
+  -- what it left before this one starts. A project needs no clearing, because
+  -- its output is the path its own render log reports.
+  local cleared, refused = true, nil
+  if not document.project then
+    cleared, refused = M.clear_stale_output(context.tests, document, format, output_file,
+      context.output_dir)
+  end
   if not cleared then
     -- Nothing has been rendered, so there is no log to read or to point at:
     -- the case is built here rather than from the render's diagnostics.
@@ -325,7 +408,7 @@ local function render_and_grade(context, target, typ)
   local output_is_typ = type(output_file) == 'string' and output_file:match('%.typ$') ~= nil
   -- A `.typ` file that is already there is not the render's to remove: it
   -- may be hand-written. Only one the render kept is removed, after grading.
-  local typ_path = M.kept_typ_path(document)
+  local typ_path = M.kept_typ_path(context.inspected)
   local typ_preexisting = false
   local base = format:match('([^%-]+)$') or format
   local is_typst = base == 'typst' or output_is_typ
@@ -334,8 +417,11 @@ local function render_and_grade(context, target, typ)
     typ.path, typ.remove = typ_path, not typ_preexisting
   end
 
+  -- A project renders from its own directory, which is where Quarto finds
+  -- its project file and where the log paths start.
+  local cwd = document.project and document.absolute or context.tests
   local started = os.time()
-  local code, output = util.capture(cli.render_command(context.tests, document.absolute, format,
+  local code, output = util.capture(cli.render_command(cwd, document.absolute, format,
     log_path, settings.timeout))
   local elapsed = os.time() - started
   local lines, incomplete, log_missing = log.read(log_path)
@@ -364,6 +450,13 @@ local function render_and_grade(context, target, typ)
     case.status = 'fail'
     case.failure = { stage = stage_name, reason = reason, message = message, log = log_path }
     return case
+  end
+
+  local function locate_output()
+    if document.project then
+      return M.project_output(document, lines)
+    end
+    return M.output_path(context.tests, document, format, output_file, context.output_dir)
   end
 
   local function grade_assertions(ctx, log_only)
@@ -418,7 +511,7 @@ local function render_and_grade(context, target, typ)
         return fail('render', 'exit-zero',
           'the case declares `shouldError` with `errors: strict` but the render exited 0')
       end
-      local written, missing = M.output_path(context.tests, document, format, output_file, context.output_dir)
+      local written, missing = locate_output()
       if written then
         return fail('assert', 'output-written', string.format(
           'the case declares `shouldError` with `errors: strict` but the render wrote %s', tests_relative(written)))
@@ -477,7 +570,7 @@ local function render_and_grade(context, target, typ)
     end
   end
 
-  local output_path, missing = M.output_path(context.tests, document, format, output_file, context.output_dir)
+  local output_path, missing = locate_output()
   if not output_path then
     case.status, case.failure = M.grade_missing(missing, format, log_path)
     return case
@@ -493,7 +586,7 @@ local function render_and_grade(context, target, typ)
     output_path = output_path,
     output_label = output_label,
     output_dir = pandoc.path.directory(output_path),
-    support_dir = pandoc.path.split_extension(output_path) .. '_files',
+    support_dir = context.support_dir or (pandoc.path.split_extension(output_path) .. '_files'),
     -- Only a Typst render keeps a `.typ` file, so another format has none to
     -- read, whatever sits beside the document.
     typ_path = is_typst and (output_is_typ and output_path or typ_path) or nil,
@@ -570,6 +663,8 @@ function M.grade_missing(missing, format, log_path)
     message = string.format(
       'the output directory or name reported for `%s` climbs out of the directory it is placed under, so nothing was removed or rendered',
       format)
+  elseif missing == 'outside-project' then
+    message = string.format('the `%s` output of the project is outside the project directory, so it is not read', format)
   else
     message = string.format('the render reported success but wrote no `%s` output to check', format)
   end
@@ -769,7 +864,19 @@ function M.execute(options, documents, descriptors, layer, emit)
       })
     end
 
-    local info, inspect_err = cli.inspect(document.absolute, options.tests)
+    -- A project is read through the document that carries its block, and
+    -- from its own directory, so Quarto merges its own project file.
+    local inspected, inspect_cwd = document.absolute, options.tests
+    if document.project then
+      local main, main_err = M.project_main(document.absolute)
+      if not main then
+        emit_document('fail', 'inspect', 'inspect-failed', main_err)
+        goto continue
+      end
+      inspected, inspect_cwd = main, document.absolute
+    end
+
+    local info, inspect_err = cli.inspect(inspected, inspect_cwd)
     if not info then
       emit_document('fail', 'inspect', 'inspect-failed', inspect_err)
       goto continue
@@ -782,6 +889,16 @@ function M.execute(options, documents, descriptors, layer, emit)
         goto continue
       end
       local run_warnings = frontmatter.unknown_run_keys(spec.run)
+      if document.project then
+        for _, entry in ipairs(collect(document.absolute)) do
+          local path = util.join(document.absolute, entry.relative)
+          if not entry.project and path ~= inspected and frontmatter.declares_tests(path) then
+            run_warnings[#run_warnings + 1] = string.format(
+              '`%s` sets `_quarto.tests`, which a project case does not read; move the block to `%s`',
+              entry.relative, pandoc.path.filename(inspected))
+          end
+        end
+      end
       local reason = frontmatter.skip_reason(spec.run)
       if reason then
         emit_document('skip', 'discover', 'skipped', reason, run_warnings)
@@ -819,13 +936,25 @@ function M.execute(options, documents, descriptors, layer, emit)
       end
 
       context.document = document
+      context.inspected = inspected
       context.settings = settings
       context.exhaustive = exhaustive
       context.check = document.origin == 'tests' and settings.check or nil
       context.layer = layer
-      context.output_files = info.output_files
-      context.output_dir = info.output_dir
-      context.fallback_output_file = M.fallback_output_file(document.absolute)
+      -- The names `quarto inspect` gives for the document of a project are
+      -- those of a single render of that document, not of the project.
+      if document.project then
+        context.output_files = {}
+        context.output_dir = nil
+        context.fallback_output_file = nil
+        context.support_dir = info.lib_dir
+          and util.join(document.absolute, info.output_dir or '.', info.lib_dir) or nil
+      else
+        context.output_files = info.output_files
+        context.output_dir = info.output_dir
+        context.fallback_output_file = M.fallback_output_file(document.absolute)
+        context.support_dir = nil
+      end
       for _, target in ipairs(targets) do
         if target.problem then
           emit({
@@ -870,7 +999,8 @@ function M.run(options, descriptors, emit)
     return
   end
 
-  local staged, reason, message = stage.prepare(options.root, options.tests)
+  local projects = M.project_dirs(documents)
+  local staged, reason, message = stage.prepare(options.root, options.tests, projects)
   if not staged then
     emit({
       id = 'render/stage',
@@ -889,7 +1019,7 @@ function M.run(options, descriptors, emit)
 
   local ok, err = pcall(M.execute, options, documents, descriptors, 'render', emit)
 
-  stage.unstage(options.tests)
+  stage.unstage(options.tests, projects)
 
   if not ok then
     emit({
