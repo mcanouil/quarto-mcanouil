@@ -1,0 +1,39 @@
+name: Test
+
+# The extension tests render the test documents and check the output, so a
+# pull request runs them unless it is still a draft. The default activity types
+# fire nothing when a pull request leaves draft, so `ready_for_review` is what
+# runs the tests once the draft is lifted.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    # The reusable extension-test workflow cannot install veraPDF or poppler,
+    # which the Typst checks need, so the job calls the action it wraps.
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: release
+
+      - name: Install the PDF tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes poppler-utils
+          quarto install verapdf --no-prompt
+
+      - name: Run the extension tests
+        uses: mcanouil/quarto-extension-test/.github/actions/extension-test@0.2.1
+        with:
+          quarto: release
