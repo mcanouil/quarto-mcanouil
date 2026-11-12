@@ -14,7 +14,7 @@ _quarto:
     run:
       extension-test:
         description: With no type set, the document is a compact report with no cover.
-        check: bash _checks/types.sh compact
+        check: bash _checks/types.sh compact gold
     mcanouil-typst:
       ensureTypstFileRegexMatches:
         - ['mcanouil-document\(\s*"report",\s*"compact",\s*none']

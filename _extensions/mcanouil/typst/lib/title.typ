@@ -20,6 +20,16 @@
   v(below)
 }
 
+// Answer the space that moves the text below the corner motif, when the title
+// block ends above the bottom of the shapes of the motif.
+// - motif-bottom: distance from the top of the page to the bottom of the shapes, or none.
+#let clear-motif(motif-bottom) = context {
+  let position = here().position()
+  if motif-bottom != none and position.page == 1 and position.y < motif-bottom {
+    v(motif-bottom - position.y)
+  }
+}
+
 // Answer the title block of a document.
 // - title, subtitle, kicker, date, abstract: content, or none.
 // - authors: array of author dictionaries, see author-line().
@@ -28,8 +38,8 @@
 // - keywords: array of content.
 // - abstract-title: heading of the abstract.
 // - font: font family of the title and the subtitle, or none for the text font.
-// - motif-space: width that the corner motif takes beside the text, or none.
-// - motif-bottom: distance from the top of the page to the bottom of the corner motif, or none.
+// - motif-space: width that the shapes of the corner motif take beside the text, or none.
+// - motif-bottom: distance from the top of the page to the bottom of those shapes, or none.
 #let title-block(
   title: none,
   subtitle: none,
@@ -95,4 +105,5 @@
   if keywords.len() > 0 {
     row(1em, small[*#mc-labels.at("mcanouil-keywords"):* #keywords.join[, ]])
   }
+  clear-motif(motif-bottom)
 }

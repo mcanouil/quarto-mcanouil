@@ -9,6 +9,9 @@
 // Side of the corner motif on page 1 of a compact report.
 #let mc-first-page-motif-size = 80mm
 
+// Space kept between the shapes of the corner motif and the text.
+#let mc-motif-gap = 3mm
+
 // Answer a report.
 // - meta: the document, see mcanouil-document().
 // - body: the content of the document.
@@ -16,6 +19,7 @@
   let tokens = meta.tokens
   let fonts = meta.fonts
   let motif-name = meta.at("motif-name", default: none)
+  let extent = if motif-name != none { mc-motif-extent(motif-name) }
   let corner = if motif-name != none { motif(motif-name, top + right, mc-first-page-motif-size) }
   show: chrome-page.with(meta.header, meta.footer, motif: corner)
   title-block(
@@ -30,8 +34,10 @@
     abstract-title: meta.at("abstract-title", default: none),
     keywords: meta.at("keywords", default: ()),
     font: fonts.headings,
-    motif-space: if corner != none { mc-first-page-motif-size - mc-page-margin.right },
-    motif-bottom: if corner != none { mc-first-page-motif-size },
+    motif-space: if corner != none {
+      calc.max(0pt, mc-first-page-motif-size * (100 - extent.left) / 100 + mc-motif-gap - mc-page-margin.right)
+    },
+    motif-bottom: if corner != none { mc-first-page-motif-size * extent.bottom / 100 + mc-motif-gap },
   )
   body
 }

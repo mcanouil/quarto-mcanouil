@@ -19,7 +19,7 @@ _quarto:
     run:
       extension-test:
         description: The compact report of the mono preset starts on page 1 with the title block, the abstract and the body.
-        check: bash _checks/types.sh compact
+        check: bash _checks/types.sh compact mono
     mcanouil-typst:
       ensureTypstFileRegexMatches:
         - ['mcanouil-document\(\s*"report",\s*"compact",\s*none']

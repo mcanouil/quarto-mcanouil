@@ -4,7 +4,8 @@ set -euo pipefail
 
 # Check hook: the layout of each document type, read from the text of the PDF.
 #
-# Usage: types.sh compact
+# Usage: types.sh compact <preset>
+#        types.sh compact-short <preset>
 #
 # Exits 77 for a format other than Typst.
 #
@@ -50,14 +51,36 @@ compact_no_gap() {
 		awk -v top="${abstract_top}" -v bottom="${author_bottom}" 'BEGIN { exit !((top - bottom) / 72 * 25.4 < 15) }'
 }
 
-# Succeed when no word that starts above the bottom of the 80 mm corner motif reaches into the motif square.
-compact_clear_of_motif() {
-	local width
+# Answer the extent of the shapes of the motif of a preset, as "left bottom" in view box units (0 to 100).
+# $1 preset.
+motif_extent() {
+	local name
+	name="$(awk '/^motif:/ { print $2 }' "${ext_dir}/presets/$1.yml")"
+	typst_value "${typ}" mc-motif-extent "mc-motif-extent(\"${name}\").values().map(str).join(\" \")" | tr -d '"'
+}
+
+# Succeed when no word that starts above the bottom of the shapes of the corner motif reaches into them.
+# The motif is 80 mm wide, as in typst/types/report.typ.
+# $1 preset.
+clear_of_motif() {
+	local width extent
 	width="$(pdftotext -bbox -f 1 -l 1 "${output}" - | sed -nE 's/.*<page width="([0-9.]+)".*/\1/p')"
-	[ -n "${width}" ] &&
-		page1_words | awk -v left="$(awk -v w="${width}" 'BEGIN { print w - 80 / 25.4 * 72 }')" -v bottom="$(awk 'BEGIN { print 80 / 25.4 * 72 }')" '
+	extent="$(motif_extent "$1")"
+	[ -n "${width}" ] && [ -n "${extent}" ] &&
+		page1_words | awk -v width="${width}" -v extent="${extent}" '
+			BEGIN {
+				split(extent, e, " ")
+				size = 80 / 25.4 * 72
+				left = width - (100 - e[1]) / 100 * size
+				bottom = e[2] / 100 * size
+			}
 			$2 < bottom && $3 > left { bad = 1 }
 			END { exit bad }'
+}
+
+# Succeed when page 1 holds the title, the footer and at least three lines of paragraph.
+first_paragraph_long() {
+	[ "$(pdf_page_text "${output}" 1 | grep -c .)" -ge 5 ]
 }
 
 case "${1:-}" in
@@ -65,7 +88,11 @@ compact)
 	expect "compact-first-page" "the title, the abstract and the first heading on page 1" compact_first_page
 	expect "compact-headings-inline" "two level 1 headings on page 1" compact_headings_inline
 	expect "compact-no-gap" "the abstract less than 15 mm below the author line" compact_no_gap
-	expect "compact-clear-of-motif" "no text inside the 80 mm corner motif square" compact_clear_of_motif
+	expect "compact-clear-of-motif" "no text inside the shapes of the ${2:?compact needs a preset} motif" clear_of_motif "$2"
+	;;
+compact-short)
+	expect "compact-clear-of-motif" "no text inside the shapes of the ${2:?compact-short needs a preset} motif" clear_of_motif "$2"
+	expect "compact-short-paragraph" "a first paragraph of several lines, so a line can reach the motif" first_paragraph_long
 	;;
 *)
 	printf 'Bail out! unknown case %s\n' "${1:-}"
