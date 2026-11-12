@@ -1,0 +1,5 @@
+logo:
+  images:
+    mark:
+      path: figure.svg
+  medium: mark

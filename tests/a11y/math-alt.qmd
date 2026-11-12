@@ -1,0 +1,22 @@
+---
+title: Maths alt text
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: An equation with an alt attribute keeps its alternative text in the Typst output and in the PDF tags.
+        check: bash _checks/accessibility.sh math-alt
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+      ensureTypstFileRegexMatches:
+        - ['alt: "Mass equals energy over the speed of light squared\."']
+---
+
+The relation is [$m = E / c^2$]{alt="Mass equals energy over the speed of light squared."} in short.
+
+::: {alt="The sum of one over n squared tends to pi squared over six."}
+$$\sum_{n=1}^\infty \frac{1}{n^2} = \frac{\pi^2}{6}$$
+:::

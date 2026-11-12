@@ -2,8 +2,7 @@
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
---- @version 1.0.0
---- @brief Math alt-text filter for Typst accessibility
+--- @brief Maths alt text for Typst accessibility
 --- @description Converts math elements with alt attributes to Typst math.equation()
 --- calls with proper alt-text support for accessibility.
 --- For non-Typst formats, removes the wrapper and returns the math content directly.
@@ -131,6 +130,5 @@ end
 -- FILTER EXPORTS
 -- ============================================================================
 
-return {
-  { Span = Span, Div = Div }
-}
+--- @type table Filter step of the entry filter.
+return { filter = { Span = Span, Div = Div } }

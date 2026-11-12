@@ -274,3 +274,29 @@ verapdf_ua1() {
 	report="$("${verapdf_bin}" --flavour ua1 "$1")"
 	grep -q '<validationReport ' <<<"${report}" && grep -q 'isCompliant="true"' <<<"${report}"
 }
+
+# Answer the alternative texts of a PDF, one per line, from the /Alt entries of
+# its objects (inflating the compressed streams that hold them).
+# $1 PDF file.
+pdf_alt_texts() {
+	python3 -I - "$1" <<'PY'
+import re
+import sys
+import zlib
+
+data = open(sys.argv[1], "rb").read()
+chunks = [data]
+for match in re.finditer(rb"stream\r?\n", data):
+    end = data.find(b"endstream", match.end())
+    try:
+        chunks.append(zlib.decompress(data[match.end():end]))
+    except zlib.error:
+        continue
+for chunk in chunks:
+    for literal in re.findall(rb"/Alt\s*\(((?:[^()\\]|\\.)*)\)", chunk):
+        print(literal.decode("latin-1"))
+    for hexed in re.findall(rb"/Alt\s*<([0-9A-Fa-f\s]*)>", chunk):
+        raw = bytes.fromhex(re.sub(rb"\s", b"", hexed).decode())
+        print(raw.decode("utf-16-be") if raw[:2] == b"\xfe\xff" else raw.decode("latin-1"))
+PY
+}

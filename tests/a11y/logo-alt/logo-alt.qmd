@@ -1,0 +1,17 @@
+---
+title: Logo with alt text
+brand: _brand.yml
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The user brand logo reaches Typst with its alt text, and a preset logo fills in when there is none.
+        check: bash _checks/accessibility.sh logo-alt
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+---
+
+A paragraph.
