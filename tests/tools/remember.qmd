@@ -1,0 +1,22 @@
+---
+title: Remember
+author: Test Author
+date: 2026-01-01
+engine: markdown
+format: mcanouil-html
+extensions:
+  remember:
+    enabled: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The remember tool runs when its option is on.
+    mcanouil-html:
+      ensureFileRegexMatches:
+        - ['quarto-remember']
+---
+
+# Remember
+
+Some text.

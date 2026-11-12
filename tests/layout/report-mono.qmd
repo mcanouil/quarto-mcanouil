@@ -1,0 +1,22 @@
+---
+title: Survival analysis
+author: Test Author
+version: Version 1.2
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: mono
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The mono report has an artefact motif, the motif colour in the corner, and PDF/UA-1 tags.
+        check: bash _checks/pdf.sh report mono
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['motif\(']
+---
+
+{{< include _report.qmd >}}

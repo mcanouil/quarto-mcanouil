@@ -1,0 +1,16 @@
+---
+title: Dark deck
+brand-mode: dark
+format: mcanouil-revealjs
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A brand-mode dark deck carries the gold dark tokens in :root and in the dark slide rule.
+        check: bash _checks/tokens.sh dark-deck
+    mcanouil-revealjs:
+---
+
+## Slide
+
+A paragraph.

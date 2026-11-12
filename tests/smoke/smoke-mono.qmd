@@ -1,0 +1,32 @@
+---
+title: Smoke
+author: Test Author
+date: 2026-01-01
+format:
+  mcanouil-html: default
+  mcanouil-revealjs: default
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: mono
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The mono preset reaches HTML, Reveal.js and Typst, and no opt-in tool leaves a marker.
+        check: bash _checks/tokens.sh smoke mono
+    mcanouil-html:
+      ensureFileRegexMatches:
+        - ['<main']
+        - ['class="light-content"', '<iconify-icon', 'data-prism=', 'sourceCode python cw-auto', 'assets/typst-render/', 'gitlink-badge', 'mobile-toc/', 'preview-colour', 'collapse-output', 'quarto-remember']
+    mcanouil-revealjs:
+      ensureFileRegexMatches:
+        - ['<section']
+        - ['class="light-content"', '<iconify-icon', 'data-prism=', 'sourceCode python cw-auto', 'data-veil-hidden', 'assets/typst-render/', 'gitlink-badge', 'mobile-toc/', 'preview-colour', 'collapse-output', 'quarto-remember']
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['motif\(']
+---
+
+{{< include _smoke.qmd >}}

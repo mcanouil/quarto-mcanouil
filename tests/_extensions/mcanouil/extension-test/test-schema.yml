@@ -1,0 +1,38 @@
+# The `_quarto.tests.run.extension-test` options.
+#
+# Written in the same v2 vocabulary the runner validates `_schema.yml` with,
+# so the framework's own configuration is checked by the validator whose
+# behaviour the framework exists to protect.
+#
+# Every option is optional. A value that does not validate, or a key this
+# version does not know, fails the document with `options-invalid`.
+
+$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json
+
+options:
+  timeout:
+    type: integer
+    default: 300
+    minimum: 1
+    maximum: 86400
+    description: "Seconds allowed for each render."
+
+  name:
+    type: string
+    description: "A human name for the case. Defaults to the document's file stem."
+
+  description:
+    type: string
+    default: ""
+    description: "What the case covers."
+
+  warnings:
+    type: string
+    enum: [default, exhaustive]
+    default: default
+    description: "With `exhaustive`, each warning in a `noErrors` format must match an expected `printsMessage` entry."
+
+  check:
+    type: string
+    pattern: "\\S"
+    description: "A shell command that runs after the assertions of each format pass."
