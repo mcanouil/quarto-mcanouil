@@ -13,8 +13,10 @@ permissions:
 
 jobs:
   test:
-    # The reusable extension-test workflow cannot install veraPDF or poppler,
-    # which the Typst checks need, so the job calls the action it wraps.
+    # The reusable extension-test workflow cannot install veraPDF or poppler yet,
+    # which the Typst checks need, so the job sets up Quarto itself and calls the
+    # action the workflow wraps. That action sets up Quarto a second time, which
+    # is harmless. Switch to the reusable workflow once it takes setup inputs.
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:

@@ -8,6 +8,7 @@ _quarto:
       extension-test:
         description: A palette that fails the contrast check stops the render with the pair and the ratio.
     mcanouil-html:
+      # The exit code and no-output assertions wait for a runner feature.
       shouldError: true
       printsMessage:
         level: ERROR

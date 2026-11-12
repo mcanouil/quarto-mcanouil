@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2154 # format, output, typ, ext_dir, tests_dir and tap_n are set by lib.sh
 set -euo pipefail
 
 # Check hook: the tokens of a preset reach the HTML, Reveal.js and Typst output.
@@ -15,7 +16,7 @@ set -euo pipefail
 # @copyright 2026 Mickaël Canouil
 # @author Mickaël Canouil
 
-# shellcheck source=lib.sh
+# shellcheck source=/dev/null # lib.sh is checked on its own
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 # Succeed when every @font-face URL of the fonts.css linked from the HTML

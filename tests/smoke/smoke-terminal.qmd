@@ -18,8 +18,8 @@ _quarto:
         check: bash _checks/tokens.sh smoke terminal
     mcanouil-html:
       ensureFileRegexMatches:
-        - ['<main']
-        - ['class="light-content"', '<iconify-icon', 'data-prism=', 'sourceCode python cw-auto', 'assets/typst-render/', 'gitlink-badge', 'mobile-toc/', 'preview-colour', 'collapse-output', 'quarto-remember']
+        - ['<main', 'quarto-color-alternate" id="quarto-bootstrap" data-mode="dark"']
+        - ['class="light-content"', '<iconify-icon', 'data-prism=', 'sourceCode python cw-auto', 'data-veil-hidden', 'assets/typst-render/', 'gitlink-badge', 'mobile-toc/', 'preview-colour', 'collapse-output', 'quarto-remember']
     mcanouil-revealjs:
       ensureFileRegexMatches:
         - ['<section']

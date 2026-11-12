@@ -9,6 +9,7 @@ _quarto:
       extension-test:
         description: A dark ink that fails the contrast check stops a brand-mode dark Typst render.
     mcanouil-typst:
+      # The exit code and no-output assertions wait for a runner feature.
       shouldError: true
       printsMessage:
         level: ERROR

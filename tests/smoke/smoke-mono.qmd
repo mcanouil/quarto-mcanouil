@@ -19,7 +19,7 @@ _quarto:
     mcanouil-html:
       ensureFileRegexMatches:
         - ['<main']
-        - ['class="light-content"', '<iconify-icon', 'data-prism=', 'sourceCode python cw-auto', 'assets/typst-render/', 'gitlink-badge', 'mobile-toc/', 'preview-colour', 'collapse-output', 'quarto-remember']
+        - ['class="light-content"', '<iconify-icon', 'data-prism=', 'sourceCode python cw-auto', 'data-veil-hidden', 'assets/typst-render/', 'gitlink-badge', 'mobile-toc/', 'preview-colour', 'collapse-output', 'quarto-remember']
     mcanouil-revealjs:
       ensureFileRegexMatches:
         - ['<section']
