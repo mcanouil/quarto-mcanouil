@@ -1,0 +1,23 @@
+# Study objectives and design
+
+How the study was set up, who took part, and how the data were analysed.
+
+## Objectives
+
+The primary objective was to characterise the dermatologic tolerability of the treatment over 24 weeks [@doe2020].
+
+{{< lipsum 1 >}}
+
+## Overall design
+
+The study was a randomised, double-blind, placebo-controlled, parallel-group study conducted at multiple sites.
+
+{{< lipsum 2 >}}
+
+### Study periods
+
+{{< lipsum 1 >}}
+
+## Selection of the study population
+
+{{< lipsum 2 >}}

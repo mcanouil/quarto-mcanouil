@@ -1,0 +1,22 @@
+---
+title: A letter
+format: mcanouil-revealjs
+extensions:
+  mcanouil:
+    type: letter
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The letter type stops a Reveal.js render with the type and the supported format.
+        errors: strict
+    mcanouil-revealjs:
+      shouldError: true
+      printsMessage:
+        level: ERROR
+        regex: 'mcanouil: type "letter" supports mcanouil-typst only, not mcanouil-revealjs\.'
+---
+
+## A slide
+
+A paragraph.

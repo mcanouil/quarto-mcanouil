@@ -20,9 +20,14 @@ ext_dir="${repo_dir}/_extensions/mcanouil"
 # The format name without the extension prefix: html, revealjs or typst.
 format="${EXTENSION_TEST_FORMAT##*-}"
 output="${EXTENSION_TEST_OUTPUT:-}"
-# The Typst source that a keep-typ render leaves beside the input.
+# The Typst source that a keep-typ render leaves beside the input, or beside
+# the index.qmd of a project case, whose input is the project directory.
 typ="${EXTENSION_TEST_INPUT:-}"
-typ="${typ%.qmd}.typ"
+if [ -d "${typ}" ]; then
+	typ="${typ}/index.typ"
+else
+	typ="${typ%.qmd}.typ"
+fi
 
 tap_n=0
 tap_failed=0
@@ -230,11 +235,33 @@ typst_value() {
 	printf '%s\n' "${value}"
 }
 
+# Motif sample points of each preset, in motif units: "x,y" pairs inside a
+# shape. The first pair is the shape nearest the corner, the last one is on the
+# right edge at mid motif height or the nearest shape to it.
+motif_points() {
+	case "$1" in
+	gold) printf '99.5,0.5 99.5,50' ;;
+	mono) printf '99.5,0.5 81,0.5 99.5,32 99.5,50' ;;
+	quarto) printf '46,0.5 99.5,54' ;;
+	terminal) printf '96,4 96,53' ;;
+	esac
+}
+
+# Answer the token of the colour that a preset motif uses on its page: a light
+# page uses accent, a dark page accent-high.
+motif_token() {
+	case "$1" in
+	terminal) printf 'accent-high' ;;
+	*) printf 'accent' ;;
+	esac
+}
+
 # Answer the side of the page 1 motif, in pixels at 50 dpi, from the motif size
 # that the kept Typst file uses.
+# $1 name of the size binding, mc-first-page-motif-size when omitted.
 motif_side_px() {
-	local points
-	points="$(typst_value "${typ}" mc-first-page-motif-size 'mc-first-page-motif-size.pt()' || printf 0)"
+	local points constant="${1:-mc-first-page-motif-size}"
+	points="$(typst_value "${typ}" "${constant}" "${constant}.pt()" || printf 0)"
 	awk -v p="${points}" 'BEGIN { printf "%d", p * 50 / 72 }'
 }
 

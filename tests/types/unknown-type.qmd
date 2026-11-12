@@ -1,0 +1,20 @@
+---
+title: Unknown type
+format: mcanouil-typst
+extensions:
+  mcanouil:
+    type: poster
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: An unknown type stops the render and names the known types.
+        errors: strict
+    mcanouil-typst:
+      shouldError: true
+      printsMessage:
+        level: ERROR
+        regex: 'mcanouil: unknown type "poster"; use article, report\.'
+---
+
+A paragraph.

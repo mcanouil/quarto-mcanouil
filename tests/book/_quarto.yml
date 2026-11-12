@@ -1,0 +1,43 @@
+project:
+  type: book
+
+book:
+  title: Clinical study report
+  subtitle: A 24-week, randomised, double-blind, placebo-controlled study
+  author:
+    - name: Ana Author
+      email: ana@example.org
+      orcid: 0000-0002-0724-1961
+      corresponding: true
+    - name: Ben Writer
+    - name: Cleo Third
+  date: 2026-11-11
+  chapters:
+    - index.qmd
+    - sections/01-design.qmd
+    - sections/02-methods.qmd
+    - sections/03-references.qmd
+  appendices:
+    - sections/appendix-a-listings.qmd
+
+version: Version 1.2
+license: CC BY 4.0
+bibliography: references.bib
+
+format:
+  mcanouil-typst:
+    keep-typ: true
+
+extensions:
+  mcanouil:
+    preset: gold
+    type: report
+    layout: full
+
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The test book, modelled on the clinical study report demonstration, renders as a full report with a cover, chapter dividers and contents pages, lettered appendices and a closing page.
+        check: bash _checks/types.sh book
+        timeout: 300

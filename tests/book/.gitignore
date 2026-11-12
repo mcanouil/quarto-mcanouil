@@ -1,0 +1,6 @@
+/.quarto/
+/_book/
+/_extensions/
+/index.typ
+
+**/*.quarto_ipynb

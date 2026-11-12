@@ -1,0 +1,13 @@
+# Introduction
+
+The opening paragraph comes before the quotes.
+
+> Design for the reader who cannot see the colours, and every reader benefits.
+>
+> -- Mickaël Canouil, 2026
+
+A paragraph between the two quotes.
+
+> A quote without attribution stays a plain quote, with *emphasis* inside.
+
+The closing paragraph comes after the quotes.

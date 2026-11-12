@@ -14,6 +14,7 @@ $endfor$
 )
 #let mc-mode = "$mcanouil-mode$"
 #let mc-motif = "$mcanouil-motif$"
+#let mc-preset = "$mcanouil-preset$"
 
 // Answer the colour tokens of the render mode.
 #let tokens() = mc-tokens

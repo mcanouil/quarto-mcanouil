@@ -20,14 +20,23 @@
   #counter(page).get().first() / #counter(page).final().first()
 ]
 
-// Answer the title of the current chapter: the first level 1 heading of the
-// page, or else the last one before it, with its number when it has one.
+// Distance below the top margin within which a chapter heading counts as the
+// start of its page.
+#let mc-chapter-top-tolerance = 2pt
+
+// Answer the title of the chapter in force at the top of the page: the last
+// level 1 heading on an earlier page, or at the very top of this page, with
+// its number when it has one. A chapter that starts lower on the page shows
+// from the next page on.
 #let chapter-title() = context {
-  let chapters = heading.where(level: 1)
-  let on-page = query(chapters).filter(it => it.location().page() == here().page())
-  let before = query(chapters.before(here()))
-  let chapter = if on-page.len() > 0 { on-page.first() } else if before.len() > 0 { before.last() }
-  if chapter != none {
+  let page = here().page()
+  let top = mc-page-margin.top + mc-chapter-top-tolerance
+  let in-force = query(heading.where(level: 1)).filter(it => {
+    let position = it.location().position()
+    position.page < page or (position.page == page and position.y <= top)
+  })
+  if in-force.len() > 0 {
+    let chapter = in-force.last()
     if chapter.numbering != none {
       numbering(chapter.numbering, ..counter(heading).at(chapter.location()))
       h(0.5em)

@@ -1,0 +1,26 @@
+# Introduction
+
+The first paragraph states the question and reaches a Callpoint[^note] before it ends, with a reference [@doe2020] and enough words to run across the whole body column of the page.
+
+::: {.column-margin}
+Sidenote set beside its paragraph.
+:::
+
+[^note]: Footnoted remark set in the margin.
+
+# Methods
+
+{{< lipsum 2 >}}
+
+## Design
+
+{{< lipsum 1 >}}
+
+# Results
+
+{{< lipsum 1 >}}
+
+# References {.unnumbered}
+
+::: {#refs}
+:::

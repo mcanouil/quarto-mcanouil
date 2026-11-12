@@ -1,0 +1,29 @@
+---
+title: A very long title for a clinical study report that runs over several lines of the cover page and keeps going past where a short title would stop
+subtitle: A subtitle that is also long enough to wrap onto a second line of the cover page
+author:
+  - name: Ana Author
+  - name: Ben Writer
+  - name: Cleo Third
+date: 2026-11-11
+version: Version 1.2
+license: CC BY 4.0
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: report
+    layout: full
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: On the cover of a full report, a long title stays clear of the corner motif and of the footer band.
+        check: bash _checks/types.sh long-title gold
+---
+
+# Introduction
+
+{{< lipsum 1 >}}

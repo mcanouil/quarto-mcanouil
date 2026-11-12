@@ -1,0 +1,22 @@
+---
+title: Block quotes
+author: Test Author
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A block quote whose closing paragraph starts with an em dash has the attribution too.
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['attribution: \[\s*Mickaël Canouil, 2026\s*\]']
+---
+
+> Design for the reader who cannot see the colours.
+>
+> — Mickaël Canouil, 2026

@@ -1,0 +1,24 @@
+---
+title: Survival analysis
+author: Test Author
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The running header names the chapter in force at the top of the page, not a chapter that starts lower on the page.
+        check: bash _checks/pdf.sh running-header
+---
+
+# Alpha
+
+{{< lipsum 7 >}}
+
+# Beta
+
+{{< lipsum 6 >}}

@@ -46,6 +46,28 @@
     .flatten()
 )
 
+// Answer the extent of the shapes of a motif, in the units of the 100 by 100
+// view box: `left` is the least x and `bottom` the greatest y of any shape.
+// - name: motif name, a key of mc-motif-geometry.
+#let mc-motif-extent(name) = {
+  let xs = ()
+  let ys = ()
+  for shape in mc-motif-geometry.at(name) {
+    let p = shape.points
+    if shape.kind == "polygon" {
+      xs += p.chunks(2).map(c => c.at(0))
+      ys += p.chunks(2).map(c => c.at(1))
+    } else if shape.kind == "rect" {
+      xs += (p.at(0), p.at(0) + p.at(2))
+      ys += (p.at(1), p.at(1) + p.at(3))
+    } else {
+      xs += (p.at(0) - p.at(2), p.at(0) + p.at(2))
+      ys += (p.at(1) - p.at(2), p.at(1) + p.at(2))
+    }
+  }
+  (left: calc.min(..xs), bottom: calc.max(..ys))
+}
+
 // Answer a corner motif, tagged as an artefact and placed in its page corner
 // so that it bleeds to both edges. Place it in the page background.
 // - name: motif name, a key of mc-motif-geometry.
