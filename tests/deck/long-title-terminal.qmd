@@ -1,0 +1,24 @@
+---
+title: A talk title long enough to wrap over several lines of the title slide, next to the corner motif
+subtitle: Build, share and maintain your own formats
+author: Mickaël Canouil
+format: mcanouil-revealjs
+extensions:
+  mcanouil:
+    preset: terminal
+    event: useR! 2026 · Warwick
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A long title and a long section title in the terminal deck stay clear of the corner motif.
+        check: bash _checks/deck.sh long-title terminal
+    mcanouil-revealjs:
+      noErrorsOrWarnings: true
+---
+
+# A section title long enough to wrap over several lines of the slide
+
+## Content
+
+A paragraph.

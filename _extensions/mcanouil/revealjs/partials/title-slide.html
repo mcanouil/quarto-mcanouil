@@ -1,0 +1,29 @@
+<section id="$idprefix$title-slide" class="quarto-title-block mc-ground mc-title-slide has-dark-background$if(mcanouil-title-long)$ mc-title-long$endif$"$for(title-slide-attributes/pairs)$ $it.key$="$it.value$"$endfor$>
+$if(mcanouil-motif-svg)$
+$mcanouil-motif-svg$
+$endif$
+<div class="mc-title-content">
+$if(mcanouil-event)$
+<p class="mc-kicker">$mcanouil-event$</p>
+$endif$
+<h1 class="title">$title$</h1>
+$if(subtitle)$
+<p class="subtitle">$subtitle$</p>
+$endif$
+$if(mcanouil-speakers)$
+<div class="mc-speakers">
+$for(mcanouil-speakers)$
+<div class="mc-speaker">
+$if(it.photo)$
+<img class="mc-speaker-photo" src="$it.photo$" alt="">
+$endif$
+<p class="mc-speaker-text"><span class="mc-speaker-name">$it.name$</span>$if(it.degrees)$, $it.degrees$$endif$$if(it.affiliation)$<br><span class="mc-speaker-affiliation">$it.affiliation$</span>$endif$</p>
+</div>
+$endfor$
+</div>
+$endif$
+$if(date)$
+<p class="date">$date$</p>
+$endif$
+</div>
+</section>

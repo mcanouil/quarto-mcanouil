@@ -1,3 +1,373 @@
 /*-- scss:defaults --*/
 
+// The colours come from the `--mc-*` custom properties that Lua writes for the
+// scheme of the deck, and again for each dark and ground slide. The Sass
+// colour variables of Quarto keep their defaults: the rules below replace
+// every place where Reveal.js and Quarto paint them.
+$font-family-sans-serif: var(--mc-font-base);
+$font-family-monospace: var(--mc-font-mono);
+$presentation-heading-font: var(--mc-font-headings);
+$presentation-font-size-root: 32px;
+$presentation-line-height: 1.4;
+$presentation-heading-font-weight: 700;
+$presentation-heading-line-height: 1.15;
+$presentation-h1-font-size: 2.5em;
+$presentation-h2-font-size: 1.5em;
+$presentation-h3-font-size: 1.15em;
+$presentation-title-slide-text-align: left;
+
+$mc-slide-pad: 56px;
+$mc-semantics: note, tip, warning, important, caution;
+
 /*-- scss:rules --*/
+
+// Each slide resolves the Reveal.js and Quarto properties against its own
+// tokens, so a dark or ground slide gets its own colours.
+:root,
+.reveal .slides section {
+  --r-background-color: var(--mc-paper);
+  --r-main-color: var(--mc-ink);
+  --r-heading-color: var(--mc-ink);
+  --r-link-color: var(--mc-link);
+  --r-link-color-hover: var(--mc-link);
+  --r-link-color-dark: var(--mc-link);
+  --r-selection-background-color: var(--mc-accent-text);
+  --r-selection-color: var(--mc-paper);
+  --quarto-body-bg: var(--mc-paper);
+  --quarto-body-color: var(--mc-ink);
+  --quarto-text-muted: var(--mc-muted);
+  --quarto-border-color: var(--mc-line);
+  --quarto-hl-co-color: var(--mc-muted);
+  --quarto-hl-normal-color: var(--mc-accent-text);
+  --mc-gilded: linear-gradient(90deg, var(--mc-accent-low), var(--mc-accent-high) 50%, var(--mc-accent-low));
+  --mc-slide-pad: #{$mc-slide-pad};
+}
+
+:root {
+  --mc-radius: 4px;
+  --mc-font-ui: var(--mc-font-base);
+}
+
+.reveal-viewport {
+  background: var(--mc-paper);
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal .slides section,
+.reveal .slides section.has-light-background,
+.reveal .slides section.has-dark-background {
+  color: var(--mc-ink);
+  font-family: var(--mc-font-base);
+}
+
+.reveal .slides section :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--mc-ink);
+  font-family: var(--mc-font-headings);
+}
+
+.reveal .slides section a,
+.reveal .slides section a:hover {
+  color: var(--mc-link);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.reveal .slides section :focus-visible,
+.reveal .footer :focus-visible {
+  outline: 3px solid var(--mc-link);
+  outline-offset: 2px;
+}
+
+.reveal .slides section li::marker {
+  color: var(--mc-accent-text);
+}
+
+.reveal .slides section :not(pre) > code {
+  color: var(--mc-ink);
+  background: var(--mc-tint);
+  border-radius: var(--mc-radius);
+  padding: 0 0.2em;
+}
+
+// Code: the tint of the preset, no ligatures, and token colours from the
+// text tokens that the contrast check covers on the tint.
+.reveal div.sourceCode {
+  background: var(--mc-tint);
+  border: 1px solid var(--mc-line);
+  border-radius: var(--mc-radius);
+}
+
+.reveal pre,
+.reveal pre code,
+.reveal pre.sourceCode code,
+.reveal .column-output-location .column:first-of-type div.sourceCode {
+  background-color: var(--mc-tint);
+  color: var(--mc-ink);
+}
+
+.reveal pre,
+.reveal code,
+.reveal kbd {
+  font-family: var(--mc-font-mono);
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+
+.reveal .slides section div.sourceCode code span {
+  &:is(.kw, .cf, .im, .bu, .ex) {
+    color: var(--mc-accent-text);
+  }
+
+  &:is(.st, .ss, .ch, .vs, .sc) {
+    color: var(--mc-tip-text);
+  }
+
+  &:is(.dv, .bn, .fl, .cn, .va) {
+    color: var(--mc-note-text);
+  }
+
+  &:is(.co, .an, .cv, .do, .in) {
+    color: var(--mc-muted);
+    font-style: italic;
+  }
+
+  &:is(.fu, .at) {
+    color: var(--mc-link);
+  }
+
+  &:is(.al, .er, .wa) {
+    color: var(--mc-important-text);
+  }
+
+  &:is(.op, .ot, .pp, .dt, .re, .sp) {
+    color: var(--mc-ink);
+  }
+}
+
+.reveal pre.sourceCode code > span > a:first-child {
+  color: var(--mc-muted);
+}
+
+// Code window: the file name of a code block, on a title bar.
+.reveal .code-with-filename {
+  border: 1px solid var(--mc-line);
+  border-radius: var(--mc-radius);
+  overflow: hidden;
+}
+
+.reveal .code-with-filename .code-with-filename-file,
+.reveal .code-with-filename .code-with-filename-file pre {
+  background: var(--mc-tint);
+  color: var(--mc-muted);
+  font-family: var(--mc-font-ui);
+}
+
+.reveal .code-with-filename .code-with-filename-file {
+  border-bottom: 1px solid var(--mc-line);
+}
+
+.reveal .code-with-filename div.sourceCode {
+  border: 0;
+  border-radius: 0;
+}
+
+// Code annotations: the number in a round mark, in the code and in the list.
+.reveal code.sourceCode .code-annotation-anchor {
+  color: var(--mc-paper);
+  background: var(--mc-accent-text);
+  border-color: var(--mc-accent-text);
+}
+
+.reveal dl.code-annotation-container-grid dt {
+  color: var(--mc-paper);
+  background: var(--mc-accent-text);
+  border-color: var(--mc-accent-text);
+  font-family: var(--mc-font-ui);
+  font-weight: 700;
+}
+
+.reveal dl.code-annotation-container-grid dd {
+  color: var(--mc-ink);
+  font-size: 0.75em;
+}
+
+// Callouts: the semantic colour on the edge, the tint behind the text.
+.reveal div.callout,
+.reveal div.callout.callout-style-default,
+.reveal div.callout.callout-style-simple {
+  background: var(--mc-tint);
+  color: var(--mc-ink);
+  border: 1px solid var(--mc-line);
+  border-left-width: 0.3rem;
+  border-radius: var(--mc-radius);
+}
+
+.reveal div.callout .callout-title,
+.reveal div.callout div.callout-title p,
+.reveal div.callout .callout-body {
+  color: var(--mc-ink);
+  background: transparent;
+}
+
+@each $kind in $mc-semantics {
+  .reveal div.callout.callout-#{$kind} {
+    border-left-color: var(--mc-#{$kind});
+  }
+
+  .reveal div.callout.callout-#{$kind} .callout-title,
+  .reveal div.callout.callout-#{$kind} div.callout-title p {
+    color: var(--mc-#{$kind}-text);
+  }
+
+  // The title band of Quarto takes a colour mixed in Sass: the tint replaces it.
+  .reveal div.callout.callout-#{$kind}.callout-style-default .callout-title,
+  .reveal div.callout.callout-#{$kind}.callout-style-simple .callout-title {
+    background-color: transparent;
+  }
+}
+
+// Block quotes: a plain block here; each preset draws its own quote.
+.reveal blockquote {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  color: var(--mc-ink);
+  background: none;
+  border: 0;
+  box-shadow: none;
+  font-style: normal;
+}
+
+.reveal figure.mc-quote {
+  position: relative;
+  margin: var(--r-block-margin) 0;
+}
+
+.reveal figure.mc-quote figcaption.mc-quote-attribution {
+  margin-top: 0.4em;
+  font-size: 0.8em;
+  color: var(--mc-muted);
+}
+
+// Figures and tables.
+.reveal .slides section figcaption,
+.reveal .slides section .figure-caption {
+  color: var(--mc-muted);
+  font-size: 0.6em;
+}
+
+.reveal table {
+  color: var(--mc-ink);
+}
+
+.reveal table th,
+.reveal table td {
+  border-color: var(--mc-line);
+}
+
+.reveal .panel-tabset [role="tablist"],
+.reveal .panel-tabset [role="tab"],
+.reveal .panel-tabset [role="tab"][aria-selected="true"] {
+  border-color: var(--mc-line);
+  background-color: transparent;
+  color: var(--mc-ink);
+}
+
+// Footer: three slots on one line, the centre slot in the flow and the side
+// slots at the edges (Quarto sets the display of the footer inline). The slide
+// number of Reveal.js sits in the right slot, aligned right.
+.reveal .footer.mc-footer {
+  left: var(--mc-slide-pad);
+  right: var(--mc-slide-pad);
+  width: auto;
+  bottom: 14px;
+  font-family: var(--mc-font-ui);
+  font-size: 15px;
+  line-height: 1.2;
+  color: var(--mc-muted);
+  text-align: center;
+}
+
+.reveal .footer.mc-footer .mc-slot {
+  max-width: 36%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reveal .footer.mc-footer :is(.mc-slot-left, .mc-slot-right) {
+  position: absolute;
+  bottom: 0;
+}
+
+.reveal .footer.mc-footer .mc-slot-left {
+  left: 0;
+  text-align: left;
+}
+
+.reveal .footer.mc-footer .mc-slot-right {
+  right: 0;
+  text-align: right;
+}
+
+.reveal .footer.mc-footer .mc-slot-centre {
+  display: inline-block;
+  max-width: 24%;
+  vertical-align: bottom;
+}
+
+.reveal .slide-number,
+.reveal .slide-number.has-light-background {
+  right: var(--mc-slide-pad);
+  bottom: 14px;
+  padding: 0;
+  font-family: var(--mc-font-ui);
+  font-size: 15px;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  color: var(--mc-muted);
+  background: transparent;
+}
+
+.reveal .slide-number a {
+  color: inherit;
+}
+
+.reveal .slide-number .slide-number-delimiter {
+  margin: 0 0.25em;
+}
+
+.reveal .footer.mc-footer.has-dark-background,
+.reveal .slide-number.has-dark-background {
+  color: var(--mc-on-ground-text);
+}
+
+// Progress bar: thin and gilded.
+.reveal .progress {
+  height: 3px;
+  background: color-mix(in srgb, var(--mc-ink) 12%, transparent);
+}
+
+.reveal .progress span {
+  background: var(--mc-gilded);
+}
+
+// The title and closing slides have no footer, no slide number and no progress bar.
+// Reveal.js sets the display of the slide number inline, so this rule needs
+// the priority.
+.mc-bare .reveal .slide-number,
+.mc-bare .reveal .progress {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal .slides section,
+  .reveal .slides section .fragment,
+  .reveal .progress span {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -2,7 +2,7 @@
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
---- @brief Attribution of block quotes in Typst and HTML
+--- @brief Attribution of block quotes in Typst, HTML and Reveal.js
 --- @description A block quote whose last paragraph starts with an em dash, an
 --- en dash or `--` has an attribution, and the dash is dropped. In Typst, the
 --- quote is written as `#quote(block: true, attribution: [...])[...]`, so that
@@ -14,7 +14,7 @@
 --- source, not as quoted text. The label is for the decoration that the
 --- preset style sheet draws as generated content with an empty alternative
 --- text. A GitHub alert (`> [!NOTE]`) is left to Quarto, which makes it a
---- callout.
+--- callout. Reveal.js uses its own figure rewrite, `convert_html`.
 
 local fail = require('lib.fail')
 local labels = require('lib.labels')
@@ -131,21 +131,54 @@ function M.html(quote, label)
   return blocks
 end
 
---- Rewrite a block quote for the output format: Typst, or HTML other than
---- Reveal.js. Other formats keep the quote.
+--- Rewrite a block quote as a figure for Reveal.js.
+--- @param quote pandoc.BlockQuote Block quote
+--- @param label string Quote label, in the language of the document
+--- @return pandoc.Blocks Raw HTML around the quote and its attribution
+local function convert_html(quote, label)
+  local content = quote.content
+  local attribution = nil
+  local last = content[#content]
+  if #content >= 2 and last.t == 'Para' then
+    attribution = M.attribution(last.content)
+  end
+  local body = pandoc.Blocks({})
+  for index = 1, #content - (attribution and 1 or 0) do
+    body:insert(content[index])
+  end
+  local escaped = escape_attribute(label)
+  local blocks = pandoc.Blocks({
+    pandoc.RawBlock('html', '<figure class="mc-quote" data-mc-label="' .. escaped .. '">'),
+    pandoc.BlockQuote(body),
+  })
+  if attribution ~= nil then
+    blocks:insert(pandoc.RawBlock('html', '<figcaption class="mc-quote-attribution" data-mc-label="' .. escaped .. '">'))
+    blocks:insert(pandoc.Plain(attribution))
+    blocks:insert(pandoc.RawBlock('html', '</figcaption>'))
+  end
+  blocks:insert(pandoc.RawBlock('html', '</figure>'))
+  return blocks
+end
+
+--- Rewrite a block quote for the output format: Typst, Reveal.js, or other
+--- HTML. Other formats keep the quote.
 --- @param quote pandoc.BlockQuote Block quote
 --- @return pandoc.Blocks|nil
 local function rewrite(quote)
   if quarto.doc.is_format('typst') then
     return convert(quote)
   end
-  if quarto.doc.is_format('html') and not quarto.doc.is_format('revealjs') then
+  if quarto.doc.is_format('revealjs') then
+    return convert_html(quote, labels.get('mcanouil-quote'))
+  end
+  if quarto.doc.is_format('html') then
     return M.html(quote, labels.get('mcanouil-quote'))
   end
   return nil
 end
 
 M.convert = convert
+M.convert_html = convert_html
 
 --- @type table Filter step of the entry filter.
 M.filter = { BlockQuote = fail.guard(rewrite) }

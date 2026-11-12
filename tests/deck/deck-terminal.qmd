@@ -1,0 +1,29 @@
+---
+title: Quarto extensions
+subtitle: Build, share and maintain your own formats
+author:
+  - name: Mickaël Canouil
+    photo: speaker.svg
+date: 2026-07-08
+format: mcanouil-revealjs
+extensions:
+  mcanouil:
+    preset: terminal
+    event: useR! 2026 · Warwick
+    closing:
+      links:
+        - mickael.canouil.fr
+        - "@mickael.canouil.fr"
+        - github.com/mcanouil
+      licence: "Slides: m.canouil.dev/user2026 · CC BY 4.0"
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The terminal deck puts title, section and closing slides on the ground, a dark slide on the dark tokens, the footer in three slots, the motif out of the accessibility tree, the closing links as text, and passes axe.
+        check: bash _checks/deck.sh terminal
+    mcanouil-revealjs:
+      noErrorsOrWarnings: true
+---
+
+{{< include _deck.qmd >}}
