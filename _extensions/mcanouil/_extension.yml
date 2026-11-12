@@ -48,6 +48,7 @@ contributes:
           - html/presets/_mono.scss
           - html/presets/_quarto.scss
           - html/presets/_terminal.scss
+          - html/decoration.scss
         dark:
           - html/tokens.scss
           - html/base.scss
@@ -56,6 +57,7 @@ contributes:
           - html/presets/_mono.scss
           - html/presets/_quarto.scss
           - html/presets/_terminal.scss
+          - html/decoration.scss
           - html/scheme-dark.scss
     typst:
       font-paths: fonts

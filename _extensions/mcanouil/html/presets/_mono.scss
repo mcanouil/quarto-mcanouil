@@ -30,6 +30,10 @@ $mc-mono-radius: 0px !default;
     background-color: var(--mc-accent);
   }
 
+  body.quarto-dark .mc-title-rule {
+    background-color: var(--mc-accent-high);
+  }
+
   main.content h2 {
     padding-top: 0.4rem;
     border-top: 2px solid var(--mc-ink);

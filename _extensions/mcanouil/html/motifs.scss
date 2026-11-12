@@ -25,23 +25,3 @@ body {
   padding: 0;
   pointer-events: none;
 }
-
-// Decoration is not content: forced colours remove it.
-@media (forced-colors: active) {
-  .mc-motif,
-  .mc-title-rule,
-  main.content h2::before,
-  main.content h2::after {
-    display: none;
-  }
-}
-
-// No decoration moves by default; this keeps it so if a later rule animates it.
-@media (prefers-reduced-motion: reduce) {
-  .mc-motif,
-  .mc-title-rule,
-  .mc-title-block .title::after {
-    animation: none;
-    transition: none;
-  }
-}

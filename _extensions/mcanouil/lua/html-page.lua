@@ -71,7 +71,8 @@ function M.footer(meta)
   if not filled then
     return nil
   end
-  return '<footer class="mc-page-footer">' .. table.concat(parts) .. '</footer>'
+  return '<footer class="mc-page-footer page-columns page-full"><div class="mc-slots">'
+    .. table.concat(parts) .. '</div></footer>'
 end
 
 --- Deliver the title block data and add the page footer.

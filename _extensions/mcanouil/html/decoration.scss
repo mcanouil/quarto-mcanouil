@@ -1,0 +1,38 @@
+/*-- scss:defaults --*/
+
+/*-- scss:rules --*/
+
+// Decoration rules that must win over the presets, so this file comes after
+// them in the theme. The selectors repeat those of the rules they undo.
+
+// Decoration is not content: forced colours remove it.
+@media (forced-colors: active) {
+  #title-block-header > .mc-motif,
+  .mc-title-rule,
+  .mc-title-block .title::before,
+  .mc-title-block .title::after,
+  .mc-kicker::before,
+  .mc-kicker::after,
+  main.content h2::before,
+  main.content h2::after {
+    display: none;
+  }
+
+  // The toggle icon is a mask over its background colour, which forced
+  // colours would replace with the canvas colour.
+  .quarto-color-scheme-toggle:not(.alternate).top-right .bi::before,
+  .quarto-color-scheme-toggle.alternate.top-right .bi::before {
+    forced-color-adjust: none;
+    background-color: ButtonText;
+  }
+}
+
+// No decoration moves by default; this keeps it so if a later rule animates it.
+@media (prefers-reduced-motion: reduce) {
+  #title-block-header > .mc-motif,
+  .mc-title-rule,
+  .mc-title-block .title::after {
+    animation: none;
+    transition: none;
+  }
+}

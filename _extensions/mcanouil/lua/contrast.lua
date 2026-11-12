@@ -54,6 +54,7 @@ local function build_pairs()
   add('paper', 'accent', TEXT, 'mono', 'quote-label: paper on accent')
   add('accent-high', 'ground-1', LARGE_TEXT)
   add('accent-high', 'ground-2', LARGE_TEXT)
+  add('accent-high', 'paper', LARGE_TEXT, 'terminal', 'decoration: accent-high on paper')
   add('accent', 'paper', NON_TEXT)
   add('link', 'paper', NON_TEXT)
   for _, semantic in ipairs(SEMANTICS) do

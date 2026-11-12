@@ -220,14 +220,18 @@ sys.exit(0 if top and right else f"# {kind} shapes: top edge {top}, right edge {
 PY
 }
 
-# Answer the command of a headless Chromium browser, or nothing.
+# Answer the command of a headless Chromium browser, or nothing: CHROME_PATH,
+# QUARTO_CHROMIUM, an installed Brave, Chrome or Chromium, then the newest
+# Chromium that Playwright downloaded (macOS and Linux caches).
 find_browser() {
 	local candidate
 	for candidate in "${CHROME_PATH:-}" "${QUARTO_CHROMIUM:-}" \
 		"/Applications/Brave Browser.app/Contents/MacOS/Brave Browser" \
 		"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
 		"/Applications/Chromium.app/Contents/MacOS/Chromium" \
-		"$(command -v google-chrome || true)" "$(command -v chromium || true)" "$(command -v chromium-browser || true)"; do
+		"$(command -v google-chrome || true)" "$(command -v chromium || true)" "$(command -v chromium-browser || true)" \
+		"$(find "${HOME}/Library/Caches/ms-playwright" "${HOME}/.cache/ms-playwright" -maxdepth 6 -type f \
+			\( -path '*/chromium-*/Contents/MacOS/*' -o -path '*/chromium-*/chrome-linux*/chrome' \) 2>/dev/null | sort | tail -n 1)"; do
 		if [ -n "${candidate}" ] && [ -x "${candidate}" ]; then
 			printf '%s' "${candidate}"
 			return 0
@@ -235,31 +239,30 @@ find_browser() {
 	done
 }
 
-# Measure the title block and its motif in the browser, in a frame of one
-# size, and print the measures as JSON. The page runs in a frame because a
-# headless window is never narrower than 500 pixels.
-# $1 width. $2 height.
+# Measure the title block, its motif, the scheme toggle and the decorations in
+# the browser, in a frame of one size, and print the measures as JSON. The page
+# runs in a frame because a headless window is never narrower than 500 pixels.
+# With "forced", the page uses copies of its stylesheets in which the
+# forced-colors media query always applies, so the computed styles are those
+# of forced colours mode.
+# $1 width. $2 height. $3 "forced", or nothing.
 measure() {
 	local page frame dump
 	page="$(dirname "${output}")/.measure-$$-page.html"
 	frame="$(dirname "${output}")/.measure-$$-frame.html"
-	python3 -I - "${output}" "${page}" "${frame}" "$1" "$2" <<'PY'
+	python3 -I - "${output}" "${page}" "${frame}" "$1" "$2" "${3:-}" <<'PY'
 import os
+import re
 import sys
 
+source, page, frame, width, height, mode = sys.argv[1:7]
 script = """<script>
 window.addEventListener("load", () => document.fonts.ready.then(() => {
   const header = document.getElementById("title-block-header");
   const motif = header && header.querySelector(":scope > svg.mc-motif");
-  const out = { viewport: document.documentElement.clientWidth };
-  if (header && motif) {
-    const h = header.getBoundingClientRect();
-    const m = motif.getBoundingClientRect();
-    const style = getComputedStyle(motif);
-    out.header = [h.top + window.scrollY, h.right];
-    out.motif = [m.top + window.scrollY, m.right, m.width, m.height];
-    out.box = [style.marginTop, style.marginRight, style.paddingTop, style.paddingRight].join(" ");
-    out.overlaps = [];
+  const out = { viewport: document.documentElement.clientWidth, overlaps: [] };
+  const intersects = (a, b) => a.right > b.left && a.left < b.right && a.bottom > b.top && a.top < b.bottom;
+  const textOver = (rect, label) => {
     const walker = document.createTreeWalker(header, NodeFilter.SHOW_TEXT);
     while (walker.nextNode()) {
       const node = walker.currentNode;
@@ -267,26 +270,67 @@ window.addEventListener("load", () => document.fonts.ready.then(() => {
       const range = document.createRange();
       range.selectNodeContents(node);
       for (const r of range.getClientRects()) {
-        if (r.right > m.left && r.left < m.right && r.bottom > m.top && r.top < m.bottom) {
-          out.overlaps.push(node.textContent.trim().slice(0, 30));
-        }
+        if (intersects(r, rect)) out.overlaps.push(label + ": " + node.textContent.trim().slice(0, 30));
       }
     }
+  };
+  if (header && motif) {
+    const h = header.getBoundingClientRect();
+    const m = motif.getBoundingClientRect();
+    const style = getComputedStyle(motif);
+    out.header = [h.top + window.scrollY, h.right];
+    out.motif = [m.top + window.scrollY, m.right, m.width, m.height];
+    out.box = [style.marginTop, style.marginRight, style.paddingTop, style.paddingRight].join(" ");
+    textOver(m, "motif");
+    const toggle = document.querySelector(".quarto-color-scheme-toggle");
+    if (toggle && toggle.getClientRects().length) {
+      const t = toggle.getBoundingClientRect();
+      out.toggle = [t.left, t.top, t.right, t.bottom];
+      out.toggleOverMotif = intersects(t, m);
+      textOver(t, "toggle");
+    }
   }
+  const h2 = document.querySelector("main.content h2");
+  const title = header && header.querySelector(".title");
+  const show = (el, pseudo) => {
+    if (!el) return "missing";
+    const style = getComputedStyle(el, pseudo);
+    return pseudo && (style.content === "none" || style.content === "normal") ? "none" : style.display;
+  };
+  out.decorations = {
+    motif: show(motif, null),
+    rule: show(header && header.querySelector(".mc-title-rule"), null),
+    "h2::before": show(h2, "::before"),
+    "h2::after": show(h2, "::after"),
+    "title::before": show(title, "::before"),
+    "title::after": show(title, "::after"),
+  };
   parent.postMessage(JSON.stringify(out), "*");
 }));
 </script>"""
-html = open(sys.argv[1], encoding="utf-8").read()
-open(sys.argv[2], "w", encoding="utf-8").write(html.replace("</body>", script + "</body>", 1))
-frame = f"""<!DOCTYPE html><html><body style="margin:0">
-<iframe src="{os.path.basename(sys.argv[2])}" width="{sys.argv[4]}" height="{sys.argv[5]}" style="border:0;display:block"></iframe>
+html = open(source, encoding="utf-8").read()
+if mode == "forced":
+    def forced_copy(match):
+        href = match.group(1)
+        path = os.path.join(os.path.dirname(source), href)
+        if not href.endswith(".css") or not os.path.isfile(path):
+            return match.group(0)
+        css = open(path, encoding="utf-8").read()
+        css = re.sub(r"@media ?\(forced-colors: ?active\)", "@media all", css)
+        copy = os.path.join(os.path.dirname(path), ".forced-" + os.path.basename(path))
+        open(copy, "w", encoding="utf-8").write(css)
+        return match.group(0).replace(href, os.path.join(os.path.dirname(href), ".forced-" + os.path.basename(href)))
+    html = re.sub(r'<link\b[^>]*href="([^"]+)"[^>]*>', forced_copy, html)
+open(page, "w", encoding="utf-8").write(html.replace("</body>", script + "</body>", 1))
+open(frame, "w", encoding="utf-8").write(f"""<!DOCTYPE html><html><body style="margin:0">
+<iframe src="{os.path.basename(page)}" width="{width}" height="{height}" style="border:0;display:block"></iframe>
 <script>window.addEventListener("message", (e) => document.body.setAttribute("data-mc-measure", e.data));</script>
-</body></html>"""
-open(sys.argv[3], "w", encoding="utf-8").write(frame)
+</body></html>""")
 PY
 	dump="$("${browser}" --headless=new --disable-gpu --no-first-run --hide-scrollbars \
 		--window-size=1600,1000 --virtual-time-budget=8000 --dump-dom "file://${frame}" 2>/dev/null || true)"
 	rm -f "${page}" "${frame}"
+	find "$(dirname "${output}")" -name '.forced-*.css' -delete
 	python3 -I -c '
 import html, re, sys
 found = re.search(r"data-mc-measure=\"([^\"]*)\"", sys.stdin.read())
@@ -296,7 +340,8 @@ print(html.unescape(found.group(1)) if found else "{}")
 
 # Succeed when the measures put the motif flush in the top right corner of the
 # title block, the title block at the top right corner of the page, with no
-# margin or padding on the motif and no text over the motif.
+# margin or padding on the motif, no text over the motif or the scheme toggle,
+# and the scheme toggle clear of the motif.
 # $1 measures, as JSON.
 flush_corner() {
 	python3 -I -c '
@@ -311,9 +356,33 @@ if abs(m["header"][0]) > 0.5: problems.append("block top %s, page top 0" % m["he
 if abs(m["header"][1] - m["viewport"]) > 0.5: problems.append("block right %s, page right %s" % (m["header"][1], m["viewport"]))
 if m["box"] != "0px 0px 0px 0px": problems.append("motif margin and padding " + m["box"])
 if m["motif"][2] <= 0: problems.append("motif has no size")
-if m["overlaps"]: problems.append("text over the motif: " + ", ".join(m["overlaps"]))
+if m["overlaps"]: problems.append("text over a decoration or control: " + ", ".join(m["overlaps"]))
 for problem in problems: print("# " + problem)
 sys.exit(1 if problems else 0)
+' "$1"
+}
+
+# Succeed when the scheme toggle, when it shows, does not overlap the motif.
+# $1 measures, as JSON.
+toggle_clear() {
+	python3 -I -c '
+import json, sys
+m = json.loads(sys.argv[1])
+if "motif" not in m:
+    sys.exit("# no measures: " + sys.argv[1])
+if m.get("toggleOverMotif"):
+    sys.exit("# toggle %s over the motif %s" % (m["toggle"], m["motif"]))
+' "$1"
+}
+
+# Succeed when every decoration is hidden in forced colours mode.
+# $1 measures in forced colours mode, as JSON.
+decorations_hidden() {
+	python3 -I -c '
+import json, sys
+shown = {k: v for k, v in json.loads(sys.argv[1]).get("decorations", {"measures": "none"}).items() if v != "none"}
+for name, display in shown.items(): print("# %s display %s" % (name, display))
+sys.exit(1 if shown else 0)
 ' "$1"
 }
 
@@ -369,8 +438,6 @@ check_title() {
 
 	expect "html-motif-in-title-block-${preset}" "the motif in the title block" structure_ok motif-in-title-block
 	expect "html-motif-hidden-aria-${preset}" "aria-hidden on the motif" structure_ok motif-aria-hidden
-	expect "html-motif-hidden-forced-colors-${preset}" "the motif hidden under forced colours" \
-		css_has "${light_css}" '@media ?\(forced-colors: ?active\) ?\{[^@]*\.mc-motif[^{]*\{display:none'
 	expect "html-motif-hidden-reduced-motion-${preset}" "a prefers-reduced-motion guard" \
 		css_has "${light_css}" '@media ?\(prefers-reduced-motion: ?reduce\) ?\{[^{]*\.mc-motif'
 	expect "html-motif-corner-${preset}" "the motif shapes at the corner of the view box" motif_corner
@@ -382,9 +449,13 @@ check_title() {
 	fi
 	for size in 1440,900 768,1024 320,568; do
 		measures="$(measure "${size%,*}" "${size#*,}")"
-		expect "html-motif-flush-${preset}-${size%,*}" "the motif flush in the top right corner, no text over it" \
+		expect "html-motif-flush-${preset}-${size%,*}" "the motif flush in the top right corner, no text over it or the toggle" \
 			flush_corner "${measures}"
+		expect "html-toggle-clear-${preset}-${size%,*}" "the scheme toggle clear of the motif" toggle_clear "${measures}"
 	done
+	measures="$(measure 1440 900 forced)"
+	expect "html-motif-hidden-forced-colors-${preset}" "motif, title rule, H2 and title decorations hidden in forced colours" \
+		decorations_hidden "${measures}"
 
 	expect "html-fonts-local-${preset}" "local @font-face files and no font service" html_fonts_local
 	expect "html-axe-${preset}" "no axe-core finding in light and dark, at 1440 and 320 pixels" axe_clean

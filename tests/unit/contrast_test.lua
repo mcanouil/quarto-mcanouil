@@ -65,4 +65,16 @@ cases['contrast-pairs-cover-the-spec'] = function()
   end
 end
 
+cases['contrast-terminal-decoration-large-text'] = function()
+  local found = nil
+  for _, pair in ipairs(contrast.PAIRS) do
+    if pair.fg_token == 'accent-high' and pair.bg_token == 'paper' then
+      found = pair
+    end
+  end
+  assert_equal(found ~= nil, true, 'accent-high on paper pair')
+  assert_equal(found.threshold, 3, 'large text threshold')
+  assert_equal(found.only, 'terminal', 'terminal only')
+end
+
 return cases
