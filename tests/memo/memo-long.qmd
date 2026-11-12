@@ -1,0 +1,30 @@
+---
+title: Quarto 1.11 migration
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: memo
+    memo:
+      to: Data team
+      from: M. Canouil
+      date: 11 Nov 2026
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A memo of several pages has the band with the footer slots at the bottom of every page, and the banner on page 1 only.
+        check: bash _checks/memo.sh band gold
+---
+
+{{< include _note.qmd >}}
+
+# Background
+
+{{< lipsum 6 >}}
+
+# Details
+
+{{< lipsum 6 >}}

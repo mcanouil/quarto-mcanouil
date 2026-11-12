@@ -1,0 +1,11 @@
+# Context
+
+The next Quarto release changes how the Typst output is built, so every document of the team renders again before the end of the month.
+
+# Decision
+
+We move all documents to the new release in one batch and keep the old one available for two weeks.
+
+# Next steps
+
+Each owner renders their documents and reports any difference on the team channel.

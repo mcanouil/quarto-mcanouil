@@ -133,7 +133,7 @@ end
 
 cases['resolve-unknown-type'] = function()
   fails_with(
-    type_options({ type = 'poster' }), 'mcanouil-typst', 'mcanouil: unknown type "poster"; use article, report.', 'unknown type'
+    type_options({ type = 'poster' }), 'mcanouil-typst', 'mcanouil: unknown type "poster"; use article, memo, report.', 'unknown type'
   )
 end
 
@@ -189,6 +189,74 @@ cases['slot-speaker-event'] = function()
   assert_equal(text, 'Ada · useR! 2026', 'speaker and event')
   meta.extensions = nil
   assert_equal(pandoc.utils.stringify(document.resolve_slot({ kind = 'field', value = 'speaker' }, meta)), 'Ada', 'speaker only')
+end
+
+cases['resolve-memo-default-kind'] = function()
+  local resolved = document.resolve(type_options({ type = 'memo' }), 'mcanouil-typst')
+  assert_equal(resolved.type, 'memo', 'memo type')
+  assert_equal(resolved.kind, 'note', 'default memo kind')
+end
+
+cases['resolve-memo-kind'] = function()
+  local resolved = document.resolve(type_options({ type = 'memo', kind = 'minutes' }), 'mcanouil-typst')
+  assert_equal(resolved.kind, 'minutes', 'memo kind')
+end
+
+cases['resolve-memo-unknown-kind'] = function()
+  fails_with(
+    type_options({ type = 'memo', kind = 'poster' }),
+    'mcanouil-typst',
+    'mcanouil: unknown kind "poster" for type "memo"; use agenda, brief, minutes, note.',
+    'unknown memo kind'
+  )
+end
+
+local function memo_meta(fields)
+  local memo = {}
+  for key, value in pairs(fields) do
+    memo[key] = pandoc.MetaInlines({ pandoc.Str(value) })
+  end
+  return { extensions = { mcanouil = { type = 'memo', memo = memo } } }
+end
+
+local function keys(fields)
+  local found = {}
+  for _, field in ipairs(fields) do
+    found[#found + 1] = field.key
+  end
+  return table.concat(found, ',')
+end
+
+cases['memo-fields-note'] = function()
+  local fields = document.memo_fields(memo_meta({ to = 'Team', from = 'Ana', date = 'Today' }), 'note')
+  assert_equal(keys(fields), 'to,from,date', 'note fields in order')
+  assert_equal(pandoc.utils.stringify(fields[2].value), 'Ana', 'from value')
+end
+
+cases['memo-fields-missing-left-out'] = function()
+  local fields = document.memo_fields(memo_meta({ to = 'Team', date = 'Today' }), 'note')
+  assert_equal(keys(fields), 'to,date', 'no empty row for from')
+end
+
+cases['memo-fields-ignores-other-kinds'] = function()
+  local fields = document.memo_fields(memo_meta({ to = 'Team', place = 'Room 4', present = 'AA' }), 'agenda')
+  assert_equal(keys(fields), 'place', 'agenda fields only')
+end
+
+cases['memo-fields-date-time-falls-back-to-date'] = function()
+  local fields = document.memo_fields(memo_meta({ date = '11 Nov', present = 'AA' }), 'minutes')
+  assert_equal(keys(fields), 'date-time,present', 'date-time from date')
+  assert_equal(pandoc.utils.stringify(fields[1].value), '11 Nov', 'date-time value')
+end
+
+cases['memo-fields-top-level-date'] = function()
+  local meta = memo_meta({ to = 'Team' })
+  meta.date = pandoc.MetaInlines({ pandoc.Str('2026') })
+  assert_equal(keys(document.memo_fields(meta, 'note')), 'to,date', 'document date fills the date field')
+end
+
+cases['memo-fields-empty-value-left-out'] = function()
+  assert_equal(keys(document.memo_fields(memo_meta({ to = '', from = 'Ana' }), 'note')), 'from', 'empty value')
 end
 
 return cases

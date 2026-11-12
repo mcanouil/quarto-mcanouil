@@ -1,0 +1,36 @@
+---
+title: Steering committee
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: memo
+    kind: minutes
+    memo:
+      date-time: 11 Nov 2026, 14:00
+      present: MC, AA, BW
+      absent: CD
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A minutes memo has the date and time, the present and the absent rows in the banner, and an actions table in the body.
+        check: bash _checks/memo.sh kind minutes gold
+---
+
+# Decisions
+
+The committee approves the revised plan and the budget for the second half of the year.
+
+# Actions
+
+| Action     | Owner | Due    |
+|------------|-------|--------|
+| Draft plan | AA    | 18 Nov |
+| Book room  | MC    | 20 Nov |
+
+# Next meeting
+
+The committee meets again in December.

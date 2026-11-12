@@ -1,0 +1,29 @@
+---
+title: Release readiness
+date: 2026-11-11
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: memo
+    kind: brief
+    memo:
+      audience: Product leads
+      purpose: Agree the go or no go for the release
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A brief memo has the date, the audience and the purpose in the banner, taking the date from the document.
+        check: bash _checks/memo.sh kind brief gold
+---
+
+# Status
+
+All blocking issues are closed and the last build passes.
+
+# Risks
+
+Two minor issues remain open, and neither one blocks the release.

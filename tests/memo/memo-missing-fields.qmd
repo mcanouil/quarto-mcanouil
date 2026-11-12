@@ -1,0 +1,21 @@
+---
+title: Quarto 1.11 migration
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: memo
+    memo:
+      to: Data team
+      date: 11 Nov 2026
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A memo field that the document leaves out has no column in the banner table, not even an empty one.
+        check: bash _checks/memo.sh missing gold
+---
+
+{{< include _note.qmd >}}
