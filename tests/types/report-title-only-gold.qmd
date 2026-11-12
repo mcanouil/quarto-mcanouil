@@ -1,0 +1,17 @@
+---
+title: A title and nothing else
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A compact report of the gold preset with a title only, no author and no abstract, compiles without a Typst warning.
+        check: bash _checks/convergence.sh title-only-gold
+---
+
+The body starts under the title.

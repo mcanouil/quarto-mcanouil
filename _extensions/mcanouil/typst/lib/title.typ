@@ -21,12 +21,14 @@
 }
 
 // Answer the space that moves the text below the corner motif, when the title
-// block ends above the bottom of the shapes of the motif.
+// block ends above the bottom of the shapes of the motif. The space is a block
+// and not a `v`: a `v` after the context moves the position that the context
+// reads, so the layout never settles.
 // - motif-bottom: distance from the top of the page to the bottom of the shapes, or none.
 #let clear-motif(motif-bottom) = context {
   let position = here().position()
   if motif-bottom != none and position.page == 1 and position.y < motif-bottom {
-    v(motif-bottom - position.y)
+    block(width: 100%, height: motif-bottom - position.y, above: 0pt, below: 0pt)
   }
 }
 
