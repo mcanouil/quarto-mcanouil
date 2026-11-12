@@ -46,7 +46,13 @@ contributes:
           - html/scheme-dark.scss
     typst:
       font-paths: fonts
+      pdf-standard: ua-1
       template-partials:
+        - typst/lib/tokens.typ
+        - typst/lib/slots.typ
+        - typst/lib/decoration.typ
+        - typst/lib/motifs.typ
+        - typst/lib/chrome.typ
         - typst/typst-template.typ
         - typst/typst-show.typ
     revealjs:

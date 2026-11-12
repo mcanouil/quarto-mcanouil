@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="mc-motif mc-motif-steps" style="color: var(--mc-accent, currentColor)" aria-hidden="true" focusable="false">
+  <rect x="88" y="0" width="12" height="12" fill="currentColor" opacity="0.75"/>
+  <rect x="88" y="13" width="12" height="12" fill="currentColor" opacity="0.59"/>
+  <rect x="88" y="26" width="12" height="12" fill="currentColor" opacity="0.43"/>
+  <rect x="88" y="39" width="12" height="12" fill="currentColor" opacity="0.27"/>
+  <rect x="75" y="0" width="12" height="12" fill="currentColor" opacity="0.59"/>
+  <rect x="75" y="13" width="12" height="12" fill="currentColor" opacity="0.43"/>
+  <rect x="75" y="26" width="12" height="12" fill="currentColor" opacity="0.27"/>
+  <rect x="62" y="0" width="12" height="12" fill="currentColor" opacity="0.43"/>
+  <rect x="62" y="13" width="12" height="12" fill="currentColor" opacity="0.27"/>
+  <rect x="49" y="0" width="12" height="12" fill="currentColor" opacity="0.27"/>
+</svg>

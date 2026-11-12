@@ -1,5 +1,5 @@
 # mcanouil - gold preset
-# Colour tokens for the light and dark schemes, fonts and logos of the gold preset.
+# Colour tokens for the light and dark schemes, fonts, motif and logos of the gold preset.
 # This file and the other preset files are the only files of the extension with colour values.
 #
 # @license MIT
@@ -70,6 +70,8 @@ fonts:
     base: serif
     headings: serif
     monospace: monospace
+
+motif: facets
 
 logo:
   light: logos/logo-light.svg
