@@ -275,6 +275,11 @@ book_appendices_divider() {
 	! grep -qF 'Clinical study report' <<<"${text}" && ! grep -qE '[0-9]+ / [0-9]+' <<<"${text}"
 }
 
+# Succeed when no page shows the front matter block of a chapter as a code window.
+book_no_title_block() {
+	! pdf_text "${output}" | grep -qi 'quarto-title-block'
+}
+
 # Succeed when the book appendices are lettered, A.1 for their sections, and the references are unnumbered.
 book_appendix_numbering() {
 	pdf_text "${output}" | grep -qE '(^|[[:space:]])A\.1[[:space:]]+Individual subject data listings' &&
@@ -319,6 +324,7 @@ book)
 	expect "book-chapter-toc-links" "one link annotation for each entry of the first chapter contents page" \
 		chapter_toc_links "$(page_matching 'In this chapter')"
 	expect "book-appendices-divider" "the Appendices part on a divider page with no header and no page number" book_appendices_divider
+	expect "book-no-title-block" "no QUARTO-TITLE-BLOCK code window from a chapter front matter" book_no_title_block
 	expect "book-appendix-numbering" "lettered appendices, A.1 sections and unnumbered references" book_appendix_numbering
 	;;
 *)

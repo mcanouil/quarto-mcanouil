@@ -20,9 +20,14 @@ ext_dir="${repo_dir}/_extensions/mcanouil"
 # The format name without the extension prefix: html, revealjs or typst.
 format="${EXTENSION_TEST_FORMAT##*-}"
 output="${EXTENSION_TEST_OUTPUT:-}"
-# The Typst source that a keep-typ render leaves beside the input.
+# The Typst source that a keep-typ render leaves beside the input, or beside
+# the index.qmd of a project case, whose input is the project directory.
 typ="${EXTENSION_TEST_INPUT:-}"
-typ="${typ%.qmd}.typ"
+if [ -d "${typ}" ]; then
+	typ="${typ}/index.typ"
+else
+	typ="${typ%.qmd}.typ"
+fi
 
 tap_n=0
 tap_failed=0
