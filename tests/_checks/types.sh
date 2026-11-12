@@ -277,7 +277,9 @@ book_appendices_divider() {
 
 # Succeed when no page shows the front matter block of a chapter as a code window.
 book_no_title_block() {
-	! pdf_text "${output}" | grep -qi 'quarto-title-block'
+	local text
+	text="$(pdf_text "${output}")" || return 1
+	[ -n "${text}" ] && ! grep -qi 'quarto-title-block' <<<"${text}"
 }
 
 # Succeed when the book appendices are lettered, A.1 for their sections, and the references are unnumbered.
