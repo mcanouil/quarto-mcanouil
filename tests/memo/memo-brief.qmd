@@ -20,10 +20,10 @@ _quarto:
         check: bash _checks/memo.sh kind brief gold
 ---
 
-# Status
+## Status
 
 All blocking issues are closed and the last build passes.
 
-# Risks
+## Risks
 
 Two minor issues remain open, and neither one blocks the release.

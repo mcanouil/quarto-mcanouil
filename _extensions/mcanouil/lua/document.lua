@@ -357,16 +357,21 @@ end
 local function memo_value(meta, key)
   local options = meta.extensions and meta.extensions.mcanouil or {}
   local memo = options.memo or {}
-  local sources = { memo[key] }
+  local sources = {}
+  local function add(value)
+    if value ~= nil then
+      sources[#sources + 1] = value
+    end
+  end
+  add(memo[key])
   if key == 'date-time' then
-    sources[#sources + 1] = memo.date
+    add(memo.date)
   end
   if key == 'date' or key == 'date-time' then
-    sources[#sources + 1] = meta.date
+    add(meta.date)
   end
-  for index = 1, 3 do
-    local value = sources[index]
-    if value ~= nil and pandoc.utils.stringify(value) ~= '' then
+  for _, value in ipairs(sources) do
+    if pandoc.utils.stringify(value) ~= '' then
       return value
     end
   end

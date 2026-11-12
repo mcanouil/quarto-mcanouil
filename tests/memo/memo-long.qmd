@@ -21,10 +21,10 @@ _quarto:
 
 {{< include _note.qmd >}}
 
-# Background
+## Background
 
 {{< lipsum 6 >}}
 
-# Details
+## Details
 
 {{< lipsum 6 >}}

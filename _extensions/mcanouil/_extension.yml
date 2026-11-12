@@ -66,6 +66,9 @@ contributes:
     typst:
       font-paths: fonts
       pdf-standard: ua-1
+      extensions:
+        offset-headings:
+          quarto-shift-warning: false
       template-partials:
         - typst/lib/tokens.typ
         - typst/lib/labels.typ

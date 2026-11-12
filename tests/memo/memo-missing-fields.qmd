@@ -14,8 +14,10 @@ _quarto:
   tests:
     run:
       extension-test:
-        description: A memo field that the document leaves out has no column in the banner table, not even an empty one.
+        description: With level 2 headings only, a memo renders with no warning, and a memo field that the document leaves out has no column in the banner table, not even an empty one.
         check: bash _checks/memo.sh missing gold
+    mcanouil-typst:
+      noErrorsOrWarnings: true
 ---
 
 {{< include _note.qmd >}}

@@ -108,6 +108,11 @@
   )
   show heading.where(level: 1): set text(size: 1.15em)
   set heading(numbering: none)
+  set table(
+    stroke: (x, y) => (bottom: if y == 0 { 0.75pt + colours.accent } else { 0.5pt + colours.line }),
+    inset: (x: 0.6em, y: 0.4em),
+  )
+  show table.cell.where(y: 0): set text(weight: "bold")
   memo-banner(
     meta.kind,
     meta.at("title", default: none),
