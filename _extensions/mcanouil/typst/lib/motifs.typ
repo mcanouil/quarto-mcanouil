@@ -34,7 +34,7 @@
     .map(i => range(10).map(j => (i: i, j: j, o: 0.75 - calc.sqrt(i * i + j * j) * 0.085)))
     .flatten()
     .filter(it => it.o > 0.04)
-    .map(it => (kind: "circle", points: (96 - it.i * 7, 4 + it.j * 7, 1.3), opacity: calc.round(it.o, digits: 2))),
+    .map(it => (kind: "circle", points: (98.7 - it.i * 7, 1.3 + it.j * 7, 1.3), opacity: calc.round(it.o, digits: 2))),
 )
 
 // Answer every shape of every motif as one line of text:
