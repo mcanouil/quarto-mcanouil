@@ -323,6 +323,7 @@ local function deliver(meta)
     end
     meta['mcanouil-fonts'] = typst_fonts
     meta['mcanouil-motif'] = data.motif
+    meta['mcanouil-preset'] = name
   end
   return meta
 end

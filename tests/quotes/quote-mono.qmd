@@ -1,0 +1,21 @@
+---
+title: Block quotes
+author: Test Author
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: mono
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The mono preset styles a block quote in its own way, turns a closing dash paragraph into the attribution, keeps the decoration out of the tag tree, and keeps the text readable.
+        check: bash _checks/quotes.sh mono
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mc-preset = "mono"', 'attribution: \[']
+---
+
+{{< include _quotes.qmd >}}

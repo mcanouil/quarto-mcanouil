@@ -4,6 +4,8 @@ $labels.typ()$
 
 $decoration.typ()$
 
+$quote.typ()$
+
 $motifs.typ()$
 
 $chrome.typ()$
@@ -46,5 +48,6 @@ $article.typ()$
   show heading: set text(font: fonts.headings)
   show raw: set text(font: fonts.monospace)
   show link: set text(fill: tokens.link)
+  show: mc-quotes.with(meta)
   mc-types.at(type)(meta + (layout: layout, kind: kind), body)
 }

@@ -51,6 +51,7 @@ contributes:
         - typst/lib/tokens.typ
         - typst/lib/labels.typ
         - typst/lib/decoration.typ
+        - typst/lib/quote.typ
         - typst/lib/motifs.typ
         - typst/lib/chrome.typ
         - typst/lib/slots.typ

@@ -1,0 +1,21 @@
+---
+title: Citations
+lang: fr
+author: Test Author
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: mono
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The label of a mono block quote follows the document language.
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mc-preset = "mono"', 'mcanouil-quote: "Citation"', 'attribution: \[']
+---
+
+{{< include _quotes.qmd >}}

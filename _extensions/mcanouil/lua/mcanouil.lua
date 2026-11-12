@@ -15,6 +15,7 @@ local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
 local alt_text = require(quarto.utils.resolve_path('alt-text.lua'):gsub('%.lua$', ''))
 local math_alt_text = require(quarto.utils.resolve_path('math-alt-text.lua'):gsub('%.lua$', ''))
 local sections = require(quarto.utils.resolve_path('sections.lua'):gsub('%.lua$', ''))
+local quote = require(quarto.utils.resolve_path('quote.lua'):gsub('%.lua$', ''))
 
 --- @type table[] The filter steps, run in order.
 local STEPS = {
@@ -27,6 +28,7 @@ local STEPS = {
   alt_text.filter,
   math_alt_text.filter,
   sections.pre_filter,
+  quote.filter,
 }
 
 return STEPS
