@@ -128,6 +128,15 @@ function M.q2_selection(spec, settings)
   if settings.warnings == 'exhaustive' then
     return excluded('`warnings: exhaustive` is a rule of this runner only')
   end
+  -- Only a `shouldError` format reads `errors: strict`, so a project default
+  -- leaves the other documents in the q2 run.
+  if settings.errors == 'strict' then
+    for _, format in ipairs(spec.formats) do
+      if format.policy == 'shouldError' then
+        return excluded('`errors: strict` is a rule of this runner only')
+      end
+    end
+  end
   return { included = true }
 end
 

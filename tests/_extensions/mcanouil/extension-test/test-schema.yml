@@ -32,6 +32,12 @@ options:
     default: default
     description: "With `exhaustive`, each warning in a `noErrors` format must match an expected `printsMessage` entry."
 
+  errors:
+    type: string
+    enum: [default, strict]
+    default: default
+    description: "With `strict`, a `shouldError` format needs a non-zero exit and no output file."
+
   check:
     type: string
     pattern: "\\S"

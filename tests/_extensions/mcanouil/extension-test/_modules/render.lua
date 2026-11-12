@@ -282,7 +282,9 @@ end
 ---
 --- The checks run in a fixed order, and the first one that fails gives the
 --- reason of the case. Under `shouldError`, only the timeout check, the
---- `shouldError` check, and the `printsMessage` entries apply.
+--- `shouldError` check, and the `printsMessage` entries apply. With
+--- `errors: strict`, the `shouldError` check also needs a non-zero exit and
+--- no output file.
 --- @param context table {tests, log_dir, settings, exhaustive, check, document, layer, output_files, output_dir, fallback_output_file}
 --- @param target table a format entry from `frontmatter.spec`
 --- @return table case
@@ -353,6 +355,11 @@ local function render_and_grade(context, target, typ)
     assertions = {},
   }
 
+  local prefix = context.tests .. '/'
+  local function tests_relative(path)
+    return path:sub(1, #prefix) == prefix and path:sub(#prefix + 1) or path
+  end
+
   local function fail(stage_name, reason, message)
     case.status = 'fail'
     case.failure = { stage = stage_name, reason = reason, message = message, log = log_path }
@@ -393,8 +400,10 @@ local function render_and_grade(context, target, typ)
 
   -- With no log, the log rule cannot be judged, and an empty log would read
   -- as a clean one. That is a gap in this run, so the case is a skip. A
-  -- render that exits with an error code is still judged on its exit code.
-  if log_missing and code == 0 then
+  -- render that exits with an error code is still judged on its exit code,
+  -- and so is a strict `shouldError` render, which fails on exit 0 alone.
+  local strict = target.policy == 'shouldError' and settings.errors == 'strict'
+  if log_missing and code == 0 and not strict then
     case.status = 'skip'
     case.failure = {
       stage = 'log', reason = 'log-missing',
@@ -404,7 +413,22 @@ local function render_and_grade(context, target, typ)
   end
 
   if target.policy == 'shouldError' then
-    if code == 0 and #errors == 0 then
+    if strict then
+      if code == 0 then
+        return fail('render', 'exit-zero',
+          'the case declares `shouldError` with `errors: strict` but the render exited 0')
+      end
+      local written, missing = M.output_path(context.tests, document, format, output_file, context.output_dir)
+      if written then
+        return fail('assert', 'output-written', string.format(
+          'the case declares `shouldError` with `errors: strict` but the render wrote %s', tests_relative(written)))
+      end
+      -- With no file to look for, the absence of the output cannot be checked.
+      if missing == 'unknown-suffix' then
+        case.status, case.failure = M.grade_missing(missing, format, log_path)
+        return case
+      end
+    elseif code == 0 and #errors == 0 then
       return fail('log', 'unexpected-pass',
         'the case declares `shouldError` but the render exited 0 and logged no error')
     end
@@ -463,8 +487,7 @@ local function render_and_grade(context, target, typ)
       'the output still holds shortcode text, so the shortcode did not expand')
   end
 
-  local prefix = context.tests .. '/'
-  local output_label = output_path:sub(1, #prefix) == prefix and output_path:sub(#prefix + 1) or output_path
+  local output_label = tests_relative(output_path)
   local ctx = {
     lines = lines,
     output_path = output_path,
