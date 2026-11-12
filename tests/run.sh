@@ -8,8 +8,9 @@ set -euo pipefail
 # in CHECKS. Quarto does not follow symbolic links, so the extension is copied
 # into a temporary work directory.
 #
-# Requires: quarto, pdftotext, pdfinfo, pdffonts and pdftoppm from poppler,
-# and docker for the veraPDF checks of tests/a11y/run.sh.
+# Requires: quarto with "quarto install verapdf" (each Typst render is
+# validated against PDF/UA-1), and pdftotext, pdfinfo, pdffonts and pdftoppm
+# from poppler.
 #
 # Usage: tests/run.sh [--only <glob>]
 
@@ -63,8 +64,10 @@ output_extension() {
 #   - "[verapdf]: Validating ... against PDF/UA1...PASSED", with a green
 #     PASSED, and the colour reset that follows it on its own line;
 #   - "Output created: <file>".
-# Anything else, a "WARN:" or "ERROR:" line, a failed veraPDF validation or a
-# filter message, is a problem.
+# Anything else, a "WARN:" or "ERROR:" line or a filter message, is a problem.
+# A failed validation prints a red "FAILED" in place of "PASSED", then
+# "WARN: PDF validation failed for ua-1:" and the failed rules, and Quarto
+# still exits 0, so this filter is what makes it fail the run.
 # $1 stderr file.
 unexpected_stderr() {
 	grep -Ev $'^$|^\033\\[1m(pandoc|metadata)|^[[:space:]]|^\\[typst\\]: Compiling .*DONE$|^\\[verapdf\\]: Validating .* against PDF/UA1\\.\\.\\.\033\\[32mPASSED$|^\033\\[39m$|^Output created: ' "$1" || true
