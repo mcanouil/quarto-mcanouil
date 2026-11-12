@@ -133,7 +133,7 @@ end
 
 cases['resolve-unknown-type'] = function()
   fails_with(
-    type_options({ type = 'poster' }), 'mcanouil-typst', 'mcanouil: unknown type "poster"; use article, letter, memo, report.', 'unknown type'
+    type_options({ type = 'poster' }), 'mcanouil-typst', 'mcanouil: unknown type "poster"; use article, invoice, letter, memo, report.', 'unknown type'
   )
 end
 
@@ -262,6 +262,12 @@ end
 cases['resolve-letter-layout'] = function()
   local resolved = document.resolve(type_options({ type = 'letter' }), 'mcanouil-typst')
   assert_equal(resolved.type, 'letter', 'type')
+  assert_equal(resolved.layout, 'standard', 'layout')
+end
+
+cases['resolve-invoice-layout'] = function()
+  local resolved = document.resolve(type_options({ type = 'invoice' }), 'mcanouil-typst')
+  assert_equal(resolved.type, 'invoice', 'type')
   assert_equal(resolved.layout, 'standard', 'layout')
 end
 

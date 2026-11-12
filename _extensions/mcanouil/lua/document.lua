@@ -35,6 +35,7 @@ M.TYPES = {
   article = { 'standard' },
   memo = { 'standard' },
   letter = { 'standard' },
+  invoice = { 'standard' },
 }
 
 --- @type table<string, string[]> The kinds of the types that vary by kind, the default kind first.
@@ -94,6 +95,10 @@ M.DEFAULTS = {
     footer = { left = 'author', centre = 'version', right = 'page' },
   },
   letter = {
+    header = { left = '', centre = '', right = '' },
+    footer = { left = '', centre = '', right = 'page' },
+  },
+  invoice = {
     header = { left = '', centre = '', right = '' },
     footer = { left = '', centre = '', right = 'page' },
   },
@@ -409,7 +414,7 @@ M.LETTER_STANDARD_BY_LANGUAGE = { de = 'din', fr = 'nf' }
 --- @type string Letter standard of the languages that M.LETTER_STANDARD_BY_LANGUAGE does not list.
 M.LETTER_STANDARD_DEFAULT = 'nf'
 
---- Answer the standard of a letter: `extensions.mcanouil.letter-standard`, else the one of the document
+--- Answer the standard of a letter or an invoice: `extensions.mcanouil.letter-standard`, else the one of the document
 --- language (`fr` gives `nf`, `de` gives `din`), else `nf`.
 --- @param meta table Document metadata
 --- @return string|nil Standard, `din` or `nf`
@@ -469,12 +474,12 @@ local function deliver(meta)
     end
     meta['mcanouil-memo-fields'] = pandoc.MetaList(fields)
   end
-  if resolved.type == 'letter' then
+  if resolved.type == 'letter' or resolved.type == 'invoice' then
     local standard, standard_message = M.letter_standard(meta)
     if not standard then
       fail.stop(standard_message)
     end
-    meta['mcanouil-letter-standard'] = standard
+    meta['mcanouil-' .. resolved.type .. '-standard'] = standard
   end
   local furniture = M.furniture(meta)
   for _, part in ipairs(M.PARTS) do

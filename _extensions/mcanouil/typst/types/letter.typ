@@ -48,21 +48,6 @@
 // - value: content.
 #let labelled(key, value) = [#with-colon(mc-labels.at(key)) #value]
 
-// Answer the reference block of DIN 5008: each term in small muted type above its value.
-// - standard: key of mc-letter-standards.
-// - entries: array of (label, value) pairs.
-#let reference-block(standard, entries) = {
-  let info = mc-letter-standards.at(standard).info
-  let colours = tokens()
-  at-page(standard, info.x, info.y, width: info.width, {
-    set par(spacing: 0.5em)
-    for (label, value) in entries {
-      block(above: 0.8em, below: 0pt, sticky: true, text(size: 8pt, fill: colours.muted, label))
-      block(above: 0.2em, below: 0pt, value)
-    }
-  })
-}
-
 // Answer a letter.
 // - meta: the document, see mcanouil-document(), with `letter`: standard, address, sender, place, reference,
 //   your-reference, subject, opening, closing, cc, encl, ps and signature-image.
@@ -81,6 +66,7 @@
   let reference = fields.at("reference", default: none)
   let your-reference = fields.at("your-reference", default: none)
   let subject = fields.at("subject", default: none)
+  let signature-image = fields.at("signature-image", default: none)
   let din = standard == "din"
 
   set page(
@@ -130,9 +116,9 @@
   body
   if "closing" in fields { block(above: 1.2em, below: 0pt, sticky: false, fields.closing) }
   block(above: 0.6em, below: 0pt, breakable: false, {
-    if "signature-image" in fields {
+    if signature-image != none {
       image(
-        fields.at("signature-image"),
+        signature-image,
         height: 16mm,
         alt: mc-labels.at("mcanouil-letter-signature"),
       )

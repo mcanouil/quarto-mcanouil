@@ -19,7 +19,7 @@ options:
     enum:
       - nf
       - din
-    description: "Standard of a letter: nf follows NF Z 11-001 with the address window on the right, din follows DIN 5008 form B with the address window on the left and a reference block. When it is not set, the language of the document chooses: fr gives nf, de gives din, and any other language gives nf. Set it as `extensions: { mcanouil: { letter-standard: <name> } }`."
+    description: "Standard of a letter or an invoice: nf follows NF Z 11-001 with the address window on the right, din follows DIN 5008 form B with the address window on the left and a reference block. When it is not set, the language of the document chooses: fr gives nf, de gives din, and any other language gives nf. Set it as `extensions: { mcanouil: { letter-standard: <name> } }`."
   header:
     type: object
     additionalProperties: false

@@ -4,7 +4,7 @@
 //
 // NF Z 11-001 (France): A4, the window on the right at 110 mm from the left and
 // 50 mm from the top, 80 by 35 mm; fold marks at one third (99 mm) and two thirds
-// (198 mm) of the page height.
+// (198 mm) of the page height. These values are not verified against the AFNOR text.
 // DIN 5008 form B (Germany): A4, the window on the left at 20 mm from the left and
 // 45 mm from the top, 85 by 45 mm; reference block at 125 mm from the left and
 // 50 mm from the top, 75 mm wide; fold marks at 105 mm and 210 mm, punch mark at
@@ -87,6 +87,24 @@
     }
     if geometry.punch != none {
       place(top + left, dy: geometry.punch, line(length: 2 * geometry.mark, stroke: stroke))
+    }
+  })
+}
+
+// Answer a reference block: each term in small muted type above its value. In DIN 5008 it sits in the
+// information field; the invoice also uses it for the dates under the sender of an NF Z 11-001 page.
+// - standard: key of mc-letter-standards.
+// - entries: array of (label, value) pairs.
+// - x, y, width: position and width from the top left corner of the page, by default the information field of the standard.
+#let reference-block(standard, entries, x: auto, y: auto, width: auto) = {
+  let info = mc-letter-standards.at(standard).info
+  let colours = tokens()
+  let at(value, key) = if value == auto { info.at(key) } else { value }
+  at-page(standard, at(x, "x"), at(y, "y"), width: at(width, "width"), {
+    set par(spacing: 0.5em)
+    for (label, value) in entries {
+      block(above: 0.8em, below: 0pt, sticky: true, text(size: 8pt, fill: colours.muted, label))
+      block(above: 0.2em, below: 0pt, value)
     }
   })
 }

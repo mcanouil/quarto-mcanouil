@@ -87,6 +87,7 @@ contributes:
         - typst/types/article.typ
         - typst/types/memo.typ
         - typst/types/letter.typ
+        - typst/types/invoice.typ
         - typst/typst-template.typ
         - typst/typst-show.typ
     revealjs:
