@@ -301,14 +301,39 @@ text_clear_of_motif() {
 		' <<<"${boxes}"
 }
 
-# Succeed when every text and mark that the probe read meets its contrast
-# ratio (4.5:1 for text, 3:1 for large text and marks), and the probe read the
-# kicker, the footer and the menu button.
+# Answer the colour readings that the deck fixture must give for a preset, one
+# "<slide> <name>" per line: the kicker, the section number, the quote label or
+# icon of the preset, the attribution, the footer slots, the slide number and
+# the menu button.
+# $1 preset.
+expected_colours() {
+	local slide
+	printf 'title-slide .mc-kicker\n'
+	printf 'brand-presets .mc-section-number\n'
+	case "$1" in
+	mono) printf 'one-rule figcaption.mc-quote-attribution::before\n' ;;
+	quarto | terminal) printf 'one-rule figure.mc-quote::before\n' ;;
+	esac
+	printf 'one-rule figcaption.mc-quote-attribution\n'
+	for slide in brand-presets why-presets one-rule why-presets-after-dark; do
+		printf '%s footer-left\n%s footer-centre\n%s slide-number\n%s menu-button\n' "${slide}" "${slide}" "${slide}" "${slide}"
+	done
+}
+
+# Succeed when the probe read every expected text and mark, and each meets its
+# contrast ratio (4.5:1 for text, 3:1 for large text and marks). Names each
+# missing reading and each low ratio.
+# $1 preset.
 colours_readable() {
-	local colours
+	local colours slide name missing=0
 	colours="$(awk '$2 == "colour"' <<<"${probe_lines}")"
-	grep -q ' \.mc-kicker ' <<<"${colours}" && grep -q ' footer' <<<"${colours}" && grep -q ' menu-button ' <<<"${colours}" &&
-		awk '$4 + 0 < $5 + 0 { print "# low contrast: " $0; bad = 1 } END { exit bad }' <<<"${colours}"
+	while read -r slide name; do
+		if ! awk -v s="${slide}" -v n="${name}" '$1 == s && $3 == n { found = 1 } END { exit !found }' <<<"${colours}"; then
+			printf '# missing: %s %s\n' "${slide}" "${name}"
+			missing=1
+		fi
+	done < <(expected_colours "$1")
+	awk '$4 + 0 < $5 + 0 { print "# low contrast: " $0; bad = 1 } END { exit bad }' <<<"${colours}" && [ "${missing}" = 0 ]
 }
 
 # Succeed when axe-core finds no violation in the deck. The scan runs on a
@@ -343,7 +368,7 @@ gold | mono | quarto | terminal)
 	expect "deck-axe-light-${1}" "no axe-core violation in the ${1} deck" axe_clean
 	find_browser
 	probe_lines="$(probe_slides title-slide brand-presets why-presets one-rule why-presets-after-dark mc-closing)"
-	expect "deck-computed-contrast-${1}" "4.5:1 for text, 3:1 for large text and marks, as the browser paints them" colours_readable
+	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
 	;;
 long-title)
 	find_browser

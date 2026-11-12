@@ -176,7 +176,8 @@
     var footer = document.querySelector(".reveal > .footer.mc-footer");
     if (footer && getComputedStyle(footer).display !== "none") {
       footer.querySelectorAll(".mc-slot").forEach(function (slot) {
-        if (slot.textContent.trim()) { measureColour(slide, "footer" + slot.className.replace(/\s+/g, "."), slot, null, "text"); }
+        var position = (slot.className.match(/mc-slot-(left|centre|right)/) || [null, "slot"])[1];
+        if (slot.textContent.trim()) { measureColour(slide, "footer-" + position, slot, null, "text"); }
       });
     }
     var number = document.querySelector(".reveal .slide-number");

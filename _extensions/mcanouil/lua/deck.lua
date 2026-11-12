@@ -177,7 +177,7 @@ local function ground_attributes(state, bare)
   local attributes = { ['background-gradient'] = M.ground_gradient(state.dark), ['data-state'] = M.DARK_STATE }
   if bare then
     attributes['data-footer'] = 'false'
-    attributes['data-state'] = M.BARE_STATE .. ' ' .. M.DARK_STATE .. ' ' .. M.DARK_STATE
+    attributes['data-state'] = M.BARE_STATE .. ' ' .. M.DARK_STATE
   end
   return attributes
 end
