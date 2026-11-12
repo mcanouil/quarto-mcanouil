@@ -12,6 +12,7 @@ local LUA_DIR = debug.getinfo(1, 'S').source:match('^@(.*)[/\\][^/\\]+$')
 
 package.path = LUA_DIR .. '/?.lua;' .. package.path
 
+local fail = require('lib.fail')
 local contrast_math = require('lib.contrast-math')
 local preset = require('preset')
 
@@ -93,8 +94,7 @@ local function run(meta)
     for index, failure in ipairs(failures) do
       lines[index] = 'mcanouil: contrast check failed: ' .. failure.message
     end
-    io.stderr:write(table.concat(lines, '\n'), '\n')
-    os.exit(1)
+    fail.stop(table.concat(lines, '\n'))
   end
 end
 

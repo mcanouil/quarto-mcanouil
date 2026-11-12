@@ -9,6 +9,8 @@
 --- fills the slots the user leaves out from the defaults of the document type,
 --- and delivers the resolved content of each slot to Typst.
 
+local fail = require('lib.fail')
+
 local M = {}
 
 --- @type string[] Slot names, in output order.
@@ -92,13 +94,13 @@ local function user_slots(part, options)
   for key, value in pairs(options) do
     local slot = ALIASES[key] or key
     if not SLOT_NAMES[slot] then
-      error(string.format(
+      fail.stop(string.format(
         'mcanouil: unknown slot "%s.%s" in extensions.mcanouil; use left, centre (or center) and right.',
         part, key
       ))
     end
     if slots[slot] ~= nil then
-      error(string.format(
+      fail.stop(string.format(
         'mcanouil: both "%s.centre" and "%s.center" are set in extensions.mcanouil; keep one.',
         part, part
       ))
@@ -269,8 +271,7 @@ local function deliver(meta)
     or FORMAT_NAMES.html
   local resolved, message = M.resolve(meta, format)
   if not resolved then
-    io.stderr:write(message, '\n')
-    os.exit(1)
+    fail.stop(message)
   end
   if format ~= FORMAT_NAMES.typst then
     return meta

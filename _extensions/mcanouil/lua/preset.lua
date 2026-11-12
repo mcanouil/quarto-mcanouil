@@ -9,6 +9,7 @@
 --- metadata for Typst.
 
 --- @type string Directory of the extension, the parent of `lua/`.
+local fail = require('lib.fail')
 local EXTENSION_DIR = debug.getinfo(1, 'S').source:match('^@(.*)[/\\]lua[/\\][^/\\]+$')
 
 local colour = dofile(EXTENSION_DIR .. '/_vendor/quarto-lua-modules/colour.lua')
@@ -88,7 +89,7 @@ local function to_hex(value, role, mode)
   if compact:match('^rgb%(%d+,%d+,%d+%)$') then
     return colour.RGB_to_HTML(compact):lower()
   end
-  error(string.format(
+  fail.stop(string.format(
     'mcanouil: cannot read the colour "%s" of the brand role "%s" (%s); use a hex value, rgb() or a CSS colour name.',
     value, role, mode
   ))
@@ -106,7 +107,7 @@ function M.resolve_name(name)
       return name
     end
   end
-  error(string.format(
+  fail.stop(string.format(
     'mcanouil: unknown preset "%s" in extensions.mcanouil.preset; use one of %s.',
     name, table.concat(M.PRESETS, ', ')
   ))
@@ -119,7 +120,7 @@ function M.read(name)
   local path = EXTENSION_DIR .. '/presets/' .. name .. '.yml'
   local file = io.open(path, 'r')
   if not file then
-    error('mcanouil: cannot open the preset file ' .. path .. '.')
+    fail.stop('mcanouil: cannot open the preset file ' .. path .. '.')
   end
   local text = file:read('a')
   file:close()

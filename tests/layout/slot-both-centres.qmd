@@ -1,0 +1,22 @@
+---
+title: Both centres
+format: mcanouil-typst
+extensions:
+  mcanouil:
+    header:
+      center: One
+      centre: Two
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: Setting both centre and center stops the render.
+        errors: strict
+    mcanouil-typst:
+      shouldError: true
+      printsMessage:
+        level: ERROR
+        regex: 'mcanouil: both "header\.centre" and "header\.center" are set in extensions\.mcanouil; keep one\.'
+---
+
+A paragraph.
