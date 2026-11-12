@@ -21,7 +21,7 @@
   title-block(
     title: meta.at("title", default: none),
     subtitle: meta.at("subtitle", default: none),
-    kicker: meta.at("kicker", default: none),
+    kicker: meta.at("kicker", default: mc-labels.at("mcanouil-report")),
     date: meta.at("date", default: none),
     authors: meta.at("authors", default: ()),
     affiliations: meta.at("affiliations", default: ()),
@@ -31,7 +31,7 @@
     keywords: meta.at("keywords", default: ()),
     font: fonts.headings,
     motif-space: if corner != none { mc-first-page-motif-size - mc-page-margin.right },
-    motif-height: if corner != none { mc-first-page-motif-size - mc-page-margin.top } else { 0pt },
+    motif-bottom: if corner != none { mc-first-page-motif-size },
   )
   body
 }

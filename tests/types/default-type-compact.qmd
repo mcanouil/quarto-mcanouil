@@ -1,7 +1,11 @@
 ---
 title: Compact report
 author: Test Author
-abstract: This abstract opens page 1.
+subtitle: A subtitle long enough to run beside the corner motif and wrap onto a second line of text
+abstract: |
+  This abstract opens page 1.
+
+  A second abstract paragraph that is long enough to reach the right margin of the page if nothing narrows it, so the check sees any text under the corner motif.
 format:
   mcanouil-typst:
     keep-typ: true
