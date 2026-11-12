@@ -76,14 +76,14 @@ $mc-gold-radius: 5px !default;
 
   // Block quotes: a gilded edge, italic text, the attribution in small
   // capitals.
-  blockquote.mc-quote {
+  figure.mc-quote {
     padding: 0.15rem 0 0.15rem 1.1rem;
     border-inline-start: 0;
     font-size: 1.1rem;
     font-style: italic;
   }
 
-  blockquote.mc-quote::before {
+  figure.mc-quote::before {
     content: "";
     position: absolute;
     inset-inline-start: 0;
@@ -94,7 +94,7 @@ $mc-gold-radius: 5px !default;
     background-image: linear-gradient(var(--mc-accent-low), var(--mc-accent-high), var(--mc-accent-low));
   }
 
-  blockquote.mc-quote .mc-quote-attribution {
+  figure.mc-quote .mc-quote-attribution {
     color: var(--mc-accent-text);
     font-style: normal;
     font-variant-caps: all-small-caps;

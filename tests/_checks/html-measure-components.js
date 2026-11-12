@@ -67,8 +67,8 @@ window.addEventListener("load", () => document.fonts.ready.then(() => {
     ["inline code", "p code"],
     ["table cell", "main table td, main table th"],
     ["table caption", "main table caption, main .table-caption"],
-    ["quote", "main blockquote p"],
-    ["quote attribution", "main blockquote footer"],
+    ["quote", "main figure.mc-quote blockquote p"],
+    ["quote attribution", "main figure.mc-quote figcaption"],
   ];
   out.colours = [];
   for (const [label, selector] of SAMPLES) {
@@ -83,10 +83,29 @@ window.addEventListener("load", () => document.fonts.ready.then(() => {
     }
   }
 
-  // Each callout has a visible text title.
+  // Each callout has a visible text title. A custom title hides the type in
+  // a screen reader span, so the type must show another way: that span made
+  // visible, or the icon glyph.
+  const glyph = (callout) => {
+    const container = callout.querySelector(".callout-icon-container");
+    const icon = callout.querySelector(".callout-icon");
+    if (!container || !icon || !shown(container)) return "";
+    const style = getComputedStyle(icon, "::before");
+    if (style.display === "none" || style.content === "none" || style.content === "normal") return "";
+    return style.content;
+  };
   out.callouts = [...document.querySelectorAll(".callout")].map((callout) => {
     const title = callout.querySelector(".callout-header .callout-title-container");
-    return { type: callout.className.match(/callout-(note|tip|warning|important|caution)/)[1], title: title && shown(title) ? title.innerText.trim() : "" };
+    const hidden = title && title.querySelector(".screen-reader-only");
+    const typeText = hidden && hidden.getBoundingClientRect().width > 2 ? hidden.textContent.trim() : "";
+    return {
+      type: callout.className.match(/callout-(note|tip|warning|important|caution)/)[1],
+      title: title && shown(title) ? title.innerText.trim() : "",
+      custom: Boolean(hidden),
+      typeShown: !hidden || Boolean(typeText) || /[^\s"\/]/.test(glyph(callout).replace(/\/ ?""$/, "")),
+      typeText,
+      glyph: glyph(callout),
+    };
   });
 
   // Callout icons carry no text: no text node, and generated content with an
@@ -135,9 +154,9 @@ window.addEventListener("load", () => document.fonts.ready.then(() => {
     ["callout-title::after", ".callout .callout-title-container", "::after"],
     ["tab::before", ".panel-tabset .nav-link", "::before"],
     ["tab::after", ".panel-tabset .nav-link", "::after"],
-    ["quote::before", "main blockquote", "::before"],
-    ["quote::after", "main blockquote", "::after"],
-    ["attribution::before", "main blockquote footer", "::before"],
+    ["quote::before", "main figure.mc-quote", "::before"],
+    ["quote::after", "main figure.mc-quote", "::after"],
+    ["attribution::before", "main figure.mc-quote figcaption", "::before"],
   ];
   for (const [name, selector, pseudo] of DECORATIONS) {
     for (const el of document.querySelectorAll(selector)) {
@@ -145,10 +164,32 @@ window.addEventListener("load", () => document.fonts.ready.then(() => {
       if (value !== "none") out.decorations[name] = value;
     }
   }
+  // The active tab: its mark in forced colours, and the cues other than
+  // colour that tell it from an inactive tab.
   const active = document.querySelector(".panel-tabset .nav-link.active");
+  const inactive = document.querySelector(".panel-tabset .nav-link:not(.active)");
   if (active) {
     const style = getComputedStyle(active);
     out.activeTab = { decoration: style.textDecorationLine, border: style.borderBottomStyle + " " + style.borderBottomWidth };
+  }
+  out.activeCues = [];
+  if (active && inactive) {
+    const cue = (el) => {
+      const s = getComputedStyle(el);
+      const before = getComputedStyle(el, "::before");
+      const after = getComputedStyle(el, "::after");
+      return {
+        weight: s.fontWeight,
+        decoration: s.textDecorationLine,
+        shadow: s.boxShadow,
+        border: s.borderBottomStyle + " " + s.borderBottomWidth,
+        before: before.content,
+        after: after.content + " " + after.backgroundImage,
+      };
+    };
+    const a = cue(active);
+    const b = cue(inactive);
+    out.activeCues = Object.keys(a).filter((key) => a[key] !== b[key]);
   }
   parent.postMessage(JSON.stringify(out), "*");
 }));

@@ -87,6 +87,29 @@ $mc-terminal-radius: 0px !default;
     display: flex;
   }
 
+  // A custom title keeps the type in a screen reader span. With no icon, the
+  // span shows, inside the brackets and before the title, so the type is not
+  // told by colour alone: [!IMPORTANT] Database lock.
+  div.callout .callout-title-container .screen-reader-only {
+    position: static;
+    order: -1;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: nowrap;
+  }
+
+  div.callout .callout-title-container::before {
+    order: -2;
+  }
+
+  div.callout .callout-title-container:has(.screen-reader-only)::after {
+    order: -1;
+    margin-inline-end: 0.6em;
+  }
+
   div.callout .callout-title-container::before {
     content: "[!";
     content: "[!" / "";
@@ -120,6 +143,24 @@ $mc-terminal-radius: 0px !default;
     content: " ]" / "";
   }
 
+  // The active tab is bold behind a > cursor, not told by colour alone.
+  .panel-tabset .nav-tabs .nav-link.active {
+    font-weight: 700;
+  }
+
+  .panel-tabset .nav-tabs .nav-link.active::before {
+    content: "> [ ";
+    content: "> [ " / "";
+  }
+
+  // Dot field: the mask is larger than the corner box, so the
+  // box shows the corner of the field with dots large enough to see.
+  div.callout.callout-style-default::after,
+  div.callout.callout-style-simple::after {
+    mask-size: 7rem;
+    opacity: 0.8;
+  }
+
   // Code: dashed windows.
   div.sourceCode {
     border-style: dashed;
@@ -136,13 +177,13 @@ $mc-terminal-radius: 0px !default;
   }
 
   // Block quotes: a dashed box with a [QUOTE] label on its top edge.
-  blockquote.mc-quote {
+  figure.mc-quote {
     margin-top: 2rem;
     padding: 1rem 0.75rem 0.5rem;
     border: 1px dashed var(--mc-line);
   }
 
-  blockquote.mc-quote::before {
+  figure.mc-quote::before {
     content: "[" attr(data-mc-label) "]";
     content: "[" attr(data-mc-label) "]" / "";
     position: absolute;

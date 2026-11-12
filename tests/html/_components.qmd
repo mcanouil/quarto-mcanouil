@@ -20,8 +20,14 @@ Small cells make the estimate unstable.
 Do not unblind before the database lock.
 :::
 
-::: {.callout-caution collapse="true"}
+::: {.callout-caution}
 Interim results are not for publication.
+:::
+
+::: {.callout-caution collapse="true"}
+## Release plan
+
+The collapsed callout keeps its body hidden until it opens.
 :::
 
 ## Tabsets
@@ -59,7 +65,7 @@ model <- coxph(Surv(time_to_event_in_days, event_indicator) ~ treatment_arm + ag
 
 A code block without a window:
 
-```r
+```{.r code-window-enabled="false"}
 summary(model)
 ```
 

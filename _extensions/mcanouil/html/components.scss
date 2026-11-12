@@ -215,11 +215,12 @@ caption {
   color: var(--mc-muted);
 }
 
-// Block quotes: lua/quote.lua writes each quote as blockquote.mc-quote, with
-// the attribution in footer.mc-quote-attribution and the label of the
-// decoration in data-mc-label.
+// Block quotes: lua/quote.lua writes each quote as figure.mc-quote around the
+// blockquote, with the attribution as figcaption.mc-quote-attribution and the
+// label of the decoration in data-mc-label. The figure is the box; the
+// blockquote inside it drops the Bootstrap edge and colours.
 
-blockquote.mc-quote {
+figure.mc-quote {
   position: relative;
   margin: 1.5rem 0;
   padding: 0.25rem 0 0.25rem 1rem;
@@ -228,11 +229,19 @@ blockquote.mc-quote {
   font-size: 1.05rem;
 }
 
-blockquote.mc-quote > :has(+ .mc-quote-attribution) {
+figure.mc-quote > blockquote {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+figure.mc-quote > blockquote > :last-child {
   margin-bottom: 0;
 }
 
-blockquote.mc-quote .mc-quote-attribution {
+figure.mc-quote .mc-quote-attribution {
   margin-top: 0.5rem;
   color: var(--mc-muted);
   font-size: 0.86em;

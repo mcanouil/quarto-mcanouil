@@ -440,7 +440,8 @@ check_title() {
 }
 
 # Run the structure checks of the components of the HTML output: the ARIA tab
-# pattern of each tabset, and the block quotes with their attribution. Print
+# pattern of each tabset, and the block quotes (figure.mc-quote) with their
+# attribution as the caption. Print
 # one "name ok" or "name fail: reason" line for each.
 components_report() {
 	python3 -I - "${output}" <<'PY'
@@ -458,7 +459,7 @@ class Page(HTMLParser):
         self.panels = set()
         self.quotes = []
         self.depth = []
-        self.footer = None
+        self.caption = None
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
@@ -469,28 +470,28 @@ class Page(HTMLParser):
             self.tabs.append(attrs)
         if role == "tabpanel" and attrs.get("id"):
             self.panels.add(attrs["id"])
-        if tag == "blockquote":
-            self.quotes.append({"attrs": attrs, "children": [], "footer": None})
+        if tag == "figure" and "mc-quote" in attrs.get("class", "").split():
+            self.quotes.append({"attrs": attrs, "children": [], "caption": None})
             self.depth.append(0)
         elif self.depth and tag not in VOID:
             if self.depth[-1] == 0:
                 self.quotes[-1]["children"].append(tag)
-                if tag == "footer":
-                    self.quotes[-1]["footer"] = ""
-                    self.footer = self.quotes[-1]
+                if tag == "figcaption":
+                    self.quotes[-1]["caption"] = ""
+                    self.caption = self.quotes[-1]
             self.depth[-1] += 1
 
     def handle_endtag(self, tag):
-        if tag == "blockquote" and self.depth:
+        if self.depth and self.depth[-1] == 0 and tag == "figure":
             self.depth.pop()
         elif self.depth and tag not in VOID:
             self.depth[-1] -= 1
-            if tag == "footer":
-                self.footer = None
+            if tag == "figcaption":
+                self.caption = None
 
     def handle_data(self, data):
-        if self.footer is not None:
-            self.footer["footer"] += data
+        if self.caption is not None:
+            self.caption["caption"] += data
 
 
 page = Page()
@@ -514,14 +515,16 @@ report(
     f"found {len(page.tablists)} lists, {len(page.tabs)} tabs, {len(selected)} selected, "
     f"controls {controls}, panels {sorted(page.panels)}",
 )
-attributed = [q for q in page.quotes if q["footer"] is not None]
+attributed = [q for q in page.quotes if q["caption"] is not None]
 report(
     "quote-attribution",
-    len(attributed) == 1
-    and attributed[0]["children"][-1] == "footer"
-    and attributed[0]["footer"].strip() == "Mickaël Canouil, 2026",
-    "one blockquote whose last child is a footer with the attribution, dash dropped; found "
-    + repr([(q["children"], q["footer"]) for q in page.quotes]),
+    len(page.quotes) == 2
+    and all(q["children"][0] == "blockquote" for q in page.quotes)
+    and len(attributed) == 1
+    and attributed[0]["children"] == ["blockquote", "figcaption"]
+    and attributed[0]["caption"].strip() == "Mickaël Canouil, 2026",
+    "two figure.mc-quote, each with a blockquote, one with the attribution as its figcaption, dash dropped; found "
+    + repr([(q["children"], q["caption"]) for q in page.quotes]),
 )
 report(
     "quote-label",
@@ -597,7 +600,7 @@ check_components() {
 	light_css="$(linked_css quarto-bootstrap 0)"
 
 	expect "html-tabset-aria-${preset}" "the ARIA tab pattern, see the line above" structure_ok tabset-aria
-	expect "html-quote-attribution-${preset}" "the attribution in a footer, see the line above" structure_ok quote-attribution
+	expect "html-quote-attribution-${preset}" "the attribution as the caption of the quote figure, see the line above" structure_ok quote-attribution
 	expect "html-quote-label-${preset}" "the label of the quote decoration on every quote" structure_ok quote-label
 	expect "html-no-important-${preset}" "no !important in the extension stylesheets without an upstream issue" no_important
 
@@ -607,14 +610,18 @@ check_components() {
 		exit 1
 	fi
 	measures="$(measure 1440 900 "" components)"
-	expect "html-callout-label-text-${preset}" "a visible text title on each of the five callouts" \
-		measured "${measures}" 'len(m["callouts"]) == 5 and all(c["title"] for c in m["callouts"])' 'm["callouts"]'
+	expect "html-callout-label-text-${preset}" "a visible text title on each of the six callouts" \
+		measured "${measures}" 'len(m["callouts"]) == 6 and all(c["title"] for c in m["callouts"])' 'm["callouts"]'
+	expect "html-callout-type-shown-${preset}" "the type of a callout with a custom title shown as text or glyph, not colour alone" \
+		measured "${measures}" 'sum(c["custom"] for c in m["callouts"]) == 2 and all(c["typeShown"] for c in m["callouts"])' 'm["callouts"]'
+	expect "html-tab-active-cue-${preset}" "the active tab told from the others by more than colour" \
+		measured "${measures}" 'm["activeCues"]' 'm["activeCues"]'
 	expect "html-callout-icon-decorative-${preset}" "callout icons with no text and silent generated content" \
 		measured "${measures}" 'm["icons"] and all(not i["text"] and i["silent"] for i in m["icons"])' 'm["icons"]'
 	for size in 1440,900 320,568; do
 		measures="$(measure "${size%,*}" "${size#*,}" "" components)"
 		expect "html-callout-motif-${preset}-${size%,*}" "a corner motif on each callout, with no text over it" \
-			measured "${measures}" 'm["motifs"] == 5 and not m["motifOverlaps"]' '(m["motifs"], m["motifOverlaps"])'
+			measured "${measures}" 'm["motifs"] == 6 and not m["motifOverlaps"]' '(m["motifs"], m["motifOverlaps"])'
 	done
 	for scheme in light dark; do
 		expected="${scheme}"

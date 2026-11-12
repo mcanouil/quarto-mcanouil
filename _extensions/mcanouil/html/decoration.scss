@@ -22,9 +22,9 @@
   .panel-tabset .nav-tabs .nav-link::before,
   .panel-tabset .nav-tabs .nav-link::after,
   .panel-tabset .nav-tabs .nav-link.active::after,
-  blockquote.mc-quote::before,
-  blockquote.mc-quote::after,
-  blockquote.mc-quote .mc-quote-attribution::before {
+  figure.mc-quote::before,
+  figure.mc-quote::after,
+  figure.mc-quote .mc-quote-attribution::before {
     display: none;
   }
 

@@ -8,11 +8,13 @@
 --- quote is written as `#quote(block: true, attribution: [...])[...]`, so that
 --- the Typst show rule styles the attribution; a quote without that paragraph
 --- is left to Pandoc. In HTML, every quote is written as
---- `<blockquote class="mc-quote" data-mc-label="...">`, with the attribution
---- as its last child, a `<footer class="mc-quote-attribution">`. The label is
---- for the decoration that the preset style sheet draws as generated content
---- with an empty alternative text. A GitHub alert (`> [!NOTE]`) is left to
---- Quarto, which makes it a callout.
+--- `<figure class="mc-quote" data-mc-label="..."><blockquote>...</blockquote>`,
+--- and the attribution, when there is one, as the caption of the figure,
+--- `<figcaption class="mc-quote-attribution">`, so that it is announced as the
+--- source, not as quoted text. The label is for the decoration that the
+--- preset style sheet draws as generated content with an empty alternative
+--- text. A GitHub alert (`> [!NOTE]`) is left to Quarto, which makes it a
+--- callout.
 
 local fail = require('lib.fail')
 local labels = require('lib.labels')
@@ -98,11 +100,12 @@ local function is_alert(quote)
   return pandoc.utils.stringify(first.content):match('^%[!%a+%]') ~= nil
 end
 
---- Rewrite a block quote as HTML with the label of its decoration and, when
---- it has one, its attribution in a footer.
+--- Rewrite a block quote as an HTML figure: the quote, then its attribution,
+--- when it has one, as the caption. The figure carries the label of the
+--- decoration in `data-mc-label`. Other HTML formats can call it.
 --- @param quote pandoc.BlockQuote Block quote
 --- @param label string Text of the quote label, for example `Quote`
---- @return pandoc.Blocks|nil Raw HTML around the content, or nil to keep the quote
+--- @return pandoc.Blocks|nil Raw HTML around the content, or nil to keep the quote (a GitHub alert)
 function M.html(quote, label)
   if not quote.content or #quote.content == 0 or is_alert(quote) then
     return nil
@@ -113,17 +116,18 @@ function M.html(quote, label)
   if #quote.content >= 2 and last.t == 'Para' then
     attribution = M.attribution(last.content)
   end
-  local blocks = pandoc.Blocks({ pandoc.RawBlock('html', '<blockquote class="mc-quote"' .. data .. '>') })
+  local blocks = pandoc.Blocks({ pandoc.RawBlock('html', '<figure class="mc-quote"' .. data .. '>\n<blockquote>') })
   local body_end = attribution and #quote.content - 1 or #quote.content
   for index = 1, body_end do
     blocks:insert(quote.content[index])
   end
-  if attribution then
-    blocks:insert(pandoc.RawBlock('html', '<footer class="mc-quote-attribution"' .. data .. '>'))
-    blocks:insert(pandoc.Plain(attribution))
-    blocks:insert(pandoc.RawBlock('html', '</footer>'))
-  end
   blocks:insert(pandoc.RawBlock('html', '</blockquote>'))
+  if attribution then
+    blocks:insert(pandoc.RawBlock('html', '<figcaption class="mc-quote-attribution"' .. data .. '>'))
+    blocks:insert(pandoc.Plain(attribution))
+    blocks:insert(pandoc.RawBlock('html', '</figcaption>'))
+  end
+  blocks:insert(pandoc.RawBlock('html', '</figure>'))
   return blocks
 end
 

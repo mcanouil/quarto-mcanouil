@@ -106,7 +106,7 @@ $mc-quarto-radius: 9px !default;
   }
 
   // Block quotes: a card with a round quote icon, the attribution in a pill.
-  blockquote.mc-quote {
+  figure.mc-quote {
     padding: 0.75rem 1rem 0.75rem 2.75rem;
     border-inline-start: 0;
     border-radius: #{$mc-quarto-radius};
@@ -114,7 +114,7 @@ $mc-quarto-radius: 9px !default;
     box-shadow: 0 2px 8px color-mix(in srgb, var(--mc-ink) 12%, transparent);
   }
 
-  blockquote.mc-quote::before {
+  figure.mc-quote::before {
     content: "\201C";
     content: "\201C" / "";
     position: absolute;
@@ -129,7 +129,7 @@ $mc-quarto-radius: 9px !default;
     text-align: center;
   }
 
-  blockquote.mc-quote .mc-quote-attribution {
+  figure.mc-quote .mc-quote-attribution {
     display: inline-block;
     padding: 0.05rem 0.6rem;
     border-radius: 999px;
