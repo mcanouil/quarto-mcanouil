@@ -10,6 +10,7 @@ _quarto:
       extension-test:
         description: A figure with no alt text warns once, and a figure with fig-alt does not.
         warnings: exhaustive
+        errors: strict
     mcanouil-html: &warns
       noErrors: true
       printsMessage:
@@ -30,6 +31,8 @@ _quarto:
         - level: WARN
           regex: 'mcanouil: figure "fig-plain" has no alt text\. Add fig-alt\.'
           count: 1
+        - level: ERROR
+          regex: 'PDF/UA-1 error: missing alt text'
 ---
 
 ![](figure.svg)
