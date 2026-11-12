@@ -1,0 +1,6 @@
+---
+title: Dark page
+brand-mode: dark
+---
+
+A paragraph.

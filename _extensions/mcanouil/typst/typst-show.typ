@@ -1,8 +1,3 @@
-#let mc-tokens = (
-$for(mcanouil-tokens/pairs)$
-  $it.key$: rgb("#$it.value$"),
-$endfor$
-)
 #let mc-labels = (
 $for(mcanouil-labels/pairs)$
   $it.key$: $it.value$,
@@ -28,7 +23,10 @@ $if(region)$
   region: "$region$",
 $endif$
   mode: "$mcanouil-mode$",
-  tokens: mc-tokens,
+  tokens: tokens(),
   fonts: mc-fonts,
+  header: slots(left: [$mcanouil-header.left$], centre: [$mcanouil-header.centre$], right: [$mcanouil-header.right$]),
+  footer: slots(left: [$mcanouil-footer.left$], centre: [$mcanouil-footer.centre$], right: [$mcanouil-footer.right$]),
+  motif-name: mc-motif,
   doc,
 )
