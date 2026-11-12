@@ -87,7 +87,7 @@ end
 --- @param block pandoc.CodeBlock
 --- @return pandoc.CodeBlock|nil Relabelled block, or nil when the pass is skipped
 local function normalise_language(block)
-  if not code_window.draws_chrome() then
+  if not code_window.draws_chrome() or code_window.is_quarto_block(block) then
     return nil
   end
   if not code_window.CONFIG().auto_filename then
