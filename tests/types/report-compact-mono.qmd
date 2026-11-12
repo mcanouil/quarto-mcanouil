@@ -1,0 +1,24 @@
+---
+title: Compact report
+author: Test Author
+abstract: This abstract opens page 1.
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: mono
+    type: report
+    layout: compact
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The compact report of the mono preset starts on page 1 with the title block, the abstract and the body.
+        check: bash _checks/types.sh compact
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mcanouil-document\(\s*"report",\s*"compact",\s*none']
+---
+
+{{< include _compact.qmd >}}

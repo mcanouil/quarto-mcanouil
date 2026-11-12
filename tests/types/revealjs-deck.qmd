@@ -1,0 +1,18 @@
+---
+title: A deck
+format: mcanouil-revealjs
+extensions:
+  mcanouil:
+    type: report
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: Reveal.js reads the type only for workshop, so a report type still renders a deck.
+    mcanouil-revealjs:
+      noErrorsOrWarnings: true
+---
+
+## A slide
+
+A paragraph.

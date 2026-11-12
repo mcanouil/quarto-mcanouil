@@ -2,8 +2,10 @@
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
---- @brief Page furniture: the three header and footer slots
---- @description Reads `extensions.mcanouil.header` and `extensions.mcanouil.footer`,
+--- @brief Document type and page furniture
+--- @description Reads `extensions.mcanouil.type`, `layout` and `kind`, stops the
+--- render for a type that the format cannot render, and delivers the choice to
+--- Typst. Reads `extensions.mcanouil.header` and `extensions.mcanouil.footer`,
 --- fills the slots the user leaves out from the defaults of the document type,
 --- and delivers the resolved content of each slot to Typst.
 
@@ -23,6 +25,23 @@ local ALIASES = { center = 'centre' }
 
 --- @type string Document type used when `extensions.mcanouil.type` is not set.
 M.DEFAULT_TYPE = 'report'
+
+--- @type string Layout used when `extensions.mcanouil.layout` is not set.
+M.DEFAULT_LAYOUT = 'compact'
+
+--- @type table<string, string[]> The document types that Typst renders, with the layouts of each.
+M.TYPES = {
+  report = { 'compact' },
+}
+
+--- @type string[] Document types that only `mcanouil-typst` renders.
+M.PDF_ONLY = { 'letter', 'invoice' }
+
+--- @type string The only format that renders a PDF-only type.
+local PDF_FORMAT = 'mcanouil-typst'
+
+--- @type table<string, string> Format name of each Quarto output format.
+local FORMAT_NAMES = { typst = 'mcanouil-typst', revealjs = 'mcanouil-revealjs', html = 'mcanouil-html' }
 
 --- @type table<string, table> Default slots of each document type, one row
 --- per type. A value is a field name, or `''` for an empty slot.
@@ -152,7 +171,7 @@ end
 --- @param slot table Slot from `M.furniture`
 --- @param meta table Document metadata
 --- @return pandoc.Inlines Content
-function M.resolve(slot, meta)
+function M.resolve_slot(slot, meta)
   if slot.kind == 'empty' then
     return pandoc.Inlines({})
   end
@@ -173,18 +192,97 @@ function M.resolve(slot, meta)
   return pandoc.Inlines(value)
 end
 
---- Deliver the resolved slots to Typst as `mcanouil-header` and `mcanouil-footer`.
+--- Read a string option of the extension.
+--- @param options table `extensions.mcanouil`
+--- @param key string Option name
+--- @return string|nil Value, or nil when the option is not set
+local function option(options, key)
+  local value = options[key]
+  if value == nil then
+    return nil
+  end
+  local text = pandoc.utils.stringify(value)
+  return text ~= '' and text or nil
+end
+
+--- @param list string[]
+--- @param value string
+--- @return boolean
+local function contains(list, value)
+  for _, item in ipairs(list) do
+    if item == value then
+      return true
+    end
+  end
+  return false
+end
+
+--- @param map table<string, any>
+--- @return string[] Sorted keys
+local function sorted_keys(map)
+  local keys = {}
+  for key in pairs(map) do
+    keys[#keys + 1] = key
+  end
+  table.sort(keys)
+  return keys
+end
+
+--- Answer the document type, layout and kind of a document for a format.
+--- Quarto replaces the global `error` with a logger that returns, so a failure
+--- is returned and the caller stops the render.
+--- @param meta table Document metadata
+--- @param format string `mcanouil-typst`, `mcanouil-html` or `mcanouil-revealjs`
+--- @return table|nil `type`, `layout` and `kind`; `layout` and `kind` are nil when unset or unused
+--- @return string|nil Message, when the format cannot render the type or the type or layout is not known
+function M.resolve(meta, format)
+  local options = meta.extensions and meta.extensions.mcanouil or {}
+  local doc_type = option(options, 'type')
+  if doc_type and format ~= PDF_FORMAT and contains(M.PDF_ONLY, doc_type) then
+    return nil, string.format('mcanouil: type "%s" supports %s only, not %s.', doc_type, PDF_FORMAT, format)
+  end
+  if format == 'mcanouil-revealjs' then
+    return { type = doc_type == 'workshop' and 'workshop' or 'deck' }
+  end
+  doc_type = doc_type or M.DEFAULT_TYPE
+  local layouts = M.TYPES[doc_type]
+  if not layouts then
+    return nil, string.format('mcanouil: unknown type "%s"; use %s.', doc_type, table.concat(sorted_keys(M.TYPES), ', '))
+  end
+  local layout = option(options, 'layout') or M.DEFAULT_LAYOUT
+  if not contains(layouts, layout) then
+    return nil, string.format(
+      'mcanouil: unknown layout "%s" for type "%s"; use %s.', layout, doc_type, table.concat(layouts, ', ')
+    )
+  end
+  return { type = doc_type, layout = layout, kind = option(options, 'kind') }
+end
+
+--- Deliver the type and the resolved slots to Typst as `mcanouil-type`,
+--- `mcanouil-layout`, `mcanouil-kind`, `mcanouil-header` and `mcanouil-footer`.
+--- Stops the render, with a message, when the type cannot be rendered.
 --- @param meta table Document metadata
 --- @return table Metadata
 local function deliver(meta)
-  if not quarto.doc.is_format('typst') then
+  local format = quarto.doc.is_format('typst') and FORMAT_NAMES.typst
+    or quarto.doc.is_format('revealjs') and FORMAT_NAMES.revealjs
+    or FORMAT_NAMES.html
+  local resolved, message = M.resolve(meta, format)
+  if not resolved then
+    io.stderr:write(message, '\n')
+    os.exit(1)
+  end
+  if format ~= FORMAT_NAMES.typst then
     return meta
   end
+  meta['mcanouil-type'] = resolved.type
+  meta['mcanouil-layout'] = resolved.layout
+  meta['mcanouil-kind'] = resolved.kind
   local furniture = M.furniture(meta)
   for _, part in ipairs(M.PARTS) do
     local delivered = {}
     for _, slot in ipairs(M.SLOTS) do
-      delivered[slot] = pandoc.MetaInlines(M.resolve(furniture[part][slot], meta))
+      delivered[slot] = pandoc.MetaInlines(M.resolve_slot(furniture[part][slot], meta))
     end
     meta['mcanouil-' .. part] = delivered
   end

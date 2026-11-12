@@ -1,0 +1,19 @@
+---
+title: Compact report
+author: Test Author
+abstract: This abstract opens page 1.
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With no type set, the document is a compact report with no cover.
+        check: bash _checks/types.sh compact
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mcanouil-document\(\s*"report",\s*"compact",\s*none']
+---
+
+{{< include _compact.qmd >}}

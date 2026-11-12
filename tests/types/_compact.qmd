@@ -1,0 +1,7 @@
+# Introduction
+
+A short opening paragraph.
+
+# Study design
+
+A short second paragraph.
