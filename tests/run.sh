@@ -822,7 +822,7 @@ declare -A MOTIF_POINTS=(
 	[gold]="99.5,0.5 99.5,50"
 	[mono]="99.5,0.5 81,0.5 99.5,32 99.5,50"
 	[quarto]="46,0.5 99.5,54"
-	[terminal]="98.7,1.3 98.7,50.3"
+	[terminal]="96,4 96,53"
 )
 
 # Token of the colour that each preset motif uses on a light page; a dark
