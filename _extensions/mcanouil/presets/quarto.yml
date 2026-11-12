@@ -1,0 +1,76 @@
+# mcanouil - quarto preset
+# Colour tokens for the light and dark schemes, fonts and logos of the quarto preset.
+# This file and the other preset files are the only files of the extension with colour values.
+#
+# @license MIT
+# @copyright 2026 Mickaël Canouil
+# @author Mickaël Canouil
+
+light:
+  paper: "#eef4fa"
+  ink: "#1f2a36"
+  muted: "#55626f"
+  tint: "#dde8f3"
+  line: "#cfdbe7"
+  accent: "#47709a"
+  accent-high: "#9cc4ea"
+  accent-low: "#2a4d6e"
+  accent-text: "#406993"
+  link: "#406993"
+  ground-1: "#0f1b2a"
+  ground-2: "#2a4d6e"
+  on-ground-accent: "#cfe3f5"
+  on-ground-text: "#e8edf2"
+  on-ground-title: "#ffffff"
+  chrome: "#365f84"
+  note: "#0066cc"
+  tip: "#009955"
+  warning: "#cc6600"
+  important: "#cc0000"
+  caution: "#a58300"
+  note-text: "#0055b3"
+  tip-text: "#00723f"
+  warning-text: "#964c00"
+  important-text: "#b00000"
+  caution-text: "#7a6300"
+
+dark:
+  paper: "#0f1b2a"
+  ink: "#dbe6f0"
+  muted: "#9fb0c2"
+  tint: "#0a1524"
+  line: "#22344a"
+  accent: "#47709a"
+  accent-high: "#9cc4ea"
+  accent-low: "#2a4d6e"
+  accent-text: "#74aadb"
+  link: "#74aadb"
+  ground-1: "#0f1b2a"
+  ground-2: "#2a4d6e"
+  on-ground-accent: "#cfe3f5"
+  on-ground-text: "#e8edf2"
+  on-ground-title: "#ffffff"
+  chrome: "#365f84"
+  note: "#66aaff"
+  tip: "#66cc99"
+  warning: "#ffaa44"
+  important: "#ff6666"
+  caution: "#ddcc66"
+  note-text: "#66aaff"
+  tip-text: "#66cc99"
+  warning-text: "#ffaa44"
+  important-text: "#ff6666"
+  caution-text: "#ddcc66"
+
+fonts:
+  base: Alegreya Sans
+  headings: Alegreya Sans
+  monospace: Fira Code
+  generic:
+    base: sans-serif
+    headings: sans-serif
+    monospace: monospace
+
+logo:
+  light: logos/logo-light.svg
+  dark: logos/logo-dark.svg

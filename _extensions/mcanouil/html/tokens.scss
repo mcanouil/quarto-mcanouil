@@ -1,0 +1,39 @@
+/*-- scss:defaults --*/
+
+/*-- scss:rules --*/
+
+body {
+  --bs-body-bg: var(--mc-paper);
+  --bs-body-color: var(--mc-ink);
+  --bs-primary: var(--mc-accent);
+  --bs-link-color: var(--mc-link);
+  --bs-link-hover-color: var(--mc-link);
+  --bs-secondary-color: var(--mc-muted);
+  --bs-border-color: var(--mc-line);
+  --bs-body-font-family: var(--mc-font-base);
+  --bs-font-monospace: var(--mc-font-mono);
+  background-color: var(--mc-paper);
+  color: var(--mc-ink);
+  font-family: var(--mc-font-base);
+}
+
+a {
+  color: var(--mc-link);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.title {
+  font-family: var(--mc-font-headings);
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--mc-font-mono);
+}

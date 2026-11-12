@@ -1,0 +1,76 @@
+# mcanouil - gold preset
+# Colour tokens for the light and dark schemes, fonts and logos of the gold preset.
+# This file and the other preset files are the only files of the extension with colour values.
+#
+# @license MIT
+# @copyright 2026 Mickaël Canouil
+# @author Mickaël Canouil
+
+light:
+  paper: "#fafafa"
+  ink: "#111827"
+  muted: "#4b5563"
+  tint: "#f7f4ec"
+  line: "#e3dccb"
+  accent: "#b5830a"
+  accent-high: "#e8c65a"
+  accent-low: "#6b4a05"
+  accent-text: "#876208"
+  link: "#876208"
+  ground-1: "#111827"
+  ground-2: "#3a2a06"
+  on-ground-accent: "#e8c65a"
+  on-ground-text: "#f0dfa8"
+  on-ground-title: "#ffffff"
+  chrome: "#111827"
+  note: "#0066cc"
+  tip: "#009955"
+  warning: "#cc6600"
+  important: "#cc0000"
+  caution: "#a58300"
+  note-text: "#0055b3"
+  tip-text: "#00723f"
+  warning-text: "#964c00"
+  important-text: "#b00000"
+  caution-text: "#7a6300"
+
+dark:
+  paper: "#161616"
+  ink: "#f5f5f4"
+  muted: "#a8adb5"
+  tint: "#1f1a13"
+  line: "#2e2a22"
+  accent: "#b5830a"
+  accent-high: "#e8c65a"
+  accent-low: "#6b4a05"
+  accent-text: "#c9971f"
+  link: "#c9971f"
+  ground-1: "#111827"
+  ground-2: "#3a2a06"
+  on-ground-accent: "#e8c65a"
+  on-ground-text: "#f0dfa8"
+  on-ground-title: "#ffffff"
+  chrome: "#111827"
+  note: "#66aaff"
+  tip: "#66cc99"
+  warning: "#ffaa44"
+  important: "#ff6666"
+  caution: "#ddcc66"
+  note-text: "#66aaff"
+  tip-text: "#66cc99"
+  warning-text: "#ffaa44"
+  important-text: "#ff6666"
+  caution-text: "#ddcc66"
+
+fonts:
+  base: Source Serif 4
+  headings: Source Serif 4
+  monospace: Fira Code
+  generic:
+    base: serif
+    headings: serif
+    monospace: monospace
+
+logo:
+  light: logos/logo-light.svg
+  dark: logos/logo-dark.svg
