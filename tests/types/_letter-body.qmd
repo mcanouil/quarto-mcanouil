@@ -1,0 +1,3 @@
+First paragraph of the letter body, long enough to run over more than one line of the text column so that the layout of the body is visible in the render.
+
+Second paragraph of the letter body.

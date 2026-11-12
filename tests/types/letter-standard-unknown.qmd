@@ -1,0 +1,21 @@
+---
+title: A letter
+extensions:
+  mcanouil:
+    type: letter
+    letter-standard: iso
+format: mcanouil-typst
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: An unknown letter standard stops the render with the values to use.
+        errors: strict
+    mcanouil-typst:
+      shouldError: true
+      printsMessage:
+        level: ERROR
+        regex: 'mcanouil: unknown letter-standard "iso"; use din, nf\.'
+---
+
+A paragraph.

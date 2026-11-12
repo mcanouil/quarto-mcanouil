@@ -34,6 +34,7 @@ M.TYPES = {
   report = { 'compact', 'full' },
   article = { 'standard' },
   memo = { 'standard' },
+  letter = { 'standard' },
 }
 
 --- @type table<string, string[]> The kinds of the types that vary by kind, the default kind first.
@@ -91,6 +92,10 @@ M.DEFAULTS = {
   memo = {
     header = { left = '', centre = '', right = '' },
     footer = { left = 'author', centre = 'version', right = 'page' },
+  },
+  letter = {
+    header = { left = '', centre = '', right = '' },
+    footer = { left = '', centre = '', right = 'page' },
   },
 }
 
@@ -395,6 +400,35 @@ function M.memo_fields(meta, kind)
   return fields
 end
 
+--- @type string[] Letter standards: DIN 5008 form B and NF Z 11-001.
+M.LETTER_STANDARDS = { 'din', 'nf' }
+
+--- @type table<string, string> Letter standard that each document language selects. Other languages select `nf`.
+M.LETTER_STANDARD_BY_LANGUAGE = { de = 'din', fr = 'nf' }
+
+--- @type string Letter standard of the languages that M.LETTER_STANDARD_BY_LANGUAGE does not list.
+M.LETTER_STANDARD_DEFAULT = 'nf'
+
+--- Answer the standard of a letter: `extensions.mcanouil.letter-standard`, else the one of the document
+--- language (`fr` gives `nf`, `de` gives `din`), else `nf`.
+--- @param meta table Document metadata
+--- @return string|nil Standard, `din` or `nf`
+--- @return string|nil Message, when the option names an unknown standard
+function M.letter_standard(meta)
+  local options = meta.extensions and meta.extensions.mcanouil or {}
+  local chosen = option(options, 'letter-standard')
+  if chosen then
+    if not contains(M.LETTER_STANDARDS, chosen) then
+      return nil, string.format(
+        'mcanouil: unknown letter-standard "%s"; use %s.', chosen, table.concat(M.LETTER_STANDARDS, ', ')
+      )
+    end
+    return chosen
+  end
+  local lang = meta.lang and pandoc.utils.stringify(meta.lang):lower():match('^%a+') or ''
+  return M.LETTER_STANDARD_BY_LANGUAGE[lang] or M.LETTER_STANDARD_DEFAULT
+end
+
 --- Set the margin note column of a document type that has one, so Quarto sets up the margin
 --- layout whether or not the document has a margin note.
 --- @param meta table Document metadata
@@ -434,6 +468,13 @@ local function deliver(meta)
       fields:insert({ key = pandoc.MetaString(field.key), value = pandoc.MetaInlines(field.value) })
     end
     meta['mcanouil-memo-fields'] = pandoc.MetaList(fields)
+  end
+  if resolved.type == 'letter' then
+    local standard, standard_message = M.letter_standard(meta)
+    if not standard then
+      fail.stop(standard_message)
+    end
+    meta['mcanouil-letter-standard'] = standard
   end
   local furniture = M.furniture(meta)
   for _, part in ipairs(M.PARTS) do

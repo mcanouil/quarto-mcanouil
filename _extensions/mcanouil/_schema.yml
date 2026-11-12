@@ -14,6 +14,12 @@ options:
     minimum: 1
     default: 2
     description: "Number of heading levels under a chapter that the chapter contents page of a full report lists. 1 lists the sections only, 2 adds the subsections. Set it as `extensions: { mcanouil: { chapter-toc-depth: <n> } }`."
+  letter-standard:
+    type: string
+    enum:
+      - nf
+      - din
+    description: "Standard of a letter: nf follows NF Z 11-001 with the address window on the right, din follows DIN 5008 form B with the address window on the left and a reference block. When it is not set, the language of the document chooses: fr gives nf, de gives din, and any other language gives nf. Set it as `extensions: { mcanouil: { letter-standard: <name> } }`."
   header:
     type: object
     additionalProperties: false

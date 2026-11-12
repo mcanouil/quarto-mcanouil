@@ -20,7 +20,7 @@ $if(subtitle)$
     subtitle: [$subtitle$],
 $endif$
 $if(date)$
-    date: [$date$],
+    date: [#[]$date$],
 $endif$
 $if(mcanouil-authors)$
     authors: mc-authors.authors,
@@ -49,6 +49,56 @@ $if(toc-depth)$
 $endif$
 $if(keywords)$
     keywords: ($for(keywords)$[$it$], $endfor$),
+$endif$
+$if(mcanouil-letter-standard)$
+    letter: (
+      standard: "$mcanouil-letter-standard$",
+      address: ($for(address)$[$it$], $endfor$),
+$if(sender)$
+      sender: (
+$if(sender.name)$
+        name: [$sender.name$],
+$endif$
+        address: ($for(sender.address)$[$it$], $endfor$),
+$if(sender.email)$
+        email: [$sender.email$],
+$endif$
+$if(sender.phone)$
+        phone: [$sender.phone$],
+$endif$
+      ),
+$endif$
+$if(place)$
+      place: [$place$],
+$endif$
+$if(reference)$
+      reference: [$reference$],
+$endif$
+$if(your-reference)$
+      your-reference: [$your-reference$],
+$endif$
+$if(subject)$
+      subject: [$subject$],
+$endif$
+$if(opening)$
+      opening: [$opening$],
+$endif$
+$if(closing)$
+      closing: [$closing$],
+$endif$
+$if(cc)$
+      cc: ($for(cc)$[$it$], $endfor$),
+$endif$
+$if(encl)$
+      encl: ($for(encl)$[$it$], $endfor$),
+$endif$
+$if(ps)$
+      ps: [$ps$],
+$endif$
+$if(signature-image)$
+      signature-image: "$signature-image$",
+$endif$
+    ),
 $endif$
     lang: "$if(lang)$$lang$$else$en$endif$",
     region: "$if(region)$$region$$else$US$endif$",
