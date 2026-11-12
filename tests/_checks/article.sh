@@ -5,6 +5,7 @@ set -euo pipefail
 # Check hook: the article document type, read from the PDF text, the word boxes and the pixels.
 #
 # Usage: article.sh <preset>
+#        article.sh short <preset>
 #
 # Exits 77 for a format other than Typst.
 #
@@ -122,26 +123,37 @@ motif_corner_article() {
 	done
 }
 
-# Succeed when no word that starts above the bottom of the shapes of the corner motif reaches into them.
+# Succeed when no word that starts above the bottom of the shapes of the corner motif, and the gap that the
+# document keeps clear below them, reaches into them.
 # $1 preset.
 clear_of_article_motif() {
-	local width extent name size_pt
+	local width extent name size_pt gap_pt
 	width="$(page_width)"
 	name="$(awk '/^motif:/ { print $2 }' "${ext_dir}/presets/$1.yml")"
 	extent="$(typst_value "${typ}" mc-motif-extent "mc-motif-extent(\"${name}\").values().map(str).join(\" \")" | tr -d '"')"
 	size_pt="$(typst_value "${typ}" mc-article-motif-size 'mc-article-motif-size.pt()')"
-	[ -n "${width}" ] && [ -n "${extent}" ] && [ -n "${size_pt}" ] &&
-		page_words 1 | awk -v width="${width}" -v extent="${extent}" -v size="${size_pt}" '
+	gap_pt="$(typst_value "${typ}" mc-motif-gap 'mc-motif-gap.pt()')"
+	[ -n "${width}" ] && [ -n "${extent}" ] && [ -n "${size_pt}" ] && [ -n "${gap_pt}" ] &&
+		page_words 1 | awk -v width="${width}" -v extent="${extent}" -v size="${size_pt}" -v gap="${gap_pt}" '
 			BEGIN {
 				split(extent, e, " ")
 				left = width - (100 - e[1]) / 100 * size
-				bottom = e[2] / 100 * size
+				bottom = e[2] / 100 * size + gap
 			}
 			$2 < bottom && $3 > left { bad = 1 }
 			END { exit bad }'
 }
 
+# Succeed when the margin note is on page 1, and it does not reach into the shapes of the corner motif.
+# $1 preset.
+short_note_clear() {
+	[ "$(page_of_word Titlenote)" = 1 ] && clear_of_article_motif "$1"
+}
+
 case "${1:-}" in
+short)
+	expect "article-note-clear-of-motif" "the margin note on page 1 below the shapes of the ${2:?short needs a preset} motif" short_note_clear "$2"
+	;;
 gold | mono | quarto | terminal)
 	find_verapdf
 	expect "article-title-block" "the title, the authors, the abstract, the keywords and the first heading on page 1" title_block

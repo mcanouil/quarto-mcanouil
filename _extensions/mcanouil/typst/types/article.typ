@@ -8,9 +8,22 @@
 // @copyright 2026 Mickaël Canouil
 // @author Mickaël Canouil
 
-// Side of the corner motif on page 1 of an article. It stays inside the outer
-// margin, so the text column never meets it.
+// Side of the corner motif on page 1 of an article. It is narrower than the
+// outer margin (58 mm with its gap to the text and to the page edge), so the
+// text column never meets it; only a margin note can, see motif-keep-out().
 #let mc-article-motif-size = 52mm
+
+// Answer a reservation in the margin column of page 1: an invisible note, at the
+// top of the text area, as tall as the shapes of the corner motif and their gap.
+// Margin notes shift down to keep clear of it, so no note sits on the motif.
+// - motif-name: motif name, or none.
+#let motif-keep-out(motif-name) = {
+  if motif-name == none { return }
+  let height = mc-article-motif-size * mc-motif-extent(motif-name).bottom / 100 + mc-motif-gap - mc-page-margin.top
+  if height > 0pt {
+    marginalia.note(counter: none, alignment: "top", shift: false, keep-order: true, pdf.artifact(block(height: height)))
+  }
+}
 
 // Marks of the degrees of contribution, and the mark of a role with no degree.
 #let mc-credit-marks = (lead: "L", equal: "E", supporting: "S")
@@ -61,6 +74,7 @@
     text(weight: "bold", mc-labels.at("mcanouil-credit-title"))
     v(0.4em)
     set text(size: 0.9em)
+    // Typst 0.15.1 cannot tag the first column as row headers (table.cell has no kind), so only the author columns are header cells.
     table(
       columns: (1fr,) + authors.map(_ => auto),
       stroke: (x: none, y: 0.5pt + colours.line),
@@ -90,6 +104,7 @@
   set heading(numbering: "1.1")
   set footnote.entry(separator: none)
   show: chrome-page.with(meta.header, meta.footer, motif: corner, margin: none)
+  motif-keep-out(motif-name)
   title-block(
     title: meta.at("title", default: none),
     subtitle: meta.at("subtitle", default: none),
