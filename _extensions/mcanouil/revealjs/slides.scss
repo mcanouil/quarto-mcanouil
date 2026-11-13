@@ -148,18 +148,35 @@ $mc-motif-section: 70% !default;
   color: var(--mc-on-ground-text);
 }
 
-// Section slides: the number above the middle line, the title below it, both
-// left of the motif.
-.reveal .slides section.mc-section > h1,
-.reveal .slides section.mc-section > .mc-section-number {
-  position: absolute;
-  left: var(--mc-slide-pad);
-  max-width: 48%;
+// Section slides: a grid reads the number, the title with its rule, then the
+// body, in this order. The number ends on the middle line and the title starts
+// on it, both left of the motif; the body follows the title. Reveal.js sets the
+// display of the current slide in a style attribute, so the grid needs
+// !important.
+.reveal .slides section.mc-section {
+  display: grid !important;
+  grid-template-rows: 50% auto;
+  grid-template-columns: minmax(0, 50%);
+  align-content: start;
+}
+
+.reveal .slides section.mc-section > :not(.mc-motif) {
+  grid-column: 1;
   margin: 0;
 }
 
+.reveal .slides section.mc-section > :not(.mc-motif, h1, .mc-section-number) {
+  margin-top: 0.8em;
+  font-size: 0.75em;
+}
+
+.reveal .slides section.mc-section > .mc-section-number {
+  grid-row: 1;
+  align-self: end;
+}
+
 .reveal .slides section.mc-section > h1 {
-  top: 50%;
+  grid-row: 2;
   font-size: 1.9em;
   line-height: 1.15;
 }
@@ -169,7 +186,6 @@ $mc-motif-section: 70% !default;
 }
 
 .reveal .slides section.mc-section > .mc-section-number {
-  bottom: 50%;
   font-family: var(--mc-font-headings);
   font-size: 5.5em;
   font-weight: 700;

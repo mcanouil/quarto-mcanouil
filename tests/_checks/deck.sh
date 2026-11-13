@@ -301,6 +301,31 @@ text_clear_of_motif() {
 		' <<<"${boxes}"
 }
 
+# Succeed when a section slide reads number, title with its rule, then the
+# body, from the top: the number ends above the title, the body starts below
+# the title and its rule, and ends above the footer band. A slide with no body
+# fails.
+# $1 slide id.
+section_body_after_title() {
+	local boxes
+	boxes="$(awk -v id="$1" '$1 == id' <<<"${probe_lines}")"
+	grep -q ' body ' <<<"${boxes}" &&
+		awk '
+			$2 == "slide" { height = $6 - $4 }
+			$2 == "number" { number_bottom = $6 }
+			$2 == "title" { title_top = $4; title_bottom = $6 }
+			$2 == "body" { n++; top[n] = $4; bottom[n] = $6 }
+			END {
+				if (number_bottom > title_top) { print "# number ends below the title top"; bad = 1 }
+				for (i = 1; i <= n; i++) {
+					if (top[i] < title_bottom) { print "# body starts above the title rule: " top[i] " < " title_bottom; bad = 1 }
+					if (bottom[i] > height - 56) { print "# body reaches the footer: " bottom[i]; bad = 1 }
+				}
+				exit bad
+			}
+		' <<<"${boxes}"
+}
+
 # Answer the colour readings that the deck fixture must give for a preset, one
 # "<slide> <name>" per line: the kicker, the section number, the quote label or
 # icon of the preset, the attribution, the footer slots, the slide number and
@@ -371,6 +396,7 @@ gold | mono | quarto | terminal)
 	expect "deck-axe-light-${1}" "no axe-core violation in the ${1} deck" axe_clean
 	find_browser
 	probe_lines="$(probe_slides title-slide brand-presets why-presets checks one-rule why-presets-after-dark mc-closing)"
+	expect "deck-section-body-order-${1}" "section slide body below the number, the title and its rule" section_body_after_title checks
 	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
 	;;
 long-title)

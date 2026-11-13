@@ -4,6 +4,9 @@
  * writes one line per measure into a pre element with the id mc-probe:
  * - "<slide> shape x0 y0 x1 y1": the box of a motif shape, in slide pixels.
  * - "<slide> text x0 y0 x1 y1": a line box of text, or an image, in slide pixels.
+ * - "<slide> slide|number|title|body x0 y0 x1 y1": on a section slide, the box
+ *   of the slide, of the number, of the title with its rule, and of each other
+ *   child that is not the motif, in slide pixels.
  * - "<slide> colour <name> <ratio> <threshold>": the lowest contrast ratio of
  *   an element on its effective background, and the ratio it needs. A name
  *   that ends in "-ring" is the focus ring of a control, read with the control
@@ -162,6 +165,14 @@
       });
     }
     section.querySelectorAll("img").forEach(function (image) { add("text", image.getBoundingClientRect()); });
+    if (section.classList.contains("mc-section")) {
+      add("slide", section.getBoundingClientRect());
+      Array.prototype.forEach.call(section.children, function (child) {
+        if (child.classList.contains("mc-motif")) { return; }
+        var role = child.classList.contains("mc-section-number") ? "number" : child.tagName === "H1" ? "title" : "body";
+        add(role, child.getBoundingClientRect());
+      });
+    }
   }
 
   // Focus a control as a keyboard user would, and read its focus ring.
