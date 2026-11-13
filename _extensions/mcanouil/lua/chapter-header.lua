@@ -73,21 +73,35 @@ local function inline_html(inlines)
   return (pandoc.write(pandoc.Pandoc({ pandoc.Plain(inlines) }), 'html'):gsub('%s+$', ''))
 end
 
---- Answer the list of the sections of a chapter.
+--- Escape text for an HTML attribute value.
+--- @param text string
+--- @return string
+local function attribute(text)
+  return (text:gsub('&', '&amp;'):gsub('"', '&quot;'):gsub('<', '&lt;'):gsub('>', '&gt;'))
+end
+
+--- Answer the list of the sections of a chapter, or nil when it has none.
+--- In a book page the list is named by its title alone; after a chapter
+--- heading of a single document, by its title and the chapter number and
+--- title, so that each list has its own name.
 --- @param entries table[] Entries from `M.entries`
 --- @param label string Title of the list
 --- @param id string Identifier of the title
---- @param chapter_id string|nil Identifier of the chapter heading, which names the list with the title
---- @return string HTML
-function M.html(entries, label, id, chapter_id)
+--- @param chapter_name string|nil Number and title of the chapter, as text
+--- @return string|nil HTML
+function M.html(entries, label, id, chapter_name)
+  if #entries == 0 then
+    return nil
+  end
   local items = {}
   for _, entry in ipairs(entries) do
     items[#items + 1] = string.format('<li class="mc-chapter-contents-level-%d"><a href="#%s">%s</a></li>',
       entry.level, entry.id, inline_html(entry.content))
   end
-  local labelled = chapter_id and (id .. ' ' .. chapter_id) or id
+  local name = chapter_name and string.format('aria-label="%s"', attribute(label .. ', ' .. chapter_name))
+    or string.format('aria-labelledby="%s"', id)
   return table.concat({
-    string.format('<nav class="mc-chapter-contents" aria-labelledby="%s">', labelled),
+    string.format('<nav class="mc-chapter-contents" %s>', name),
     string.format('<p class="mc-chapter-contents-title" id="%s">%s</p>', id, label),
     '<ol>', table.concat(items), '</ol>',
     '</nav>',
@@ -105,9 +119,9 @@ function M.insert(blocks, label, depth)
   for index, block in ipairs(blocks) do
     result:insert(block)
     if sections.opens_chapter(block) and number_of(block) ~= nil then
-      local entries = M.entries(blocks, index + 1, 1, depth)
-      if #entries > 0 then
-        local html = M.html(entries, label, 'mc-chapter-contents-' .. block.identifier, block.identifier)
+      local html = M.html(M.entries(blocks, index + 1, 1, depth), label,
+        'mc-chapter-contents-' .. block.identifier, pandoc.utils.stringify(block.content))
+      if html ~= nil then
         result:insert(pandoc.RawBlock('html', html))
       end
     end
@@ -157,10 +171,10 @@ local function chapter_headers(doc)
   if kind == nil then
     return doc
   end
-  local entries = M.entries(doc.blocks, 1, 1, depth)
-  meta['mcanouil-chapter-contents'] = pandoc.MetaBlocks({
-    pandoc.RawBlock('html', M.html(entries, label, 'mc-chapter-contents')),
-  })
+  local html = M.html(M.entries(doc.blocks, 1, 1, depth), label, 'mc-chapter-contents')
+  if html ~= nil then
+    meta['mcanouil-chapter-contents'] = pandoc.MetaBlocks({ pandoc.RawBlock('html', html) })
+  end
   meta['mcanouil-kicker'] = pandoc.MetaInlines({ pandoc.Str(labels.get(M.KICKERS[kind])) })
   doc.meta = meta
   return doc

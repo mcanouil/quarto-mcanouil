@@ -36,8 +36,10 @@ end
 
 cases['chapter-header-nav-html'] = function()
   local entries = chapter_header.entries(sample(), 4, 1, 2)
-  local html = chapter_header.html(entries, 'In this chapter', 'mc-chapter-contents-design', 'design')
-  assert_equal(html:find('<nav class="mc-chapter-contents" aria-labelledby="mc-chapter-contents-design design">', 1, true) ~= nil, true, 'nav labelled by its title and the chapter heading: ' .. html)
+  local html = chapter_header.html(entries, 'In this chapter', 'mc-chapter-contents-design', '1 Design & "plan"')
+  assert_equal(html:find('<nav class="mc-chapter-contents" aria-label="In this chapter, 1 Design &amp; &quot;plan&quot;">', 1, true) ~= nil, true, 'nav named by its title and the chapter number and title: ' .. html)
+  local book = chapter_header.html(entries, 'In this chapter', 'mc-chapter-contents')
+  assert_equal(book:find('<nav class="mc-chapter-contents" aria-labelledby="mc-chapter-contents">', 1, true) ~= nil, true, 'book page nav named by its title: ' .. book)
   assert_equal(html:find('<p class="mc-chapter-contents-title" id="mc-chapter-contents-design">In this chapter</p>', 1, true) ~= nil, true, 'title')
   assert_equal(html:find('<li class="mc-chapter-contents-level-1"><a href="#objectives"><span class="header-section-number">1.1</span> Objectives</a></li>', 1, true) ~= nil, true, 'entry with its number: ' .. html)
   assert_equal(html:find('mc-chapter-contents-level-2"><a href="#secondary"', 1, true) ~= nil, true, 'nested entry')
@@ -47,12 +49,17 @@ cases['chapter-header-insert-after-chapters'] = function()
   local blocks = chapter_header.insert(sample(), 'In this chapter', 2)
   assert_equal(blocks[4].t, 'RawBlock', 'nav after the first numbered chapter')
   assert_equal(blocks[4].text:find('href="#plan"', 1, true) ~= nil, true, 'chapter 1 list')
+  assert_equal(blocks[4].text:find('aria-label="In this chapter, 1 Design"', 1, true) ~= nil, true, 'chapter 1 name: ' .. blocks[4].text)
   assert_equal(blocks[2].t, 'Para', 'no nav after an unnumbered heading')
   local count = 0
   for _, block in ipairs(blocks) do
     if block.t == 'RawBlock' then count = count + 1 end
   end
   assert_equal(count, 2, 'one nav for each numbered chapter')
+end
+
+cases['chapter-header-empty-list'] = function()
+  assert_equal(chapter_header.html({}, 'In this chapter', 'mc-chapter-contents'), nil, 'no list without sections')
 end
 
 cases['chapter-header-page-kind'] = function()

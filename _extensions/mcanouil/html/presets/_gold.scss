@@ -121,13 +121,19 @@ $mc-gold-radius: 5px !default;
     content: "";
     position: absolute;
     top: 0;
-    right: 0;
+    inset-inline-end: 0;
     width: 2.5rem;
     height: 2.5rem;
     background-image: linear-gradient(135deg, var(--mc-accent-high), var(--mc-accent));
     clip-path: polygon(38% 0, 100% 0, 100% 62%);
     opacity: 0.28;
     pointer-events: none;
+  }
+
+  // In a right-to-left page the facets sit in the other corner.
+  nav#TOC:dir(rtl)::before {
+    background-image: linear-gradient(225deg, var(--mc-accent-high), var(--mc-accent));
+    clip-path: polygon(0 0, 62% 0, 0 62%);
   }
 
   #TOC > #toc-title {
@@ -177,6 +183,11 @@ $mc-gold-radius: 5px !default;
     background-image: linear-gradient(135deg, var(--mc-accent-high), var(--mc-accent));
     clip-path: polygon(0 0, 100% 0, 100% 100%);
     opacity: 0.85;
+  }
+
+  #TOC a.nav-link.active:dir(rtl)::after {
+    background-image: linear-gradient(225deg, var(--mc-accent-high), var(--mc-accent));
+    clip-path: polygon(0 0, 100% 0, 0 100%);
   }
 
   #quarto-sidebar.sidebar-navigation:not(.rollup) {

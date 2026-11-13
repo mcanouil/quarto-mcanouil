@@ -256,6 +256,11 @@ $mc-terminal-radius: 0px !default;
     color: var(--mc-muted);
   }
 
+  // In a right-to-left page the branch points the other way.
+  #quarto-sidebar .sidebar-section a.sidebar-link:not(.active):dir(rtl)::before {
+    content: "\2524\2500  " / "";
+  }
+
   #quarto-sidebar .sidebar-item-toggle .bi-chevron-right::before {
     content: "[+]" / "";
     font-family: var(--mc-font-mono);

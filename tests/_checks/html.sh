@@ -301,7 +301,8 @@ open(frame, "w", encoding="utf-8").write(f"""<!DOCTYPE html><html><body style="m
 PY
 	dump="$("${browser}" --headless=new --disable-gpu --no-first-run --hide-scrollbars \
 		"--blink-settings=preferredColorScheme=$([ "${scheme}" = dark ] && echo 0 || echo 1)" \
-		--window-size=1600,1000 --virtual-time-budget=8000 --dump-dom "file://${frame}" 2>/dev/null || true)"
+		--window-size=1600,1000 --virtual-time-budget=8000 --run-all-compositor-stages-before-draw \
+		--dump-dom "file://${frame}" 2>/dev/null || true)"
 	if [ -f "${page}.copies" ]; then
 		while IFS= read -r copy; do rm -f "${copy}"; done <"${page}.copies"
 	fi
@@ -380,16 +381,17 @@ axe_clean() {
 	return "${status}"
 }
 
-# Report a check that waits for an upstream fix as a TAP TODO: it does not
-# fail the hook, and it reports a pass once Quarto fixes the defect.
+# Report a check that waits for an upstream fix as a TAP TODO, which does
+# not fail the hook. Once Quarto fixes the defect the check passes, and it
+# then fails the hook, so the TODO is removed and the check kept.
 # $1 name. $2 upstream issue. The rest is the command.
 expect_todo() {
 	local name="$1" issue="$2"
 	shift 2
-	tap_n=$((tap_n + 1))
 	if "$@"; then
-		printf 'ok %d - %s # TODO %s, fixed upstream: remove the TODO\n' "${tap_n}" "${name}" "${issue}"
+		tap_not_ok "${name}" "a failure until ${issue} is fixed; it passes now, so remove the TODO (fixed upstream)"
 	else
+		tap_n=$((tap_n + 1))
 		printf 'not ok %d - %s # TODO %s\n' "${tap_n}" "${name}" "${issue}"
 	fi
 }
@@ -688,6 +690,25 @@ toc_levels() {
 		'[(e["depth"], e["indent"], e["text"][:16]) for e in m["toc"]["entries"]]'
 }
 
+# Succeed when each absolute decoration of the contents sits on the other
+# side in a right-to-left page, and its clip path, when it has one, changes.
+# $1 measures of the left-to-right page. $2 measures of the right-to-left page.
+mirrored() {
+	python3 -I -c '
+import json, sys
+ltr = json.loads(sys.argv[1])["toc"]["decorations"]
+rtl = json.loads(sys.argv[2])["toc"]["decorations"]
+problems = []
+for name, a in ltr.items():
+    b = rtl.get(name)
+    end = lambda d: float(d["right"].rstrip("px")) < float(d["left"].rstrip("px"))
+    if not b or end(a) == end(b) or (a["clip"] != "none" and a["clip"] == b["clip"]):
+        problems.append("%s: %s, then %s" % (name, a, b))
+for p in problems: print("# " + p)
+sys.exit(1 if problems else 0)
+' "$1" "$2"
+}
+
 # The Python test of a current entry or page that is told from the others by
 # more than colour.
 NON_COLOUR_CUE='{"weight", "decoration", "shadow", "outline", "border", "before", "after"}'
@@ -705,7 +726,7 @@ pill_tokens() {
 # left, and the pill and sheet of narrow screens.
 # $1 preset.
 check_toc() {
-	local preset="$1" light_css scheme expected measures
+	local preset="$1" light_css scheme expected measures ltr
 	structure="$(structure_report)"
 	light_css="$(linked_css quarto-bootstrap 0)"
 	expect "html-toc-nav-label-${preset}" "a labelled nav for the contents" structure_ok landmark-nav
@@ -746,12 +767,20 @@ check_toc() {
 	expect "html-toc-print-hidden-${preset}" "no contents in print" measured "${measures}" '"none" in m["toc"]["printDisplay"]' 'm["toc"]["printDisplay"]'
 	measures="$(measure 1440 900 reduced nav)"
 	expect "html-toc-reduced-motion-${preset}" "no transition under reduced motion" measured "${measures}" 'not any(m["toc"]["motion"])' 'm["toc"]["motion"]'
+	ltr="$(measure 1440 900 "" nav)"
 	measures="$(measure 1440 900 rtl nav)"
 	expect "html-toc-rtl-${preset}" "indents from the right edge in a right-to-left page" toc_levels "${measures}"
+	expect "html-toc-rtl-decoration-${preset}" "decorations of the contents on the mirrored side in a right-to-left page" \
+		mirrored "${ltr}" "${measures}"
 
+	measures="$(measure 1440 900 overlap nav)"
+	expect_todo "html-toc-overlap-button-${preset}" "quarto-cli#14969" \
+		measured "${measures}" 'm.get("overlap") and m["overlap"]["button"] and m["overlap"]["expanded"] in ("true", "false") and m["overlap"]["controls"] and m["overlap"]["closedInert"] and m["overlap"]["originalOut"]' 'm.get("overlap")'
 	measures="$(measure 360 640 "" nav)"
 	expect "html-toc-pill-${preset}" "one pill of 44 pixels or more on a narrow screen" \
 		measured "${measures}" 'm.get("pill") and m["pill"]["height"] >= 44 and len(m["pills"]) == 1' '(m.get("pill"), m["pills"])'
+	expect_todo "html-toc-pill-current-section-${preset}" "mobile-toc: the pill shows the current section (spec 9.1)" \
+		measured "${measures}" 'm.get("pill") and m["toc"]["current"] and m["toc"]["current"]["text"].split(" ", 1)[-1][:12] in m["pill"]["label"]' '(m.get("pill"), m["toc"]["current"])'
 	expected=light
 	[ "${preset}" = terminal ] && expected=dark
 	expect "html-toc-pill-tokens-${preset}" "the pill on the card or paper token, text at 4.5:1" pill_tokens "${measures}" "${preset}" "${expected}"
@@ -767,7 +796,7 @@ check_toc() {
 # kicker, and the "In this chapter" list with one link for each section.
 # $1 measures, as JSON. $2 kicker. $3 Python list of the expected link texts.
 chapter_header() {
-	measured "$1" "m.get('chapter') and m['chapter']['label'] == 'In this chapter' and m['chapter']['kicker'] == '$2' and m['chapter']['links'] == $3 and all(c['ratio'] >= 4.5 for c in m['chapter']['colours'])" 'm.get("chapter")'
+	measured "$1" "m.get('chapter') and m['chapter']['label'] == 'In this chapter' and m['chapterNames'] == ['In this chapter'] and m['chapter']['kicker'] == '$2' and m['chapter']['links'] == $3 and all(c['ratio'] >= 4.5 for c in m['chapter']['colours'])" '(m.get("chapterNames"), m.get("chapter"))'
 }
 
 # Check the HTML render of the test book: the sidebar in every state of the
@@ -838,8 +867,10 @@ check_full() {
 		exit 1
 	fi
 	measures="$(measure 1440 900 "" nav)"
-	expect "html-full-chapter-header" "an In this chapter list after each chapter heading, one link for each section" \
+	expect "html-full-chapter-header" "a chapter list after each chapter heading, one link for each section" \
 		measured "${measures}" 'm.get("chapters") == [["1.1 Objectives", "1.1.1 Secondary objectives", "1.2 Design"], ["2.1 Primary outcome", "2.2 Safety"]] and all(c["ratio"] >= 4.5 for c in m["chapter"]["colours"])' '(m.get("chapters"), m.get("chapter"))'
+	expect "html-full-chapter-header-name" "each list named by its title and its chapter, not by the chapter text" \
+		measured "${measures}" 'm.get("chapterNames") == ["In this chapter, 1 Study design", "In this chapter, 2 Results"]' 'm.get("chapterNames")'
 	expect "html-axe-full" "no axe-core finding in light and dark, at 1440 and 320 pixels" axe_clean
 }
 

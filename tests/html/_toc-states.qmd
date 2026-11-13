@@ -112,6 +112,10 @@ The analysis of the serious adverse events follows the plan.
 
 The section describes the discussion of the study.
 
+::: {.column-margin}
+A margin note sits where the contents is, so Quarto swaps the contents for its toggle while the note is on screen.
+:::
+
 ### Strengths
 
 The analysis of the strengths follows the plan.

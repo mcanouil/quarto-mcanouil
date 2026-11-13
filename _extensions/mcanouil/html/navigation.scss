@@ -290,6 +290,16 @@ nav.quarto-secondary-nav,
   background: var(--mc-paper);
 }
 
+// Margin content, which shares the side column with the contents: Quarto
+// computes its colour from the Sass body colour.
+.column-margin figcaption,
+.margin-caption,
+div.aside,
+aside,
+.column-margin {
+  color: var(--mc-muted);
+}
+
 .quarto-sidebar-toggle-title {
   color: var(--mc-ink);
   font-weight: 700;

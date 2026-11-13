@@ -100,4 +100,39 @@ cases['focus-ring-contrast'] = function()
   end
 end
 
+--- Mix two hex colours as CSS `color-mix(in srgb, a p%, b)` does.
+local function mix(a, b, share)
+  local out = {}
+  for i = 0, 2 do
+    local x = tonumber(a:sub(2 + 2 * i, 3 + 2 * i), 16)
+    local y = tonumber(b:sub(2 + 2 * i, 3 + 2 * i), 16)
+    out[#out + 1] = string.format('%02x', math.floor(x * share + y * (1 - share) + 0.5))
+  end
+  return '#' .. table.concat(out)
+end
+
+cases['focus-ring-contrast-mixed-surfaces'] = function()
+  local preset = require('preset')
+  for _, name in ipairs(preset.PRESETS) do
+    local data = preset.read(name)
+    for _, mode in ipairs({ 'light', 'dark' }) do
+      local t = data[mode]
+      local surfaces = {}
+      for _, semantic in ipairs({ 'note', 'tip', 'warning', 'important', 'caution' }) do
+        surfaces[semantic .. ' callout tint'] = mix(t[semantic], t.paper, 0.07)
+      end
+      if name == 'gold' then
+        surfaces['current contents entry'] = mix(t.accent, t.card, 0.16)
+        surfaces['current sidebar page'] = mix(t.accent, t.paper, 0.16)
+      end
+      for surface, colour in pairs(surfaces) do
+        local ratio = math_lib.ratio(t.link, colour)
+        if ratio < 3 then
+          error(string.format('%s %s: focus ring link on the %s (%s) is %.2f, below 3:1', name, mode, surface, colour, ratio))
+        end
+      end
+    end
+  end
+end
+
 return cases
