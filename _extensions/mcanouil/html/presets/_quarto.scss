@@ -137,3 +137,35 @@ $mc-quarto-radius: 9px !default;
     color: var(--mc-accent-text);
   }
 }
+
+// Contents and sidebar with the current item as a pill on the tint.
+@include mc-preset(quarto) {
+  #TOC a.nav-link {
+    padding-block: 0.2rem;
+    border-radius: 999px;
+  }
+
+  #TOC a.nav-link.active,
+  #quarto-sidebar a.sidebar-link.active {
+    background-color: var(--mc-tint);
+    box-shadow: inset 0 0 0 1px var(--mc-line);
+  }
+
+  #quarto-sidebar a.sidebar-link {
+    border-radius: 999px;
+  }
+
+  #quarto-sidebar .sidebar-item-section > .sidebar-item-container > .sidebar-item-toggle {
+    color: var(--mc-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .mc-chapter-contents {
+    border-inline-start: 0;
+    border-radius: 12px;
+    background-color: var(--mc-card);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--mc-ink) 12%, transparent), 0 4px 12px color-mix(in srgb, var(--mc-ink) 8%, transparent);
+  }
+}

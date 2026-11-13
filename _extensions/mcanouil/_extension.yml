@@ -45,6 +45,7 @@ contributes:
           - html/base.scss
           - html/motifs.scss
           - html/components.scss
+          - html/navigation.scss
           - html/presets/_gold.scss
           - html/presets/_mono.scss
           - html/presets/_quarto.scss
@@ -55,6 +56,7 @@ contributes:
           - html/base.scss
           - html/motifs.scss
           - html/components.scss
+          - html/navigation.scss
           - html/presets/_gold.scss
           - html/presets/_mono.scss
           - html/presets/_quarto.scss

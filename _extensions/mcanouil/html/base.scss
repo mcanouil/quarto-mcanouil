@@ -10,8 +10,15 @@ $mc-title-measure: 50rem !default;
 $mc-toggle-room: 2.75rem !default;
 
 // Quarto colours the current contents entry with $toc-color, behind an
-// !important. Only these rules read it, so it can hold the link token.
-$toc-color: var(--mc-link) !default;
+// !important. Only these rules read it, so it holds a custom property that
+// html/navigation.scss sets to the ink and the presets may change.
+$toc-color: var(--mc-toc-current, var(--mc-link)) !default;
+
+// Quarto draws one focus ring on every focusable element: an outline in the
+// outer colour and a ring of the inner colour in the offset. Both come from
+// the tokens, so the ring is in the link colour on every surface.
+$focus-ring-outer-color: var(--mc-link) !default;
+$focus-ring-inner-color: var(--mc-paper) !default;
 
 /*-- scss:rules --*/
 

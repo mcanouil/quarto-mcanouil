@@ -77,4 +77,27 @@ cases['contrast-terminal-decoration-large-text'] = function()
   assert_equal(found.only, 'terminal', 'terminal only')
 end
 
+cases['focus-ring-contrast'] = function()
+  local preset = require('preset')
+  local seen = {}
+  for _, pair in ipairs(contrast.PAIRS) do
+    seen[string.format('%s on %s %g', pair.fg_token, pair.bg_token, pair.threshold)] = true
+  end
+  for _, surface in ipairs({ 'paper', 'tint', 'card' }) do
+    assert_equal(seen['link on ' .. surface .. ' 3'] or seen['link on ' .. surface .. ' 4.5'], true, 'focus ring pair link on ' .. surface)
+  end
+  assert_equal(seen['muted on card 4.5'], true, 'contents text pair muted on card')
+  for _, name in ipairs(preset.PRESETS) do
+    local data = preset.read(name)
+    for _, mode in ipairs({ 'light', 'dark' }) do
+      for _, surface in ipairs({ 'paper', 'tint', 'card' }) do
+        local ratio = math_lib.ratio(data[mode].link, data[mode][surface])
+        if ratio < 3 then
+          error(string.format('%s %s: focus ring link on %s is %.2f, below 3:1', name, mode, surface, ratio))
+        end
+      end
+    end
+  end
+end
+
 return cases

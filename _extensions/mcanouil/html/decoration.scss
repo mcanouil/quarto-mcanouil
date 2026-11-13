@@ -24,8 +24,20 @@
   .panel-tabset .nav-tabs .nav-link.active::after,
   figure.mc-quote::before,
   figure.mc-quote::after,
-  figure.mc-quote .mc-quote-attribution::before {
+  figure.mc-quote .mc-quote-attribution::before,
+  nav#TOC::before,
+  #TOC > #toc-title::after,
+  #TOC a.nav-link.active::after,
+  #quarto-sidebar .sidebar-title::after {
     display: none;
+  }
+
+  // The current contents entry and the current page keep a mark that is not
+  // colour: an outline in the text colour.
+  #TOC a.nav-link.active,
+  #quarto-sidebar a.sidebar-link.active {
+    outline: 2px solid CanvasText;
+    outline-offset: -2px;
   }
 
   // Without its decoration, the active tab keeps a mark that is not colour.
@@ -47,7 +59,12 @@
 @media (prefers-reduced-motion: reduce) {
   #title-block-header > .mc-motif,
   .mc-title-rule,
-  .mc-title-block .title::after {
+  .mc-title-block .title::after,
+  #TOC a.nav-link,
+  #quarto-sidebar,
+  #quarto-sidebar-glass,
+  #quarto-sidebar .sidebar-item-toggle .bi::before,
+  .quarto-sidebar-toggle-contents {
     animation: none;
     transition: none;
   }

@@ -106,6 +106,12 @@ local function deliver(meta)
       .. M.motif_mask(pandoc.utils.stringify(meta['mcanouil-motif'])) .. '; }</style>')
   end
   meta['mcanouil-kicker'] = kicker(meta)
+  -- A book or a website page has Quarto's header as its banner landmark, so
+  -- the title block is not a second banner: its text is a region named by
+  -- the title.
+  if meta.book ~= nil or meta.website ~= nil then
+    meta['mcanouil-site'] = true
+  end
   local collected = authors.collect(meta)
   if collected ~= nil then
     meta['mcanouil-authors-html'] = pandoc.MetaBlocks({ pandoc.RawBlock('html', authors.html(collected, labels.get)) })

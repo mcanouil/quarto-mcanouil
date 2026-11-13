@@ -1,0 +1,380 @@
+/*-- scss:defaults --*/
+
+// Quarto draws a left edge in this colour on the current contents entry. The
+// presets draw their own mark, so the edge is transparent.
+$toc-active-border: transparent !default;
+
+/*-- scss:rules --*/
+
+// Contents (nav#TOC) and sidebar (#quarto-sidebar) of every preset. Quarto
+// writes the markup and its scripts; these rules only style it. The id in the
+// selectors outranks Quarto's own rules, so no rule needs !important. Indents
+// and edges use logical properties, so a right-to-left page mirrors them.
+
+body {
+  // The current contents entry and the hover colour: Quarto reads
+  // $toc-color behind an !important, and $toc-color is this property.
+  --mc-toc-current: var(--mc-ink);
+  // The narrow-screen pill and sheet of mobile-toc take their colours from
+  // these properties.
+  --mobile-toc-bg: var(--mc-card);
+  --mobile-toc-fg: var(--mc-ink);
+  --mobile-toc-muted: var(--mc-muted);
+  --mobile-toc-accent: var(--mc-link);
+  --mobile-toc-edge: var(--mc-line);
+  --mobile-toc-active-bg: var(--mc-tint);
+  --mobile-toc-radius: max(var(--mc-radius), 0.75rem);
+  --mobile-toc-shadow: 0 4px 14px color-mix(in srgb, var(--mc-ink) 18%, transparent);
+  --mobile-toc-sheet-shadow: 0 -8px 24px color-mix(in srgb, var(--mc-ink) 20%, transparent);
+  --mobile-toc-backdrop: color-mix(in srgb, var(--mc-ink) 35%, transparent);
+}
+
+// Anchors and focused elements stay clear of the fixed header of a book or
+// a website, and of the contents pill at the bottom of a narrow screen.
+:root:has(#quarto-header.fixed-top) {
+  scroll-padding-top: 4.5rem;
+}
+
+@media (max-width: 767.98px) {
+  :root:has(.mobile-toc-pill) {
+    scroll-padding-bottom: calc(44px + 2rem + env(safe-area-inset-bottom));
+  }
+}
+
+// Contents.
+#quarto-margin-sidebar {
+  font-family: var(--mc-font-ui);
+}
+
+#TOC > #toc-title,
+#TOC .quarto-other-links > h2,
+#quarto-margin-sidebar .toc-actions > h2 {
+  margin-bottom: 0.5rem;
+  color: var(--mc-muted);
+  font-family: var(--mc-font-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+#TOC > ul {
+  margin-inline-start: 0;
+  padding-inline-start: 0;
+}
+
+#TOC ul {
+  padding-left: 0;
+  padding-inline-start: 0;
+}
+
+#TOC a.nav-link {
+  padding-left: 0;
+  padding-inline: 0.5rem;
+  border-left: 0;
+  color: var(--mc-muted);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+// A numbered entry hangs its title after the number, so a long title wraps
+// under itself and not under the number.
+#TOC a.nav-link:has(> .header-section-number) {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 0.35em;
+}
+
+#TOC ul ul a.nav-link {
+  padding-inline-start: 1.25rem;
+}
+
+#TOC ul ul ul a.nav-link {
+  padding-inline-start: 2rem;
+}
+
+#TOC ul ul ul ul a.nav-link {
+  padding-inline-start: 2.75rem;
+}
+
+#TOC a.nav-link .header-section-number {
+  color: var(--mc-accent-text);
+  font-family: var(--mc-font-ui);
+  font-size: 0.85em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+#TOC a.nav-link:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--mc-accent);
+  text-underline-offset: 3px;
+}
+
+// The current entry: the ink colour and a heavier weight in every preset,
+// so it never shows by colour alone; the presets add their own mark.
+#TOC a.nav-link.active {
+  font-weight: 600;
+}
+
+#TOC .quarto-other-links,
+#quarto-margin-sidebar .toc-actions,
+#quarto-margin-sidebar .quarto-code-links {
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--mc-line);
+
+  a {
+    color: var(--mc-muted);
+    font-size: 0.8rem;
+  }
+
+  a:hover {
+    color: var(--mc-ink);
+    text-decoration: underline;
+  }
+}
+
+// Sidebar of a book or a website.
+#quarto-sidebar {
+  font-family: var(--mc-font-ui);
+}
+
+nav.sidebar.sidebar-navigation:not(.rollup) {
+  background-color: var(--mc-paper);
+}
+
+#quarto-sidebar .sidebar-title > a {
+  color: var(--mc-ink);
+  font-family: var(--mc-font-headings);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+#quarto-sidebar div.sidebar-item-container {
+  color: var(--mc-muted);
+}
+
+#quarto-sidebar div.sidebar-item-container:hover {
+  color: var(--mc-ink);
+}
+
+#quarto-sidebar a.sidebar-link {
+  padding-block: 0.15rem;
+  padding-inline: 0.5rem;
+  color: var(--mc-muted);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+#quarto-sidebar a.sidebar-link:hover {
+  color: var(--mc-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--mc-accent);
+  text-underline-offset: 3px;
+}
+
+// The current page: ink and a heavier weight, plus the preset mark.
+#quarto-sidebar a.sidebar-link.active {
+  color: var(--mc-ink);
+  font-weight: 600;
+}
+
+#quarto-sidebar .sidebar-item-section > .sidebar-item-container > .sidebar-item-toggle {
+  padding-block: 0.15rem;
+  padding-inline: 0.5rem;
+  color: var(--mc-ink);
+  font-weight: 700;
+}
+
+#quarto-sidebar .sidebar-section {
+  padding-left: 0;
+  padding-inline-start: 0.75rem;
+}
+
+#quarto-sidebar .sidebar-divider {
+  border-color: var(--mc-line);
+  opacity: 1;
+}
+
+// Quarto fades the sidebar tools, which takes their icons below 3:1.
+#quarto-sidebar .quarto-navigation-tool {
+  opacity: 1;
+  color: var(--mc-muted);
+}
+
+.sidebar-tools-main .quarto-color-scheme-toggle .bi::before {
+  background-color: currentColor;
+  background-image: none;
+  mask: url($mc-toggle-off) center / 1rem 1rem no-repeat;
+}
+
+.sidebar-tools-main .quarto-color-scheme-toggle.alternate .bi::before {
+  mask-image: url($mc-toggle-on);
+}
+
+// Top bar of a book below 992 pixels, with the menu button of the drawer.
+#quarto-header,
+nav.quarto-secondary-nav,
+.quarto-banner nav.quarto-secondary-nav {
+  background-color: var(--mc-paper);
+  color: var(--mc-ink);
+}
+
+nav.quarto-secondary-nav,
+.quarto-banner nav.quarto-secondary-nav {
+  border-color: var(--mc-line);
+}
+
+.quarto-secondary-nav .quarto-btn-toggle,
+.quarto-secondary-nav button.quarto-search-button {
+  color: var(--mc-ink);
+}
+
+.quarto-secondary-nav nav.quarto-page-breadcrumbs,
+.quarto-secondary-nav nav.quarto-page-breadcrumbs a,
+.quarto-secondary-nav nav.quarto-page-breadcrumbs .breadcrumb-item::before,
+.quarto-title-breadcrumbs .breadcrumb-item,
+.quarto-title-breadcrumbs .breadcrumb-item a,
+.quarto-title-breadcrumbs .breadcrumb-item::before,
+.quarto-title-breadcrumbs .breadcrumb li:last-of-type a {
+  color: var(--mc-muted);
+}
+
+// Drawer of the sidebar below 992 pixels.
+@media (max-width: 991.98px) {
+  #quarto-sidebar.show,
+  #quarto-sidebar.collapsing {
+    padding-bottom: env(safe-area-inset-bottom);
+    border-inline-end: 1px solid var(--mc-line);
+    background-color: var(--mc-card);
+    box-shadow: 8px 0 24px color-mix(in srgb, var(--mc-ink) 20%, transparent);
+  }
+
+  #quarto-sidebar-glass.show {
+    background-color: color-mix(in srgb, var(--mc-ink) 35%, transparent);
+  }
+}
+
+// Previous and next page links: Quarto colours them in Bootstrap's muted
+// grey, below 4.5:1.
+.page-navigation .nav-page a,
+.page-navigation .nav-page .nav-page-text,
+.page-navigation .nav-page .bi {
+  color: var(--mc-muted);
+}
+
+.page-navigation .nav-page a:hover .nav-page-text {
+  color: var(--mc-ink);
+}
+
+// The overlap toggle that Quarto puts in place of a side column under wide
+// content: the narrow-screen pill look.
+.quarto-sidebar-toggle {
+  border: 1px solid var(--mc-line);
+  border-radius: 999px;
+  background-color: var(--mc-card);
+  color: var(--mc-ink);
+  font-family: var(--mc-font-ui);
+}
+
+.quarto-sidebar-toggle.expanded {
+  border-radius: max(var(--mc-radius), 0.75rem);
+}
+
+// Wide tables cover the side columns on the page colour, which Quarto takes
+// from the Sass body colour.
+.page-columns :is(.column-body-outset, .column-body-outset-left, .column-body-outset-right, .column-page, .column-page-left, .column-page-right, .column-page-inset, .column-page-inset-left, .column-page-inset-right, .column-screen, .column-screen-left, .column-screen-right, .column-screen-inset, .column-screen-inset-left, .column-screen-inset-right) table {
+  background: var(--mc-paper);
+}
+
+.quarto-sidebar-toggle-title {
+  color: var(--mc-ink);
+  font-weight: 700;
+}
+
+// Chapter header of a full report: the "In this chapter" list, in the title
+// block of a book chapter or after each chapter heading of a document.
+.mc-chapter-contents {
+  max-width: 40rem;
+  margin: 1rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+  border-inline-start: 3px solid var(--mc-accent);
+  border-radius: var(--mc-radius);
+  background-color: var(--mc-tint);
+  font-family: var(--mc-font-ui);
+
+  .mc-chapter-contents-title {
+    margin: 0 0 0.4rem;
+    color: var(--mc-accent-text);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    margin: 0.15rem 0;
+  }
+
+  .mc-chapter-contents-level-2 {
+    padding-inline-start: 1.25rem;
+    font-size: 0.92em;
+  }
+
+  // A numbered entry hangs its title after the number, as in the contents.
+  a {
+    display: inline-grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 0.35em;
+    color: var(--mc-ink);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--mc-accent);
+  }
+
+  .header-section-number {
+    color: var(--mc-accent-text);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+}
+
+// In a book chapter, the title block underlines its links; the list of the
+// chapter is navigation, so its links show their underline on hover only.
+#title-block-header.mc-title-block .mc-chapter-contents a {
+  text-decoration: none;
+}
+
+#title-block-header.mc-title-block .mc-chapter-contents a:hover {
+  text-decoration: underline;
+}
+
+.mc-title-block .title .chapter-number,
+main.content h1 > .header-section-number {
+  color: var(--mc-accent-text);
+  font-family: var(--mc-font-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+@media print {
+  #quarto-margin-sidebar,
+  #quarto-sidebar,
+  #quarto-sidebar-glass,
+  #quarto-header,
+  .quarto-sidebar-toggle {
+    display: none;
+  }
+}

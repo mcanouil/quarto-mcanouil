@@ -101,3 +101,153 @@ $mc-gold-radius: 5px !default;
     letter-spacing: 0.05em;
   }
 }
+
+// Contents as a white card with a gold hairline and a corner facet; the
+// current entry as a soft gold pill with a small facet at its end. Sidebar
+// with a thin border at its end, a gilded hairline under the title,
+// small-caps part headers with + and -, and the current page as a gold pill
+// after a small diamond.
+@include mc-preset(gold) {
+  nav#TOC {
+    position: relative;
+    overflow: hidden;
+    padding: 0.75rem 0.6rem 0.6rem;
+    border: 1px solid color-mix(in srgb, var(--mc-accent) 40%, transparent);
+    border-radius: 10px;
+    background-color: var(--mc-card);
+  }
+
+  nav#TOC::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-image: linear-gradient(135deg, var(--mc-accent-high), var(--mc-accent));
+    clip-path: polygon(38% 0, 100% 0, 100% 62%);
+    opacity: 0.28;
+    pointer-events: none;
+  }
+
+  #TOC > #toc-title {
+    padding-inline: 0.4rem;
+    color: var(--mc-ink);
+    font-family: var(--mc-font-headings);
+    font-size: 0.95rem;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  #TOC > #toc-title::after {
+    content: "";
+    display: block;
+    width: 2rem;
+    height: 2px;
+    margin-top: 0.3rem;
+    border-radius: 2px;
+    background-image: var(--mc-gilded);
+  }
+
+  #TOC a.nav-link {
+    position: relative;
+    overflow: hidden;
+    padding-block: 0.2rem;
+    padding-inline-end: 1.1rem;
+    border-radius: 6px;
+    font-family: var(--mc-font-headings);
+  }
+
+  #TOC a.nav-link:hover {
+    text-decoration-color: color-mix(in srgb, var(--mc-accent) 60%, transparent);
+  }
+
+  #TOC a.nav-link.active {
+    background-color: color-mix(in srgb, var(--mc-accent) 16%, var(--mc-card));
+  }
+
+  #TOC a.nav-link.active::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    inset-inline-end: 0;
+    width: 0.75rem;
+    height: 0.75rem;
+    background-image: linear-gradient(135deg, var(--mc-accent-high), var(--mc-accent));
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+    opacity: 0.85;
+  }
+
+  #quarto-sidebar.sidebar-navigation:not(.rollup) {
+    border-inline-end: 1px solid var(--mc-line);
+  }
+
+  #quarto-sidebar .sidebar-title::after {
+    content: "";
+    display: block;
+    height: 1px;
+    margin-top: 0.5rem;
+    background-image: var(--mc-gilded);
+  }
+
+  #quarto-sidebar a.sidebar-link,
+  #quarto-sidebar .sidebar-item-section > .sidebar-item-container > .sidebar-item-toggle {
+    border-radius: 6px;
+    font-family: var(--mc-font-headings);
+  }
+
+  #quarto-sidebar .sidebar-item-section > .sidebar-item-container > .sidebar-item-toggle {
+    font-size: 1rem;
+    font-variant-caps: all-small-caps;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  #quarto-sidebar .sidebar-item-toggle .bi-chevron-right::before {
+    content: "+" / "";
+    color: var(--mc-muted);
+    font-family: var(--mc-font-ui);
+    font-weight: 400;
+    transform: none;
+  }
+
+  #quarto-sidebar .sidebar-item-toggle[aria-expanded="true"] .bi-chevron-right::before {
+    content: "\2212" / "";
+    transform: none;
+  }
+
+  #quarto-sidebar a.sidebar-link.active {
+    background-color: color-mix(in srgb, var(--mc-accent) 16%, var(--mc-paper));
+  }
+
+  #quarto-sidebar a.sidebar-link.active::before {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin-inline-end: 0.45rem;
+    margin-bottom: 2px;
+    background-color: var(--mc-accent);
+    transform: rotate(45deg);
+  }
+
+  .mc-chapter-contents {
+    border-inline-start: 0;
+    background-color: var(--mc-card);
+    box-shadow: inset 0 2px 0 var(--mc-accent);
+  }
+
+  .mc-chapter-contents .mc-chapter-contents-title {
+    color: var(--mc-ink);
+    font-family: var(--mc-font-headings);
+    font-size: 1rem;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  .mc-chapter-contents a {
+    font-family: var(--mc-font-headings);
+  }
+}

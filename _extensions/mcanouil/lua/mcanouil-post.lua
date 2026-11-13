@@ -8,10 +8,12 @@
 
 local authors = require(quarto.utils.resolve_path('authors.lua'):gsub('%.lua$', ''))
 local sections = require(quarto.utils.resolve_path('sections.lua'):gsub('%.lua$', ''))
+local chapter_header = require(quarto.utils.resolve_path('chapter-header.lua'):gsub('%.lua$', ''))
 
 --- @type table[] The filter steps, run in order.
 local STEPS = {
   sections.filter,
+  chapter_header.filter,
   authors.post_filter,
 }
 

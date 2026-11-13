@@ -6,7 +6,11 @@ set -euo pipefail
 #
 # Usage: html.sh title <preset>
 #        html.sh components <preset>
+#        html.sh toc <preset>
+#        html.sh book
+#        html.sh full
 #        html.sh subdir
+#        html.sh measure <width> <height> [mode] [kind]   (prints the measures)
 #
 # The title case checks the schemes, the landmarks, the skip link, the title
 # block and its corner motif, the local fonts and the preset style rules of one
@@ -248,10 +252,13 @@ find_browser() {
 # page runs in a frame because a headless window is never narrower than 500
 # pixels. With "forced", the page uses copies of its stylesheets in which the
 # forced-colors media query always applies, so the computed styles are those
-# of forced colours mode. With "dark", the browser prefers the dark scheme, so
-# Quarto loads the dark stylesheets; otherwise it prefers the light scheme.
-# $1 width. $2 height. $3 "forced", "dark" or nothing. $4 kind: title (default)
-# or components.
+# of forced colours mode; "print" and "reduced" do the same for the print and
+# the prefers-reduced-motion queries. With "rtl", the page is right to left.
+# With "dark", the browser prefers the dark scheme, so Quarto loads the dark
+# stylesheets; otherwise it prefers the light scheme. The measure script reads
+# the mode from window.mcMode ("open" opens the sidebar drawer).
+# $1 width. $2 height. $3 "forced", "print", "reduced", "rtl", "open", "dark"
+# or nothing. $4 kind: title (default), components or nav.
 measure() {
 	local page frame dump scheme=light
 	page="$(dirname "${output}")/.measure-$$-page.html"
@@ -265,18 +272,27 @@ import sys
 source, page, frame, width, height, mode, script_file = sys.argv[1:8]
 script = "<script>" + open(script_file, encoding="utf-8").read() + "</script>"
 html = open(source, encoding="utf-8").read()
-if mode == "forced":
-    def forced_copy(match):
+QUERIES = {
+    "forced": r"@media ?\(forced-colors: ?active\)",
+    "print": r"@media print",
+    "reduced": r"@media ?\(prefers-reduced-motion: ?reduce\)",
+}
+if mode in QUERIES:
+    def media_copy(match):
         href = match.group(1)
         path = os.path.join(os.path.dirname(source), href)
         if not href.endswith(".css") or not os.path.isfile(path):
             return match.group(0)
         css = open(path, encoding="utf-8").read()
-        css = re.sub(r"@media ?\(forced-colors: ?active\)", "@media all", css)
+        css = re.sub(QUERIES[mode], "@media all", css)
         copy = os.path.join(os.path.dirname(path), ".forced-" + os.path.basename(path))
         open(copy, "w", encoding="utf-8").write(css)
+        open(page + ".copies", "a", encoding="utf-8").write(copy + "\n")
         return match.group(0).replace(href, os.path.join(os.path.dirname(href), ".forced-" + os.path.basename(href)))
-    html = re.sub(r'<link\b[^>]*href="([^"]+)"[^>]*>', forced_copy, html)
+    html = re.sub(r'<link\b[^>]*href="([^"]+)"[^>]*>', media_copy, html)
+if mode == "rtl":
+    html = re.sub(r"<html\b", '<html dir="rtl"', html, count=1)
+script = f"<script>window.mcMode = {mode!r};</script>" + script
 open(page, "w", encoding="utf-8").write(html.replace("</body>", script + "</body>", 1))
 open(frame, "w", encoding="utf-8").write(f"""<!DOCTYPE html><html><body style="margin:0">
 <iframe src="{os.path.basename(page)}" width="{width}" height="{height}" style="border:0;display:block"></iframe>
@@ -286,8 +302,10 @@ PY
 	dump="$("${browser}" --headless=new --disable-gpu --no-first-run --hide-scrollbars \
 		"--blink-settings=preferredColorScheme=$([ "${scheme}" = dark ] && echo 0 || echo 1)" \
 		--window-size=1600,1000 --virtual-time-budget=8000 --dump-dom "file://${frame}" 2>/dev/null || true)"
-	rm -f "${page}" "${frame}"
-	find "$(dirname "${output}")" -name '.forced-*.css' -delete
+	if [ -f "${page}.copies" ]; then
+		while IFS= read -r copy; do rm -f "${copy}"; done <"${page}.copies"
+	fi
+	rm -f "${page}" "${frame}" "${page}.copies"
 	python3 -I -c '
 import html, re, sys
 found = re.search(r"data-mc-measure=\"([^\"]*)\"", sys.stdin.read())
@@ -344,18 +362,36 @@ sys.exit(1 if shown else 0)
 }
 
 # Succeed when axe-core finds nothing on the page, in light and dark, at 1440
-# and 320 pixels wide (the default matrix of quarto call axe). The scan writes
-# its artefacts to tests/_axe-checks, which ignores itself.
+# and 320 pixels wide (the default matrix of quarto call axe), or at other
+# sizes. The scan writes its artefacts to _axe-checks in the project of the
+# page, which ignores itself.
+# $1 page globs, relative to the site directory (default: the output page).
+# $2 viewports, as WxH separated by commas (default: 1440x900,320x568).
+# $3 site directory (default: the directory of the output).
 axe_clean() {
 	local report status=0
 	report="$(mktemp -d)"
-	quarto call axe "$(dirname "${output}")" --pages "$(basename "${output}")" --settle 500 \
-		--fail-on minor --quiet --report "${report}/report.md" || status=$?
+	quarto call axe "${3:-$(dirname "${output}")}" --pages "${1:-$(basename "${output}")}" --settle 500 \
+		--viewports "${2:-1440x900,320x568}" --fail-on minor --quiet --report "${report}/report.md" || status=$?
 	if [ "${status}" -ne 0 ] && [ -f "${report}/report.md" ]; then
 		sed 's/^/# /' "${report}/report.md" | head -n 40
 	fi
 	rm -rf "${report}"
 	return "${status}"
+}
+
+# Report a check that waits for an upstream fix as a TAP TODO: it does not
+# fail the hook, and it reports a pass once Quarto fixes the defect.
+# $1 name. $2 upstream issue. The rest is the command.
+expect_todo() {
+	local name="$1" issue="$2"
+	shift 2
+	tap_n=$((tap_n + 1))
+	if "$@"; then
+		printf 'ok %d - %s # TODO %s, fixed upstream: remove the TODO\n' "${tap_n}" "${name}" "${issue}"
+	else
+		printf 'not ok %d - %s # TODO %s\n' "${tap_n}" "${name}" "${issue}"
+	fi
 }
 
 # Check the title page of one preset.
@@ -644,6 +680,169 @@ check_components() {
 		preset_rule "${light_css}" "${preset}" '\.callout'
 }
 
+# Succeed when the contents has three levels, each indented from the start
+# edge more than the level above (left to right, or right to left).
+# $1 measures, as JSON.
+toc_levels() {
+	measured "$1" '(lambda d: len(d) >= 3 and all(min(d[k]) > max(d[j]) for j, k in zip(sorted(d), sorted(d)[1:])))({e["depth"]: [x["indent"] for x in m["toc"]["entries"] if x["depth"] == e["depth"]] for e in m["toc"]["entries"]})' \
+		'[(e["depth"], e["indent"], e["text"][:16]) for e in m["toc"]["entries"]]'
+}
+
+# The Python test of a current entry or page that is told from the others by
+# more than colour.
+NON_COLOUR_CUE='{"weight", "decoration", "shadow", "outline", "border", "before", "after"}'
+
+# Succeed when the pill and the sheet colours of a narrow screen come from the
+# tokens of the scheme: the pill on the card or the paper, and text at 4.5:1.
+# $1 measures, as JSON. $2 preset. $3 scheme of the tokens: light or dark.
+pill_tokens() {
+	measured "$1" "m.get('pill') and m['pill']['colour']['bg'] in ('$(preset_value "$2" "$3" card)', '$(preset_value "$2" "$3" paper)') and m['pill']['colour']['ratio'] >= 4.5" 'm.get("pill")'
+}
+
+# Check the contents of one preset, in every state of the spec: label, three
+# numbered levels, long titles, current entry, hover and focus, actions,
+# sticky with its own scroll, print, forced colours, reduced motion, right to
+# left, and the pill and sheet of narrow screens.
+# $1 preset.
+check_toc() {
+	local preset="$1" light_css scheme expected measures
+	structure="$(structure_report)"
+	light_css="$(linked_css quarto-bootstrap 0)"
+	expect "html-toc-nav-label-${preset}" "a labelled nav for the contents" structure_ok landmark-nav
+
+	browser="$(find_browser)"
+	if [ -z "${browser}" ]; then
+		printf 'Bail out! no Chromium browser; set CHROME_PATH\n'
+		exit 1
+	fi
+	measures="$(measure 1440 900 "" nav)"
+	expect "html-toc-label-${preset}" "a visible contents label" measured "${measures}" 'm["toc"]["label"]' 'm["toc"]'
+	expect "html-toc-levels-${preset}" "three levels, each indented from the one above" toc_levels "${measures}"
+	expect "html-toc-numbered-${preset}" "numbered entries" \
+		measured "${measures}" 'all(e["text"][:1].isdigit() for e in m["toc"]["entries"])' '[e["text"] for e in m["toc"]["entries"]]'
+	expect "html-toc-wrap-${preset}" "long titles wrap, and nothing overflows the contents" \
+		measured "${measures}" 'any(e["lines"] >= 2 for e in m["toc"]["entries"]) and not any(e["overflow"] for e in m["toc"]["entries"] if e["shown"]) and not m["toc"]["overflowX"]' \
+		'([(e["text"], e["lines"], e["overflow"]) for e in m["toc"]["entries"]], m["toc"]["overflowX"])'
+	expect_todo "html-toc-aria-current-${preset}" "quarto-cli: active contents entry has no aria-current (draft)" \
+		measured "${measures}" 'm["toc"]["current"]["ariaCurrent"] == "location"' 'm["toc"]["current"]'
+	expect "html-toc-current-cue-${preset}" "the current entry told from the others by more than colour" \
+		measured "${measures}" "set(m['toc']['current']['cues']) & ${NON_COLOUR_CUE}" 'm["toc"]["current"]'
+	expect "html-toc-focus-ring-${preset}" "a solid focus ring of 2 pixels or more, at 3:1 or more on the contents" \
+		measured "${measures}" 'm["toc"]["ring"]["focused"] and m["toc"]["ring"]["style"] == "solid" and m["toc"]["ring"]["width"] >= 2 and m["toc"]["ring"]["ratio"] >= 3' 'm["toc"]["ring"]'
+	expect "html-toc-sticky-${preset}" "a sticky contents with its own scroll" \
+		measured "${measures}" 'm["toc"]["position"] == "sticky" and m["toc"]["overflowY"] in ("auto", "scroll") and m["toc"]["maxHeight"] != "none"' 'm["toc"]'
+	expect "html-toc-actions-${preset}" "the actions row: edit, source and issue" measured "${measures}" 'm["toc"]["actions"] == 3' 'm["toc"]["actions"]'
+	for scheme in light dark; do
+		expected="${scheme}"
+		[ "${preset}" = terminal ] && expected=dark
+		measures="$(measure 1440 900 "$([ "${scheme}" = dark ] && echo dark || true)" nav)"
+		expect "html-toc-colours-${preset}-${scheme}" "contents text at 4.5:1 or more on ${expected} backgrounds" \
+			component_colours "${measures}" "${expected}"
+	done
+	measures="$(measure 1440 900 forced nav)"
+	expect "html-toc-current-forced-colors-${preset}" "a visible mark of the current entry in forced colours" \
+		measured "${measures}" 'any(v for k, v in m["toc"]["current"]["forced"].items() if k != "weight")' 'm["toc"]["current"]'
+	measures="$(measure 1440 900 print nav)"
+	expect "html-toc-print-hidden-${preset}" "no contents in print" measured "${measures}" '"none" in m["toc"]["printDisplay"]' 'm["toc"]["printDisplay"]'
+	measures="$(measure 1440 900 reduced nav)"
+	expect "html-toc-reduced-motion-${preset}" "no transition under reduced motion" measured "${measures}" 'not any(m["toc"]["motion"])' 'm["toc"]["motion"]'
+	measures="$(measure 1440 900 rtl nav)"
+	expect "html-toc-rtl-${preset}" "indents from the right edge in a right-to-left page" toc_levels "${measures}"
+
+	measures="$(measure 360 640 "" nav)"
+	expect "html-toc-pill-${preset}" "one pill of 44 pixels or more on a narrow screen" \
+		measured "${measures}" 'm.get("pill") and m["pill"]["height"] >= 44 and len(m["pills"]) == 1' '(m.get("pill"), m["pills"])'
+	expected=light
+	[ "${preset}" = terminal ] && expected=dark
+	expect "html-toc-pill-tokens-${preset}" "the pill on the card or paper token, text at 4.5:1" pill_tokens "${measures}" "${preset}" "${expected}"
+	expect "html-toc-sheet-${preset}" "a bottom sheet of about 70 percent, a close button, text at 4.5:1, the current entry marked" \
+		measured "${measures}" 'm.get("sheet") and m["sheet"]["heightShare"] <= 0.75 and m["sheet"]["close"] and all(c["ratio"] >= 4.5 for c in m["sheet"]["colours"]) and m["sheet"]["current"] and m["sheet"]["current"]["ariaCurrent"] == "location"' 'm.get("sheet")'
+
+	expect "html-axe-toc-${preset}" "no axe-core finding in light and dark, at 1440, 768 and 320 pixels" \
+		axe_clean "" 1440x900,768x1024,320x568
+	expect "html-toc-style-${preset}" "contents rules scoped to the ${preset} preset" preset_rule "${light_css}" "${preset}" '#TOC'
+}
+
+# Succeed when a chapter page of a full report shows the chapter header: the
+# kicker, and the "In this chapter" list with one link for each section.
+# $1 measures, as JSON. $2 kicker. $3 Python list of the expected link texts.
+chapter_header() {
+	measured "$1" "m.get('chapter') and m['chapter']['label'] == 'In this chapter' and m['chapter']['kicker'] == '$2' and m['chapter']['links'] == $3 and all(c['ratio'] >= 4.5 for c in m['chapter']['colours'])" 'm.get("chapter")'
+}
+
+# Check the HTML render of the test book: the sidebar in every state of the
+# spec, the book chrome, and the chapter header of the full layout.
+check_book() {
+	local site page light_css scheme expected measures
+	site="$(dirname "${output}")"
+	page="${site}/sections/01-design.html"
+	light_css="$(linked_css quarto-bootstrap 0)"
+
+	browser="$(find_browser)"
+	if [ -z "${browser}" ]; then
+		printf 'Bail out! no Chromium browser; set CHROME_PATH\n'
+		exit 1
+	fi
+	measures="$(output="${page}" measure 1440 900 "" nav)"
+	expect "html-book-sidebar-buttons-expanded" "part headers as buttons with aria-expanded and aria-controls" \
+		measured "${measures}" 'm["sidebar"]["toggles"] and all(t["tag"] == "BUTTON" and t["expanded"] in ("true", "false") and t["target"] for t in m["sidebar"]["toggles"])' 'm["sidebar"]["toggles"]'
+	expect "html-book-sidebar-expand-marker" "a plus and minus or chevron marker on each part header" \
+		measured "${measures}" 'all(t["marker"] not in ("none", "normal", "") for t in m["sidebar"]["toggles"])' 'm["sidebar"]["toggles"]'
+	expect_todo "html-book-sidebar-aria-current" "quarto-cli#15190" \
+		measured "${measures}" 'm["sidebar"]["current"]["ariaCurrent"] == "page"' 'm["sidebar"]["current"]'
+	expect "html-book-sidebar-current-cue" "the current page told from the others by more than colour" \
+		measured "${measures}" "set(m['sidebar']['current']['cues']) & ${NON_COLOUR_CUE}" 'm["sidebar"]["current"]'
+	expect "html-book-sidebar-focus-ring" "a solid focus ring of 2 pixels or more, at 3:1 or more on the sidebar" \
+		measured "${measures}" 'm["sidebar"]["ring"]["focused"] and m["sidebar"]["ring"]["style"] == "solid" and m["sidebar"]["ring"]["width"] >= 2 and m["sidebar"]["ring"]["ratio"] >= 3' 'm["sidebar"]["ring"]'
+	expect "html-full-chapter-header-book" "the chapter kicker and the In this chapter list of the chapter page" \
+		chapter_header "${measures}" Chapter '["1.1 Objectives", "1.2 Overall design", "1.2.1 Study periods", "1.3 Selection of the study population"]'
+	for scheme in light dark; do
+		expected="${scheme}"
+		has "${page}" 'name="mcanouil-preset" content="terminal"' && expected=dark
+		measures="$(output="${page}" measure 1440 900 "$([ "${scheme}" = dark ] && echo dark || true)" nav)"
+		expect "html-book-sidebar-colours-${scheme}" "sidebar and contents text at 4.5:1 or more on ${expected} backgrounds" \
+			component_colours "$(python3 -I -c 'import json, sys; m = json.loads(sys.argv[1]); m["colours"] = m.get("colours", []) + m["sidebar"].get("colours", []); print(json.dumps(m))' "${measures}")" "${expected}"
+	done
+	measures="$(output="${site}/sections/appendix-a-listings.html" measure 1440 900 "" nav)"
+	expect "html-full-chapter-header-appendix" "the appendix kicker and the In this chapter list of the appendix page" \
+		chapter_header "${measures}" Appendix '["A.1 Individual subject data listings", "A.2 Adverse event listings"]'
+	measures="$(output="${page}" measure 1440 900 forced nav)"
+	expect "html-book-sidebar-current-forced-colors" "a visible mark of the current page in forced colours" \
+		measured "${measures}" 'any(v for k, v in m["sidebar"]["current"]["forced"].items() if k != "weight")' 'm["sidebar"]["current"]'
+	measures="$(output="${page}" measure 1440 900 print nav)"
+	expect "html-book-print-hidden" "no sidebar and no contents in print" \
+		measured "${measures}" 'm["sidebar"]["printDisplay"] == "none" and "none" in m["toc"]["printDisplay"]' '(m["sidebar"]["printDisplay"], m["toc"]["printDisplay"])'
+	measures="$(output="${page}" measure 1440 900 reduced nav)"
+	expect "html-book-reduced-motion" "no sidebar transition under reduced motion" measured "${measures}" 'not any(m["sidebar"]["motion"])' 'm["sidebar"]["motion"]'
+	measures="$(output="${page}" measure 800 900 "" nav)"
+	expect "html-book-drawer-closed" "below 992 pixels, the sidebar is a closed drawer behind a menu button of 24 pixels or more" \
+		measured "${measures}" 'not m["sidebar"]["shown"] and m["menu"]["shown"] and m["menu"]["width"] >= 24 and m["menu"]["height"] >= 24 and m["menuColour"]["ratio"] >= 3' '(m["sidebar"]["shown"], m.get("menu"), m.get("menuColour"))'
+	expect "html-book-scroll-offset" "anchors clear of the fixed header" \
+		measured "${measures}" 'max(m["scroll"]["paddingTop"], m["scroll"]["headingMargin"]) >= m["scroll"]["header"]' 'm["scroll"]'
+	measures="$(output="${page}" measure 800 900 open nav)"
+	expect "html-book-drawer-open" "the menu button opens the drawer, text at 4.5:1" \
+		measured "${measures}" 'm.get("drawer") and m["drawer"]["shown"] and m["drawer"]["expanded"] == "true" and all(c["ratio"] >= 4.5 for c in m["drawer"]["colours"])' 'm.get("drawer")'
+
+	expect "html-axe-book" "no axe-core finding on the book pages in light and dark, at 1440, 768 and 320 pixels" \
+		axe_clean "*.html,sections/*.html" 1440x900,768x1024,320x568 "${site}"
+	expect "html-book-style" "sidebar rules scoped to the gold preset" preset_rule "${light_css}" gold '\.sidebar'
+}
+
+# Check the chapter header of a single document in the full layout: each
+# level 1 heading has its "In this chapter" list.
+check_full() {
+	local measures
+	browser="$(find_browser)"
+	if [ -z "${browser}" ]; then
+		printf 'Bail out! no Chromium browser; set CHROME_PATH\n'
+		exit 1
+	fi
+	measures="$(measure 1440 900 "" nav)"
+	expect "html-full-chapter-header" "an In this chapter list after each chapter heading, one link for each section" \
+		measured "${measures}" 'm.get("chapters") == [["1.1 Objectives", "1.1.1 Secondary objectives", "1.2 Design"], ["2.1 Primary outcome", "2.2 Safety"]] and all(c["ratio"] >= 4.5 for c in m["chapter"]["colours"])' '(m.get("chapters"), m.get("chapter"))'
+	expect "html-axe-full" "no axe-core finding in light and dark, at 1440 and 320 pixels" axe_clean
+}
+
 # Check that a document in a subdirectory of a project finds the fonts and the motif.
 check_subdir() {
 	structure="$(structure_report)"
@@ -656,7 +855,15 @@ browser=""
 case "${1:-}" in
 title) check_title "${2:?title needs a preset}" ;;
 components) check_components "${2:?components needs a preset}" ;;
+toc) check_toc "${2:?toc needs a preset}" ;;
+book) check_book ;;
+full) check_full ;;
 subdir) check_subdir ;;
+measure)
+	browser="$(find_browser)"
+	measure "${2:?measure needs a width}" "${3:?measure needs a height}" "${4:-}" "${5:-nav}"
+	exit 0
+	;;
 *)
 	printf 'Bail out! unknown case %s\n' "${1:-}"
 	exit 1

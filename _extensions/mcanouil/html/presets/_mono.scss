@@ -142,3 +142,79 @@ $mc-mono-radius: 0px !default;
     text-transform: uppercase;
   }
 }
+
+// Contents with a rule between entries and a square marker on the current
+// entry; sidebar with a thick ink border at its end, part headers under an
+// ink rule, and a square before the current page.
+@include mc-preset(mono) {
+  #TOC > #toc-title {
+    color: var(--mc-ink);
+  }
+
+  #TOC li {
+    border-top: 1px solid var(--mc-line);
+  }
+
+  #TOC a.nav-link {
+    position: relative;
+    padding-block: 0.25rem;
+    padding-inline-start: 0.9rem;
+  }
+
+  #TOC ul ul a.nav-link {
+    padding-inline-start: 1.65rem;
+  }
+
+  #TOC ul ul ul a.nav-link {
+    padding-inline-start: 2.4rem;
+  }
+
+  #TOC a.nav-link.active::before {
+    content: "";
+    position: absolute;
+    top: 0.7em;
+    inset-inline-start: 0;
+    width: 6px;
+    height: 6px;
+    background-color: var(--mc-ink);
+  }
+
+  #TOC ul ul a.nav-link.active::before {
+    inset-inline-start: 0.75rem;
+  }
+
+  #TOC ul ul ul a.nav-link.active::before {
+    inset-inline-start: 1.5rem;
+  }
+
+  #quarto-sidebar.sidebar-navigation:not(.rollup) {
+    border-inline-end: 2px solid var(--mc-ink);
+  }
+
+  #quarto-sidebar .sidebar-item-section > .sidebar-item-container > .sidebar-item-toggle {
+    padding-top: 0.3rem;
+    border-top: 2px solid var(--mc-ink);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  #quarto-sidebar a.sidebar-link.active::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-inline-end: 0.4rem;
+    background-color: var(--mc-ink);
+  }
+
+  .mc-chapter-contents {
+    border-inline-start: 0;
+    border-top: 2px solid var(--mc-ink);
+    background-color: transparent;
+  }
+
+  .mc-chapter-contents .mc-chapter-contents-title {
+    color: var(--mc-ink);
+  }
+}

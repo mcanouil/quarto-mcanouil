@@ -51,6 +51,7 @@ local function build_pairs()
   end
   add('on-ground-title', 'chrome', TEXT)
   add('ink', 'card', TEXT)
+  add('muted', 'card', TEXT)
   add('accent-text', 'card', TEXT)
   add('paper', 'accent', TEXT, 'mono', 'quote-label: paper on accent')
   add('accent-high', 'ground-1', LARGE_TEXT)
@@ -58,6 +59,7 @@ local function build_pairs()
   add('accent-high', 'paper', LARGE_TEXT, 'terminal', 'decoration: accent-high on paper')
   add('accent', 'paper', NON_TEXT)
   add('link', 'paper', NON_TEXT)
+  add('link', 'card', NON_TEXT, nil, 'focus ring: link on card')
   for _, semantic in ipairs(SEMANTICS) do
     add(semantic, 'paper', NON_TEXT)
   end

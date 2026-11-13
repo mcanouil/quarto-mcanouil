@@ -3,10 +3,39 @@
   "findings": [
     {
       "signature": "aria-allowed-attr :: .collapsed",
-      "pages": ["components-gold.html", "components-mono.html", "components-quarto.html", "components-terminal.html"],
+      "pages": [
+        "components-gold.html",
+        "components-mono.html",
+        "components-quarto.html",
+        "components-terminal.html"
+      ],
       "impact": "critical",
       "note": "tracked upstream: quarto-cli#4934 (the header of a collapsed callout is a div with aria-expanded and no role)",
       "rule": "aria-allowed-attr"
+    },
+    {
+      "signature": "landmark-unique :: .quarto-sidebar-toggle-contents > nav",
+      "pages": [
+        "toc-states-gold.html",
+        "toc-states-mono.html",
+        "toc-states-quarto.html",
+        "toc-states-terminal.html"
+      ],
+      "impact": "moderate",
+      "note": "tracked upstream: quarto-cli#14969 (wide content over the contents makes Quarto clone nav#TOC into a toggle outside any landmark, with the same id and name)",
+      "rule": "landmark-unique"
+    },
+    {
+      "signature": "region :: .quarto-sidebar-toggle-title",
+      "pages": [
+        "toc-states-gold.html",
+        "toc-states-mono.html",
+        "toc-states-quarto.html",
+        "toc-states-terminal.html"
+      ],
+      "impact": "moderate",
+      "note": "tracked upstream: quarto-cli#14969 (wide content over the contents makes Quarto clone nav#TOC into a toggle outside any landmark, with the same id and name)",
+      "rule": "region"
     }
   ]
 }
