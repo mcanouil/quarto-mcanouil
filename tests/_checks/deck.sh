@@ -281,7 +281,7 @@ with open(probe, "w", encoding="utf-8") as handle:
     handle.write(html.replace("</body>", inject + "</body>"))
 PY
 	"${browser_bin}" --headless --disable-gpu --hide-scrollbars --window-size=1600,900 \
-		--virtual-time-budget=20000 --dump-dom "file://${probe}" 2>/dev/null |
+		--virtual-time-budget=20000 --dump-dom "file://${probe}${PROBE_QUERY:-}" 2>/dev/null |
 		python3 -I -c 'import html, re, sys; m = re.search(r"<pre id=\"mc-probe\">(.*?)</pre>", sys.stdin.read(), re.S); print(html.unescape(m.group(1)) if m else "")'
 	rm -f "${probe}"
 }
@@ -303,20 +303,26 @@ text_clear_of_motif() {
 
 # Succeed when a section slide reads number, title with its rule, then the
 # body, from the top: the number ends above the title, the body starts below
-# the title and its rule, and ends above the footer band. A slide with no body
-# fails.
-# $1 slide id.
+# the title and its rule, and ends above the footer band. The number ends and
+# the title starts on the middle line of the slide. With "body" the slide must
+# have body content, with "bare" it must have none.
+# $1 slide id. $2 body or bare.
 section_body_after_title() {
-	local boxes
+	local boxes has_body=bare
 	boxes="$(awk -v id="$1" '$1 == id' <<<"${probe_lines}")"
-	grep -q ' body ' <<<"${boxes}" &&
+	grep -q ' body ' <<<"${boxes}" && has_body=body
+	[ "${has_body}" = "$2" ] && grep -q ' number ' <<<"${boxes}" && grep -q ' title ' <<<"${boxes}" &&
 		awk '
-			$2 == "slide" { height = $6 - $4 }
+			$2 == "slide" { height = $6 - $4; middle = $4 + height / 2 }
 			$2 == "number" { number_bottom = $6 }
-			$2 == "title" { title_top = $4; title_bottom = $6 }
-			$2 == "body" { n++; top[n] = $4; bottom[n] = $6 }
+			$2 == "number" { number_left = $3 }
+			$2 == "title" { title_top = $4; title_bottom = $6; title_left = $3 }
+			$2 == "body" { n++; top[n] = $4; bottom[n] = $6; left[n] = $3 }
+			function distance(a, b) { return a > b ? a - b : b - a }
 			END {
-				if (number_bottom > title_top) { print "# number ends below the title top"; bad = 1 }
+				if (number_left < 40 || title_left < 40) { print "# number or title touches the left edge: " number_left " " title_left; bad = 1 }
+				for (i = 1; i <= n; i++) if (left[i] < 40) { print "# body touches the left edge: " left[i]; bad = 1 }
+				if (distance(number_bottom, middle) > 2 || distance(title_top, middle) > 2) { print "# number bottom " number_bottom " and title top " title_top " are off the middle line " middle; bad = 1 }
 				for (i = 1; i <= n; i++) {
 					if (top[i] < title_bottom) { print "# body starts above the title rule: " top[i] " < " title_bottom; bad = 1 }
 					if (bottom[i] > height - 56) { print "# body reaches the footer: " bottom[i]; bad = 1 }
@@ -396,8 +402,12 @@ gold | mono | quarto | terminal)
 	expect "deck-axe-light-${1}" "no axe-core violation in the ${1} deck" axe_clean
 	find_browser
 	probe_lines="$(probe_slides title-slide brand-presets why-presets checks one-rule why-presets-after-dark mc-closing)"
-	expect "deck-section-body-order-${1}" "section slide body below the number, the title and its rule" section_body_after_title checks
+	expect "deck-section-body-order-${1}" "section slide body below the number, the title and its rule" section_body_after_title checks body
+	expect "deck-section-bare-${1}" "section slide with no body: the number ends and the title starts on the middle line" section_body_after_title brand-presets bare
 	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
+	probe_lines="$(PROBE_QUERY='?print-pdf' probe_slides brand-presets checks)"
+	expect "deck-section-body-order-print-${1}" "the same order and middle line in the print layout of a PDF export" section_body_after_title checks body
+	expect "deck-section-bare-print-${1}" "the same middle line in print, with no body" section_body_after_title brand-presets bare
 	;;
 long-title)
 	find_browser

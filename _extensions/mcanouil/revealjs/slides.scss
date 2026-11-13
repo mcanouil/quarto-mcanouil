@@ -160,6 +160,15 @@ $mc-motif-section: 70% !default;
   align-content: start;
 }
 
+// Reveal.js print rules, `html.reveal-print .reveal .slides section`, set
+// `display: block` and a padding of 0, both !important. One more class gives
+// these rules the precedence, so a PDF export keeps the grid and the side
+// padding.
+html.reveal-print .reveal .slides section.mc-section {
+  display: grid !important;
+  padding: 0 var(--mc-slide-pad) !important;
+}
+
 .reveal .slides section.mc-section > :not(.mc-motif) {
   grid-column: 1;
   margin: 0;

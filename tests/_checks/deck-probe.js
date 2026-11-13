@@ -12,6 +12,8 @@
  *   that ends in "-ring" is the focus ring of a control, read with the control
  *   focused, against the background around the control; a control with no
  *   ring reads 0.
+ * - The page is read in the print layout of a PDF export when its URL has
+ *   ?print-pdf; the slides are then paged as Reveal.js pages them.
  * - "<slide> error <message>": the probe failed on the slide.
  *
  * @license MIT
@@ -146,7 +148,7 @@
   }
 
   function measureBoxes(slide, section) {
-    var scale = Reveal.getScale();
+    var scale = printing() ? 1 : Reveal.getScale();
     var origin = section.getBoundingClientRect();
     function add(name, rect) {
       lines.push([slide, name, (rect.left - origin.left) / scale, (rect.top - origin.top) / scale,
@@ -235,8 +237,10 @@
       return;
     }
     var slide = slides[0];
-    var indices = Reveal.getIndices(document.getElementById(slide));
-    Reveal.slide(indices.h, indices.v);
+    if (!printing()) {
+      var indices = Reveal.getIndices(document.getElementById(slide));
+      Reveal.slide(indices.h, indices.v);
+    }
     setTimeout(function () {
       try {
         measureSlide(slide);
@@ -247,9 +251,40 @@
     }, 300);
   }
 
+  function printing() {
+    return /[?&]print-pdf/.test(location.search);
+  }
+
+  // Reveal.js lays out a PDF export in animation frames, and a headless browser
+  // run on virtual time never draws them. Do what it does to each slide: put it
+  // in a page of the slide height, with the slide width and no offset.
+  function paginate() {
+    var width = Reveal.getConfig().width;
+    var height = Reveal.getConfig().height;
+    if (document.querySelector(".pdf-page")) { return; }
+    document.querySelectorAll(".reveal .slides section:not(.stack)").forEach(function (slide) {
+      var page = document.createElement("div");
+      page.className = "pdf-page";
+      page.style.height = height + "px";
+      slide.parentNode.insertBefore(page, slide);
+      page.appendChild(slide);
+      slide.style.left = "0px";
+      slide.style.top = "0px";
+      slide.style.width = width + "px";
+    });
+    void document.body.offsetHeight;
+  }
+
   function wait() {
     if (window.Reveal && Reveal.isReady()) {
-      document.fonts.ready.then(function () { next(window.MC_PROBE_SLIDES.slice()); });
+      document.fonts.ready.then(function () {
+        if (printing()) {
+          paginate();
+          // The print layout shows every slide at once, so fonts of the
+          // slides load only after the first layout.
+          return document.fonts.ready;
+        }
+      }).then(function () { next(window.MC_PROBE_SLIDES.slice()); });
     } else {
       setTimeout(wait, 50);
     }
