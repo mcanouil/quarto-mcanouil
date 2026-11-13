@@ -8,15 +8,6 @@ local function assert_equal(actual, expected, what)
   end
 end
 
-cases['deck-motif-ids-unique'] = function()
-  local first, second = deck.motif_svg('facets', '1'), deck.motif_svg('facets', '2')
-  assert_equal(first:find('id="mc-motif-facets-fill-1"', 1, true) ~= nil, true, 'suffixed id')
-  assert_equal(first:find('url(#mc-motif-facets-fill-1)', 1, true) ~= nil, true, 'suffixed reference')
-  assert_equal(first:find('url(#mc-motif-facets-fill)', 1, true), nil, 'no bare reference')
-  assert_equal(second:find('id="mc-motif-facets-fill-2"', 1, true) ~= nil, true, 'second copy')
-  assert_equal(first:find('aria-hidden="true"', 1, true) ~= nil, true, 'hidden')
-end
-
 cases['deck-section-number'] = function()
   assert_equal(deck.section_number(2, 'gold'), '2', 'gold')
   assert_equal(deck.section_number(2, 'terminal'), '02', 'terminal')

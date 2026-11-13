@@ -12,6 +12,7 @@
 
 local fail = require('lib.fail')
 local labels = require('lib.labels')
+local motif = require('lib.motif')
 local preset = require('preset')
 local document = require('document')
 local authors = require('authors')
@@ -72,26 +73,6 @@ local function read_file(path, what)
   local content = file:read('a')
   file:close()
   return content
-end
-
---- Answer the SVG markup of a motif. The identifiers inside the SVG take a
---- suffix, so that each copy on a page keeps its own gradient: a slide that
---- Reveal.js hides would otherwise hide the gradient of the next copies.
---- @param motif string Motif name, for example `facets`
---- @param suffix string Suffix of the identifiers
---- @return string SVG markup
-function M.motif_svg(motif, suffix)
-  local svg = read_file(EXTENSION_DIR .. '/html/motifs/' .. motif .. '.svg', 'motif file')
-  local ids = {}
-  for id in svg:gmatch('id="([^"]+)"') do
-    ids[#ids + 1] = id
-  end
-  for _, id in ipairs(ids) do
-    local escaped = id:gsub('%p', '%%%0')
-    svg = svg:gsub('id="' .. escaped .. '"', 'id="' .. id .. '-' .. suffix .. '"')
-      :gsub('url%(#' .. escaped .. '%)', 'url(#' .. id .. '-' .. suffix .. ')')
-  end
-  return (svg:gsub('%s+$', ''))
 end
 
 --- Answer the CSS gradient of the ground.
@@ -220,7 +201,7 @@ end
 --- @return pandoc.RawBlock Motif
 local function motif_block(state)
   state.motifs = state.motifs + 1
-  return pandoc.RawBlock('html', M.motif_svg(state.motif, tostring(state.motifs)))
+  return pandoc.RawBlock('html', motif.svg(state.motif, tostring(state.motifs)))
 end
 
 --- Answer whether the right footer slot of a deck holds the slide number.
@@ -374,7 +355,7 @@ local function arrange(doc)
 
   local meta = doc.meta
   meta['mcanouil-motif-svg'] = pandoc.MetaBlocks({
-    pandoc.RawBlock('html', M.motif_svg(state.motif, 'title')),
+    pandoc.RawBlock('html', motif.svg(state.motif, 'title')),
   })
   local event = option(meta, 'event')
   if event ~= nil then

@@ -9,6 +9,7 @@
 
 local fail = require('lib.fail')
 local labels = require('lib.labels')
+local motif = require('lib.motif')
 local authors = require('authors')
 local document = require('document')
 
@@ -20,28 +21,14 @@ local M = {}
 --- @type table<string, string> Label key of the default kicker of each document type.
 M.KICKERS = { report = 'mcanouil-report' }
 
---- Read the SVG file of a motif.
---- @param motif string Motif name, for example `facets`
---- @return string SVG markup
-function M.motif_svg(motif)
-  local path = EXTENSION_DIR .. '/html/motifs/' .. motif .. '.svg'
-  local file = io.open(path, 'r')
-  if not file then
-    fail.raise('mcanouil: cannot open the motif file ' .. path .. '.')
-  end
-  local svg = file:read('a')
-  file:close()
-  return (svg:gsub('%s+$', ''))
-end
-
 --- Answer a motif as a CSS image for a mask: a data URL of the SVG with the
 --- custom properties removed, since an image cannot read the custom properties
 --- of the page. A mask reads only the alpha channel, so the shapes keep their
 --- opacity and the page paints them in the colour it chooses.
---- @param motif string Motif name, for example `facets`
+--- @param name string Motif name, for example `facets`
 --- @return string CSS `url()` value
-function M.motif_mask(motif)
-  local svg = M.motif_svg(motif)
+function M.motif_mask(name)
+  local svg = motif.svg(name)
     :gsub('var%(%-%-[%w%-]+,%s*([^)]+)%)', '%1')
     :gsub('currentColor', 'black')
     :gsub('%s+', ' ')
@@ -100,7 +87,7 @@ local function deliver(meta)
     return meta
   end
   if meta['mcanouil-motif'] ~= nil then
-    local svg = M.motif_svg(pandoc.utils.stringify(meta['mcanouil-motif']))
+    local svg = motif.svg(pandoc.utils.stringify(meta['mcanouil-motif']))
     meta['mcanouil-motif-svg'] = pandoc.MetaBlocks({ pandoc.RawBlock('html', svg) })
     quarto.doc.include_text('in-header', '<style id="mcanouil-motif-mask">:root { --mc-motif-mask: '
       .. M.motif_mask(pandoc.utils.stringify(meta['mcanouil-motif'])) .. '; }</style>')
