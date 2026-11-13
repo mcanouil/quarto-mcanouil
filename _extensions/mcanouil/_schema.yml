@@ -32,7 +32,7 @@ options:
   footer:
     type: object
     additionalProperties: false
-    description: "Content of the three footer slots of Typst pages. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter and page. An empty string leaves the slot empty. A slot that is not set takes the default of the document type."
+    description: "Content of the three footer slots of Typst pages and Reveal.js slides. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter, page and speaker (the authors and the event). An empty string leaves the slot empty. A slot that is not set takes the default of the document type; a deck shows the speaker and the event, the talk title, and the slide number."
     properties:
       left:
         type: string
@@ -40,7 +40,41 @@ options:
       centre:
         type: string
         aliases: [center]
+        examples: ["Confidential"]
         description: "Content of the centre footer slot, centred."
       right:
         type: string
-        description: "Content of the right footer slot, aligned right."
+        examples: [page]
+        description: "Content of the right footer slot, aligned right. In a Reveal.js deck, only `page` here shows the slide number."
+  event:
+    type: string
+    description: "Event of a Reveal.js deck, for example `useR! 2026 · Warwick`. The title slide shows it above the title, and the left footer slot after the speaker. Set it as `extensions: { mcanouil: { event: <text> } }`."
+  speakers:
+    type: array
+    description: "Photos of the speakers on the title slide of a Reveal.js deck, one entry per author, in the order of the authors. A photo without alt text gives a warning."
+    items:
+      type: object
+      additionalProperties: false
+      properties:
+        photo:
+          type: string
+          description: "Photo file (svg, png, jpg, gif or webp), relative to the document. The deck embeds it."
+        alt:
+          type: string
+          description: "Alt text of the photo."
+  closing:
+    type: [object, boolean]
+    additionalProperties: false
+    description: "Closing slide of a Reveal.js deck, on the ground of the preset. `true` adds it with the default title; a map sets its parts. Links are shown as plain text, so they read in a PDF export too."
+    properties:
+      title:
+        type: string
+        description: "Title of the closing slide. Default: \"Thank you\" in the document language."
+      links:
+        type: array
+        items:
+          type: string
+        description: "Links of the closing slide, one per line, as plain text."
+      licence:
+        type: string
+        description: "Licence line of the closing slide, for example `Slides: example.org/talk · CC BY 4.0`."

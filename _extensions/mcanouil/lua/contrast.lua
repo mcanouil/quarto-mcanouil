@@ -31,11 +31,13 @@ local LARGE_TEXT = 3.0
 local SEMANTICS = { 'note', 'tip', 'warning', 'important', 'caution' }
 
 --- Build the pair table.
---- @return table[] Rows of `name`, `fg_token`, `bg_token`, `threshold` and, for a pair of one preset, `only` (a `label` names the row)
+--- @return table[] Rows of `name`, `fg_token`, `bg_token`, `threshold` and, for a pair of one preset, `only`, and for a pair of one scheme, `mode` (a `label` names the row)
 local function build_pairs()
   local rows = {}
-  local function add(fg, bg, threshold, only, label)
-    rows[#rows + 1] = { name = label or (fg .. ' on ' .. bg), fg_token = fg, bg_token = bg, threshold = threshold, only = only }
+  local function add(fg, bg, threshold, only, label, mode)
+    rows[#rows + 1] = {
+      name = label or (fg .. ' on ' .. bg), fg_token = fg, bg_token = bg, threshold = threshold, only = only, mode = mode,
+    }
   end
   for _, fg in ipairs({ 'ink', 'muted', 'link', 'accent-text' }) do
     add(fg, 'paper', TEXT)
@@ -54,6 +56,18 @@ local function build_pairs()
   add('muted', 'card', TEXT)
   add('accent-text', 'card', TEXT)
   add('paper', 'accent', TEXT, 'mono', 'quote-label: paper on accent')
+  add('paper', 'accent-text', TEXT, nil, 'code annotation: paper on accent-text')
+  add('ground-1', 'on-ground-accent', TEXT, 'mono', 'deck kicker: ground-1 on on-ground-accent')
+  add('on-ground-text', 'paper', TEXT, nil, 'deck footer on a dark slide: on-ground-text on paper', 'dark')
+  add('muted', 'paper', NON_TEXT, nil, 'deck menu button: muted on paper')
+  add('on-ground-text', 'ground-1', NON_TEXT, nil, 'deck menu button and focus ring: on-ground-text on ground-1')
+  add('on-ground-text', 'ground-2', NON_TEXT, nil, 'deck menu button and focus ring: on-ground-text on ground-2')
+  add('on-ground-text', 'paper', NON_TEXT, nil, 'deck menu button and focus ring on a dark slide: on-ground-text on paper', 'dark')
+  add('on-ground-accent', 'ground-1', NON_TEXT, nil, 'deck focus ring on the ground: on-ground-accent on ground-1')
+  add('on-ground-accent', 'ground-2', NON_TEXT, nil, 'deck focus ring on the ground: on-ground-accent on ground-2')
+  for _, fg in ipairs({ 'ink', 'muted', 'link', 'accent-text' }) do
+    add(fg, 'ground-2', TEXT, 'terminal', 'deck slide: ' .. fg .. ' on ground-2')
+  end
   add('accent-high', 'ground-1', LARGE_TEXT)
   add('accent-high', 'ground-2', LARGE_TEXT)
   add('accent-high', 'paper', LARGE_TEXT, 'terminal', 'decoration: accent-high on paper')
@@ -70,7 +84,7 @@ end
 M.PAIRS = build_pairs()
 
 --- Check the pairs in each scheme.
---- @param pairs table[] Rows of `name`, `fg_token`, `bg_token`, `threshold` and optionally `only`, the preset the pair applies to
+--- @param pairs table[] Rows of `name`, `fg_token`, `bg_token`, `threshold` and optionally `only`, the preset the pair applies to, and `mode`, the scheme it applies to
 --- @param get_colour fun(mode: string, token: string): string Hex colour of a token
 --- @param modes string[] Schemes to check
 --- @param preset_name string|nil Preset of the document; a pair with `only` is skipped for the others
@@ -80,7 +94,7 @@ function M.check(pairs, get_colour, modes, preset_name)
   for _, mode in ipairs(modes) do
     for _, pair in ipairs(pairs) do
       local ratio = contrast_math.ratio(get_colour(mode, pair.fg_token), get_colour(mode, pair.bg_token))
-      local applies = pair.only == nil or pair.only == preset_name
+      local applies = (pair.only == nil or pair.only == preset_name) and (pair.mode == nil or pair.mode == mode)
       if applies and ratio < pair.threshold then
         failures[#failures + 1] = {
           mode = mode,

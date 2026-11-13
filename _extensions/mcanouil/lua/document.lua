@@ -69,11 +69,16 @@ M.DEFAULTS = {
     header = { left = 'title', centre = '', right = '' },
     footer = { left = 'author', centre = 'version', right = 'page' },
   },
+  deck = {
+    header = { left = '', centre = '', right = '' },
+    footer = { left = 'speaker', centre = 'title', right = 'page' },
+  },
 }
 
 --- @type table<string, string|false> Fields a slot can name. A string is the
 --- Typst call that renders the field; `false` means the value comes from the
---- metadata key of the same name.
+--- metadata key of the same name, except `author`, and `speaker`: the authors
+--- and `extensions.mcanouil.event`, joined by a middle dot.
 M.FIELDS = {
   title = false,
   subtitle = false,
@@ -82,6 +87,7 @@ M.FIELDS = {
   version = false,
   chapter = '#chapter-title()',
   page = '#page-number()',
+  speaker = false,
 }
 
 --- Read a slot value from the metadata.
@@ -130,10 +136,11 @@ end
 --- Answer the header and footer slots of a document: the user value of each
 --- slot, or the default of the document type.
 --- @param meta table Document metadata
+--- @param doc_type string|nil Document type; nil reads `extensions.mcanouil.type`
 --- @return table `header` and `footer`, each with `left`, `centre` and `right` slots
-function M.furniture(meta)
+function M.furniture(meta, doc_type)
   local options = meta.extensions and meta.extensions.mcanouil or {}
-  local doc_type = options.type and pandoc.utils.stringify(options.type) or M.DEFAULT_TYPE
+  doc_type = doc_type or (options.type and pandoc.utils.stringify(options.type)) or M.DEFAULT_TYPE
   local defaults = M.DEFAULTS[doc_type] or M.DEFAULTS[M.DEFAULT_TYPE]
   local furniture = {}
   for _, part in ipairs(M.PARTS) do
@@ -201,6 +208,21 @@ local function authors(meta, et_al)
   return inlines
 end
 
+--- Answer the speaker and the event, joined by a middle dot.
+--- @param names pandoc.Inlines Author names
+--- @param event any|nil Event, as metadata inlines or text
+--- @return pandoc.Inlines Content of the slot
+function M.speaker_event(names, event)
+  local inlines = pandoc.Inlines(names)
+  if event ~= nil and pandoc.utils.stringify(event) ~= '' then
+    if #inlines > 0 then
+      inlines:extend({ pandoc.Space(), pandoc.Str('·'), pandoc.Space() })
+    end
+    inlines:extend(pandoc.Inlines(event))
+  end
+  return inlines
+end
+
 --- Answer the content of a slot. A field with no value gives empty inlines.
 --- @param slot table Slot from `M.furniture`
 --- @param meta table Document metadata
@@ -219,6 +241,10 @@ function M.resolve_slot(slot, meta, et_al)
   end
   if slot.value == 'author' then
     return authors(meta, et_al)
+  end
+  if slot.value == 'speaker' then
+    local options = meta.extensions and meta.extensions.mcanouil or {}
+    return M.speaker_event(authors(meta, et_al), options.event)
   end
   local value = meta[slot.value]
   if value == nil then

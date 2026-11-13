@@ -1,0 +1,86 @@
+/*
+ * mcanouil - mono preset of the Reveal.js deck
+ * Swiss: an inverted kicker, upper case slide titles under a top rule, square
+ * corners, a solid progress bar, and block quotes between two rules with an
+ * inverted label before the attribution.
+ *
+ * @license MIT
+ * @copyright 2026 Mickaël Canouil
+ * @author Mickaël Canouil
+ */
+
+:root {
+  --mc-radius: 0;
+}
+
+.reveal .slides section :is(h1, h2) {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.reveal .mc-kicker {
+  display: inline-block;
+  padding: 0.1em 0.4em;
+  color: var(--mc-ground-1);
+  background: var(--mc-on-ground-accent);
+}
+
+.reveal .slides section.mc-ground > :is(h1, h2)::after,
+.reveal .slides section.mc-title-slide h1.title::after {
+  height: 5px;
+  border-radius: 0;
+  background: var(--mc-accent-high);
+}
+
+.reveal .slides section:not(.mc-ground) > h2 {
+  padding-top: 0.3em;
+  border-top: 5px solid var(--mc-ink);
+  font-size: 1.15em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.reveal .slides section.mc-section > .mc-section-number {
+  font-weight: 800;
+  color: var(--mc-on-ground-title);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.reveal .progress span {
+  background: var(--mc-ink);
+}
+
+.reveal div.callout,
+.reveal div.callout.callout-style-default,
+.reveal div.callout.callout-style-simple {
+  background: transparent;
+  border-width: 0 0 0 0.3rem;
+}
+
+.reveal figure.mc-quote {
+  padding: 0.4em 0;
+  border-top: 4px solid var(--mc-accent);
+  border-bottom: 1px solid var(--mc-line);
+}
+
+.reveal figure.mc-quote blockquote {
+  font-size: 1.1em;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.reveal figure.mc-quote figcaption.mc-quote-attribution {
+  font-size: 0.6em;
+}
+
+.reveal figure.mc-quote figcaption.mc-quote-attribution::before {
+  content: attr(data-mc-label) / "";
+  margin-right: 0.6em;
+  padding: 0.1em 0.4em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mc-paper);
+  background: var(--mc-accent);
+}

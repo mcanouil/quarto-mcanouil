@@ -2,7 +2,7 @@
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
---- @brief Attribution of block quotes in Typst and HTML
+--- @brief Attribution of block quotes in Typst, HTML and Reveal.js
 --- @description A block quote whose last paragraph starts with an em dash, an
 --- en dash or `--` has an attribution, and the dash is dropped. In Typst, the
 --- quote is written as `#quote(block: true, attribution: [...])[...]`, so that
@@ -14,7 +14,7 @@
 --- source, not as quoted text. The label is for the decoration that the
 --- preset style sheet draws as generated content with an empty alternative
 --- text. A GitHub alert (`> [!NOTE]`) is left to Quarto, which makes it a
---- callout.
+--- callout. Reveal.js decks use the same figure.
 
 local fail = require('lib.fail')
 local labels = require('lib.labels')
@@ -102,7 +102,7 @@ end
 
 --- Rewrite a block quote as an HTML figure: the quote, then its attribution,
 --- when it has one, as the caption. The figure carries the label of the
---- decoration in `data-mc-label`. Other HTML formats can call it.
+--- decoration in `data-mc-label`. HTML pages and Reveal.js decks use it.
 --- @param quote pandoc.BlockQuote Block quote
 --- @param label string Text of the quote label, for example `Quote`
 --- @return pandoc.Blocks|nil Raw HTML around the content, or nil to keep the quote (a GitHub alert)
@@ -131,15 +131,15 @@ function M.html(quote, label)
   return blocks
 end
 
---- Rewrite a block quote for the output format: Typst, or HTML other than
---- Reveal.js. Other formats keep the quote.
+--- Rewrite a block quote for the output format: Typst, or HTML, which
+--- includes Reveal.js. Other formats keep the quote.
 --- @param quote pandoc.BlockQuote Block quote
 --- @return pandoc.Blocks|nil
 local function rewrite(quote)
   if quarto.doc.is_format('typst') then
     return convert(quote)
   end
-  if quarto.doc.is_format('html') and not quarto.doc.is_format('revealjs') then
+  if quarto.doc.is_format('html') then
     return M.html(quote, labels.get('mcanouil-quote'))
   end
   return nil
