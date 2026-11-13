@@ -66,7 +66,7 @@ kind_fields() {
 	note) page1_has Note To 'Data team' From 'M. Canouil' Date '11 Nov 2026' ;;
 	minutes) page1_has Minutes 'Date and time' '11 Nov 2026, 14:00' Present 'MC, AA, BW' Absent CD Decisions Action Owner Due 'Book room' ;;
 	agenda) page1_has Agenda 'Date and time' '18 Nov 2026, 10:00' Place 'Room 4' Participants 'MC, AA, BW, CD' 'Welcome and apologies' ;;
-	brief) page1_has Brief Date '2026-11-11' Audience 'Product leads' Purpose 'Agree the go or no go' ;;
+	brief) page1_has Brief Date 'November 11, 2026' Audience 'Product leads' Purpose 'Agree the go or no go' ;;
 	esac
 }
 
