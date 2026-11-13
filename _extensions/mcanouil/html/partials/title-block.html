@@ -1,4 +1,4 @@
-<header id="title-block-header" class="quarto-title-block mc-title-block page-columns page-full"$if(mcanouil-site)$ role="none"$endif$>
+<header id="title-block-header" class="quarto-title-block mc-title-block$if(mcanouil-memo)$ mc-memo-banner$endif$ page-columns page-full"$if(mcanouil-site)$ role="none"$endif$>
 $if(mcanouil-motif-svg)$
 $mcanouil-motif-svg$
 $endif$
@@ -11,6 +11,15 @@ $if(title)$
 <h1 class="title"$if(mcanouil-site)$ id="mc-title"$endif$>$title$</h1>
 $endif$
 <span class="mc-title-rule" aria-hidden="true"></span>
+$if(mcanouil-memo)$
+$if(mcanouil-memo-fields)$
+<dl class="mc-memo-fields">
+$for(mcanouil-memo-fields)$
+<div><dt>$it.label$</dt><dd>$it.value$</dd></div>
+$endfor$
+</dl>
+$endif$
+$else$
 $if(mcanouil-chapter-contents)$
 $mcanouil-chapter-contents$
 $endif$
@@ -42,6 +51,7 @@ $abstract$
 $endif$
 $if(keywords)$
 <p class="mc-keywords"><span class="mc-block-title">$labels.keywords$</span> $for(keywords)$$it$$sep$, $endfor$</p>
+$endif$
 $endif$
 </div>
 </header>

@@ -35,11 +35,16 @@ function M.motif_mask(name)
   return 'url("data:image/svg+xml,' .. encoded .. '")'
 end
 
---- Answer the kicker of a document: the `kicker` metadata, or the label of the
+--- Answer the kicker of a document: the label of the memo kind in a memo, as
+--- in the Typst banner, else the `kicker` metadata, or the label of the
 --- document type when the type has one, as in the Typst title block.
 --- @param meta table Document metadata
+--- @param resolved table|nil Type, layout and kind of the document, see `document.resolve`
 --- @return any|nil Kicker inlines, or nil
-local function kicker(meta)
+local function kicker(meta, resolved)
+  if resolved ~= nil and resolved.type == 'memo' then
+    return pandoc.MetaInlines({ pandoc.Str(labels.get('mcanouil-memo-' .. resolved.kind)) })
+  end
   if meta.kicker ~= nil then
     return meta.kicker
   end
@@ -58,7 +63,8 @@ end
 
 --- Answer the page footer: the three footer slots of the document type, or
 --- nil when every slot is empty. A slot that only Typst can fill, such as the
---- page number, is empty in HTML.
+--- page number, is empty in HTML. In a memo the footer is the band, on the
+--- ground gradient.
 --- @param meta table Document metadata
 --- @return string|nil HTML
 function M.footer(meta)
@@ -72,8 +78,26 @@ function M.footer(meta)
   if not filled then
     return nil
   end
-  return '<footer class="mc-page-footer page-columns page-full"><div class="mc-slots">'
+  local resolved = document.resolve(meta, 'mcanouil-html')
+  local band = resolved ~= nil and resolved.type == 'memo' and ' mc-memo-band' or ''
+  return '<footer class="mc-page-footer' .. band .. ' page-columns page-full"><div class="mc-slots">'
     .. table.concat(parts) .. '</div></footer>'
+end
+
+--- Answer the banner fields of a memo for the title block partial: each has a
+--- `label` and a `value`, and a field with no value is left out.
+--- @param meta table Document metadata
+--- @param kind string Memo kind
+--- @return pandoc.MetaList Fields
+local function memo_fields(meta, kind)
+  local fields = pandoc.List()
+  for _, field in ipairs(document.memo_fields(meta, kind)) do
+    fields:insert({
+      label = pandoc.MetaInlines({ pandoc.Str(labels.get('mcanouil-memo-' .. field.key)) }),
+      value = pandoc.MetaInlines(field.value),
+    })
+  end
+  return pandoc.MetaList(fields)
 end
 
 --- Deliver the title block data and add the page footer.
@@ -89,7 +113,12 @@ local function deliver(meta)
     quarto.doc.include_text('in-header', '<style id="mcanouil-motif-mask">:root { --mc-motif-mask: '
       .. M.motif_mask(pandoc.utils.stringify(meta['mcanouil-motif'])) .. '; }</style>')
   end
-  meta['mcanouil-kicker'] = kicker(meta)
+  local resolved = document.resolve(meta, 'mcanouil-html')
+  meta['mcanouil-kicker'] = kicker(meta, resolved)
+  if resolved ~= nil and resolved.type == 'memo' then
+    meta['mcanouil-memo'] = true
+    meta['mcanouil-memo-fields'] = memo_fields(meta, resolved.kind)
+  end
   -- A book or a website page has Quarto's header as its banner landmark, so
   -- the title block is not a second banner: its text is a region named by
   -- the title.
