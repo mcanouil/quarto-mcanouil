@@ -304,7 +304,8 @@ text_clear_of_motif() {
 # Answer the colour readings that the deck fixture must give for a preset, one
 # "<slide> <name>" per line: the kicker, the section number, the quote label or
 # icon of the preset, the attribution, the footer slots, the slide number and
-# the menu button, and the focus rings of the slide number and the menu button.
+# the menu button, the focus rings of the slide number and the menu button,
+# and the focus ring of the link on the checks section slide.
 # $1 preset.
 expected_colours() {
 	local slide
@@ -315,6 +316,7 @@ expected_colours() {
 	quarto | terminal) printf 'one-rule figure.mc-quote::before\n' ;;
 	esac
 	printf 'one-rule figcaption.mc-quote-attribution\n'
+	printf 'checks link-ring\n'
 	for slide in brand-presets why-presets one-rule why-presets-after-dark; do
 		printf '%s footer-left\n%s footer-centre\n%s slide-number\n%s menu-button\n' "${slide}" "${slide}" "${slide}" "${slide}"
 		printf '%s slide-number-ring\n%s menu-button-ring\n' "${slide}" "${slide}"
@@ -368,7 +370,7 @@ gold | mono | quarto | terminal)
 	expect "deck-quote-attribution-${1}" "the attribution of the quote without its dash" quote_attribution
 	expect "deck-axe-light-${1}" "no axe-core violation in the ${1} deck" axe_clean
 	find_browser
-	probe_lines="$(probe_slides title-slide brand-presets why-presets one-rule why-presets-after-dark mc-closing)"
+	probe_lines="$(probe_slides title-slide brand-presets why-presets checks one-rule why-presets-after-dark mc-closing)"
 	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
 	;;
 long-title)

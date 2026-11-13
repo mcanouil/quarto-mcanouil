@@ -13,9 +13,6 @@ local motif = require('lib.motif')
 local authors = require('authors')
 local document = require('document')
 
---- @type string Directory of the extension, the parent of `lua/`.
-local EXTENSION_DIR = debug.getinfo(1, 'S').source:match('^@(.*)[/\\]lua[/\\][^/\\]+$')
-
 local M = {}
 
 --- @type table<string, string> Label key of the default kicker of each document type.

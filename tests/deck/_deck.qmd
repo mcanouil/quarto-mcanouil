@@ -37,6 +37,8 @@ extensions:
 
 # Checks
 
+Sources at [github.com/mcanouil](https://github.com/mcanouil).
+
 ## One rule
 
 ::: {.callout-important}
