@@ -4,7 +4,7 @@ set -euo pipefail
 
 # Check hook: the invoice document type, read from the PDF text, the word boxes and the tag tree.
 #
-# Usage: invoice.sh totals | exempted | fr | din
+# Usage: invoice.sh totals | exempted | hex | fee | fr | din
 #
 # The fixtures hold three items and two VAT rates:
 #   2 x 1200.00 + 3 x 33.33 at 20 %, 1 x 24.50 at 5.5 %
@@ -78,7 +78,7 @@ totals)
 	expect "invoice-legal-line" "the registration and the VAT number after the terms" flat_in_order "Terms" "Registration number 123 456 789" "VAT number FR1234567890"
 	expect "invoice-fold-marks" "fold marks at 99 and 198 mm" marks_at 99 198
 	expect "invoice-payment" "the payment box with the bank details and the reference" flat_in_order "Payment" "AZERTYUI" "FR12 1234 4567 7890 1234 5678 901" "REF-2026-014"
-	expect "invoice-terms" "the terms with the days to pay, the late fee and the penalty" flat_in_order "Terms" "30 days" "2.28" "40"
+	expect "invoice-terms" "the terms with the days to pay, the late fee and the penalty" flat_in_order "Terms" "paid in 30 days" "late fee of 2.28 %" "penalty of €40.00 for recovery costs"
 	expect "invoice-dates" "the dates in the reference block" flat_in_order "2026-014" "2026-11-01" "2026-12-01"
 	;;
 exempted)
@@ -88,6 +88,17 @@ exempted)
 	expect "invoice-exempted-no-vat-column" "no VAT column" flat_lacks "20 %"
 	expect "invoice-exempted-no-subtotal" "no subtotal line" flat_lacks "Subtotal"
 	expect "invoice-exempted-total" "the total without VAT" flat_in_order "Total" "2,524.49"
+	expect "invoice-exempted-no-vat-total" "the total with VAT is absent" flat_lacks "3,025.84"
+	;;
+hex)
+	expect "invoice-hex-reference" "the reference prints as written" flat_in_order "Reference" "abcd1234"
+	expect "invoice-hex-no-badge" "no commit badge" flat_lacks GitHub
+	expect "invoice-exempted-false-vat-lines" "exempted false keeps the subtotal and the VAT lines" flat_in_order "Subtotal" "2,524.49" "VAT 20 %" "VAT 5.5 %" "Total" "3,025.84"
+	;;
+fee)
+	expect "invoice-fee-zero-terms" "a late fee of 0 prints as 0" flat_in_order "Terms" "late fee of 0 %"
+	expect "invoice-fee-zero-quantity" "a half quantity prints as 0.5 and its line as 12.25" flat_in_order "0.5" "€24.50" "€12.25"
+	expect "invoice-fee-zero-rate" "a zero VAT rate prints as 0 %" flat_in_order "Subtotal" "€2,512.24" "VAT 20 %" "€500.00" "VAT 0 %" "€0.00" "Total" "€3,012.24"
 	;;
 fr)
 	expect "invoice-fr-labels" "the French labels" flat_in_order "Facture" "Désignation" "Quantité" "Prix unitaire" "TVA" "Sous-total"

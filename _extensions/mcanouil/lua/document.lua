@@ -447,6 +447,15 @@ local function deliver_margin(meta, doc_type)
   meta.margin = meta.margin or M.MARGIN_VERTICAL[doc_type]
 end
 
+--- Turn the gitlink filter off for a document, so that a reference such as `abcd1234` in the metadata of a
+--- letter or an invoice prints as written instead of becoming a commit badge.
+--- @param meta table Document metadata
+local function disable_gitlink(meta)
+  meta.extensions = meta.extensions or pandoc.MetaMap({})
+  meta.extensions.gitlink = meta.extensions.gitlink or pandoc.MetaMap({})
+  meta.extensions.gitlink.enabled = false
+end
+
 --- Deliver the type and the resolved slots to Typst as `mcanouil-type`,
 --- `mcanouil-layout`, `mcanouil-kind`, `mcanouil-header` and `mcanouil-footer`.
 --- Stops the render, with a message, when the type cannot be rendered.
@@ -480,6 +489,7 @@ local function deliver(meta)
       fail.stop(standard_message)
     end
     meta['mcanouil-' .. resolved.type .. '-standard'] = standard
+    disable_gitlink(meta)
   end
   local furniture = M.furniture(meta)
   for _, part in ipairs(M.PARTS) do

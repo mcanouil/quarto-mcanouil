@@ -327,6 +327,7 @@
         column-gutter: 1em,
         row-gutter: 0.5em,
         align: top,
+        // BIC and IBAN stay untranslated: they are international terms.
         mc-labels.at("mcanouil-invoice-bank"), [BIC #bank.bic \ IBAN #bank.iban],
         mc-labels.at("mcanouil-invoice-reference"), strong(fields.reference),
       )
