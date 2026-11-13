@@ -2,7 +2,7 @@
 // narrow-screen contents pill and sheet, and the chapter header of an HTML
 // page, posted to the parent frame as JSON. Run by measure() in html.sh, which
 // sets window.mcMode to the mode of the measure: forced, print, reduced, rtl,
-// open, overlap, dark or nothing.
+// open, dark or nothing.
 //
 // @license MIT
 // @copyright 2026 Mickaël Canouil
@@ -261,25 +261,6 @@ const mcMeasure = () => {
     });
   }
 
-  // Overlap toggle: Quarto puts it in place of a side column under wide
-  // content. A real button opens a closed copy that stays out of the tab
-  // order, as does the hidden original.
-  const overlap = document.querySelector(".quarto-sidebar-toggle");
-  if (overlap) {
-    const title = overlap.querySelector(".quarto-sidebar-toggle-title");
-    const control = title && (title.tagName === "BUTTON" || title.getAttribute("role") === "button" ? title : title.querySelector("button"));
-    const contents = overlap.querySelector(".quarto-sidebar-toggle-contents");
-    const original = document.querySelector("#quarto-margin-sidebar");
-    const reachable = (el) => el && [...el.querySelectorAll("a[href], button")].some((a) => a.tabIndex >= 0 && !a.closest("[inert]") && getComputedStyle(a).visibility !== "hidden" && a.getClientRects().length > 0);
-    out.overlap = {
-      button: Boolean(control),
-      expanded: control ? control.getAttribute("aria-expanded") : null,
-      controls: Boolean(control && control.getAttribute("aria-controls") && document.getElementById(control.getAttribute("aria-controls"))),
-      closedInert: Boolean(contents && (contents.closest("[inert]") || contents.hasAttribute("hidden") || !reachable(contents))),
-      originalOut: !reachable(original),
-    };
-  }
-
   // Narrow screens: the pill and the sheet of mobile-toc.
   const pill = document.querySelector(".mobile-toc-pill");
   out.pills = [...document.querySelectorAll(".mobile-toc-pill, .quarto-toc-pill")].filter(shown).map((p) => p.className);
@@ -318,13 +299,4 @@ const mcMeasure = () => {
     finish();
   }
 };
-// With "overlap", the page first scrolls the first margin element into view,
-// so that Quarto swaps the contents column for its toggle.
-window.addEventListener("load", () => document.fonts.ready.then(() => {
-  const wide = window.mcMode === "overlap" && document.querySelector("main :is(.column-margin, .column-page-right, .column-screen-inset-right)");
-  if (!wide) return mcMeasure();
-  wide.scrollIntoView({ block: "center" });
-  setTimeout(() => window.scrollBy(0, 1), 300);
-  setTimeout(() => document.dispatchEvent(new Event("scroll")), 600);
-  setTimeout(mcMeasure, 1500);
-}));
+window.addEventListener("load", () => document.fonts.ready.then(mcMeasure));

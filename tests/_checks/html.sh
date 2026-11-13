@@ -9,6 +9,7 @@ set -euo pipefail
 #        html.sh toc <preset>
 #        html.sh book
 #        html.sh full
+#        html.sh overlap
 #        html.sh subdir
 #        html.sh measure <width> <height> [mode] [kind]   (prints the measures)
 #
@@ -773,9 +774,6 @@ check_toc() {
 	expect "html-toc-rtl-decoration-${preset}" "decorations of the contents on the mirrored side in a right-to-left page" \
 		mirrored "${ltr}" "${measures}"
 
-	measures="$(measure 1440 900 overlap nav)"
-	expect_todo "html-toc-overlap-button-${preset}" "quarto-cli#14969" \
-		measured "${measures}" 'm.get("overlap") and m["overlap"]["button"] and m["overlap"]["expanded"] in ("true", "false") and m["overlap"]["controls"] and m["overlap"]["closedInert"] and m["overlap"]["originalOut"]' 'm.get("overlap")'
 	measures="$(measure 360 640 "" nav)"
 	expect "html-toc-pill-${preset}" "one pill of 44 pixels or more on a narrow screen" \
 		measured "${measures}" 'm.get("pill") and m["pill"]["height"] >= 44 and len(m["pills"]) == 1' '(m.get("pill"), m["pills"])'
@@ -874,6 +872,34 @@ check_full() {
 	expect "html-axe-full" "no axe-core finding in light and dark, at 1440 and 320 pixels" axe_clean
 }
 
+# Check the overlap toggle that Quarto puts in place of the contents when
+# margin content sits beside it. Quarto builds the toggle from an
+# IntersectionObserver, so html-overlap-probe.mjs opens the page in a browser
+# session in real time (Node.js). When the toggle is built, it must be a real
+# button (quarto-cli#14969, a TODO until fixed); when the browser does not
+# build it, the check is skipped and says so, since it then proves nothing.
+check_overlap() {
+	local probe status=0
+	need node
+	browser="$(find_browser)"
+	if [ -z "${browser}" ]; then
+		printf 'Bail out! no Chromium browser; set CHROME_PATH\n'
+		exit 1
+	fi
+	probe="$(node "${tests_dir}/_checks/html-overlap-probe.mjs" "${browser}" "${output}" 1440 900)" || status=$?
+	[ -n "${probe}" ] || probe='{}'
+	expect "html-toc-overlap-probe" "the probe ran on a page with margin content beside the contents" \
+		measured "${probe}" 'm.get("margin") is True' 'm'
+	[ "${status}" -eq 0 ] || return 0
+	if measured "${probe}" 'm["toggle"]' 'm' >/dev/null; then
+		expect_todo "html-toc-overlap-button" "quarto-cli#14969" \
+			measured "${probe}" 'm["button"] and m["expanded"] in ("true", "false") and m["controls"] and m["closedInert"] and m["originalOut"]' 'm'
+	else
+		tap_n=$((tap_n + 1))
+		printf 'ok %d - html-toc-overlap-button # SKIP toggle not built (headless): %s\n' "${tap_n}" "${probe}"
+	fi
+}
+
 # Check that a document in a subdirectory of a project finds the fonts and the motif.
 check_subdir() {
 	structure="$(structure_report)"
@@ -889,6 +915,7 @@ components) check_components "${2:?components needs a preset}" ;;
 toc) check_toc "${2:?toc needs a preset}" ;;
 book) check_book ;;
 full) check_full ;;
+overlap) check_overlap ;;
 subdir) check_subdir ;;
 measure)
 	browser="$(find_browser)"
