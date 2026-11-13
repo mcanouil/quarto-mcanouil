@@ -1,0 +1,33 @@
+---
+title: Hash reference
+lang: en-GB
+date: 2026-11-11
+sender:
+  name: Mickaël Canouil
+  address:
+    - 12 Example Street
+    - Lille
+place: Lille
+reference: abcd1234
+subject: Training proposal
+address:
+  - Company Ltd
+  - 10 Station Road
+  - London
+opening: Dear Sir or Madam,
+closing: Yours faithfully,
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: letter
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A reference that looks like a commit hash prints as written, with no commit badge.
+        check: bash _checks/letter.sh hex
+---
+
+{{< include _letter-body.qmd >}}

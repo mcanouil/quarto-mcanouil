@@ -45,6 +45,14 @@ cases['labels-files-same-placeholders'] = function()
   end
 end
 
+cases['labels-german-letter-terms'] = function()
+  local english, german = labels.read('_language.yml'), labels.read('_language-de.yml')
+  for key in pairs(german) do
+    if english[key] == nil then error('missing in _language.yml: ' .. key) end
+    if not key:find('^mcanouil%-letter%-') then error('_language-de.yml holds only the letter terms: ' .. key) end
+  end
+end
+
 cases['labels-typst-string'] = function()
   assert_equal(labels.typst_string('a "b" \\c'), '"a \\"b\\" \\\\c"', 'escaped literal')
 end

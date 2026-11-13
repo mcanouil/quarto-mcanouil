@@ -16,6 +16,8 @@ $logo.typ()$
 
 $authors.typ()$
 
+$address.typ()$
+
 $title.typ()$
 
 $toc.typ()$
@@ -25,12 +27,17 @@ $report.typ()$
 $article.typ()$
 
 $memo.typ()$
+$letter.typ()$
+
+$invoice.typ()$
 
 // The document types, each a function (meta, body) -> content.
 #let mc-types = (
   report: mc-report,
   article: mc-article,
   memo: mc-memo,
+  letter: mc-letter,
+  invoice: mc-invoice,
 )
 
 // Answer the document of a type: the text, heading, code and link styles that
