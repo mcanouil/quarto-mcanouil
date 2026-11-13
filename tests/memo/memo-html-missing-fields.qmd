@@ -1,0 +1,23 @@
+---
+title: Quarto 1.11 migration
+format: mcanouil-html
+extensions:
+  mcanouil:
+    preset: gold
+    type: memo
+    kind: note
+    memo:
+      to: Data team
+      date: 11 Nov 2026
+    footer:
+      left: Internal
+      centre: Memo 2026-07
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In HTML, a memo field that the document leaves out has no term and no description in the banner.
+        check: bash _checks/html.sh memo missing gold
+---
+
+{{< include _note.qmd >}}

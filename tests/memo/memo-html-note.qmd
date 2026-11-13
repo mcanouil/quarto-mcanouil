@@ -1,0 +1,24 @@
+---
+title: Quarto 1.11 migration
+format: mcanouil-html
+extensions:
+  mcanouil:
+    preset: gold
+    type: memo
+    kind: note
+    memo:
+      to: Data team
+      from: M. Canouil
+      date: 11 Nov 2026
+    footer:
+      left: Internal
+      centre: Memo 2026-07
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In HTML, a note memo has the banner on the ground with the kind label, the title and the to, from and date fields in a definition list, and the band with the footer slots.
+        check: bash _checks/html.sh memo note gold
+---
+
+{{< include _note.qmd >}}
