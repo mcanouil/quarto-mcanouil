@@ -4,7 +4,7 @@ set -euo pipefail
 
 # Check hook: the letter document type, read from the word boxes, the pixels and the PDF text.
 #
-# Usage: letter.sh nf | din | en | override | hex | fields
+# Usage: letter.sh nf | din | en | override | hex | hex-enabled | fields
 #
 # Window geometry, in millimetres from the top left of an A4 page:
 #   NF Z 11-001: window at x 110, y 50, 80 wide and 35 high; fold marks at 99 and 198.
@@ -60,6 +60,9 @@ override)
 hex)
 	expect "letter-hex-reference" "the reference prints as written" page_has "Reference: abcd1234"
 	expect "letter-hex-no-badge" "no commit badge" page_lacks GitHub
+	;;
+hex-enabled)
+	expect "letter-hex-enabled-badge" "gitlink enabled by the author turns the reference into a badge" page_has GitHub
 	;;
 fields)
 	find_verapdf

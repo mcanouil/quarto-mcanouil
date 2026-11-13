@@ -448,12 +448,18 @@ local function deliver_margin(meta, doc_type)
 end
 
 --- Turn the gitlink filter off for a document, so that a reference such as `abcd1234` in the metadata of a
---- letter or an invoice prints as written instead of becoming a commit badge.
+--- letter or an invoice prints as written instead of becoming a commit badge. A setting of the author stays.
 --- @param meta table Document metadata
 local function disable_gitlink(meta)
-  meta.extensions = meta.extensions or pandoc.MetaMap({})
-  meta.extensions.gitlink = meta.extensions.gitlink or pandoc.MetaMap({})
-  meta.extensions.gitlink.enabled = false
+  if type(meta.extensions) ~= 'table' then
+    meta.extensions = pandoc.MetaMap({})
+  end
+  local gitlink = meta.extensions.gitlink
+  if gitlink == nil then
+    meta.extensions.gitlink = pandoc.MetaMap({ enabled = false })
+  elseif type(gitlink) == 'table' and gitlink.enabled == nil then
+    gitlink.enabled = false
+  end
 end
 
 --- Deliver the type and the resolved slots to Typst as `mcanouil-type`,
