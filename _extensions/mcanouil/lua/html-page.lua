@@ -12,6 +12,7 @@ local labels = require('lib.labels')
 local motif = require('lib.motif')
 local authors = require('authors')
 local document = require('document')
+local workshop = require('workshop')
 
 local M = {}
 
@@ -36,14 +37,19 @@ function M.motif_mask(name)
 end
 
 --- Answer the kicker of a document: the label of the memo kind in a memo, as
---- in the Typst banner, else the `kicker` metadata, or the label of the
---- document type when the type has one, as in the Typst title block.
+--- in the Typst banner, the session in a workshop, else the `kicker`
+--- metadata, or the label of the document type when the type has one, as in
+--- the Typst title block.
 --- @param meta table Document metadata
 --- @param resolved table|nil Type, layout and kind of the document, see `document.resolve`
 --- @return any|nil Kicker inlines, or nil
 local function kicker(meta, resolved)
   if resolved ~= nil and resolved.type == 'memo' then
     return pandoc.MetaInlines({ pandoc.Str(labels.get('mcanouil-memo-' .. resolved.kind)) })
+  end
+  local session = resolved ~= nil and resolved.type == 'workshop' and workshop.session_text(meta)
+  if session then
+    return pandoc.MetaInlines(pandoc.Inlines(session))
   end
   if meta.kicker ~= nil then
     return meta.kicker
@@ -118,6 +124,9 @@ local function deliver(meta)
   if resolved ~= nil and resolved.type == 'memo' then
     meta['mcanouil-memo'] = true
     meta['mcanouil-memo-fields'] = memo_fields(meta, resolved.kind)
+  end
+  if resolved ~= nil and resolved.type == 'workshop' then
+    meta['mcanouil-duration'] = workshop.duration_field(meta)
   end
   -- A book or a website page has Quarto's header as its banner landmark, so
   -- the title block is not a second banner: its text is a region named by

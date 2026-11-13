@@ -189,6 +189,12 @@ $endif$
     header: slots(left: [$mcanouil-header.left$], centre: [$mcanouil-header.centre$], right: [$mcanouil-header.right$]),
     footer: slots(left: [$mcanouil-footer.left$], centre: [$mcanouil-footer.centre$], right: [$mcanouil-footer.right$]),
     motif-name: mc-motif,
+$if(mcanouil-session)$
+    session: [$mcanouil-session$],
+$endif$
+$if(mcanouil-duration)$
+    duration: [$mcanouil-duration$],
+$endif$
 $if(mcanouil-memo-fields)$
     memo-fields: ($for(mcanouil-memo-fields)$(key: "$it.key$", value: [$it.value$]), $endfor$),
 $endif$

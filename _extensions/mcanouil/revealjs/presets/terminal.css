@@ -87,3 +87,8 @@
   color: var(--mc-accent-text);
   background: var(--mc-paper);
 }
+
+/* Workshop blocks: dashed boxes, as the terminal code windows. */
+.reveal .mc-ws:is(.mc-ws-objectives, .mc-ws-prerequisites, .mc-ws-exercise) {
+  border-style: dashed;
+}

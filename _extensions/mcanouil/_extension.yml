@@ -51,6 +51,7 @@ contributes:
           - html/presets/_quarto.scss
           - html/presets/_terminal.scss
           - html/memo.scss
+          - html/workshop.scss
           - html/decoration.scss
         dark:
           - html/tokens.scss
@@ -63,6 +64,7 @@ contributes:
           - html/presets/_quarto.scss
           - html/presets/_terminal.scss
           - html/memo.scss
+          - html/workshop.scss
           - html/decoration.scss
           - html/scheme-dark.scss
     typst:
@@ -90,6 +92,7 @@ contributes:
         - typst/types/memo.typ
         - typst/types/letter.typ
         - typst/types/invoice.typ
+        - typst/types/workshop.typ
         - typst/typst-template.typ
         - typst/typst-show.typ
     revealjs:
@@ -116,3 +119,4 @@ contributes:
       theme:
         - revealjs/theme.scss
         - revealjs/slides.scss
+        - revealjs/workshop.scss

@@ -343,3 +343,40 @@ for chunk in chunks:
         print(raw.decode("utf-16-be") if raw[:2] == b"\xfe\xff" else raw.decode("latin-1"))
 PY
 }
+
+# Succeed when a stylesheet animates the workshop blocks (selectors with
+# "mc-ws") only inside @media (prefers-reduced-motion: no-preference), and
+# has at least one such rule. A declaration of animation or transition with
+# the value none does not count.
+# $1 CSS file.
+motion_guarded() {
+	python3 -I - "$1" <<'PY'
+import re
+import sys
+
+css = re.sub(r"/\*.*?\*/", "", open(sys.argv[1], encoding="utf-8").read(), flags=re.S)
+stack, guarded, problems, start = [], 0, [], 0
+for index, char in enumerate(css):
+    if char == "{":
+        stack.append(css[start:index].strip())
+        start = index + 1
+    elif char == "}":
+        body = css[start:index]
+        selector = stack.pop() if stack else ""
+        start = index + 1
+        if "mc-ws" not in selector or selector.startswith("@"):
+            continue
+        for name, value in re.findall(r"(?:^|;)\s*(animation|transition)(?:-[a-z-]+)?\s*:\s*([^;]+)", body):
+            if value.strip().startswith("none"):
+                continue
+            if any("prefers-reduced-motion" in s and "no-preference" in s for s in stack):
+                guarded += 1
+            else:
+                problems.append("%s { %s: %s } outside prefers-reduced-motion: no-preference" % (selector, name, value.strip()))
+for problem in problems:
+    print("# " + problem)
+if guarded == 0:
+    print("# no guarded workshop motion rule in " + sys.argv[1])
+sys.exit(1 if problems or guarded == 0 else 0)
+PY
+}

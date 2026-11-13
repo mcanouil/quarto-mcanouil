@@ -86,3 +86,9 @@
     display: none;
   }
 }
+
+/* Workshop exercise: a card with a soft shadow. */
+.reveal .mc-ws-exercise {
+  background-color: var(--mc-card);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--mc-ink) 12%, transparent);
+}

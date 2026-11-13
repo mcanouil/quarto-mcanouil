@@ -43,6 +43,11 @@ $elseif(date-modified)$
 <div><dt>$labels.modified$</dt><dd class="date-modified">$date-modified$</dd></div>
 </dl>
 $endif$
+$if(mcanouil-duration)$
+<dl class="mc-meta mc-session-meta">
+<div><dt>$mcanouil-duration.label$</dt><dd class="mc-duration">$mcanouil-duration.value$</dd></div>
+</dl>
+$endif$
 $if(abstract)$
 <div class="mc-abstract">
 <p class="mc-block-title">$labels.abstract$</p>

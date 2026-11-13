@@ -3,8 +3,8 @@ $if(mcanouil-motif-svg)$
 $mcanouil-motif-svg$
 $endif$
 <div class="mc-title-content">
-$if(mcanouil-event)$
-<p class="mc-kicker">$mcanouil-event$</p>
+$if(mcanouil-kicker)$
+<p class="mc-kicker">$mcanouil-kicker$</p>
 $endif$
 <h1 class="title">$title$</h1>
 $if(subtitle)$
@@ -24,6 +24,9 @@ $endfor$
 $endif$
 $if(date)$
 <p class="date">$date$</p>
+$endif$
+$if(mcanouil-duration)$
+<p class="mc-duration"><span class="mc-duration-label">$mcanouil-duration.label$</span> $mcanouil-duration.value$</p>
 $endif$
 </div>
 </section>

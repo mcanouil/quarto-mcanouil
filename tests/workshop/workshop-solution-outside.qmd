@@ -1,0 +1,24 @@
+---
+title: Solution outside an exercise
+format: mcanouil-html
+extensions:
+  mcanouil:
+    type: workshop
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A solution block outside an exercise stops the render and says where it belongs.
+        errors: strict
+    mcanouil-html:
+      shouldError: true
+      printsMessage:
+        level: ERROR
+        regex: 'mcanouil: a \.solution block must sit inside an \.exercise block'
+---
+
+::: {.solution}
+
+An answer with no exercise.
+
+:::

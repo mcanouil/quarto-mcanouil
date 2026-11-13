@@ -59,3 +59,8 @@
     display: none;
   }
 }
+
+/* Workshop exercise label: the gilded mark of the preset. */
+.reveal .mc-ws-exercise > .mc-ws-label::before {
+  background: var(--mc-gilded, currentColor);
+}

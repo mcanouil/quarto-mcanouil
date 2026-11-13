@@ -197,6 +197,7 @@
       ["figure.mc-quote", "::before", "text"],
       ["figcaption.mc-quote-attribution", "::before", "text"],
       ["figcaption.mc-quote-attribution", null, "text"],
+      [".mc-ws-label", null, "text"],
     ];
     targets.forEach(function (target) {
       section.querySelectorAll(target[0]).forEach(function (element) {

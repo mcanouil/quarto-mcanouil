@@ -7,7 +7,8 @@
 --- of the preset with its corner motif, gives a slide with the `dark` class the
 --- dark paper, numbers the section slides, fills the three footer slots, builds
 --- the closing slide from `extensions.mcanouil.closing`, delivers to the
---- title slide partial the event, the speakers and the motif, and adds the
+--- title slide partial the kicker (the event, or the session of a workshop),
+--- the duration of a workshop, the speakers and the motif, and adds the
 --- style layer of the preset after the theme, so that it wins over the theme.
 
 local fail = require('lib.fail')
@@ -16,6 +17,7 @@ local motif = require('lib.motif')
 local preset = require('preset')
 local document = require('document')
 local authors = require('authors')
+local workshop = require('workshop')
 
 --- @type string Directory of the extension, the parent of `lua/`.
 local EXTENSION_DIR = debug.getinfo(1, 'S').source:match('^@(.*)[/\\]lua[/\\][^/\\]+$')
@@ -308,7 +310,8 @@ local function arrange(doc)
     motifs = 0,
     sections = 0,
   }
-  local furniture = document.furniture(doc.meta, 'deck')
+  local doc_type = (document.resolve(doc.meta, 'mcanouil-revealjs') or { type = 'deck' }).type
+  local furniture = document.furniture(doc.meta, doc_type)
   local slide_number = doc.meta.slideNumber
   local number_off = slide_number == false or (slide_number ~= nil and pandoc.utils.stringify(slide_number) == 'false')
   if not M.page_on_right(furniture) and not number_off then
@@ -357,9 +360,14 @@ local function arrange(doc)
   meta['mcanouil-motif-svg'] = pandoc.MetaBlocks({
     pandoc.RawBlock('html', motif.svg(state.motif, 'title')),
   })
-  local event = option(meta, 'event')
-  if event ~= nil then
-    meta['mcanouil-event'] = event
+  local kicker = option(meta, 'event')
+  if doc_type == 'workshop' then
+    local session = workshop.session_text(meta)
+    kicker = session and pandoc.MetaInlines(pandoc.Inlines(session)) or kicker
+    meta['mcanouil-duration'] = workshop.duration_field(meta)
+  end
+  if kicker ~= nil then
+    meta['mcanouil-kicker'] = kicker
   end
   meta['mcanouil-speakers'] = speakers(meta)
   if meta.title ~= nil and utf8.len(pandoc.utils.stringify(meta.title)) > M.LONG_TITLE then

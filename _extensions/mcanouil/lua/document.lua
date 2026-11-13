@@ -36,6 +36,7 @@ M.TYPES = {
   memo = { 'standard' },
   letter = { 'standard' },
   invoice = { 'standard' },
+  workshop = { 'standard' },
 }
 
 --- @type table<string, string[]> The kinds of the types that vary by kind, the default kind first.
@@ -102,12 +103,18 @@ M.DEFAULTS = {
     header = { left = '', centre = '', right = '' },
     footer = { left = '', centre = '', right = 'page' },
   },
+  workshop = {
+    header = { left = '', centre = '', right = '' },
+    footer = { left = 'event', centre = 'session', right = 'page' },
+  },
 }
 
 --- @type table<string, string|false> Fields a slot can name. A string is the
 --- Typst call that renders the field; `false` means the value comes from the
---- metadata key of the same name, except `author`, and `speaker`: the authors
---- and `extensions.mcanouil.event`, joined by a middle dot.
+--- metadata key of the same name, except `author`; `speaker`: the authors
+--- and `extensions.mcanouil.event`, joined by a middle dot; `event`:
+--- `extensions.mcanouil.event`; and `session`: the session label and
+--- `extensions.mcanouil.session.number`, for example "Session 2".
 M.FIELDS = {
   title = false,
   subtitle = false,
@@ -117,6 +124,8 @@ M.FIELDS = {
   chapter = '#chapter-title()',
   page = '#page-number()',
   speaker = false,
+  event = false,
+  session = false,
 }
 
 --- Read a slot value from the metadata.
@@ -252,6 +261,19 @@ function M.speaker_event(names, event)
   return inlines
 end
 
+--- Answer the number of the session of a workshop, `extensions.mcanouil.session.number`.
+--- @param meta table Document metadata
+--- @return string|nil Number, or nil when it is not set
+function M.session_number(meta)
+  local options = meta.extensions and meta.extensions.mcanouil or {}
+  local session = options.session
+  if type(session) ~= 'table' or session.number == nil then
+    return nil
+  end
+  local number = pandoc.utils.stringify(session.number)
+  return number ~= '' and number or nil
+end
+
 --- Answer the content of a slot. A field with no value gives empty inlines.
 --- @param slot table Slot from `M.furniture`
 --- @param meta table Document metadata
@@ -271,9 +293,16 @@ function M.resolve_slot(slot, meta, et_al)
   if slot.value == 'author' then
     return authors(meta, et_al)
   end
+  local options = meta.extensions and meta.extensions.mcanouil or {}
   if slot.value == 'speaker' then
-    local options = meta.extensions and meta.extensions.mcanouil or {}
     return M.speaker_event(authors(meta, et_al), options.event)
+  end
+  if slot.value == 'event' then
+    return options.event ~= nil and pandoc.Inlines(options.event) or pandoc.Inlines({})
+  end
+  if slot.value == 'session' then
+    local number = M.session_number(meta)
+    return number and pandoc.Inlines(labels.get('mcanouil-session') .. ' ' .. number) or pandoc.Inlines({})
   end
   local value = meta[slot.value]
   if value == nil then

@@ -8,6 +8,7 @@ set -euo pipefail
 #        html.sh components <preset>
 #        html.sh toc <preset>
 #        html.sh memo <note|minutes|agenda|brief|missing> <preset>
+#        html.sh workshop <preset>
 #        html.sh book
 #        html.sh full
 #        html.sh overlap
@@ -1067,6 +1068,88 @@ check_memo() {
 	expect "memo-html-axe-${case}-${preset}" "no axe-core finding in light and dark, at 1440 and 320 pixels" axe_clean
 }
 
+# Succeed when the workshop page has its solutions as closed native
+# disclosures with a "Solution" summary, its blocks as named groups with a
+# visible label, the session as the kicker, the duration in the metadata, and
+# the event and the session in the page footer.
+workshop_structure() {
+	python3 -I - "${output}" <<'PY'
+import re
+import sys
+
+html = open(sys.argv[1], encoding="utf-8").read()
+problems = []
+details = re.findall(r"<details\b([^>]*)>\s*<summary\b[^>]*>(.*?)</summary>(.*?)</details>", html, re.S)
+solutions = [d for d in details if "mc-ws-solution" in d[0]]
+if len(solutions) != 2:
+    problems.append("%d details.mc-ws-solution, expected 2" % len(solutions))
+for attrs, summary, body in solutions:
+    if re.search(r"\bopen\b", attrs):
+        problems.append("a solution is open by default: <details%s>" % attrs)
+    if re.sub(r"<[^>]+>", "", summary).strip() != "Solution":
+        problems.append("summary %r, expected 'Solution'" % summary)
+if solutions and "The first solution sets two formats" not in solutions[0][2]:
+    problems.append("the first solution text is not in its disclosure")
+labels = re.findall(r'<p class="mc-ws-label" id="([^"]+)">(.*?)</p>', html, re.S)
+want = ["Objectives", "Prerequisites", "Exercise 2.1 · 15 min · solo", "Exercise 2.2 · 20 min · pairs", "Checkpoint"]
+found = [re.sub(r"<[^>]+>", "", text).strip() for _, text in labels]
+if found != want:
+    problems.append("labels %r, expected %r" % (found, want))
+for ident, _ in labels:
+    if not re.search(r'<div[^>]*role="group"[^>]*aria-labelledby="%s"|<div[^>]*aria-labelledby="%s"[^>]*role="group"' % (ident, ident), html):
+        problems.append("no group named by #%s" % ident)
+kicker = re.search(r'<p class="mc-kicker">(.*?)</p>', html, re.S)
+if not kicker or kicker.group(1).strip() != "Session 2 of 7":
+    problems.append("kicker %r, expected 'Session 2 of 7'" % (kicker.group(1) if kicker else None))
+if not re.search(r"<dt>Duration</dt>\s*<dd[^>]*>90 min</dd>", html):
+    problems.append("no Duration 90 min in the title block metadata")
+footer = re.search(r'<footer class="mc-page-footer[^"]*".*?</footer>', html, re.S)
+text = re.sub(r"<[^>]+>", "|", footer.group(0)) if footer else ""
+if "Mastering Quarto CLI" not in text or "Session 2" not in text:
+    problems.append("footer %r, expected the event and the session" % text)
+for problem in problems:
+    print("# " + problem)
+sys.exit(1 if problems else 0)
+PY
+}
+
+# Check the HTML page of the workshop session in one preset.
+# $1 preset.
+check_workshop() {
+	local preset="$1" scheme expected measures light_css
+	light_css="$(linked_css quarto-bootstrap 0)"
+	expect "workshop-html-details-${preset}" "closed <details> solutions, labelled groups, the session kicker, the duration and the footer slots" \
+		workshop_structure
+	expect "workshop-reduced-motion-html-${preset}" "workshop motion only inside prefers-reduced-motion: no-preference" \
+		motion_guarded "${light_css}"
+
+	browser="$(find_browser)"
+	if [ -z "${browser}" ]; then
+		printf 'Bail out! no Chromium browser; set CHROME_PATH\n'
+		exit 1
+	fi
+	measures="$(measure 1440 900 "" workshop)"
+	expect "workshop-html-labels-shown-${preset}" "a visible label on every block, the same text as the name of its group" \
+		measured "${measures}" 'len(m["blocks"]) == 7 and all(b["label"] and (b["group"] == "details" or b["named"] == b["label"]) for b in m["blocks"])' 'm["blocks"]'
+	expect "workshop-html-closed-${preset}" "both solutions closed when the page opens" \
+		measured "${measures}" 'm["closed"] == [True, True]' 'm["closed"]'
+	expect "no-ligatures-html-${preset}" "font-variant-ligatures: none and liga and calt off on every code element" \
+		measured "${measures}" 'm["code"] and all(c["ligatures"] == "none" and "\"liga\" 0" in c["features"] and "\"calt\" 0" in c["features"] for c in m["code"])' 'm["code"][:3]'
+	expect "workshop-html-silent-marks-${preset}" "decorative marks of the labels with an empty alternative text" \
+		measured "${measures}" 'm["silent"]' 'm["decorations"]'
+	for scheme in light dark; do
+		expected="${scheme}"
+		[ "${preset}" = terminal ] && expected=dark
+		measures="$(measure 1440 900 "$([ "${scheme}" = dark ] && echo dark || true)" workshop)"
+		expect "workshop-html-colours-${preset}-${scheme}" "block labels and text at 4.5:1 or more on ${expected} backgrounds" \
+			component_colours "${measures}" "${expected}"
+	done
+	measures="$(measure 1440 900 forced workshop)"
+	expect "workshop-html-forced-colors-${preset}" "label marks hidden in forced colours, labels still shown" \
+		measured "${measures}" 'not m["decorations"] and all(b["label"] for b in m["blocks"])' '(m["decorations"], m["blocks"])'
+	expect "workshop-html-axe-${preset}" "no axe-core finding in light and dark, at 1440 and 320 pixels" axe_clean
+}
+
 structure=""
 browser=""
 case "${1:-}" in
@@ -1074,6 +1157,7 @@ title) check_title "${2:?title needs a preset}" ;;
 components) check_components "${2:?components needs a preset}" ;;
 toc) check_toc "${2:?toc needs a preset}" ;;
 memo) check_memo "${2:?memo needs a case}" "${3:?memo needs a preset}" ;;
+workshop) check_workshop "${2:?workshop needs a preset}" ;;
 book) check_book ;;
 full) check_full ;;
 overlap) check_overlap ;;

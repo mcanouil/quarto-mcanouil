@@ -8,6 +8,18 @@ local function assert_equal(actual, expected, what)
   end
 end
 
+-- Labels read the document language from Quarto, which the unit runner does
+-- not have: run a function with an empty language table, so labels are English.
+local function in_english(fn)
+  local saved = quarto
+  quarto = { doc = { language = {} } }
+  local ok, err = pcall(fn)
+  quarto = saved
+  if not ok then
+    error(err, 0)
+  end
+end
+
 local function options(furniture)
   return { extensions = { mcanouil = furniture } }
 end
@@ -133,7 +145,7 @@ end
 
 cases['resolve-unknown-type'] = function()
   fails_with(
-    type_options({ type = 'poster' }), 'mcanouil-typst', 'mcanouil: unknown type "poster"; use article, invoice, letter, memo, report.', 'unknown type'
+    type_options({ type = 'poster' }), 'mcanouil-typst', 'mcanouil: unknown type "poster"; use article, invoice, letter, memo, report, workshop.', 'unknown type'
   )
 end
 
@@ -294,6 +306,32 @@ cases['letter-standard-unknown'] = function()
   local standard, message = document.letter_standard(letter_meta('fr', 'iso'))
   assert_equal(standard, nil, 'result')
   assert_equal(message, 'mcanouil: unknown letter-standard "iso"; use din, nf.', 'message')
+end
+
+cases['furniture-workshop-default'] = function()
+  local furniture = document.furniture(options({ type = 'workshop' }))
+  assert_equal(furniture.header.left.kind, 'empty', 'header left')
+  assert_equal(furniture.footer.left.value, 'event', 'footer left')
+  assert_equal(furniture.footer.centre.value, 'session', 'footer centre')
+  assert_equal(furniture.footer.right.value, 'page', 'footer right')
+end
+
+cases['slot-event-session'] = function()
+  in_english(function()
+    local meta = options({
+      event = pandoc.MetaInlines({ pandoc.Str('Mastering'), pandoc.Space(), pandoc.Str('Quarto') }),
+      session = { number = pandoc.MetaString('2'), total = pandoc.MetaString('7') },
+    })
+    assert_equal(pandoc.utils.stringify(document.resolve_slot({ kind = 'field', value = 'event' }, meta)), 'Mastering Quarto', 'event')
+    assert_equal(pandoc.utils.stringify(document.resolve_slot({ kind = 'field', value = 'session' }, meta)), 'Session 2', 'session')
+    assert_equal(pandoc.utils.stringify(document.resolve_slot({ kind = 'field', value = 'session' }, {})), '', 'no session')
+  end)
+end
+
+cases['resolve-workshop-every-format'] = function()
+  for _, format in ipairs({ 'mcanouil-html', 'mcanouil-typst', 'mcanouil-revealjs' }) do
+    assert_equal(document.resolve(type_options({ type = 'workshop' }), format).type, 'workshop', format)
+  end
 end
 
 return cases
