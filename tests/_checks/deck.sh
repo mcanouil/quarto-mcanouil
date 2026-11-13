@@ -304,7 +304,7 @@ text_clear_of_motif() {
 # Answer the colour readings that the deck fixture must give for a preset, one
 # "<slide> <name>" per line: the kicker, the section number, the quote label or
 # icon of the preset, the attribution, the footer slots, the slide number and
-# the menu button.
+# the menu button, and the focus rings of the slide number and the menu button.
 # $1 preset.
 expected_colours() {
 	local slide
@@ -317,6 +317,7 @@ expected_colours() {
 	printf 'one-rule figcaption.mc-quote-attribution\n'
 	for slide in brand-presets why-presets one-rule why-presets-after-dark; do
 		printf '%s footer-left\n%s footer-centre\n%s slide-number\n%s menu-button\n' "${slide}" "${slide}" "${slide}" "${slide}"
+		printf '%s slide-number-ring\n%s menu-button-ring\n' "${slide}" "${slide}"
 	done
 }
 

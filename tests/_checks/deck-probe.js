@@ -5,7 +5,10 @@
  * - "<slide> shape x0 y0 x1 y1": the box of a motif shape, in slide pixels.
  * - "<slide> text x0 y0 x1 y1": a line box of text, or an image, in slide pixels.
  * - "<slide> colour <name> <ratio> <threshold>": the lowest contrast ratio of
- *   an element on its effective background, and the ratio it needs.
+ *   an element on its effective background, and the ratio it needs. A name
+ *   that ends in "-ring" is the focus ring of a control, read with the control
+ *   focused, against the background around the control; a control with no
+ *   ring reads 0.
  * - "<slide> error <message>": the probe failed on the slide.
  *
  * @license MIT
@@ -103,7 +106,7 @@
     var fill = parseColours(style.webkitTextFillColor)[0];
     var clipped = fill && fill[3] === 0;
     layers(element, section ? section.parentElement : null).forEach(function (node) {
-      if (node === element && !pseudo && clipped) { return; }
+      if (node === element && ((!pseudo && clipped) || kind === "ring")) { return; }
       var own = paints(getComputedStyle(node));
       if (own.length === 0) { return; }
       var next = [];
@@ -111,7 +114,10 @@
       backgrounds = next;
     });
     var foregrounds;
-    if (kind === "mark") {
+    if (kind === "ring") {
+      var drawn = style.outlineStyle !== "none" && parseFloat(style.outlineWidth) > 0;
+      foregrounds = drawn ? parseColours(style.outlineColor) : [[0, 0, 0, 0]];
+    } else if (kind === "mark") {
       foregrounds = parseColours(style.backgroundColor);
     } else {
       if (pseudo) {
@@ -127,12 +133,12 @@
     var lowest = Infinity;
     backgrounds.forEach(function (base) {
       foregrounds.forEach(function (fg) {
-        lowest = Math.min(lowest, ratio(fg[3] < 1 ? over(fg, base) : fg, base));
+        lowest = fg[3] === 0 ? 0 : Math.min(lowest, ratio(fg[3] < 1 ? over(fg, base) : fg, base));
       });
     });
     var size = parseFloat(style.fontSize);
     var bold = parseInt(style.fontWeight, 10) >= 700;
-    var threshold = kind === "mark" || size >= 24 || (bold && size >= 18.66) ? 3 : 4.5;
+    var threshold = kind === "mark" || kind === "ring" || size >= 24 || (bold && size >= 18.66) ? 3 : 4.5;
     lines.push([slide, "colour", name, lowest.toFixed(2), threshold].join(" "));
   }
 
@@ -156,6 +162,17 @@
       });
     }
     section.querySelectorAll("img").forEach(function (image) { add("text", image.getBoundingClientRect()); });
+  }
+
+  // Focus a control as a keyboard user would, and read its focus ring.
+  function measureRing(slide, name, element) {
+    element.focus({ focusVisible: true });
+    if (!element.matches(":focus-visible")) {
+      lines.push([slide, "error", name + "_not_focus_visible"].join(" "));
+      return;
+    }
+    measureColour(slide, name, element, null, "ring");
+    element.blur();
   }
 
   function measureSlide(slide) {
@@ -187,7 +204,15 @@
     var menu = document.querySelector(".reveal .slide-menu-button .fa-bars");
     if (menu && getComputedStyle(menu.closest(".slide-menu-button")).display !== "none") {
       measureColour(slide, "menu-button", menu, "::before", "mark");
+      measureRing(slide, "menu-button-ring", menu.closest("a"));
     }
+    var numberLink = document.querySelector(".reveal .slide-number a");
+    if (numberLink && getComputedStyle(number).display !== "none") {
+      measureRing(slide, "slide-number-ring", numberLink);
+    }
+    section.querySelectorAll("a[href]").forEach(function (link) {
+      measureRing(slide, "link-ring", link);
+    });
   }
 
   function next(slides) {

@@ -76,9 +76,19 @@ $mc-semantics: note, tip, warning, important, caution;
 }
 
 .reveal .slides section :focus-visible,
-.reveal .footer :focus-visible {
+.reveal .footer :focus-visible,
+.reveal .slide-number a:focus-visible,
+.reveal .slide-menu-button a:focus-visible {
   outline: 3px solid var(--mc-link);
   outline-offset: 2px;
+}
+
+// On a ground or dark slide, the controls outside the slide sit on the dark
+// background, so their focus ring takes the ground text colour.
+.mc-dark .reveal .footer :focus-visible,
+.mc-dark .reveal .slide-number a:focus-visible,
+.mc-dark .reveal .slide-menu-button a:focus-visible {
+  outline-color: var(--mc-on-ground-text);
 }
 
 .reveal .slides section li::marker {

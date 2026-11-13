@@ -33,6 +33,10 @@ $mc-motif-section: 70% !default;
   color: var(--mc-on-ground-accent);
 }
 
+.reveal .slides section.mc-ground :focus-visible {
+  outline-color: var(--mc-on-ground-accent);
+}
+
 .reveal .slides section.mc-ground > :is(h1, h2)::after {
   content: "";
   display: block;
