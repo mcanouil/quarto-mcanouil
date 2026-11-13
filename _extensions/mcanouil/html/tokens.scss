@@ -1,5 +1,16 @@
 /*-- scss:defaults --*/
 
+/*-- scss:mixins --*/
+
+// Scope rules to one preset. The preset step of the Lua filter writes
+// <meta name="mcanouil-preset" content="<preset>"> in the head of the page, so
+// the scope needs no script. :where() keeps the specificity of the rules inside.
+@mixin mc-preset($name) {
+  :where(:root:has(meta[name="mcanouil-preset"][content="#{$name}"])) {
+    @content;
+  }
+}
+
 /*-- scss:rules --*/
 
 body {

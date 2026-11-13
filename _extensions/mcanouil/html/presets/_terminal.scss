@@ -1,0 +1,279 @@
+/*-- scss:defaults --*/
+
+// terminal, console: a $ prompt and a cursor on the title, [ ] around the
+// kicker, ## before headings, dashed rules and boxes, square corners. The
+// generated text has an empty alternative, so screen readers skip it.
+$mc-terminal-radius: 0px !default;
+
+/*-- scss:rules --*/
+
+@include mc-preset(terminal) {
+  // Dark only: the light tokens repeat the dark ones, so the scheme toggle
+  // has nothing to switch.
+  color-scheme: dark;
+
+  .quarto-color-scheme-toggle {
+    display: none;
+  }
+
+  body {
+    --mc-radius: #{$mc-terminal-radius};
+  }
+
+  .mc-title-block .title::before {
+    content: "$ ";
+    content: "$ " / "";
+    color: var(--mc-accent-high);
+  }
+
+  .mc-title-block .title::after {
+    content: "";
+    display: inline-block;
+    width: 0.55em;
+    height: 0.9em;
+    margin-inline-start: 0.15em;
+    vertical-align: -0.1em;
+    background-color: var(--mc-accent-high);
+  }
+
+  .mc-kicker::before {
+    content: "[ ";
+    content: "[ " / "";
+  }
+
+  .mc-kicker::after {
+    content: " ]";
+    content: " ]" / "";
+  }
+
+  .mc-title-rule {
+    height: 2px;
+    border-radius: 0;
+    background-image: repeating-linear-gradient(90deg, var(--mc-accent-high) 0 6px, transparent 6px 9px);
+  }
+
+  main.content h2::before {
+    content: "## ";
+    content: "## " / "";
+    color: var(--mc-accent-high);
+  }
+
+  .mc-abstract {
+    border: 1px dashed var(--mc-accent);
+    background-color: transparent;
+  }
+
+  // Callouts: dashed boxes with a [!NOTE] label and a dot field. The title
+  // names the type, so the icon goes.
+  div.callout.callout-style-default,
+  div.callout.callout-style-simple {
+    border: 1px dashed var(--mc-callout);
+    border-radius: 0;
+  }
+
+  div.callout.callout-style-default > .callout-header,
+  div.callout.callout-style-simple > .callout-header {
+    font-family: var(--mc-font-mono);
+    text-transform: uppercase;
+  }
+
+  div.callout .callout-icon-container {
+    display: none;
+  }
+
+  // A flex container drops the white space around the title text, so the
+  // brackets sit close to it.
+  div.callout .callout-title-container {
+    display: flex;
+  }
+
+  // A custom title keeps the type in a screen reader span. With no icon, the
+  // span shows, inside the brackets and before the title, so the type is not
+  // told by colour alone: [!IMPORTANT] Database lock.
+  div.callout .callout-title-container .screen-reader-only {
+    position: static;
+    order: -1;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: nowrap;
+  }
+
+  div.callout .callout-title-container::before {
+    order: -2;
+  }
+
+  div.callout .callout-title-container:has(.screen-reader-only)::after {
+    order: -1;
+    margin-inline-end: 0.6em;
+  }
+
+  div.callout .callout-title-container::before {
+    content: "[!";
+    content: "[!" / "";
+  }
+
+  div.callout .callout-title-container::after {
+    content: "]";
+    content: "]" / "";
+  }
+
+  // Tabs: [ R ], the active tab in the accent text colour.
+  .panel-tabset .nav-tabs {
+    --bs-nav-tabs-border-color: transparent;
+    --bs-nav-tabs-link-active-color: var(--mc-accent-text);
+    --bs-nav-tabs-link-active-bg: transparent;
+    --bs-nav-tabs-link-active-border-color: transparent;
+    font-family: var(--mc-font-mono);
+  }
+
+  .panel-tabset .nav-tabs .nav-link {
+    padding-inline: 0.5rem;
+  }
+
+  .panel-tabset .nav-tabs .nav-link::before {
+    content: "[ ";
+    content: "[ " / "";
+  }
+
+  .panel-tabset .nav-tabs .nav-link::after {
+    content: " ]";
+    content: " ]" / "";
+  }
+
+  // The active tab is bold behind a > cursor, not told by colour alone.
+  .panel-tabset .nav-tabs .nav-link.active {
+    font-weight: 700;
+  }
+
+  .panel-tabset .nav-tabs .nav-link.active::before {
+    content: "> [ ";
+    content: "> [ " / "";
+  }
+
+  // Dot field: the mask is larger than the corner box, so the
+  // box shows the corner of the field with dots large enough to see.
+  div.callout.callout-style-default::after,
+  div.callout.callout-style-simple::after {
+    mask-size: 7rem;
+    opacity: 0.8;
+  }
+
+  // Code: dashed windows.
+  div.sourceCode {
+    border-style: dashed;
+    border-radius: 0;
+  }
+
+  body .code-with-filename {
+    border: 1px dashed var(--mc-accent);
+    border-radius: 0;
+  }
+
+  body .code-with-filename .code-with-filename-file {
+    border-bottom-style: dashed;
+  }
+
+  // Block quotes: a dashed box with a [QUOTE] label on its top edge.
+  figure.mc-quote {
+    margin-top: 2rem;
+    padding: 1rem 0.75rem 0.5rem;
+    border: 1px dashed var(--mc-line);
+  }
+
+  figure.mc-quote::before {
+    content: "[" attr(data-mc-label) "]";
+    content: "[" attr(data-mc-label) "]" / "";
+    position: absolute;
+    top: -0.75em;
+    inset-inline-start: 0.6rem;
+    padding: 0 0.4rem;
+    background-color: var(--mc-paper);
+    color: var(--mc-accent-text);
+    font-size: 0.85em;
+    text-transform: uppercase;
+  }
+}
+
+// Contents and sidebar in the monospace font, with a > cursor before the
+// current item, tree lines before nested pages and [+] or [-] on part
+// headers.
+@include mc-preset(terminal) {
+  #quarto-margin-sidebar,
+  #quarto-sidebar,
+  #TOC a.nav-link,
+  .mc-chapter-contents {
+    font-family: var(--mc-font-mono);
+  }
+
+  #TOC {
+    --mc-toc-current: var(--mc-accent-text);
+  }
+
+  #quarto-sidebar a.sidebar-link.active {
+    color: var(--mc-accent-text);
+  }
+
+  #TOC a.nav-link {
+    position: relative;
+    padding-inline-start: 1.5ch;
+  }
+
+  #TOC ul ul a.nav-link {
+    padding-inline-start: calc(1.5ch + 1.25rem);
+  }
+
+  #TOC ul ul ul a.nav-link {
+    padding-inline-start: calc(1.5ch + 2rem);
+  }
+
+  #TOC a.nav-link.active::before {
+    content: ">" / "";
+    position: absolute;
+    inset-inline-start: 0;
+  }
+
+  #TOC ul ul a.nav-link.active::before {
+    inset-inline-start: 1.25rem;
+  }
+
+  #TOC ul ul ul a.nav-link.active::before {
+    inset-inline-start: 2rem;
+  }
+
+  #quarto-sidebar a.sidebar-link.active::before {
+    content: "> " / "";
+  }
+
+  #quarto-sidebar.sidebar-navigation:not(.rollup) {
+    border-inline-end: 1px dashed var(--mc-line);
+  }
+
+  #quarto-sidebar .sidebar-section a.sidebar-link:not(.active)::before {
+    content: "\251C\2500  " / "";
+    color: var(--mc-muted);
+  }
+
+  // In a right-to-left page the branch points the other way.
+  #quarto-sidebar .sidebar-section a.sidebar-link:not(.active):dir(rtl)::before {
+    content: "\2524\2500  " / "";
+  }
+
+  #quarto-sidebar .sidebar-item-toggle .bi-chevron-right::before {
+    content: "[+]" / "";
+    font-family: var(--mc-font-mono);
+    transform: none;
+  }
+
+  #quarto-sidebar .sidebar-item-toggle[aria-expanded="true"] .bi-chevron-right::before {
+    content: "[-]" / "";
+    transform: none;
+  }
+
+  .mc-chapter-contents {
+    border: 1px dashed var(--mc-line);
+    background-color: transparent;
+  }
+}

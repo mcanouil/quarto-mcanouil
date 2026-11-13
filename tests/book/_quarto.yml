@@ -27,6 +27,8 @@ bibliography: references.bib
 format:
   mcanouil-typst:
     keep-typ: true
+  mcanouil-html:
+    toc: true
 
 extensions:
   mcanouil:
@@ -38,6 +40,6 @@ _quarto:
   tests:
     run:
       extension-test:
-        description: The test book, modelled on the clinical study report demonstration, renders as a full report with a cover, chapter dividers and contents pages, lettered appendices and a closing page.
-        check: bash _checks/types.sh book
+        description: The test book, modelled on the clinical study report demonstration, renders as a full report with a cover, chapter dividers and contents pages, lettered appendices and a closing page, and as a book website with the preset sidebar, contents and chapter headers.
+        check: bash _checks/book.sh
         timeout: 300

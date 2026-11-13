@@ -1,0 +1,264 @@
+/*-- scss:defaults --*/
+
+// gold, editorial: small-caps kicker, gilded rules under the title and H2,
+// warm boxes with a thin gold edge.
+$mc-gold-radius: 5px !default;
+
+/*-- scss:rules --*/
+
+@include mc-preset(gold) {
+  body {
+    --mc-radius: #{$mc-gold-radius};
+    --mc-font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .mc-kicker {
+    font-size: 0.95rem;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.12em;
+    text-transform: none;
+  }
+
+  .mc-byline .mc-author-degrees {
+    font-variant-caps: all-small-caps;
+  }
+
+  main.content h2::after {
+    content: "";
+    display: block;
+    width: 2.5rem;
+    height: 2px;
+    margin-top: 0.35rem;
+    background-image: linear-gradient(90deg, var(--mc-accent), var(--mc-accent-high));
+  }
+
+  .mc-abstract {
+    border: 1px solid var(--mc-line);
+    border-inline-start: 3px solid var(--mc-accent);
+  }
+
+  // Callouts: a tint of the type colour, a gilded corner facet, the title in
+  // small capitals.
+  div.callout.callout-style-default,
+  div.callout.callout-style-simple {
+    border: 0;
+    border-inline-start: 3px solid var(--mc-callout);
+  }
+
+  div.callout.callout-style-default > .callout-header,
+  div.callout.callout-style-simple > .callout-header {
+    font-family: var(--mc-font-headings);
+    font-size: 1rem;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.04em;
+  }
+
+  // Tabs: no box, a gilded underline under the active tab.
+  .panel-tabset .nav-tabs {
+    --bs-nav-tabs-link-active-bg: transparent;
+    --bs-nav-tabs-link-active-border-color: transparent;
+    font-family: var(--mc-font-headings);
+  }
+
+  .panel-tabset .nav-tabs .nav-link {
+    position: relative;
+  }
+
+  .panel-tabset .nav-tabs .nav-link.active::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0.5rem;
+    bottom: -1px;
+    height: 3px;
+    border-radius: 2px;
+    background-image: linear-gradient(90deg, var(--mc-accent-low), var(--mc-accent-high) 50%, var(--mc-accent-low));
+  }
+
+  // Block quotes: a gilded edge, italic text, the attribution in small
+  // capitals.
+  figure.mc-quote {
+    padding: 0.15rem 0 0.15rem 1.1rem;
+    border-inline-start: 0;
+    font-size: 1.1rem;
+    font-style: italic;
+  }
+
+  figure.mc-quote::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 2px;
+    background-image: linear-gradient(var(--mc-accent-low), var(--mc-accent-high), var(--mc-accent-low));
+  }
+
+  figure.mc-quote .mc-quote-attribution {
+    color: var(--mc-accent-text);
+    font-style: normal;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.05em;
+  }
+}
+
+// Contents as a white card with a gold hairline and a corner facet; the
+// current entry as a soft gold pill with a small facet at its end. Sidebar
+// with a thin border at its end, a gilded hairline under the title,
+// small-caps part headers with + and -, and the current page as a gold pill
+// after a small diamond.
+@include mc-preset(gold) {
+  nav#TOC {
+    position: relative;
+    overflow: hidden;
+    padding: 0.75rem 0.6rem 0.6rem;
+    border: 1px solid color-mix(in srgb, var(--mc-accent) 40%, transparent);
+    border-radius: 10px;
+    background-color: var(--mc-card);
+  }
+
+  nav#TOC::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    inset-inline-end: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-image: linear-gradient(135deg, var(--mc-accent-high), var(--mc-accent));
+    clip-path: polygon(38% 0, 100% 0, 100% 62%);
+    opacity: 0.28;
+    pointer-events: none;
+  }
+
+  // In a right-to-left page the facets sit in the other corner.
+  nav#TOC:dir(rtl)::before {
+    background-image: linear-gradient(225deg, var(--mc-accent-high), var(--mc-accent));
+    clip-path: polygon(0 0, 62% 0, 0 62%);
+  }
+
+  #TOC > #toc-title {
+    padding-inline: 0.4rem;
+    color: var(--mc-ink);
+    font-family: var(--mc-font-headings);
+    font-size: 0.95rem;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  #TOC > #toc-title::after {
+    content: "";
+    display: block;
+    width: 2rem;
+    height: 2px;
+    margin-top: 0.3rem;
+    border-radius: 2px;
+    background-image: var(--mc-gilded);
+  }
+
+  #TOC a.nav-link {
+    position: relative;
+    overflow: hidden;
+    padding-block: 0.2rem;
+    padding-inline-end: 1.1rem;
+    border-radius: 6px;
+    font-family: var(--mc-font-headings);
+  }
+
+  #TOC a.nav-link:hover {
+    text-decoration-color: color-mix(in srgb, var(--mc-accent) 60%, transparent);
+  }
+
+  #TOC a.nav-link.active {
+    background-color: color-mix(in srgb, var(--mc-accent) 16%, var(--mc-card));
+  }
+
+  #TOC a.nav-link.active::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    inset-inline-end: 0;
+    width: 0.75rem;
+    height: 0.75rem;
+    background-image: linear-gradient(135deg, var(--mc-accent-high), var(--mc-accent));
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+    opacity: 0.85;
+  }
+
+  #TOC a.nav-link.active:dir(rtl)::after {
+    background-image: linear-gradient(225deg, var(--mc-accent-high), var(--mc-accent));
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+
+  #quarto-sidebar.sidebar-navigation:not(.rollup) {
+    border-inline-end: 1px solid var(--mc-line);
+  }
+
+  #quarto-sidebar .sidebar-title::after {
+    content: "";
+    display: block;
+    height: 1px;
+    margin-top: 0.5rem;
+    background-image: var(--mc-gilded);
+  }
+
+  #quarto-sidebar a.sidebar-link,
+  #quarto-sidebar .sidebar-item-section > .sidebar-item-container > .sidebar-item-toggle {
+    border-radius: 6px;
+    font-family: var(--mc-font-headings);
+  }
+
+  #quarto-sidebar .sidebar-item-section > .sidebar-item-container > .sidebar-item-toggle {
+    font-size: 1rem;
+    font-variant-caps: all-small-caps;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  #quarto-sidebar .sidebar-item-toggle .bi-chevron-right::before {
+    content: "+" / "";
+    color: var(--mc-muted);
+    font-family: var(--mc-font-ui);
+    font-weight: 400;
+    transform: none;
+  }
+
+  #quarto-sidebar .sidebar-item-toggle[aria-expanded="true"] .bi-chevron-right::before {
+    content: "\2212" / "";
+    transform: none;
+  }
+
+  #quarto-sidebar a.sidebar-link.active {
+    background-color: color-mix(in srgb, var(--mc-accent) 16%, var(--mc-paper));
+  }
+
+  #quarto-sidebar a.sidebar-link.active::before {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin-inline-end: 0.45rem;
+    margin-bottom: 2px;
+    background-color: var(--mc-accent);
+    transform: rotate(45deg);
+  }
+
+  .mc-chapter-contents {
+    border-inline-start: 0;
+    background-color: var(--mc-card);
+    box-shadow: inset 0 2px 0 var(--mc-accent);
+  }
+
+  .mc-chapter-contents .mc-chapter-contents-title {
+    color: var(--mc-ink);
+    font-family: var(--mc-font-headings);
+    font-size: 1rem;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  .mc-chapter-contents a {
+    font-family: var(--mc-font-headings);
+  }
+}

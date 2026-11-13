@@ -4,6 +4,9 @@ _quarto:
     mcanouil-typst:
       ensureTypstFileRegexMatches:
         - ['mcanouil-document\(\s*"report",\s*"full",\s*none', 'mc-part-divider\.update\(true\)']
+    mcanouil-html:
+      ensureFileRegexMatches:
+        - ['<nav id="quarto-sidebar"', '<meta name="mcanouil-preset" content="gold">']
 ---
 
 # Preface {.unnumbered}
