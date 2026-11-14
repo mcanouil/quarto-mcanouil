@@ -40,3 +40,17 @@ The worked answer wraps the text in a warning callout.
 :::
 
 :::
+
+## Cross-reference ids {#cross-reference-ids}
+
+::: {.exercise duration="5 min"}
+
+Give a solution an id with the sol- prefix.
+
+::: {.solution #sol-a}
+
+The second answer keeps the id the author wrote.
+
+:::
+
+:::

@@ -236,7 +236,7 @@ local function solution(div, number, state)
   if state.mode == 'hide' then
     return pandoc.Blocks({})
   end
-  local target = '<mc-ws-solution-' .. number:gsub('%.', '-') .. '>'
+  local target = '<' .. (div.identifier ~= '' and div.identifier or ('mc-ws-solution-' .. number:gsub('%.', '-'))) .. '>'
   state.solutions[#state.solutions + 1] = { target = target, number = number, name = name, content = div.content }
   return pandoc.Blocks({ pandoc.RawBlock('typst', '#mc-ws-solution-link(' .. target .. ')') })
 end
@@ -315,6 +315,11 @@ end
 --- and the workshop step sets `.solution` back.
 M.SOURCE_CLASS = 'mc-ws-solution-source'
 
+--- @type string Prefix of a solution identifier that Quarto reads as a proof
+--- cross-reference, and the private prefix that hides it until the workshop step.
+M.SOLUTION_ID_PREFIX = 'sol-'
+M.SOURCE_ID_PREFIX = 'mc-ws-sol-'
+
 --- @type boolean True when the document is a workshop, set by the detect step.
 local is_workshop = false
 
@@ -357,8 +362,10 @@ local function swap_class(div, from, to)
   return nil
 end
 
---- Hide a solution of a workshop from Quarto's proof parse, with no change to
---- its content, identifier, classes or attributes. Other documents keep the
+--- Hide a solution of a workshop from Quarto's proof parse, which reads both
+--- the class `solution` and an identifier that starts with `sol-`: the class
+--- becomes `mc-ws-solution-source` and the prefix `mc-ws-sol-`, with no other
+--- change to its content, identifier, classes or attributes. Other documents keep the
 --- proof environment.
 --- @param div pandoc.Div
 --- @return pandoc.Div|nil
@@ -366,7 +373,24 @@ local function hide_solution(div)
   if not is_workshop then
     return nil
   end
-  return swap_class(div, 'solution', M.SOURCE_CLASS)
+  local hidden = swap_class(div, 'solution', M.SOURCE_CLASS)
+  if div.identifier:sub(1, #M.SOLUTION_ID_PREFIX) == M.SOLUTION_ID_PREFIX then
+    div.identifier = M.SOURCE_ID_PREFIX .. div.identifier:sub(#M.SOLUTION_ID_PREFIX + 1)
+    hidden = div
+  end
+  return hidden
+end
+
+--- Set back the class and the identifier that `hide_solution` changed.
+--- @param div pandoc.Div
+--- @return pandoc.Div|nil
+local function restore_solution(div)
+  local restored = swap_class(div, M.SOURCE_CLASS, 'solution')
+  if div.identifier:sub(1, #M.SOURCE_ID_PREFIX) == M.SOURCE_ID_PREFIX then
+    div.identifier = M.SOLUTION_ID_PREFIX .. div.identifier:sub(#M.SOURCE_ID_PREFIX + 1)
+    restored = div
+  end
+  return restored
 end
 
 --- Rewrite the workshop blocks of a document.
@@ -378,9 +402,7 @@ local function arrange(doc)
   end
   local format = output_format()
   doc.blocks = doc.blocks:walk({
-    Div = function(div)
-      return swap_class(div, M.SOURCE_CLASS, 'solution')
-    end,
+    Div = restore_solution,
   })
   local mode, message = M.solutions_mode(doc.meta)
   if not mode then

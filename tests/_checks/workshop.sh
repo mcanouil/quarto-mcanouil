@@ -51,10 +51,25 @@ if not re.search(r"<h3\b[^>]*>.*?Step by step.*?</h3>", body, re.S):
     problems.append("no h3 Step by step in the solution")
 if "The worked answer wraps the text" not in body:
     problems.append("the solution text is missing")
+second = re.search(r'<%s\b([^>]*\bid="sol-a"[^>]*)>(.*?)</%s>' % (tag, tag), html, re.S)
+if not second or "mc-ws-solution" not in second.group(1):
+    problems.append("no %s.mc-ws-solution with id sol-a" % tag)
+elif "The second answer keeps the id" not in second.group(2):
+    problems.append("the text of the sol-a solution is missing")
+if "mc-ws-sol-" in html:
+    problems.append("the private id prefix leaked into the output")
 for problem in problems:
     print("# " + problem)
 sys.exit(1 if problems else 0)
 PY
+}
+
+# Succeed when the solution with the id sol-a is at the end of the handout,
+# and its heading carries the label <sol-a>, as the author wrote the id.
+# $1 text of the PDF.
+solution_sol_id() {
+	grep -qF 'Solution 2.2 The second answer keeps the id' <<<"$1" && grep -qE '<sol-a>' "${typ}" &&
+		! grep -qF 'mc-ws-sol-' "${typ}"
 }
 
 if [ "${1:-}" = solution-attrs ]; then
@@ -66,6 +81,8 @@ if [ "${1:-}" = solution-attrs ]; then
 		attrs_text="$(pdftotext "${output}" - | tr -s '[:space:]' ' ')"
 		expect "workshop-solution-attrs-pdf" "the end heading with the name, then the solution heading and text" \
 			grep -qE 'Solution 2\.1 · Worked answer Step by step The worked answer wraps the text' <<<"${attrs_text}"
+		expect "workshop-solution-sol-id-pdf" "the sol-a solution at the end, with its id as a Typst label" \
+			solution_sol_id "${attrs_text}"
 		find_verapdf
 		expect "workshop-solution-attrs-ua1" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
 		;;
