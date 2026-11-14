@@ -365,7 +365,9 @@ end
 --- Hide a solution of a workshop from Quarto's proof parse, which reads both
 --- the class `solution` and an identifier that starts with `sol-`: the class
 --- becomes `mc-ws-solution-source` and the prefix `mc-ws-sol-`, with no other
---- change to its content, identifier, classes or attributes. Other documents keep the
+--- change to its content, identifier, classes or attributes. With the class
+--- hidden but a `sol-` identifier left, Quarto would still wrap the block in a
+--- `Proof` node, and the workshop step would replace the division inside it. Other documents keep the
 --- proof environment.
 --- @param div pandoc.Div
 --- @return pandoc.Div|nil

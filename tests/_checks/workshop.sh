@@ -56,6 +56,8 @@ if not second or "mc-ws-solution" not in second.group(1):
     problems.append("no %s.mc-ws-solution with id sol-a" % tag)
 elif "The second answer keeps the id" not in second.group(2):
     problems.append("the text of the sol-a solution is missing")
+if re.search(r'class="[^"]*\bproof\b', html):
+    problems.append("a solution was rendered as a Quarto proof")
 if "mc-ws-sol-" in html:
     problems.append("the private id prefix leaked into the output")
 for problem in problems:
