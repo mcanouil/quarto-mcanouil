@@ -36,7 +36,7 @@ problems = []
 if not found:
     sys.exit("# no %s.mc-ws-solution" % tag)
 attrs, body = found.groups()
-for want in ('id="worked-callout"', 'data-level="easy"'):
+for want in ('id="workedanswer"', 'data-level="easy"'):
     if want not in attrs:
         problems.append("missing %s in <%s%s>" % (want, tag, attrs))
 classes = re.search(r'class="([^"]*)"', attrs).group(1).split()
@@ -56,6 +56,8 @@ if not second or "mc-ws-solution" not in second.group(1):
     problems.append("no %s.mc-ws-solution with id sol-a" % tag)
 elif "The second answer keeps the id" not in second.group(2):
     problems.append("the text of the sol-a solution is missing")
+if not re.search(r'<a href="#/?sol-a" class="quarto-xref"[^>]*>Solution 2\.2</a>', html):
+    problems.append("no link to #sol-a (#/sol-a in a deck) with the text Solution 2.2")
 if re.search(r'class="[^"]*\bproof\b', html):
     problems.append("a solution was rendered as a Quarto proof")
 if "mc-ws-sol-" in html:
@@ -74,6 +76,62 @@ solution_sol_id() {
 		! grep -qF 'mc-ws-sol-' "${typ}"
 }
 
+# Answer the first page of the PDF whose text holds a string, or nothing.
+# $1 string.
+page_of() {
+	local page pages
+	pages="$(pdf_page_count "${output}")"
+	for ((page = 1; page <= pages; page++)); do
+		if pdftotext -f "${page}" -l "${page}" "${output}" - | tr -s '[:space:]' ' ' | grep -qF -- "$1"; then
+			printf '%s' "${page}"
+			return 0
+		fi
+	done
+}
+
+# Succeed when the reference to sol-a reads "Solution 2.2", the PDF has a
+# named destination sol-a on the page of that solution, and two link
+# annotations (the reference and the "Solution: page n" link) go to it.
+# $1 text of the PDF.
+solution_links_to_dest() {
+	local page dest_page links
+	page="$(page_of 'The second answer keeps the id')"
+	dest_page="$(pdfinfo -dests "${output}" | awk '$NF == "\"sol-a\"" { print $1 }')"
+	links="$(pdf_links_to sol-a)"
+	if grep -qF 'compare with Solution 2.2' <<<"$1" && [ -n "${page}" ] && [ "${dest_page}" = "${page}" ] && [ "${links}" -ge 2 ]; then
+		return 0
+	fi
+	printf '# solution page %s, destination page %s, links to sol-a %s\n' "${page}" "${dest_page}" "${links}"
+	return 1
+}
+
+# Answer the number of link annotations of the PDF that go to a named
+# destination, read from its objects and inflated streams.
+# $1 destination name.
+pdf_links_to() {
+	python3 -I - "${output}" "$1" <<'PY'
+import re
+import sys
+import zlib
+
+data = open(sys.argv[1], "rb").read()
+chunks = [data]
+for match in re.finditer(rb"stream\r?\n", data):
+    end = data.find(b"endstream", match.end())
+    try:
+        chunks.append(zlib.decompress(data[match.end():end]))
+    except zlib.error:
+        continue
+name = re.escape(sys.argv[2].encode())
+count = 0
+for chunk in chunks:
+    for annot in re.findall(rb"<<(?:[^<>]|<<(?:[^<>]|<<[^<>]*>>)*>>)*/Subtype\s*/Link(?:[^<>]|<<(?:[^<>]|<<[^<>]*>>)*>>)*>>", chunk):
+        if re.search(rb"/(?:D|Dest)\s*(?:\(" + name + rb"\)|/" + name + rb"\b)", annot):
+            count += 1
+print(count)
+PY
+}
+
 if [ "${1:-}" = solution-attrs ]; then
 	case "${format}" in
 	html) expect "workshop-solution-attrs-html" "the details keeps id, class, data attribute and heading, label with the name" attrs_kept_html details ;;
@@ -85,6 +143,8 @@ if [ "${1:-}" = solution-attrs ]; then
 			grep -qE 'Solution 2\.1 · Worked answer Step by step The worked answer wraps the text' <<<"${attrs_text}"
 		expect "workshop-solution-sol-id-pdf" "the sol-a solution at the end, with its id as a Typst label" \
 			solution_sol_id "${attrs_text}"
+		expect "workshop-solution-ref-pdf" "the reference reads Solution 2.2, and it and the page link both go to the sol-a destination on the page of the solution" \
+			solution_links_to_dest "${attrs_text}"
 		find_verapdf
 		expect "workshop-solution-attrs-ua1" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
 		;;
@@ -109,19 +169,6 @@ readonly EXERCISE_2='Exercise 2.2 · 20 min · pairs'
 readonly CHECKPOINT='Your document renders to HTML and to Typst'
 
 text="$(pdftotext "${output}" - | tr -s '[:space:]' ' ')"
-
-# Answer the first page of the PDF whose text holds a string, or nothing.
-# $1 string.
-page_of() {
-	local page pages
-	pages="$(pdf_page_count "${output}")"
-	for ((page = 1; page <= pages; page++)); do
-		if pdftotext -f "${page}" -l "${page}" "${output}" - | tr -s '[:space:]' ' ' | grep -qF -- "$1"; then
-			printf '%s' "${page}"
-			return 0
-		fi
-	done
-}
 
 # Answer the position of a string in the text of the PDF, or -1.
 # $1 string.

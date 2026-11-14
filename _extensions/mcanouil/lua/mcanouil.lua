@@ -32,7 +32,9 @@ local STEPS = {
   math_alt_text.filter,
   sections.pre_filter,
   quote.filter,
-  workshop.filter,
+  workshop.filters[1],
+  workshop.filters[2],
+  workshop.filters[3],
   html_page.filter,
   deck.filter,
 }

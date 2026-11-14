@@ -19,7 +19,7 @@ _quarto:
   tests:
     run:
       extension-test:
-        description: A solution that starts with a heading and has a name, an identifier, an extra class and a data attribute keeps all of them, and its name joins its label, in the HTML page, the deck and the PDF handout.
+        description: A solution that starts with a heading and has a name, an identifier, an extra class and a data attribute keeps all of them, and its name joins its label; a reference to a sol- id links to that solution with no warning, in the HTML page, the deck and the PDF handout.
         check: bash _checks/workshop.sh solution-attrs
 ---
 
@@ -31,7 +31,7 @@ _quarto:
 
 Highlight a warning with a callout.
 
-::: {#worked-callout .solution .worked name="Worked answer" data-level="easy"}
+::: {#workedanswer .solution .worked name="Worked answer" data-level="easy"}
 
 ### Step by step
 
@@ -45,7 +45,7 @@ The worked answer wraps the text in a warning callout.
 
 ::: {.exercise duration="5 min"}
 
-Give a solution an id with the sol- prefix.
+Give a solution an id with the sol- prefix, then compare with @sol-a.
 
 ::: {.solution #sol-a}
 

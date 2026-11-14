@@ -8,12 +8,15 @@
 --- `.checkpoint`) for the output format. Each block gets a visible label from
 --- the language files, so it never relies on colour alone. An exercise label
 --- holds its number (with the session number when it is set), its `duration`
---- and its `format`; a solution label holds its `name`. A solution keeps its
---- content, identifier, classes and other attributes. A solution is a native `<details>` disclosure in HTML, a
---- block of the veil group `solutions`, hidden until shown, in Reveal.js, and
---- in Typst, after `extensions.mcanouil.solutions`: collected at the end behind
---- a "Solution: page n" link (`end`, the default), in its exercise (`inline`),
---- or left out (`hide`).
+--- and its `format`; a solution label holds its `name`. Quarto reads a
+--- solution as a `Proof` node; the workshop step turns it back into a division
+--- that keeps its content, identifier, classes and other attributes. A
+--- solution is a native `<details>` disclosure in HTML, a block of the veil
+--- group `solutions`, hidden until shown, in Reveal.js, and in Typst, after
+--- `extensions.mcanouil.solutions`: collected at the end behind a "Solution:
+--- page n" link (`end`, the default), in its exercise (`inline`), or left out
+--- (`hide`). A reference to a solution identifier, such as `@sol-a`, links to
+--- the solution with its label, "Solution 2.1".
 
 local fail = require('lib.fail')
 local labels = require('lib.labels')
@@ -211,6 +214,9 @@ end
 --- @param state table Workshop state
 --- @return pandoc.Blocks Blocks that take the place of the solution in the exercise
 local function solution(div, number, state)
+  if div.identifier ~= '' then
+    state.by_id[div.identifier] = { id = div.identifier, number = number }
+  end
   local name = attribute(div.attributes.name)
   div.attributes.name = nil
   local label = M.solution_label(name)
@@ -231,7 +237,11 @@ local function solution(div, number, state)
     return pandoc.Blocks({ group })
   end
   if state.mode == 'inline' then
-    return typst_block('solution', label, div.content)
+    local blocks = typst_block('solution', label, div.content)
+    if div.identifier ~= '' then
+      blocks[#blocks] = pandoc.RawBlock('typst', '] <' .. div.identifier .. '>')
+    end
+    return blocks
   end
   if state.mode == 'hide' then
     return pandoc.Blocks({})
@@ -309,17 +319,6 @@ local function declare_group(meta)
   veil.groups = groups
 end
 
---- @type string Class that keeps a solution of a workshop away from Quarto,
---- which reads `.solution` as its own proof environment and takes its leading
---- heading and `name` attribute apart. The step before Quarto's parse sets it,
---- and the workshop step sets `.solution` back.
-M.SOURCE_CLASS = 'mc-ws-solution-source'
-
---- @type string Prefix of a solution identifier that Quarto reads as a proof
---- cross-reference, and the private prefix that hides it until the workshop step.
-M.SOLUTION_ID_PREFIX = 'sol-'
-M.SOURCE_ID_PREFIX = 'mc-ws-sol-'
-
 --- @type boolean True when the document is a workshop, set by the detect step.
 local is_workshop = false
 
@@ -347,52 +346,71 @@ local function detect(meta)
   is_workshop = workshop_type(meta)
 end
 
---- Swap one class of a division for another, in place, keeping its position.
---- @param div pandoc.Div
---- @param from string Class to replace
---- @param to string New class
---- @return pandoc.Div|nil The division, or nil when it lacks the class
-local function swap_class(div, from, to)
-  for index, class in ipairs(div.classes) do
-    if class == from then
-      div.classes[index] = to
-      return div
-    end
-  end
-  return nil
-end
-
---- Hide a solution of a workshop from Quarto's proof parse, which reads both
---- the class `solution` and an identifier that starts with `sol-`: the class
---- becomes `mc-ws-solution-source` and the prefix `mc-ws-sol-`, with no other
---- change to its content, identifier, classes or attributes. With the class
---- hidden but a `sol-` identifier left, Quarto would still wrap the block in a
---- `Proof` node, and the workshop step would replace the division inside it. Other documents keep the
---- proof environment.
---- @param div pandoc.Div
---- @return pandoc.Div|nil
-local function hide_solution(div)
-  if not is_workshop then
+--- Answer a solution of a workshop as a division, from the `Proof` node that
+--- Quarto makes of a `.solution` block or a `sol-` identifier. The node is
+--- replaced as a whole; its `div` slot is read, never changed. The division
+--- gets the identifier, the classes (with `solution` first), the attributes
+--- and the content of the block, and the name of the proof as its `name`
+--- attribute. Quarto takes the name from the `name` attribute, else from a
+--- leading heading, which it removes; either way it joins the solution label.
+--- Other documents keep the proof.
+--- @param proof table Quarto `Proof` node
+--- @return pandoc.Div|nil Division, or nil to keep the node
+local function from_proof(proof)
+  if not is_workshop or pandoc.utils.stringify(proof.type or ''):lower() ~= 'solution' then
     return nil
   end
-  local hidden = swap_class(div, 'solution', M.SOURCE_CLASS)
-  if div.identifier:sub(1, #M.SOLUTION_ID_PREFIX) == M.SOLUTION_ID_PREFIX then
-    div.identifier = M.SOURCE_ID_PREFIX .. div.identifier:sub(#M.SOLUTION_ID_PREFIX + 1)
-    hidden = div
+  local attr = proof.div.attr:clone()
+  attr.identifier = proof.identifier or ''
+  attr.classes:insert(1, 'solution')
+  local name = proof.name ~= nil and pandoc.utils.stringify(proof.name) or ''
+  if name ~= '' then
+    attr.attributes.name = name
   end
-  return hidden
+  return pandoc.Div(proof.div.content, attr)
 end
 
---- Set back the class and the identifier that `hide_solution` changed.
---- @param div pandoc.Div
---- @return pandoc.Div|nil
-local function restore_solution(div)
-  local restored = swap_class(div, M.SOURCE_CLASS, 'solution')
-  if div.identifier:sub(1, #M.SOURCE_ID_PREFIX) == M.SOURCE_ID_PREFIX then
-    div.identifier = M.SOLUTION_ID_PREFIX .. div.identifier:sub(#M.SOURCE_ID_PREFIX + 1)
-    restored = div
+--- Answer the inlines of a reference to a workshop solution: a link to it,
+--- with the label "Solution 2.1". In a PDF handout without solutions, the
+--- label alone.
+--- @param entry table Solution: `id`, `number`
+--- @param state table Workshop state
+--- @return pandoc.Inlines Inlines
+local function solution_reference(entry, state)
+  local text = M.solution_label(nil, entry.number)
+  if state.format == 'typst' then
+    if state.mode == 'hide' then
+      return pandoc.Inlines(text)
+    end
+    return pandoc.Inlines({ pandoc.RawInline('typst', '#link(<' .. entry.id .. '>)[' .. text .. ']') })
   end
-  return restored
+  return pandoc.Inlines({ pandoc.Link(pandoc.Inlines(text), '#' .. entry.id, '', { class = 'quarto-xref' }) })
+end
+
+--- Replace each reference to a workshop solution, such as `@sol-a`, with a link
+--- to the solution. Quarto's cross-references do not index a workshop solution
+--- (it is not a proof there), so the workshop step resolves them, with the
+--- numbers of its own labels. A citation that holds anything else is kept.
+--- @param blocks pandoc.Blocks
+--- @param state table Workshop state
+--- @return pandoc.Blocks Blocks
+local function resolve_references(blocks, state)
+  return blocks:walk({
+    Cite = function(cite)
+      if #cite.citations ~= 1 or state.by_id[cite.citations[1].id] == nil then
+        return nil
+      end
+      local citation = cite.citations[1]
+      local inlines = pandoc.Inlines({})
+      if #citation.prefix > 0 then
+        inlines:extend(citation.prefix)
+        inlines:insert(pandoc.Space())
+      end
+      inlines:extend(solution_reference(state.by_id[citation.id], state))
+      inlines:extend(citation.suffix)
+      return inlines
+    end,
+  })
 end
 
 --- Rewrite the workshop blocks of a document.
@@ -403,9 +421,6 @@ local function arrange(doc)
     return doc
   end
   local format = output_format()
-  doc.blocks = doc.blocks:walk({
-    Div = restore_solution,
-  })
   local mode, message = M.solutions_mode(doc.meta)
   if not mode then
     fail.raise(message)
@@ -417,6 +432,7 @@ local function arrange(doc)
     exercises = 0,
     labels = 0,
     solutions = {},
+    by_id = {},
   }
   doc.blocks = doc.blocks:walk({
     traverse = 'topdown',
@@ -438,6 +454,7 @@ local function arrange(doc)
       return html_group(div, kind, label, state, div.content), false
     end,
   })
+  doc.blocks = resolve_references(doc.blocks, state)
   if format == 'typst' then
     doc.blocks:extend(solutions_at_end(state))
     doc.meta['mcanouil-session'] = M.session_text(doc.meta)
@@ -449,14 +466,12 @@ local function arrange(doc)
   return doc
 end
 
---- @type table[] Filter steps that run before Quarto parses the document: note
---- the type, then hide the solutions from the proof parse.
-M.pre_filters = {
+--- @type table[] Filter steps of the entry filter, in order: note the type,
+--- turn Quarto's solution proofs into divisions, then rewrite the blocks.
+M.filters = {
   { Meta = fail.guard(detect) },
-  { Div = fail.guard(hide_solution) },
+  { Proof = fail.guard(from_proof) },
+  { Pandoc = fail.guard(arrange) },
 }
-
---- @type table Filter step of the entry filter.
-M.filter = { Pandoc = fail.guard(arrange) }
 
 return M
