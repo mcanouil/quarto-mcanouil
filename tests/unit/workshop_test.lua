@@ -48,4 +48,12 @@ cases['workshop-solutions-mode'] = function()
   assert_equal(message, 'mcanouil: unknown solutions "appendix"; use end, inline, hide.', 'message')
 end
 
+cases['workshop-solution-label'] = function()
+  in_english(function()
+    assert_equal(workshop.solution_label(nil), 'Solution', 'plain')
+    assert_equal(workshop.solution_label('Worked answer'), 'Solution · Worked answer', 'name')
+    assert_equal(workshop.solution_label('Worked answer', '2.1'), 'Solution 2.1 · Worked answer', 'number and name')
+  end)
+end
+
 return cases

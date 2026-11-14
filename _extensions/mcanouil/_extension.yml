@@ -9,6 +9,8 @@ contributes:
       shortcodes:
         - iconify
       filters:
+        - path: lua/mcanouil-pre.lua
+          at: pre-ast
         - lua/mcanouil.lua
         - offset-headings
         - div-reuse

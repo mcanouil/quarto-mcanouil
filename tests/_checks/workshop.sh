@@ -7,6 +7,7 @@ set -euo pipefail
 # Usage: workshop.sh <preset>    HTML page, PDF handout (solutions at the end) and deck of one preset
 #        workshop.sh inline      PDF handout with each solution in its exercise
 #        workshop.sh hide        PDF handout without the solutions
+#        workshop.sh solution-attrs   a solution keeps its heading, name, identifier, class and data attribute
 #
 # The HTML page goes to "html.sh workshop" and the deck to "deck.sh workshop".
 # This hook checks the PDF handout: the block labels, the session kicker and
@@ -19,6 +20,60 @@ set -euo pipefail
 
 # shellcheck source=/dev/null # lib.sh is checked on its own
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+# Succeed when the HTML solution keeps its identifier, its extra class, its
+# data attribute and its leading heading, and its name joins its label.
+# $1 the element of the solution: details (page) or div (deck).
+attrs_kept_html() {
+	python3 -I - "${output}" "$1" <<'PY'
+import re
+import sys
+
+html = open(sys.argv[1], encoding="utf-8").read()
+tag = sys.argv[2]
+found = re.search(r"<%s\b([^>]*\bmc-ws-solution\b[^>]*)>(.*?)</%s>" % (tag, tag), html, re.S)
+problems = []
+if not found:
+    sys.exit("# no %s.mc-ws-solution" % tag)
+attrs, body = found.groups()
+for want in ('id="worked-callout"', 'data-level="easy"'):
+    if want not in attrs:
+        problems.append("missing %s in <%s%s>" % (want, tag, attrs))
+classes = re.search(r'class="([^"]*)"', attrs).group(1).split()
+if "worked" not in classes or "solution" not in classes:
+    problems.append("classes %r, expected worked and solution" % classes)
+if re.search(r"\bname=", attrs):
+    problems.append("the name attribute is still on the element")
+label = re.search(r"<(?:summary|p class=\"mc-ws-label\"[^>]*)>(.*?)</(?:summary|p)>", body, re.S)
+if not label or label.group(1).strip() != "Solution · Worked answer":
+    problems.append("label %r, expected 'Solution · Worked answer'" % (label.group(1) if label else None))
+if not re.search(r"<h3\b[^>]*>.*?Step by step.*?</h3>", body, re.S):
+    problems.append("no h3 Step by step in the solution")
+if "The worked answer wraps the text" not in body:
+    problems.append("the solution text is missing")
+for problem in problems:
+    print("# " + problem)
+sys.exit(1 if problems else 0)
+PY
+}
+
+if [ "${1:-}" = solution-attrs ]; then
+	case "${format}" in
+	html) expect "workshop-solution-attrs-html" "the details keeps id, class, data attribute and heading, label with the name" attrs_kept_html details ;;
+	revealjs) expect "workshop-solution-attrs-deck" "the veil block keeps id, class, data attribute and heading, label with the name" attrs_kept_html div ;;
+	typst)
+		need pdftotext
+		attrs_text="$(pdftotext "${output}" - | tr -s '[:space:]' ' ')"
+		expect "workshop-solution-attrs-pdf" "the end heading with the name, then the solution heading and text" \
+			grep -qE 'Solution 2\.1 · Worked answer Step by step The worked answer wraps the text' <<<"${attrs_text}"
+		find_verapdf
+		expect "workshop-solution-attrs-ua1" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
+		;;
+	*) skip_format workshop.sh ;;
+	esac
+	tap_done
+	exit
+fi
 
 case "${format}" in
 html) exec bash "$(dirname "${BASH_SOURCE[0]}")/html.sh" workshop "$@" ;;

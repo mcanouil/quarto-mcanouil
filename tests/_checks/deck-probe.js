@@ -238,18 +238,28 @@
       return;
     }
     var slide = slides[0];
-    if (!printing()) {
-      var indices = Reveal.getIndices(document.getElementById(slide));
-      Reveal.slide(indices.h, indices.v);
+    // The print layout shows every slide at once, so it is measured with no
+    // timer; a slide in the presentation layout is measured once Reveal.js has
+    // moved to it.
+    if (printing()) {
+      measure(slide);
+      next(slides.slice(1));
+      return;
     }
+    var indices = Reveal.getIndices(document.getElementById(slide));
+    Reveal.slide(indices.h, indices.v);
     setTimeout(function () {
-      try {
-        measureSlide(slide);
-      } catch (error) {
-        lines.push([slide, "error", String(error).replace(/\s+/g, "_")].join(" "));
-      }
+      measure(slide);
       next(slides.slice(1));
     }, 300);
+  }
+
+  function measure(slide) {
+    try {
+      measureSlide(slide);
+    } catch (error) {
+      lines.push([slide, "error", String(error).replace(/\s+/g, "_")].join(" "));
+    }
   }
 
   function printing() {

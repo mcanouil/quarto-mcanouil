@@ -22,6 +22,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 [ "${format}" = revealjs ] || skip_format deck.sh
 need python3
+need node
 
 readonly SPEAKER_EVENT='Mickaël Canouil · useR! 2026 · Warwick'
 readonly TALK_TITLE='Quarto extensions'
@@ -281,10 +282,16 @@ with open(source, encoding="utf-8") as handle:
 with open(probe, "w", encoding="utf-8") as handle:
     handle.write(html.replace("</body>", inject + "</body>"))
 PY
-	"${browser_bin}" --headless --disable-gpu --hide-scrollbars --window-size=1600,900 \
-		--virtual-time-budget=20000 --dump-dom "file://${probe}${PROBE_QUERY:-}" 2>/dev/null |
-		python3 -I -c 'import html, re, sys; m = re.search(r"<pre id=\"mc-probe\">(.*?)</pre>", sys.stdin.read(), re.S); print(html.unescape(m.group(1)) if m else "")'
+	node "$(dirname "${BASH_SOURCE[0]}")/deck-probe-run.mjs" "${browser_bin}" "${probe}" "${PROBE_QUERY:-}" || true
 	rm -f "${probe}"
+}
+
+# Set probe_lines to the lines of probe_slides, and say so in the TAP output
+# when the probe wrote nothing before its timeout.
+# $@ slide ids.
+probe() {
+	probe_lines="$(probe_slides "$@")"
+	[ -n "${probe_lines}" ] || printf '# probe: no output (budget expired?)\n'
 }
 
 # Succeed when the text of a slide is clear of its motif: every line box and
@@ -478,17 +485,17 @@ gold | mono | quarto | terminal)
 	expect "deck-quote-attribution-${1}" "the attribution of the quote without its dash" quote_attribution
 	expect "deck-axe-light-${1}" "no axe-core violation in the ${1} deck" axe_clean
 	find_browser
-	probe_lines="$(probe_slides title-slide brand-presets why-presets checks one-rule why-presets-after-dark mc-closing)"
+	probe title-slide brand-presets why-presets checks one-rule why-presets-after-dark mc-closing
 	expect "deck-section-body-order-${1}" "section slide body below the number, the title and its rule" section_body_after_title checks body
 	expect "deck-section-bare-${1}" "section slide with no body: the number ends and the title starts on the middle line" section_body_after_title brand-presets bare
 	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
-	probe_lines="$(PROBE_QUERY='?print-pdf' probe_slides brand-presets checks)"
+	PROBE_QUERY='?print-pdf' probe brand-presets checks
 	expect "deck-section-body-order-print-${1}" "the same order and middle line in the print layout of a PDF export" section_body_after_title checks body
 	expect "deck-section-bare-print-${1}" "the same middle line in print, with no body" section_body_after_title brand-presets bare
 	;;
 long-title)
 	find_browser
-	probe_lines="$(probe_slides title-slide a-section-title-long-enough-to-wrap-over-several-lines-of-the-slide mc-closing)"
+	probe title-slide a-section-title-long-enough-to-wrap-over-several-lines-of-the-slide mc-closing
 	expect "long-title-no-overlap-title-${2:?long-title needs a preset}" "title slide text clear of the ${2} motif" text_clear_of_motif title-slide
 	expect "long-title-no-overlap-section-${2}" "section slide text clear of the ${2} motif" text_clear_of_motif a-section-title-long-enough-to-wrap-over-several-lines-of-the-slide
 	expect "long-title-no-overlap-closing-${2}" "closing slide text clear of the ${2} motif" text_clear_of_motif mc-closing
@@ -504,7 +511,7 @@ workshop)
 	expect "workshop-reduced-motion-deck-${preset}" "workshop motion only inside prefers-reduced-motion: no-preference" motion_guarded "$(theme_css)"
 	expect "workshop-deck-axe-${preset}" "no axe-core violation in the ${preset} workshop deck" axe_clean
 	find_browser
-	probe_lines="$(probe_slides before-we-start exercise-front-matter checkpoint)"
+	probe before-we-start exercise-front-matter checkpoint
 	expect "workshop-deck-contrast-${preset}" "block labels at 4.5:1 or more, as the browser paints them" workshop_colours
 	;;
 dark)

@@ -8,7 +8,8 @@
 --- `.checkpoint`) for the output format. Each block gets a visible label from
 --- the language files, so it never relies on colour alone. An exercise label
 --- holds its number (with the session number when it is set), its `duration`
---- and its `format`. A solution is a native `<details>` disclosure in HTML, a
+--- and its `format`; a solution label holds its `name`. A solution keeps its
+--- content, identifier, classes and other attributes. A solution is a native `<details>` disclosure in HTML, a
 --- block of the veil group `solutions`, hidden until shown, in Reveal.js, and
 --- in Typst, after `extensions.mcanouil.solutions`: collected at the end behind
 --- a "Solution: page n" link (`end`, the default), in its exercise (`inline`),
@@ -116,6 +117,18 @@ function M.exercise_label(index, session, duration, format)
   return table.concat(parts, SEPARATOR)
 end
 
+--- Answer the label of a solution: "Solution", with the number of its
+--- exercise when it is given, then its `name` attribute when it is set, as in
+--- "Solution 2.1 · Worked answer".
+--- @param name string|nil Name of the solution
+--- @param number string|nil Number of its exercise
+--- @return string Label
+function M.solution_label(name, number)
+  local parts = { labels.get('mcanouil-solution') .. (number and (' ' .. number) or '') }
+  parts[#parts + 1] = name
+  return table.concat(parts, SEPARATOR)
+end
+
 --- Answer how the PDF shows the solutions, `extensions.mcanouil.solutions`.
 --- @param meta table Document metadata
 --- @return string|nil Mode: `end`, `inline` or `hide`
@@ -198,7 +211,9 @@ end
 --- @param state table Workshop state
 --- @return pandoc.Blocks Blocks that take the place of the solution in the exercise
 local function solution(div, number, state)
-  local label = labels.get('mcanouil-solution')
+  local name = attribute(div.attributes.name)
+  div.attributes.name = nil
+  local label = M.solution_label(name)
   if state.format == 'html' then
     local attr = div.attr:clone()
     attr.classes:extend({ 'mc-ws', 'mc-ws-solution' })
@@ -206,7 +221,7 @@ local function solution(div, number, state)
     local blocks = pandoc.Blocks({
       pandoc.RawBlock('html', '<details' .. open .. '>\n<summary>' .. escape_html(label) .. '</summary>'),
     })
-    blocks:extend(div.content)
+    blocks:insert(pandoc.Div(div.content, { class = 'mc-ws-solution-body' }))
     blocks:insert(pandoc.RawBlock('html', '</details>'))
     return blocks
   end
@@ -222,7 +237,7 @@ local function solution(div, number, state)
     return pandoc.Blocks({})
   end
   local target = '<mc-ws-solution-' .. number:gsub('%.', '-') .. '>'
-  state.solutions[#state.solutions + 1] = { target = target, number = number, content = div.content }
+  state.solutions[#state.solutions + 1] = { target = target, number = number, name = name, content = div.content }
   return pandoc.Blocks({ pandoc.RawBlock('typst', '#mc-ws-solution-link(' .. target .. ')') })
 end
 
@@ -261,7 +276,7 @@ local function solutions_at_end(state)
   end
   blocks:insert(pandoc.RawBlock('typst', '#mc-ws-solutions-heading(' .. labels.typst_string(labels.get('mcanouil-solutions')) .. ')'))
   for _, entry in ipairs(state.solutions) do
-    local title = labels.get('mcanouil-solution') .. ' ' .. entry.number
+    local title = M.solution_label(entry.name, entry.number)
     blocks:insert(pandoc.RawBlock('typst', '#mc-ws-solution-heading(' .. labels.typst_string(title) .. ') ' .. entry.target))
     blocks:extend(entry.content)
   end
@@ -294,6 +309,12 @@ local function declare_group(meta)
   veil.groups = groups
 end
 
+--- @type string Class that keeps a solution of a workshop away from Quarto,
+--- which reads `.solution` as its own proof environment and takes its leading
+--- heading and `name` attribute apart. The step before Quarto's parse sets it,
+--- and the workshop step sets `.solution` back.
+M.SOURCE_CLASS = 'mc-ws-solution-source'
+
 --- @type boolean True when the document is a workshop, set by the detect step.
 local is_workshop = false
 
@@ -321,17 +342,31 @@ local function detect(meta)
   is_workshop = workshop_type(meta)
 end
 
---- Turn a Quarto solution back into a division. Quarto reads `.solution` as
---- its own proof environment before the extension filters run, so the
---- workshop step would not see it inside an exercise. Other documents keep
---- the proof environment.
---- @param proof table Quarto `Proof` node
---- @return pandoc.Div|nil Division with the class `solution`, or nil to keep the node
-local function unwrap_solution(proof)
-  if not is_workshop or proof.type == nil or pandoc.utils.stringify(proof.type):lower() ~= 'solution' then
+--- Swap one class of a division for another, in place, keeping its position.
+--- @param div pandoc.Div
+--- @param from string Class to replace
+--- @param to string New class
+--- @return pandoc.Div|nil The division, or nil when it lacks the class
+local function swap_class(div, from, to)
+  for index, class in ipairs(div.classes) do
+    if class == from then
+      div.classes[index] = to
+      return div
+    end
+  end
+  return nil
+end
+
+--- Hide a solution of a workshop from Quarto's proof parse, with no change to
+--- its content, identifier, classes or attributes. Other documents keep the
+--- proof environment.
+--- @param div pandoc.Div
+--- @return pandoc.Div|nil
+local function hide_solution(div)
+  if not is_workshop then
     return nil
   end
-  return pandoc.Div(proof.div.content, pandoc.Attr(proof.identifier or '', { 'solution' }))
+  return swap_class(div, 'solution', M.SOURCE_CLASS)
 end
 
 --- Rewrite the workshop blocks of a document.
@@ -342,6 +377,11 @@ local function arrange(doc)
     return doc
   end
   local format = output_format()
+  doc.blocks = doc.blocks:walk({
+    Div = function(div)
+      return swap_class(div, M.SOURCE_CLASS, 'solution')
+    end,
+  })
   local mode, message = M.solutions_mode(doc.meta)
   if not mode then
     fail.raise(message)
@@ -385,12 +425,14 @@ local function arrange(doc)
   return doc
 end
 
---- @type table[] Filter steps of the entry filter, in order: note the type,
---- turn the Quarto solutions back into divisions, then rewrite the blocks.
-M.filters = {
+--- @type table[] Filter steps that run before Quarto parses the document: note
+--- the type, then hide the solutions from the proof parse.
+M.pre_filters = {
   { Meta = fail.guard(detect) },
-  { Proof = fail.guard(unwrap_solution) },
-  { Pandoc = fail.guard(arrange) },
+  { Div = fail.guard(hide_solution) },
 }
+
+--- @type table Filter step of the entry filter.
+M.filter = { Pandoc = fail.guard(arrange) }
 
 return M
