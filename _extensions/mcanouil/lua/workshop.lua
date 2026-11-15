@@ -37,6 +37,11 @@ M.LABELS = {
   checkpoint = 'mcanouil-checkpoint',
 }
 
+--- @type string Warning for a citation that mixes workshop solutions with
+--- other identifiers; `%s` is the citation.
+M.MIXED_CITATION_WARNING = 'mcanouil: the citation %s mixes workshop solutions with other references, so it is left to Quarto, '
+  .. 'which cannot resolve the solutions; cite the solutions in a citation of their own.'
+
 --- @type string Separator between the parts of an exercise label.
 local SEPARATOR = ' · '
 
@@ -387,27 +392,66 @@ local function solution_reference(entry, state)
   return pandoc.Inlines({ pandoc.Link(pandoc.Inlines(text), '#' .. entry.id, '', { class = 'quarto-xref' }) })
 end
 
---- Replace each reference to a workshop solution, such as `@sol-a`, with a link
---- to the solution. Quarto's cross-references do not index a workshop solution
---- (it is not a proof there), so the workshop step resolves them, with the
---- numbers of its own labels. A citation that holds anything else is kept.
+--- Answer the inlines of one citation of a workshop solution: its prefix, the
+--- reference to the solution, then its suffix.
+--- @param citation pandoc.Citation
+--- @param state table Workshop state
+--- @return pandoc.Inlines Inlines
+local function citation_reference(citation, state)
+  local inlines = pandoc.Inlines({})
+  if #citation.prefix > 0 then
+    inlines:extend(citation.prefix)
+    inlines:insert(pandoc.Space())
+  end
+  inlines:extend(solution_reference(state.by_id[citation.id], state))
+  inlines:extend(citation.suffix)
+  return inlines
+end
+
+--- Answer a citation as the author wrote its identifiers: `[@sol-a; @fig-b]`.
+--- @param cite pandoc.Cite
+--- @return string Text
+local function citation_text(cite)
+  local ids = {}
+  for _, citation in ipairs(cite.citations) do
+    ids[#ids + 1] = '@' .. citation.id
+  end
+  return '[' .. table.concat(ids, '; ') .. ']'
+end
+
+--- Replace each reference to workshop solutions, such as `@sol-a` or
+--- `[@sol-b; @sol-a]`, with links to the solutions. Quarto's cross-references
+--- do not index a workshop solution (it is not a proof there), so the workshop
+--- step resolves them, with the numbers of its own labels. A list joins its
+--- references with a comma, as Quarto does: "Solution 2.2, Solution 2.1". A
+--- citation that mixes solutions with other identifiers is left to Quarto,
+--- with a warning.
 --- @param blocks pandoc.Blocks
 --- @param state table Workshop state
 --- @return pandoc.Blocks Blocks
 local function resolve_references(blocks, state)
   return blocks:walk({
     Cite = function(cite)
-      if #cite.citations ~= 1 or state.by_id[cite.citations[1].id] == nil then
+      local solutions = 0
+      for _, citation in ipairs(cite.citations) do
+        if state.by_id[citation.id] ~= nil then
+          solutions = solutions + 1
+        end
+      end
+      if solutions == 0 then
         return nil
       end
-      local citation = cite.citations[1]
-      local inlines = pandoc.Inlines({})
-      if #citation.prefix > 0 then
-        inlines:extend(citation.prefix)
-        inlines:insert(pandoc.Space())
+      if solutions < #cite.citations then
+        quarto.log.warning(string.format(M.MIXED_CITATION_WARNING, citation_text(cite)))
+        return nil
       end
-      inlines:extend(solution_reference(state.by_id[citation.id], state))
-      inlines:extend(citation.suffix)
+      local inlines = pandoc.Inlines({})
+      for index, citation in ipairs(cite.citations) do
+        if index > 1 then
+          inlines:extend({ pandoc.Str(','), pandoc.Space() })
+        end
+        inlines:extend(citation_reference(citation, state))
+      end
       return inlines
     end,
   })
@@ -454,9 +498,11 @@ local function arrange(doc)
       return html_group(div, kind, label, state, div.content), false
     end,
   })
-  doc.blocks = resolve_references(doc.blocks, state)
   if format == 'typst' then
     doc.blocks:extend(solutions_at_end(state))
+  end
+  doc.blocks = resolve_references(doc.blocks, state)
+  if format == 'typst' then
     doc.meta['mcanouil-session'] = M.session_text(doc.meta)
     doc.meta['mcanouil-duration'] = M.duration(doc.meta)
   end

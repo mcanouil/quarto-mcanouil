@@ -1,0 +1,54 @@
+---
+title: Mixed references
+author: Mickaël Canouil
+date: 2026-11-13
+format:
+  mcanouil-html: default
+  mcanouil-revealjs: default
+extensions:
+  mcanouil:
+    preset: gold
+    type: workshop
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A citation that mixes a workshop solution with another reference warns once, names the citation, and is left to Quarto, which resolves the other reference.
+        warnings: exhaustive
+    mcanouil-html:
+      noErrors: true
+      printsMessage:
+        - level: WARN
+          regex: 'mcanouil: the citation \[@sol-a; @sec-intro\] mixes workshop solutions with other references, so it is left to Quarto, which cannot resolve the solutions; cite the solutions in a citation of their own\.'
+          count: 1
+        - level: WARN
+          regex: 'Unable to resolve crossref @sol-a'
+          count: 1
+      ensureFileRegexMatches:
+        - ['<a href="#sec-intro" class="quarto-xref">Section(&nbsp;| )1</a>']
+    mcanouil-revealjs:
+      noErrors: true
+      printsMessage:
+        - level: WARN
+          regex: 'mcanouil: the citation \[@sol-a; @sec-intro\] mixes workshop solutions with other references, so it is left to Quarto, which cannot resolve the solutions; cite the solutions in a citation of their own\.'
+          count: 1
+        - level: WARN
+          regex: 'Unable to resolve crossref @sol-a'
+          count: 1
+      ensureFileRegexMatches:
+        - ['<a href="#/sec-intro" class="quarto-xref">Section(&nbsp;| )1</a>']
+---
+
+# Session overview {#sec-intro}
+
+::: {.exercise duration="5 min"}
+
+Compare [@sol-a; @sec-intro].
+
+::: {.solution #sol-a}
+
+The answer.
+
+:::
+
+:::

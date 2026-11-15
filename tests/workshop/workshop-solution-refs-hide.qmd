@@ -1,0 +1,27 @@
+---
+title: Solution references
+author: Mickaël Canouil
+date: 2026-11-13
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: workshop
+    solutions: hide
+    session:
+      number: 2
+      total: 7
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With solutions set to hide, a citation list of solutions reads as their labels with no link, and the reference inside a hidden solution gives no warning.
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['Compare Solution 2\.2, Solution 2\.1 before']
+        - ['\?@sol-', '#link\(<sol-', 'builds on']
+---
+
+{{< include _workshop-solution-refs.qmd >}}
