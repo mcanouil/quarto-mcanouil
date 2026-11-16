@@ -18,7 +18,7 @@ concurrency:
 jobs:
   test:
     if: github.event.pull_request.draft == false
-    uses: mcanouil/quarto-extension-test/.github/workflows/extension-test.yml@0.4.0
+    uses: mcanouil/quarto-extension-test/.github/workflows/extension-test.yml@0.4.1
     with:
       # The extension requires Quarto 1.12.1, which is only on the pre-release
       # channel until Quarto 1.12 is released.
