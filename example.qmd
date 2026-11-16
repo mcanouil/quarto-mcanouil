@@ -1,11 +1,58 @@
 ---
-title: Example
+title: "Quarterly review"
+subtitle: "A starting point for the mcanouil formats"
+author:
+  - name: Mickaël Canouil
+    orcid: 0000-0002-3396-4549
+date: 2026-11-16
+lang: en-GB
+abstract: "One source file renders to a PDF report, an HTML page and a slide deck, in the same preset."
 format:
-  mcanouil-html: default
   mcanouil-typst: default
+  mcanouil-html:
+    toc: true
   mcanouil-revealjs: default
+extensions:
+  mcanouil:
+    preset: gold
+    type: report
+    layout: compact
 ---
 
-# Example
+# Summary {#sec-summary}
 
-A minimal document for the 1.0 skeleton.
+## Results
+
+The review covers three months of work.
+@tbl-results lists the main figures.
+
+| Measure      | Value |
+|--------------|------:|
+| Pages        |    42 |
+| Contributors |     5 |
+
+: Main figures of the quarter. {#tbl-results}
+
+## Notes
+
+::: {.callout-note}
+
+Set `extensions: mcanouil: preset:` to `gold`, `mono`, `quarto` or `terminal`.
+
+:::
+
+> Design for the reader who cannot see the colours.
+>
+> -- Mickaël Canouil, 2026
+
+# Next steps
+
+## Code
+
+```{.r filename="summary.R"}
+if (x != y && y >= 0) {
+  z <- x |> sqrt()
+}
+```
+
+See @sec-summary for the figures.

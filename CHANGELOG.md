@@ -2,12 +2,32 @@
 
 ## Unreleased
 
+Version 1.0.0 is a rewrite of the extension.
+Nothing from 0.x carries over, so a 0.x document needs new front matter.
+
 ### Breaking Changes
 
-- refactor: Remove the `typst-title` hot-fix and its `code-window.hotfix.typst-title` option, as Quarto renders theorem titles as Typst markup since 1.10. (#140)
-- refactor: Stop rewriting `_extensions/` logo and `orcid-icon` paths in Typst output, as Quarto resolves extension paths from subdirectories since 1.9.24. (#140)
-- build: Require Quarto 1.10.19 or later. (#140)
-- refactor: Rewrite the extension from scratch for 1.0.0; options, document types and presets from 0.x are not kept.
+- refactor: Rewrite the extension from scratch. The options, shortcodes, components, styles and document types of 0.x are gone, and there's no migration path. (#141)
+- build: Require Quarto 1.12.1 or later, the first release that reads extension language files correctly. (#141)
+
+### New Features
+
+- feat: Embed the document tools, such as code-window, gitlink, veil and prism, pinned at their releases and run in a fixed order. Don't list them again in your own `filters:`. (#142)
+- feat: Add the `gold`, `mono`, `quarto` and `terminal` presets, picked with `extensions: mcanouil: preset:` for all three formats. A `_brand.yml` file overrides any colour, font or logo of the preset. (#143)
+- feat: Check every colour pair against WCAG AA at render time. A failing pair stops the render and names both colours, the ratio and the threshold. (#143)
+- feat: Add English and French labels, which a language file of your own can override. (#143)
+- feat: Tag every PDF for PDF/UA-1 by default, and give Typst pages a header and a footer with three slots each. (#145)
+- feat: Add the Typst title block, with degrees, affiliations, ORCID badges and marks for corresponding and equal authors. (#147)
+- feat: Add the `report` type in a compact and a full layout, the `article` type with margin notes and a CRediT table, and styled block quotes. A Quarto book renders as a full report. (#148)
+- feat: Add `mcanouil-html`, with light and dark schemes, and contents, sidebar, callouts and tabsets styled for each preset. (#149)
+- feat: Add `mcanouil-revealjs`, with title, section, dark and closing slides, speaker photos and a footer with three slots. (#150)
+- feat: Add the `memo` type, with the `note`, `minutes`, `agenda` and `brief` kinds and a banner of fields for each. (#151)
+- feat: Add the `letter` and `invoice` types, laid out to NF Z 11-001 or DIN 5008 with an address window and fold marks. (#152)
+- feat: Show the memo banner in `mcanouil-html` too. (#153)
+- feat: Add the `workshop` type, which renders one session to an HTML page, a PDF handout and a deck, with exercises and solutions. (#154)
+- feat: Let a Typst cross-reference to a heading without a number read as its title, such as "Section Introduction".
+- feat: Embed quarto-typst-extras for lists of figures and tables, watermarks, maths alt text, and appendix and supplementary numbering. Supplementary sections are now numbered S1, with floats such as Figure S1.
+- feat: Style the code windows of HTML pages and decks to match each preset.
 
 ## 0.22.0 (2026-09-23)
 

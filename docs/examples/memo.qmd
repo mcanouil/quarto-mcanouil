@@ -1,0 +1,88 @@
+---
+title: "Memo"
+subtitle: "Notes, minutes, agendas and briefs of one to three pages."
+description: "The memo type of the mcanouil extension: its four kinds, the banner fields of each kind, and the body conventions for minutes and agendas."
+---
+
+A memo starts with a full width banner: the kind label, the title and the banner fields, on the ground of the preset.
+A band at the bottom of every page holds the footer slots.
+A memo has no cover and no contents.
+It renders in `mcanouil-typst` and `mcanouil-html`.
+
+```yaml
+title: "Steering committee"
+format:
+  mcanouil-typst: default
+  mcanouil-html: default
+extensions:
+  mcanouil:
+    type: memo
+    kind: minutes
+    memo:
+      date-time: "11 Nov 2026, 14:00"
+      present: "MC, AA, BW"
+      absent: "CD"
+```
+
+## Kinds and banner fields
+
+Put the banner fields under `extensions: mcanouil: memo:`.
+
+| `kind` | Banner fields |
+| --- | --- |
+| `note` (default) | `to`, `from`, `date` |
+| `minutes` | `date-time`, `present`, `absent` |
+| `agenda` | `date-time`, `place`, `participants` |
+| `brief` | `date`, `audience`, `purpose` |
+
+: The banner fields of each memo kind, in the order they show. {.striped .hover tbl-colwidths="[24,76]"}
+
+If you do not set `date`, the banner uses the document `date`.
+If you do not set `date-time`, the banner uses `memo: date`, then the document `date`.
+A field without a value does not show.
+In the PDF, the banner fields are a tagged table.
+
+## Minutes
+
+Write the decisions as text and the actions as a table with three columns: action, owner, due date.
+
+```markdown
+## Decisions
+
+The committee approves the revised plan.
+
+## Actions
+
+| Action     | Owner | Due    |
+|------------|-------|--------|
+| Draft plan | AA    | 18 Nov |
+| Book room  | MC    | 20 Nov |
+```
+
+## Agenda
+
+Write the agenda as a numbered list, one item per line.
+Put the duration and the owner of an item in brackets at the end of the line.
+Both are optional.
+
+```markdown
+1. Welcome and apologies (5 min, MC)
+2. Review of the last actions (10 min, AA)
+3. Release plan (20 min, BW)
+4. Any other business (5 min)
+```
+
+## Brief
+
+Write a brief as short sections, each with a level 2 heading.
+
+## Headings
+
+Memo body headings have no numbers.
+A memo can start at `##`: the format shifts the headings and gives no warning.
+
+## Footer band in HTML
+
+In `mcanouil-html`, the footer band shows only when at least one footer slot has content.
+If all three slots are empty, the HTML memo has no band.
+The PDF always has the band.

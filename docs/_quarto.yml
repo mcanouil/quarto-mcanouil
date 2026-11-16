@@ -18,7 +18,7 @@ project:
 
 website:
   title: "Mickaël Canouil's Brand"
-  description: "A Quarto project type and three formats, sharing one brand across HTML, Typst, and RevealJS."
+  description: "Three Quarto formats, four presets and six document types, sharing one style across Typst, HTML and Reveal.js."
   # No trailing slash: Quarto builds the social image URL by concatenating this
   # with the image path, without normalising.
   # quarto-dev/quarto-cli#15053 normalises this join. Drop this note once the
@@ -66,14 +66,20 @@ website:
       - href: reference.qmd
         text: "Reference"
       - section: examples.qmd
-        text: "Examples"
+        text: "Guides"
         contents:
-          - href: examples/components.qmd
-            text: "Components"
-          - href: examples/panels-and-cards.qmd
-            text: "Containers"
+          - href: examples/presets.qmd
+            text: "Presets"
+          - href: examples/report-article.qmd
+            text: "Report and article"
           - href: examples/special-sections.qmd
-            text: "Special sections and tabsets"
+            text: "Special sections"
+          - href: examples/memo.qmd
+            text: "Memo"
+          - href: examples/letter-invoice.qmd
+            text: "Letter and invoice"
+          - href: examples/workshop.qmd
+            text: "Workshop"
           - href: examples/html-format.qmd
             text: "HTML format"
           - href: examples/typst-format.qmd
@@ -82,6 +88,8 @@ website:
             text: "Reveal.js format"
           - href: examples/code-windows.qmd
             text: "Code windows"
+      - href: limitations.qmd
+        text: "Known limitations"
       - text: "---"
       - href: changelog.qmd
         text: "Changelog"
@@ -109,10 +117,11 @@ format:
         - brand
         - _extensions/mcanouil/pastel/pastel.scss
         - assets/theme.scss
-
-filters:
-  - code-window
-  - gitlink
+    # Under the format rather than at the top level, so they do not reach
+    # preview.qmd: mcanouil-typst embeds both tools and runs them itself.
+    filters:
+      - code-window
+      - gitlink
 
 extensions:
   # Quarto keeps the `website` block out of the metadata it hands to Lua

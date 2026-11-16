@@ -1,0 +1,135 @@
+---
+title: "Workshop"
+subtitle: "One session file gives an HTML page, a PDF handout and a deck."
+description: "The workshop type of the mcanouil extension: session metadata, the workshop blocks, exercises and solutions in each format, and the references to solutions."
+---
+
+A workshop session is one `.qmd` file that renders to three formats.
+For a website around the sessions, use an [atelier](https://github.com/mcanouil/quarto-atelier) project.
+
+```yaml
+title: "Authoring essentials"
+date: 2026-11-13
+lang: en-GB
+format:
+  mcanouil-html: default
+  mcanouil-typst: default
+  mcanouil-revealjs: default
+extensions:
+  mcanouil:
+    type: workshop
+    event: "Mastering Quarto CLI"
+    session:
+      number: 2
+      total: 7
+    duration: "90 min"
+    solutions: end
+```
+
+- The kicker shows "Session 2 of 7".
+- The duration shows beside the date.
+- The footer shows the event, "Session 2" and the page or slide number.
+
+## Blocks
+
+| Class | Label |
+| --- | --- |
+| `.objectives` | Objectives |
+| `.prerequisites` | Prerequisites |
+| `.exercise` | Exercise 2.1 · 15 min · pairs |
+| `.solution` | Solution |
+| `.checkpoint` | Checkpoint |
+
+: The workshop blocks and their labels. {.striped .hover tbl-colwidths="[30,70]"}
+
+Each block has a visible label from the language files, so it does not rely on colour.
+An exercise is numbered with the session number and its position.
+Without a session, the number is its position only.
+The `duration` and `format` attributes of an exercise add to its label.
+
+```markdown
+::: {.exercise duration="15 min" format="pairs"}
+
+Create `portfolio.qmd`, a document that renders to HTML and to Typst.
+
+::: {.solution}
+
+Set two formats in the front matter.
+
+:::
+
+:::
+```
+
+A `.solution` must be inside an `.exercise`.
+Outside an exercise, the render stops with a message.
+
+## Solutions in each format
+
+| Format | Solution |
+| --- | --- |
+| HTML | A closed `<details>` disclosure. |
+| Reveal.js | A block of the veil group `solutions`, hidden until the presenter shows it. |
+| PDF, `solutions: end` | A "Solution: page n" link in the exercise, and the solutions on the last pages. |
+| PDF, `solutions: inline` | The solution in its exercise. |
+| PDF, `solutions: hide` | No solutions. |
+
+: How each format shows a solution. {.striped .hover tbl-colwidths="[30,70]"}
+
+The solution fades in only when the reader has no reduced motion setting.
+
+## Solution names
+
+A `name` attribute adds to the label: "Solution · Worked answer".
+
+```markdown
+::: {.solution name="Worked answer"}
+```
+
+If a solution has no `name` and starts with a heading, that heading becomes the name.
+It then shows in the label and not as a heading.
+This is the behaviour of Quarto for proofs.
+
+## References to solutions
+
+Give a solution an identifier with the `sol-` prefix, then cite it.
+
+```markdown
+::: {.solution #sol-a}
+
+The answer.
+
+:::
+
+Compare with @sol-a.
+```
+
+- `@sol-a` reads "Solution 2.2" and links to the solution.
+- `[@sol-b; @sol-a]` reads "Solution 2.2, Solution 2.1".
+- With `solutions: hide`, the reference is text with no link.
+
+Cite solutions in a citation of their own.
+If a citation mixes solutions and other references, the render gives a warning and Quarto cannot resolve the solutions.
+
+::: {.callout-warning}
+
+Do not use a hyphen in a solution identifier other than the `sol-` prefix, for example `#worked-answer`.
+Quarto stops on such an identifier before the extension runs ([quarto-dev/quarto-cli#15113](https://github.com/quarto-dev/quarto-cli/issues/15113)).
+Use `#sol-worked` or `#workedanswer` until this is fixed.
+
+:::
+
+## `.solution` outside workshops
+
+Quarto uses `.solution` for its own proof environment.
+In a document that is not a workshop, a `.solution` div stays a Quarto proof.
+
+## Code
+
+Code ligatures are off for all code, in every format and every type.
+`->`, `!=` and `<=` keep their characters, which is important for teaching syntax.
+
+## Handout headings
+
+The first heading of the PDF handout must be level 1, because the PDF/UA-1 standard does not accept a skipped level.
+Start each session with a `#` heading.

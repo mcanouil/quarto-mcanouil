@@ -1,0 +1,97 @@
+---
+title: "Presets"
+subtitle: "One key for colours, fonts, style and motif in every format."
+description: "The four presets of the mcanouil extension, how to select one, how a _brand.yml file changes it, the light and dark schemes, and the contrast check."
+---
+
+## Select a preset
+
+Set the preset once, in the front matter or in `_quarto.yml`.
+The same preset applies to `mcanouil-html`, `mcanouil-typst` and `mcanouil-revealjs`.
+
+```yaml
+extensions:
+  mcanouil:
+    preset: mono
+```
+
+The default preset is `gold`.
+
+| Preset | Look | Fonts | Motif |
+| --- | --- | --- | --- |
+| `gold` | Editorial: small capitals, gilded rules, warm boxes with a thin gold edge. | Source Serif 4, Fira Code | Facets |
+| `mono` | Swiss: graphite on white, blue links, upper case H2 under a rule, square corners. | Alegreya Sans, Fira Code | Steps |
+| `quarto` | Documentation: pill tags, rounded cards with a soft shadow, an accent bar beside headings. | Alegreya Sans, Fira Code | Ribbon |
+| `terminal` | Console: a `$` prompt on titles, `[ ]` around kickers, dashed boxes. Dark only. | JetBrains Mono | Dot field |
+
+: The four presets. {.striped .hover tbl-colwidths="[14,50,22,14]"}
+
+The extension ships the fonts as files.
+HTML, Reveal.js and Typst all use the same files, so the output does not change offline and no request goes to a font service.
+
+Each preset has one corner motif.
+The motif shows only on surfaces without a header or a footer in that corner: covers, chapter dividers, memo banners, the HTML title block, and the title, section and closing slides.
+The motif never sits under text.
+It is an artefact in the PDF tags and `aria-hidden` in HTML, and forced colours mode removes it.
+
+## Light and dark
+
+- HTML follows the light or dark setting of the reader.
+- Reveal.js is light by default. Title, section and closing slides always use the dark ground of the preset.
+- Typst is light by default.
+
+Set `brand-mode: dark` for a dark PDF or a dark deck:
+
+```yaml
+brand-mode: dark
+```
+
+`terminal` is dark only, in every format.
+If you request the light scheme with `terminal`, the render ignores the request and gives a warning.
+
+## Change a preset with `_brand.yml`
+
+A `_brand.yml` file in the project changes the preset.
+Each value that the brand sets replaces the preset value.
+The preset gives all the other values.
+
+| Brand colour | Preset token |
+| --- | --- |
+| `primary` | `accent` |
+| `background` | `paper` |
+| `foreground` | `ink` |
+| a token name, for example `link` or `muted` | that token |
+
+: How the colours of `_brand.yml` replace the preset tokens. {.striped .hover tbl-colwidths="[50,50]"}
+
+```{.yaml filename="_brand.yml"}
+color:
+  primary: "#1b6b4a"
+typography:
+  base: Alegreya Sans
+```
+
+The brand fonts (`base`, `headings`, `monospace`) and the brand logo also replace the preset values.
+A brand logo without alt text gives a warning.
+
+## Contrast check
+
+At each render, the extension measures every colour pair that the layouts use, in the light and the dark scheme.
+The thresholds are those of WCAG 2.2 AA:
+
+- 4.5:1 for text, for example ink on paper, links, muted text, and callout text on its tint.
+- 3:1 for marks that are not text, for example rules, edges and focus rings.
+
+If a pair is below its threshold, the render stops.
+The message gives the pair, the two colours, the ratio and the threshold.
+The extension does not correct your colours.
+The preset colours pass in every scheme.
+
+::: {.callout-caution}
+
+The contrast check reads the tokens only.
+Callout and pill backgrounds mix a small part of the type colour into the paper, so they are not tokens.
+If your brand sets a semantic colour that is very near the paper, the tint of a callout can be too near the page.
+Look at your callouts in both schemes after you change those colours.
+
+:::
