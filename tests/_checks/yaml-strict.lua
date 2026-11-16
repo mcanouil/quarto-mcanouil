@@ -34,4 +34,5 @@ for _, spec in ipairs(arg) do
   end
 end
 
+io.stdout:flush()
 os.exit(failed == 0 and 0 or 1)

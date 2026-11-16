@@ -9,6 +9,67 @@ options:
       - terminal
     default: gold
     description: "Preset for every format: colours, fonts and style. Set it as `extensions: { mcanouil: { preset: <name> } }` in the front matter or in `_quarto.yml`."
+  type:
+    type: string
+    enum:
+      - report
+      - article
+      - memo
+      - letter
+      - invoice
+      - workshop
+    default: report
+    description: "Document type. mcanouil-typst renders every type; mcanouil-html renders report, article, memo and workshop; mcanouil-revealjs reads only workshop and gives a deck for any other type. letter and invoice stop the render in HTML and Reveal.js. Set it as `extensions: { mcanouil: { type: <name> } }`."
+  layout:
+    type: string
+    enum:
+      - compact
+      - full
+      - standard
+    description: "Layout of the document type. A report takes compact (the default) or full; every other type has the one layout standard. Set it as `extensions: { mcanouil: { layout: <name> } }`."
+  kind:
+    type: string
+    enum:
+      - note
+      - minutes
+      - agenda
+      - brief
+    description: "Kind of a memo: note (the default), minutes, agenda or brief. The kind chooses the banner fields. Set it as `extensions: { mcanouil: { kind: <name> } }`."
+  memo:
+    type: object
+    additionalProperties: false
+    description: "Banner fields of a memo. Each kind shows its own fields: note shows to, from and date; minutes shows date-time, present and absent; agenda shows date-time, place and participants; brief shows date, audience and purpose. A field with no value is left out."
+    properties:
+      to:
+        type: string
+        description: "Recipients of a note."
+      from:
+        type: string
+        description: "Author of a note."
+      date:
+        type: string
+        description: "Date of a note or a brief. When it is not set, the banner uses the document date."
+      date-time:
+        type: string
+        description: "Date and time of a meeting, for minutes and agendas. When it is not set, the banner uses memo date, then the document date."
+      present:
+        type: string
+        description: "People present at the meeting of the minutes."
+      absent:
+        type: string
+        description: "People absent from the meeting of the minutes."
+      place:
+        type: string
+        description: "Place of the meeting of an agenda."
+      participants:
+        type: string
+        description: "Participants of the meeting of an agenda."
+      audience:
+        type: string
+        description: "Audience of a brief."
+      purpose:
+        type: string
+        description: "Purpose of a brief."
   chapter-toc-depth:
     type: number
     minimum: 1
@@ -127,3 +188,7 @@ attributes:
     format:
       type: string
       description: "How the exercise is done, for example `pairs` or `solo`, shown in its label."
+  solution:
+    name:
+      type: string
+      description: "Name of the solution, added to its label, for example `Worked answer` gives \"Solution · Worked answer\". When it is not set and the solution starts with a heading, that heading is the name."
