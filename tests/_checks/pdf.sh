@@ -244,21 +244,44 @@ code_window_theme_test() {
 	printf 't.traffic-light-size == 0.7em and t.traffic-light-gap == 0.35em and t.label == c.muted and t.muted == c.muted and '
 	case "$1" in
 	gold) printf 'type(t.border) == gradient and t.border.stops().map(s => s.at(0)) == (c.at("accent-low"), c.at("accent-high"), c.at("accent-low")) and t.surface == c.tint and t.radius == 5pt' ;;
-	mono) printf 't.border == c.ink and t.stroke-thickness == 2pt and t.surface == c.tint and t.radius == 0pt' ;;
+	mono) printf 't.border == c.ink and t.stroke-thickness == 1pt and t.surface == c.tint and t.radius == 0pt' ;;
 	quarto) printf 't.border == c.line and t.surface == c.card and t.radius == 9pt' ;;
 	terminal) printf 't.border == c.accent and t.stroke-dash == "dashed" and t.surface == c.tint and t.radius == 0pt' ;;
 	esac
 }
 
-# Succeed when the template theme of the code windows of the document passes
-# the test of its preset. Prints the theme when it does not.
+# Answer the value of a Typst expression evaluated in the laid-out document of
+# the kept Typst file, so it can read a state at the location of an element.
+# Fails on an error or a warning.
+# $1 expression.
+typst_in_document() {
+	local value
+	value="$(quarto typst eval --in "${typ}" --root / --font-path "${ext_dir}/fonts" "$1" 2>&1)" || {
+		printf '# %s\n' "${value}"
+		return 1
+	}
+	if grep -qE '^(error|warning)' <<<"${value}"; then
+		printf '# %s\n' "${value}"
+		return 1
+	fi
+	printf '%s\n' "${value}"
+}
+
+# Succeed when both code windows of the document read a code-window theme
+# that passes the test of the preset, at their own location in the laid-out
+# document: the window with "coxph" and the window with "print". A theme set
+# after a window, or not at all, fails. Prints the theme each window reads
+# when the test fails.
 # $1 preset.
 code_window_theme() {
-	local result
-	result="$(typst_value "${typ}" 'mc-code-window-theme, mc-tokens, mc-preset' \
-		"let t = mc-code-window-theme(mc-preset, mc-tokens); let c = mc-tokens; $(code_window_theme_test "$1")")" || return 1
-	[ "${result}" = true ] || {
-		typst_value "${typ}" 'mc-code-window-theme, mc-tokens, mc-preset' 'repr(mc-code-window-theme(mc-preset, mc-tokens))' | sed 's/^/# /'
+	local at result
+	at='state("code-window-theme", (:)).at(query(raw.where(text: word)).first().location())'
+	result="$(typst_in_document "{ import \"${typ}\": mc-tokens; let c = mc-tokens; (\"coxph\", \"print\").map(word => { let t = ${at}; t.len() > 0 and $(code_window_theme_test "$1") }) }")" || {
+		printf '%s\n' "${result}"
+		return 1
+	}
+	[ "${result}" = '[true,true]' ] || {
+		typst_in_document "{ (\"coxph\", \"print\").map(word => repr(${at})) }" | sed 's/^/# theme at the windows: /'
 		return 1
 	}
 }

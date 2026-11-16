@@ -31,8 +31,8 @@
       ),
       radius: 5pt,
     ),
-    // Mono: square, in a thick ink frame.
-    mono: (border: colours.ink, stroke-thickness: 2pt, radius: 0pt),
+    // Mono: square, in an ink frame.
+    mono: (border: colours.ink, stroke-thickness: 1pt, radius: 0pt),
     // Quarto: rounded, the title bar on the card.
     quarto: (surface: colours.card, radius: 9pt),
     // Terminal: square, in a dashed accent frame.
