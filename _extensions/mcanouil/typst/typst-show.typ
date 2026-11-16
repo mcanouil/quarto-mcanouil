@@ -185,7 +185,9 @@ $endif$
     ),
 $endif$
     lang: "$if(lang)$$lang$$else$en$endif$",
-    region: "$if(region)$$region$$else$US$endif$",
+$if(region)$
+    region: "$region$",
+$endif$
     mode: "$mcanouil-mode$",
     tokens: tokens(),
     fonts: mc-fonts,

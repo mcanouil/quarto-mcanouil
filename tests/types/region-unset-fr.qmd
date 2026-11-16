@@ -1,0 +1,20 @@
+---
+title: Un rapport
+lang: fr
+date: 2026-11-11
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A document with lang fr and no region gives Typst no region, so the text is not set to fr-US, and the long date stays French.
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+      ensureTypstFileRegexMatches:
+        - ['date: \[#\[\]11 novembre 2026\]']
+        - ['region: "US"']
+---
+
+Un paragraphe.
