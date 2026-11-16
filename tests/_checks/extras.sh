@@ -8,6 +8,8 @@ set -euo pipefail
 #        extras.sh watermark
 #        extras.sh sections
 #        extras.sh chapters
+#        extras.sh chapters-unnumbered
+#        extras.sh sections-unnumbered
 #        extras.sh book
 #
 # Exits 77 for a format other than Typst.
@@ -101,6 +103,23 @@ numbered_by_chapter() {
 		pdf_text "${output}" | tr -s '[:space:]' ' ' | grep -qF 'See Figure 1.1, Figure 2.1 and Equation (1.1).'
 }
 
+# Succeed when the figures keep flat numbers, with no chapter prefix of 0.
+flat_without_numbered_headings() {
+	pdf_has 'Figure 1: A first grey rectangle.' &&
+		pdf_has 'Figure 2: A second grey rectangle.' &&
+		! pdf_has 'Figure 0.'
+}
+
+# Succeed when the body and part headings are numbered and the part sub-headings are not.
+part_sub_headings_unnumbered() {
+	pdf_matches '^[[:space:]]*1[[:space:]]+Results' &&
+		pdf_has 'Appendix A: Extra' &&
+		pdf_matches '^[[:space:]]*S1[[:space:]]+More' &&
+		pdf_matches '^[[:space:]]*Sub one' &&
+		pdf_matches '^[[:space:]]*Sub two' &&
+		! pdf_matches '(A\.1|S1\.1)[[:space:]]+Sub'
+}
+
 # Succeed when the supplementary chapter of the book reads S1, with its figure S1 and its kicker,
 # and the body chapter keeps its number and its flat figure number.
 book_supplementary() {
@@ -137,6 +156,14 @@ sections)
 chapters)
 	expect "chapters-numbering" "Figure 1.1, Figure 2.1 and equation (1.1)" numbered_by_chapter
 	expect "chapters-ua1" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
+	;;
+chapters-unnumbered)
+	expect "chapters-unnumbered-flat" "Figure 1 and Figure 2, and no Figure 0." flat_without_numbered_headings
+	expect "chapters-unnumbered-ua1" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
+	;;
+sections-unnumbered)
+	expect "sections-unnumbered-sub-headings" "1 Results, Appendix A: Extra, S1 More, and unnumbered Sub one and Sub two" part_sub_headings_unnumbered
+	expect "sections-unnumbered-ua1" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
 	;;
 book)
 	expect "book-supplementary" "the S1 chapter, its S1.1 section, Figure S1 and the Supplementary S1 kicker" book_supplementary

@@ -1,0 +1,27 @@
+---
+title: Numbering by chapter without numbered headings
+author: Test Author
+crossref:
+  chapters: true
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With crossref.chapters in a compact report, whose headings are unnumbered, the figures keep flat numbers (Figure 1, Figure 2) and never read Figure 0.1.
+        check: bash _checks/extras.sh chapters-unnumbered
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+---
+
+# Methods
+
+![A first grey rectangle.](figure.svg){#fig-one fig-alt="A grey rectangle."}
+
+# Results
+
+![A second grey rectangle.](figure.svg){#fig-two fig-alt="A grey rectangle."}
+
+See @fig-one and @fig-two.

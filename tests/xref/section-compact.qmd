@@ -1,6 +1,7 @@
 ---
 title: Section references
 author: Test Author
+number-sections: false
 format:
   mcanouil-typst:
     keep-typ: true
@@ -8,7 +9,7 @@ _quarto:
   tests:
     run:
       extension-test:
-        description: In a compact report, whose headings have no number, a reference to a section compiles with no warning and links to the heading with the supplement and the heading text.
+        description: In a compact report with number-sections set to false, whose headings have no number, a reference to a section compiles with no warning and links to the heading with the supplement and the heading text.
         check: bash _checks/xref.sh section 'Section Introduction'
         warnings: exhaustive
     mcanouil-typst:
