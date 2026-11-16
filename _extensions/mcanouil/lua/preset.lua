@@ -252,6 +252,19 @@ function M.typst_families(family)
   return families
 end
 
+--- Answer the Typst family names of a font, or those of the preset font when the font names only CSS generic
+--- families, since Typst needs at least one family name.
+--- @param family string Font family or CSS font stack
+--- @param preset_family string Font family of the preset for the same role
+--- @return string[] Family names
+function M.typst_font_list(family, preset_family)
+  local families = M.typst_families(family)
+  if #families == 0 then
+    return M.typst_families(preset_family)
+  end
+  return families
+end
+
 --- Build the CSS declarations of one scheme.
 --- @param tokens table<string, string> Hex colour of each token
 --- @param fonts table<string, table> Font of each role, from `brand_fonts`
@@ -326,7 +339,7 @@ local function deliver(meta)
     meta['mcanouil-tokens'] = typst_tokens
     local typst_fonts = {}
     for role, font in pairs(fonts[mode]) do
-      typst_fonts[role] = M.typst_families(font.family)
+      typst_fonts[role] = M.typst_font_list(font.family, data.fonts[role])
     end
     meta['mcanouil-fonts'] = typst_fonts
     meta['mcanouil-motif'] = data.motif
