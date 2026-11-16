@@ -60,6 +60,13 @@
   }
 }
 
+/* Code windows: a gilded edge along the top of the title bar, as in HTML. */
+.reveal .code-with-filename .code-with-filename-file {
+  background-image: var(--mc-gilded);
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+}
+
 /* Workshop exercise label: the gilded mark of the preset. */
 .reveal .mc-ws-exercise > .mc-ws-label::before {
   background: var(--mc-gilded, currentColor);

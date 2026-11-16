@@ -356,6 +356,7 @@ expected_colours() {
 	esac
 	printf 'one-rule figcaption.mc-quote-attribution\n'
 	printf 'checks link-ring\n'
+	printf 'pick-a-preset .code-with-filename-file>pre\npick-a-preset code.sourceCode>span,code.sourceCode>span>span\n'
 	for slide in brand-presets why-presets one-rule why-presets-after-dark; do
 		printf '%s footer-left\n%s footer-centre\n%s slide-number\n%s menu-button\n' "${slide}" "${slide}" "${slide}" "${slide}"
 		printf '%s slide-number-ring\n%s menu-button-ring\n' "${slide}" "${slide}"
@@ -485,9 +486,11 @@ gold | mono | quarto | terminal)
 	expect "deck-quote-attribution-${1}" "the attribution of the quote without its dash" quote_attribution
 	expect "deck-axe-light-${1}" "no axe-core violation in the ${1} deck" axe_clean
 	find_browser
-	probe title-slide brand-presets why-presets checks one-rule why-presets-after-dark mc-closing
+	probe title-slide brand-presets why-presets pick-a-preset checks one-rule why-presets-after-dark mc-closing
 	expect "deck-section-body-order-${1}" "section slide body below the number, the title and its rule" section_body_after_title checks body
 	expect "deck-section-bare-${1}" "section slide with no body: the number ends and the title starts on the middle line" section_body_after_title brand-presets bare
+	expect "deck-code-window-${1}" "the traffic lights and the ${1} frame, title bar and body on the code window, see code_window_look in lib.sh" \
+		code_window_matches "$(awk '$1 == "pick-a-preset" && $2 == "codewindow" { $1 = ""; $2 = ""; print; exit }' <<<"${probe_lines}")" "$1"
 	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
 	PROBE_QUERY='?print-pdf' probe brand-presets checks
 	expect "deck-section-body-order-print-${1}" "the same order and middle line in the print layout of a PDF export" section_body_after_title checks body

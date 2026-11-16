@@ -14,6 +14,8 @@
  *   ring reads 0.
  * - The page is read in the print layout of a PDF export when its URL has
  *   ?print-pdf; the slides are then paged as Reveal.js pages them.
+ * - "<slide> codewindow key=value ...": the facts of each code window, see
+ *   code_window_matches in lib.sh.
  * - "<slide> error <message>": the probe failed on the slide.
  *
  * @license MIT
@@ -188,6 +190,52 @@
     element.blur();
   }
 
+  // Facts of a code window, as "key=value" words that code_window_matches in
+  // lib.sh compares with the look of the preset. A colour is named by every
+  // token it equals, joined with "+". The same function is in
+  // html-measure-components.js.
+  function codeWindowFacts(win) {
+    var bar = win.querySelector(".code-with-filename-file");
+    var code = win.querySelector("div.sourceCode pre");
+    function token(name) {
+      var probe = document.createElement("span");
+      probe.style.color = "var(--mc-" + name + ")";
+      win.appendChild(probe);
+      var colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    }
+    function named(colour, names) {
+      return names.filter(function (name) { return token(name) === colour; }).join("+") || "other";
+    }
+    var behind = "none";
+    for (var node = code; node && node !== win.parentElement; node = node.parentElement) {
+      var colour = getComputedStyle(node).backgroundColor;
+      if (colour !== "rgba(0, 0, 0, 0)" && colour !== "transparent") {
+        behind = colour;
+        break;
+      }
+    }
+    var frame = getComputedStyle(win);
+    var title = getComputedStyle(bar);
+    var deco = getComputedStyle(bar, "::before");
+    return [
+      "deco=" + (deco.content !== "none" && /url\(/.test(deco.backgroundImage) ? 1 : 0),
+      "icon=" + (parseFloat(deco.height) / parseFloat(title.fontSize)).toFixed(2),
+      "border=" + [
+        parseFloat(frame.borderTopWidth),
+        parseFloat(frame.borderLeftWidth),
+        frame.borderTopStyle,
+        named(frame.borderTopColor, ["line", "ink", "accent"]),
+      ].join("/"),
+      "radius=" + parseFloat(frame.borderTopLeftRadius),
+      "shadow=" + (frame.boxShadow === "none" ? 0 : 1),
+      "title-edge=" + title.borderBottomStyle,
+      "gilded=" + (/gradient/.test(title.backgroundImage) ? 1 : 0),
+      "body=" + named(behind, ["tint", "card"]),
+    ].join(" ");
+  }
+
   function measureSlide(slide) {
     var section = document.getElementById(slide);
     measureBoxes(slide, section);
@@ -198,6 +246,8 @@
       ["figcaption.mc-quote-attribution", "::before", "text"],
       ["figcaption.mc-quote-attribution", null, "text"],
       [".mc-ws-label", null, "text"],
+      [".code-with-filename-file>pre", null, "text"],
+      ["code.sourceCode>span,code.sourceCode>span>span", null, "text"],
     ];
     targets.forEach(function (target) {
       section.querySelectorAll(target[0]).forEach(function (element) {
@@ -224,6 +274,9 @@
     if (numberLink && getComputedStyle(number).display !== "none") {
       measureRing(slide, "slide-number-ring", numberLink);
     }
+    section.querySelectorAll(".code-with-filename").forEach(function (win) {
+      lines.push([slide, "codewindow", codeWindowFacts(win)].join(" "));
+    });
     section.querySelectorAll("a[href]").forEach(function (link) {
       measureRing(slide, "link-ring", link);
     });

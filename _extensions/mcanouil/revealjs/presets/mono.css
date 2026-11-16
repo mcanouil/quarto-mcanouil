@@ -85,6 +85,12 @@
   background: var(--mc-accent);
 }
 
+/* Code windows: square, under a rule in the ink colour, as in HTML. */
+.reveal .code-with-filename {
+  border-width: 2px 0 0;
+  border-color: var(--mc-ink);
+}
+
 /* Workshop exercise: a thick start edge, as the mono callouts. */
 .reveal .mc-ws-exercise {
   border-width: 0 0 0 4px;

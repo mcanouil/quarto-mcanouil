@@ -380,3 +380,43 @@ if guarded == 0:
 sys.exit(1 if problems or guarded == 0 else 0)
 PY
 }
+
+# Answer the look that the code window of a preset must have, as "key=value"
+# words, in HTML and in Reveal.js alike. Every window keeps the traffic
+# lights (deco), at 0.7 times the size of the title bar text (icon).
+# - border: top width/side width/style/colour token of the frame.
+# - radius: corner radius in pixels.
+# - shadow: 1 when the window has a shadow.
+# - title-edge: style of the rule under the title bar.
+# - gilded: 1 when the title bar has the gilded edge.
+# - body: colour token behind the code.
+# $1 preset.
+code_window_look() {
+	printf 'deco=1 icon=0.70 '
+	case "$1" in
+	gold) printf 'border=1/1/solid/line radius=5 shadow=0 title-edge=solid gilded=1 body=tint\n' ;;
+	mono) printf 'border=2/0/solid/ink radius=0 shadow=0 title-edge=solid gilded=0 body=tint\n' ;;
+	quarto) printf 'border=1/1/solid/line radius=9 shadow=1 title-edge=solid gilded=0 body=card\n' ;;
+	terminal) printf 'border=1/1/dashed/accent radius=0 shadow=0 title-edge=dashed gilded=0 body=tint\n' ;;
+	esac
+}
+
+# Succeed when the measured facts of a code window match the look of the
+# preset. A measured colour lists every token it equals, joined with "+", so
+# "body=tint+card" matches "body=card". Prints each key that differs.
+# $1 measured facts, "key=value" words. $2 preset.
+code_window_matches() {
+	python3 -I -c '
+import sys
+measured = dict(word.split("=", 1) for word in sys.argv[1].split() if "=" in word)
+expected = dict(word.split("=", 1) for word in sys.argv[2].split())
+bad = []
+for key, value in expected.items():
+    got = measured.get(key, "missing")
+    if value not in got.split("+") and value != got:
+        bad.append("%s=%s, expected %s" % (key, got, value))
+for line in bad:
+    print("# code window " + line)
+sys.exit(1 if bad else 0)
+' "$1" "$(code_window_look "$2")"
+}
