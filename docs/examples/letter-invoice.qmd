@@ -107,7 +107,8 @@ extensions:
 
 - Typst calculates the totals in the smallest unit of the currency, so 3 × 33.33 gives 99.99.
 - The VAT shows for each rate.
-- `sender: exempted: true` removes the VAT column and adds the exemption label. A text value adds your own mention.
+- `sender: exempted: true` removes the VAT column and adds the exemption label.
+  A text value adds your own mention.
 - `fee` is the late fee in percent, and `penalty` is the fixed recovery cost.
 - The items table has tagged header cells and tabular figures.
 

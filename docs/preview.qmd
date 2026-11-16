@@ -5,7 +5,9 @@ author: "Mickaël CANOUIL"
 date: last-modified
 lang: en-GB
 brand: false
-abstract: "This report is produced by `mcanouil-typst` when the site is published. The layout, the type and the colours come from the extension."
+abstract: |
+  This report is produced by `mcanouil-typst` when the site is published.
+  The layout, the type and the colours come from the extension.
 format: mcanouil-typst
 extensions:
   mcanouil:
