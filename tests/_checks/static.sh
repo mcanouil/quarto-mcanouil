@@ -31,6 +31,16 @@ no_hex_outside_presets() {
 	[ -z "${found}" ]
 }
 
+# Succeed when no en dash or em dash sits in the source of the extension.
+no_dashes_in_source() {
+	local dir found=""
+	for dir in lua typst html revealjs; do
+		found+="$(grep -rn $'\u2013\|\u2014' "${ext_dir}/${dir}" || true)"
+	done
+	[ -z "${found}" ] || printf '# found: %s\n' "${found}"
+	[ -z "${found}" ]
+}
+
 # Succeed when no label text sits outside the language files.
 no_label_text_outside_language_files() {
 	local found
@@ -69,6 +79,7 @@ documents_use_declared_options() {
 expect "no-sass-colour-fns" "no Sass colour function on a preset token" no_sass_colour_fns
 expect "no-hex-outside-presets" "no hex colour outside presets/" no_hex_outside_presets
 expect "no-label-text-outside-language-files" "no label text in lua/ or typst/" no_label_text_outside_language_files
+expect "no-dashes-in-source" "no U+2013 or U+2014 in lua/, typst/, html/ or revealjs/" no_dashes_in_source
 expect "manifests-strict-yaml" "_schema.yml and _extension.yml load with a strict YAML parser" manifests_strict_yaml
 expect "documents-use-declared-options" "every option and attribute of the test documents in _schema.yml" documents_use_declared_options
 expect "type-dispatch-no-flags" "no 'if type ==' in typst/" type_dispatch_no_flags
