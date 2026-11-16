@@ -476,6 +476,56 @@ local function deliver_margin(meta, doc_type)
   meta.margin = meta.margin or M.MARGIN_VERTICAL[doc_type]
 end
 
+--- @type string[] Fields of `invoice` that Typst reads as strings.
+M.INVOICE_STRINGS = { 'issued', 'due', 'fee', 'penalty', 'currency' }
+
+--- @type string[] Fields of an invoice item that Typst reads as strings.
+M.ITEM_STRINGS = { 'quantity', 'unit-price', 'vat' }
+
+--- Answer a metadata value as a Typst string literal, with the text of raw inlines kept: Quarto passes paths to
+--- Typst as raw Typst inlines.
+--- @param value any Metadata value
+--- @return pandoc.MetaInlines|nil Literal, or nil when the value is unset
+function M.typst_literal(value)
+  if value == nil then
+    return nil
+  end
+  if pandoc.utils.type(value) == 'Inlines' then
+    value = value:walk({ RawInline = function(raw) return pandoc.Str(raw.text) end })
+  end
+  return pandoc.MetaInlines({ pandoc.RawInline('typst', labels.typst_string(pandoc.utils.stringify(value))) })
+end
+
+--- Deliver the metadata that the letter and invoice templates read as strings, as escaped Typst string literals,
+--- so a double quote or a backslash in a value cannot break the Typst source: `mcanouil-letter-strings`
+--- (`signature-image`), `mcanouil-invoice-strings` (`email` of the sender and the `M.INVOICE_STRINGS` of
+--- `invoice`, empty when unset, so the invoice template stops on a missing date with its own message) and
+--- `mcanouil-invoice-items` (each item, with its `M.ITEM_STRINGS` as literals).
+--- @param meta table Document metadata
+--- @param doc_type string `letter` or `invoice`
+function M.deliver_strings(meta, doc_type)
+  if doc_type == 'letter' then
+    meta['mcanouil-letter-strings'] = pandoc.MetaMap({ ['signature-image'] = M.typst_literal(meta['signature-image']) })
+    return
+  end
+  local invoice = type(meta.invoice) == 'table' and meta.invoice or {}
+  local sender = type(meta.sender) == 'table' and meta.sender or {}
+  local strings = { email = M.typst_literal(sender.email) }
+  for _, key in ipairs(M.INVOICE_STRINGS) do
+    strings[key] = M.typst_literal(invoice[key] or '')
+  end
+  meta['mcanouil-invoice-strings'] = pandoc.MetaMap(strings)
+  local items = pandoc.List()
+  for _, item in ipairs(type(invoice.items) == 'table' and invoice.items or {}) do
+    local delivered = { description = item.description, details = item.details }
+    for _, key in ipairs(M.ITEM_STRINGS) do
+      delivered[key] = M.typst_literal(item[key])
+    end
+    items:insert(pandoc.MetaMap(delivered))
+  end
+  meta['mcanouil-invoice-items'] = pandoc.MetaList(items)
+end
+
 --- Turn the gitlink filter off for a document, so that a reference such as `abcd1234` in the metadata of a
 --- letter or an invoice prints as written instead of becoming a commit badge. A setting of the author stays.
 --- @param meta table Document metadata
@@ -572,6 +622,7 @@ local function deliver(meta)
       fail.stop(standard_message)
     end
     meta['mcanouil-' .. resolved.type .. '-standard'] = standard
+    M.deliver_strings(meta, resolved.type)
     disable_gitlink(meta)
   end
   local furniture = M.furniture(meta)

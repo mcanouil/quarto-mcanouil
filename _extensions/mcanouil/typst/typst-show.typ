@@ -100,7 +100,7 @@ $if(ps)$
       ps: [$ps$],
 $endif$
 $if(signature-image)$
-      signature-image: "$signature-image$",
+      signature-image: $mcanouil-letter-strings.signature-image$,
 $endif$
     ),
 $endif$
@@ -121,7 +121,7 @@ $if(sender.address.country)$
 $endif$
         ),
 $if(sender.email)$
-        email: "$sender.email$",
+        email: $mcanouil-invoice-strings.email$,
 $endif$
 $if(sender.registration)$
         registration: [$sender.registration$],
@@ -148,33 +148,33 @@ $endif$
         ),
       ),
       number: [$invoice.number$],
-      issued: "$invoice.issued$",
-      due: "$invoice.due$",
+      issued: $mcanouil-invoice-strings.issued$,
+      due: $mcanouil-invoice-strings.due$,
       reference: [$invoice.reference$],
 $if(invoice.fee)$
-      fee: "$invoice.fee$",
+      fee: $mcanouil-invoice-strings.fee$,
 $endif$
 $if(invoice.penalty)$
-      penalty: "$invoice.penalty$",
+      penalty: $mcanouil-invoice-strings.penalty$,
 $endif$
 $if(invoice.currency)$
-      currency: "$invoice.currency$",
+      currency: $mcanouil-invoice-strings.currency$,
 $endif$
       items: (
-$for(invoice.items)$
+$for(mcanouil-invoice-items)$
         (
           description: [$it.description$],
 $if(it.details)$
           details: [$it.details$],
 $endif$
 $if(it.quantity)$
-          quantity: "$it.quantity$",
+          quantity: $it.quantity$,
 $endif$
 $if(it.unit-price)$
-          unit-price: "$it.unit-price$",
+          unit-price: $it.unit-price$,
 $endif$
 $if(it.vat)$
-          vat: "$it.vat$",
+          vat: $it.vat$,
 $endif$
         ),
 $endfor$

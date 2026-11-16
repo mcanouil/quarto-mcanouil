@@ -172,8 +172,7 @@
   }
   if "email" in sender {
     linebreak()
-    let address = sender.email.replace("\\", "")
-    link("mailto:" + address, address)
+    link("mailto:" + sender.email, sender.email)
   }
 }
 

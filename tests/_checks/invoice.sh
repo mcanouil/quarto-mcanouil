@@ -4,7 +4,7 @@ set -euo pipefail
 
 # Check hook: the invoice document type, read from the PDF text, the word boxes and the tag tree.
 #
-# Usage: invoice.sh totals | exempted | hex | fee | fr | din
+# Usage: invoice.sh totals | escaped | exempted | hex | fee | fr | din
 #
 # The fixtures hold three items and two VAT rates:
 #   2 x 1200.00 + 3 x 33.33 at 20 %, 1 x 24.50 at 5.5 %
@@ -80,6 +80,11 @@ totals)
 	expect "invoice-payment" "the payment box with the bank details and the reference" flat_in_order "Payment" "AZERTYUI" "FR12 1234 4567 7890 1234 5678 901" "REF-2026-014"
 	expect "invoice-terms" "the terms with the days to pay, the late fee and the penalty" flat_in_order "Terms" "paid in 30 days" "late fee of 2.28 %" "penalty of €40.00 for recovery costs"
 	expect "invoice-dates" "the dates in the reference block" flat_in_order "2026-014" "2026-11-01" "2026-12-01"
+	;;
+escaped)
+	expect "invoice-escaped-penalty" "the penalty with its quotes, set as typographic quotes, and its backslash" \
+		flat_in_order "Terms" 'penalty of 40 EUR “flat” fee, see \terms for recovery costs'
+	expect "invoice-escaped-email" "the sender email with its backslash, as written" flat_has 'mickael\x@example.org'
 	;;
 exempted)
 	expect "invoice-exempted-mention" "the exemption mention" flat_has "VAT exempt"
