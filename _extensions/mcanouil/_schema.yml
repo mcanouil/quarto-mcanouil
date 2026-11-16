@@ -38,7 +38,7 @@ options:
   footer:
     type: object
     additionalProperties: false
-    description: "Content of the three footer slots of Typst pages and Reveal.js slides. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter, page, speaker (the authors and the event), event and session (for example "Session 2"). An empty string leaves the slot empty. A slot that is not set takes the default of the document type; a deck shows the speaker and the event, the talk title, and the slide number; a workshop shows the event, the session and the page or slide number."
+    description: "Content of the three footer slots of Typst pages and Reveal.js slides. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter, page, speaker (the authors and the event), event and session (for example \"Session 2\"). An empty string leaves the slot empty. A slot that is not set takes the default of the document type; a deck shows the speaker and the event, the talk title, and the slide number; a workshop shows the event, the session and the page or slide number."
     properties:
       left:
         type: string

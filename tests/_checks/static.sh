@@ -45,8 +45,19 @@ type_dispatch_no_flags() {
 	[ "$(grep -rc 'if type ==' "${ext_dir}/typst" | awk -F: '{ total += $NF } END { print total + 0 }')" -eq 0 ]
 }
 
+# Succeed when the schema and the manifest of the extension load with a strict
+# YAML parser and hold their top-level key. The embedded tools are not checked.
+manifests_strict_yaml() {
+	local report status=0
+	report="$(quarto pandoc lua "${tests_dir}/_checks/yaml-strict.lua" \
+		"${ext_dir}/_schema.yml:options" "${ext_dir}/_extension.yml:contributes" 2>&1)" || status=$?
+	printf '%s\n' "${report}" | sed -n 's/^fail /# found: /p'
+	[ "${status}" -eq 0 ]
+}
+
 expect "no-sass-colour-fns" "no Sass colour function on a preset token" no_sass_colour_fns
 expect "no-hex-outside-presets" "no hex colour outside presets/" no_hex_outside_presets
 expect "no-label-text-outside-language-files" "no label text in lua/ or typst/" no_label_text_outside_language_files
+expect "manifests-strict-yaml" "_schema.yml and _extension.yml load with a strict YAML parser" manifests_strict_yaml
 expect "type-dispatch-no-flags" "no 'if type ==' in typst/" type_dispatch_no_flags
 tap_done
