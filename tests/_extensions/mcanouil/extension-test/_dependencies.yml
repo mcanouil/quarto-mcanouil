@@ -3,10 +3,10 @@ sources:
   quarto-wizard:
     origin: https://github.com/mcanouil/quarto-wizard
     fetch: "{origin}/releases/download/{version}/{file}"
-    version: "2.3.2"
+    version: "2.3.4"
     tag-prefix: schema-v
     licence: MIT
     files:
       schema.lua:
-        sha256: fafd1e94af15cbb416214784b544b9f51be2c4294dc938baf457462312893d17
+        sha256: 03ad6c49d40abff19ffde6defd8f7d3f9a9ffba601a4c3e26dadd2a0f207bdf9
         runtime: any

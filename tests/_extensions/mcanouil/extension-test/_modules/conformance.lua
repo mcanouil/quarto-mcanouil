@@ -134,6 +134,33 @@ local function emit_warnings(id, warnings, emit)
   end
 end
 
+--- Validate a value against one descriptor, and keep the faults of the
+--- schema apart from the faults of the value.
+--- A boolean keyword written as `yes` or `no` is a fault of the descriptor,
+--- and the validator reports it as an error with the keyword `schema`. A
+--- check of a default, an example or a `const` must not blame the value for it.
+--- @param values table
+--- @param descriptors table
+--- @return boolean valid true when no error other than a schema fault is found
+--- @return table errors the messages of those other errors
+--- @return table warnings
+--- @return table faults the schema faults, each {path, message}
+local function probe(values, descriptors)
+  local _, _, warnings, _, findings = schema.validate(values, descriptors, { unknown = 'ignore' })
+  local errors, faults = {}, {}
+  for _, finding in ipairs(findings or {}) do
+    if finding.severity ~= 'warning' then
+      if finding.keyword == 'schema' then
+        faults[#faults + 1] = finding
+      else
+        local text = finding.path and (finding.path .. ': ' .. finding.message) or finding.message
+        errors[#errors + 1] = text
+      end
+    end
+  end
+  return #errors == 0, errors, warnings, faults
+end
+
 --- Check one extension's `_extension.yml`.
 --- @param ext table {name, dir}
 --- @param manifest_schema table descriptors from manifest-schema.yml
@@ -272,7 +299,7 @@ local function check_schema(ext, severity, emit)
   -- type contradicts its own declaration surfaces, and it is the check that
   -- protects every extension reading its defaults back out of the schema.
   local empty_id = 'conformance/defaults/' .. ext.name
-  local valid, errors, warnings = schema.validate({}, loaded.options, { unknown = 'ignore' })
+  local valid, errors, warnings = probe({}, loaded.options)
   if valid then
     emit(case(empty_id, 'pass'))
   else
@@ -347,7 +374,7 @@ function M.check_descriptors(ext, loaded, severity, emit)
     if type(descriptor.examples) == 'table' then
       for index, example in ipairs(descriptor.examples) do
         local example_id = 'conformance/example/' .. ext.name .. '/' .. path .. '/' .. index
-        local valid, _, warnings = schema.validate({ probe = example }, { probe = descriptor }, { unknown = 'ignore' })
+        local valid, _, warnings = probe({ probe = example }, { probe = descriptor })
         if not valid then
           fail(example_id,
             string.format('`%s.examples[%d]` does not satisfy its own descriptor', path, index),
@@ -359,7 +386,7 @@ function M.check_descriptors(ext, loaded, severity, emit)
 
     if descriptor.const ~= nil then
       local const_id = 'conformance/const/' .. ext.name .. '/' .. path
-      local valid, _, warnings = schema.validate({ probe = descriptor.const }, { probe = descriptor }, { unknown = 'ignore' })
+      local valid, _, warnings = probe({ probe = descriptor.const }, { probe = descriptor })
       if not valid then
         fail(const_id, string.format('`%s.const` does not satisfy its own descriptor', path), 'const-invalid')
       end
@@ -376,12 +403,29 @@ function M.check_descriptors(ext, loaded, severity, emit)
     end
   end
 
+  -- The validator walks the nested descriptors itself, so the faults are
+  -- read once for each top-level descriptor, and each is reported at its path.
+  local function check_faults(path, descriptor)
+    if type(descriptor) ~= 'table' then
+      return
+    end
+    local _, _, _, faults = probe({}, { probe = descriptor })
+    for _, fault in ipairs(faults) do
+      local fault_path = path .. tostring(fault.path or 'probe'):sub(#'probe' + 1)
+      -- One descriptor can carry several faults, so the keyword keeps each id apart.
+      local keyword = tostring(fault.message):match('^schema declares "([^"]+)"') or 'keyword'
+      fail('conformance/keyword-value/' .. ext.name .. '/' .. fault_path .. '/' .. keyword,
+        string.format('`%s`: %s', fault_path, fault.message), 'keyword-not-boolean')
+    end
+  end
+
   local function check_map(section, map)
     if type(map) ~= 'table' then
       return
     end
     for _, key in ipairs(schema.key_order(map)) do
       check_descriptor(section .. '.' .. key, map[key])
+      check_faults(section .. '.' .. key, map[key])
     end
   end
 
@@ -423,6 +467,7 @@ function M.check_descriptors(ext, loaded, severity, emit)
             'argument-unnamed')
         else
           check_descriptor('shortcodes.' .. name .. '.arguments.' .. argument.name, argument)
+          check_faults('shortcodes.' .. name .. '.arguments.' .. argument.name, argument)
         end
       end
 
