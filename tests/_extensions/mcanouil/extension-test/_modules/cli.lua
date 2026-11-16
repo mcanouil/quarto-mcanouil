@@ -67,17 +67,25 @@ function M.parse_inspect(text)
 end
 
 --- Run `quarto inspect` on a document or a project directory.
+---
+--- Standard error goes to a file of its own, so that only the JSON is read.
+--- Quarto writes DEBUG lines to standard error in a GitHub Actions run with
+--- debug logging, and those lines would come before the JSON. The braces
+--- keep the redirection before the `2>&1` that `util.capture` appends.
 --- @param target string
 --- @param cwd string|nil directory to run it from
 --- @return string|nil output, string|nil error
 local function run_inspect(target, cwd)
-  local command = 'quarto inspect ' .. util.shell_quote(target)
+  local stderr_path = os.tmpname()
+  local command = '{ quarto inspect ' .. util.shell_quote(target) .. ' 2> ' .. util.shell_quote(stderr_path) .. '; }'
   if cwd then
     command = 'cd ' .. util.shell_quote(cwd) .. ' && ' .. command
   end
   local code, output = util.capture(command)
+  local stderr = util.read_file(stderr_path) or ''
+  os.remove(stderr_path)
   if code ~= 0 then
-    return nil, 'quarto inspect failed: ' .. util.trim(output)
+    return nil, 'quarto inspect failed: ' .. util.trim(util.trim(stderr) .. '\n' .. util.trim(output))
   end
   return output, nil
 end

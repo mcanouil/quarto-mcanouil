@@ -122,6 +122,18 @@ local function advisory(id, message)
   }
 end
 
+--- Emit each validator warning of a case as an advisory of its own.
+--- An undeclared key under `additionalProperties: false` is a warning, not
+--- an error, so a check that read only the errors would report nothing.
+--- @param id string the id of the case the warnings belong to
+--- @param warnings table|nil
+--- @param emit function(case)
+local function emit_warnings(id, warnings, emit)
+  for index, warning in ipairs(util.sorted_messages(warnings or {})) do
+    emit(advisory(string.format('%s/warning/%d', id, index), warning))
+  end
+end
+
 --- Check one extension's `_extension.yml`.
 --- @param ext table {name, dir}
 --- @param manifest_schema table descriptors from manifest-schema.yml
@@ -148,9 +160,7 @@ local function check_manifest(ext, manifest_schema, emit)
   else
     emit(case(id, 'pass'))
   end
-  for index, warning in ipairs(util.sorted_messages(warnings)) do
-    emit(advisory(string.format('%s/warning/%d', id, index), warning))
-  end
+  emit_warnings(id, warnings, emit)
 
   local contributes = parsed.contributes
   if type(contributes) == 'table' then
@@ -262,7 +272,7 @@ local function check_schema(ext, severity, emit)
   -- type contradicts its own declaration surfaces, and it is the check that
   -- protects every extension reading its defaults back out of the schema.
   local empty_id = 'conformance/defaults/' .. ext.name
-  local valid, errors = schema.validate({}, loaded.options, { unknown = 'ignore' })
+  local valid, errors, warnings = schema.validate({}, loaded.options, { unknown = 'ignore' })
   if valid then
     emit(case(empty_id, 'pass'))
   else
@@ -270,6 +280,7 @@ local function check_schema(ext, severity, emit)
       'an empty configuration is rejected by the schema: ' .. table.concat(util.sorted_messages(errors), ' | '),
       'conformance', 'defaults-invalid'))
   end
+  emit_warnings(empty_id, warnings, emit)
 
   return loaded
 end
@@ -335,21 +346,24 @@ function M.check_descriptors(ext, loaded, severity, emit)
     -- that has drifted from the constraint beside it.
     if type(descriptor.examples) == 'table' then
       for index, example in ipairs(descriptor.examples) do
-        local valid = schema.validate({ probe = example }, { probe = descriptor }, { unknown = 'ignore' })
+        local example_id = 'conformance/example/' .. ext.name .. '/' .. path .. '/' .. index
+        local valid, _, warnings = schema.validate({ probe = example }, { probe = descriptor }, { unknown = 'ignore' })
         if not valid then
-          fail('conformance/example/' .. ext.name .. '/' .. path .. '/' .. index,
+          fail(example_id,
             string.format('`%s.examples[%d]` does not satisfy its own descriptor', path, index),
             'example-invalid')
         end
+        emit_warnings(example_id, warnings, emit)
       end
     end
 
     if descriptor.const ~= nil then
-      local valid = schema.validate({ probe = descriptor.const }, { probe = descriptor }, { unknown = 'ignore' })
+      local const_id = 'conformance/const/' .. ext.name .. '/' .. path
+      local valid, _, warnings = schema.validate({ probe = descriptor.const }, { probe = descriptor }, { unknown = 'ignore' })
       if not valid then
-        fail('conformance/const/' .. ext.name .. '/' .. path,
-          string.format('`%s.const` does not satisfy its own descriptor', path), 'const-invalid')
+        fail(const_id, string.format('`%s.const` does not satisfy its own descriptor', path), 'const-invalid')
       end
+      emit_warnings(const_id, warnings, emit)
     end
 
     if type(descriptor.properties) == 'table' then
@@ -373,6 +387,10 @@ function M.check_descriptors(ext, loaded, severity, emit)
 
   check_map('options', loaded.options)
   check_map('classes', loaded.classes)
+  for _, language in ipairs(schema.key_order(loaded.cells or {})) do
+    local entry = loaded.cells[language]
+    check_map('cells.' .. language, type(entry) == 'table' and entry.options or nil)
+  end
 
   for _, name in ipairs(schema.key_order(loaded.formats or {})) do
     check_map('formats.' .. name, loaded.formats[name])

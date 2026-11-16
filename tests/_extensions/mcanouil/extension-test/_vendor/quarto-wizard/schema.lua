@@ -3,7 +3,7 @@
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
---- @version 2.0.0
+--- @version 2.3.2
 ---
 --- Implements the v2 extension schema vocabulary published at
 --- <https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json>.
@@ -27,11 +27,57 @@ M.SCHEMA_VERSION = 'https://m.canouil.dev/quarto-wizard/assets/schema/v2/extensi
 --- harness can install stubs before the first call.
 local _env = {}
 
---- Render a Pandoc value as plain text.
+--- The marks that a `Quoted` element had in the source.
+local _QUOTE_MARKS = { SingleQuote = "'", DoubleQuote = '"' }
+
+--- The characters that Pandoc's `smart` extension writes inside `Str`, mapped
+--- back to what the source had. A typographic character that the author typed
+--- also becomes ASCII, the same trade-off that `_QUOTE_MARKS` makes.
+local _SMART_CHARACTERS = {
+  ['‘'] = "'",
+  ['’'] = "'",
+  ['“'] = '"',
+  ['”'] = '"',
+  ['–'] = '--',
+  ['—'] = '---',
+  ['…'] = '...',
+}
+
+--- The walk that puts raw HTML, quotes and smart punctuation back as the
+--- source text.
+local _LITERAL_FILTER = {
+  Str = function(str)
+    local text = str.text
+    for typographic, ascii in pairs(_SMART_CHARACTERS) do
+      text = text:gsub(typographic, ascii)
+    end
+    return pandoc.Str(text)
+  end,
+  RawInline = function(raw)
+    return pandoc.Str(raw.text)
+  end,
+  RawBlock = function(raw)
+    return pandoc.Plain({ pandoc.Str(raw.text) })
+  end,
+  Quoted = function(quoted)
+    local mark = _QUOTE_MARKS[quoted.quotetype]
+    local inlines = pandoc.Inlines({ pandoc.Str(mark) })
+    inlines:extend(quoted.content)
+    inlines:insert(pandoc.Str(mark))
+    return inlines
+  end,
+}
+
+--- Render a Pandoc value as the plain text the document wrote.
+--- Quarto reads a metadata string as Markdown, so raw HTML arrives as
+--- `RawInline` or `RawBlock`, quotes arrive as `Quoted`, and `smart` turns
+--- `'`, `--`, `---` and `...` into typographic characters. `stringify` alone
+--- drops the raw HTML and keeps the typographic marks, so a label such as
+--- `'<b>A</b> & x'` would come back as `A & x`.
 --- @param value any Pandoc value
 --- @return string Plain text
 function _env.stringify(value)
-  return pandoc.utils.stringify(value)
+  return pandoc.utils.stringify(value:walk(_LITERAL_FILTER))
 end
 
 --- Report the Pandoc type of a value.
@@ -313,11 +359,18 @@ local function _coerce_scalar(value, name)
       return number, true
     end
   elseif name == 'boolean' then
+    -- Only `true` and `false`, which is what YAML 1.2 calls a boolean and what
+    -- Pandoc reads. `yes` and `no` are booleans in YAML 1.1 alone, and Pandoc
+    -- hands them over as strings, so accepting them here made this validator
+    -- disagree with the YAML the documents are written in.
+    --
+    -- The coercion is still needed for the words that do name a boolean,
+    -- because an attribute and a shortcode argument always arrive as strings.
     local lowered = value:lower()
-    if lowered == 'true' or lowered == 'yes' then
+    if lowered == 'true' then
       return true, true
     end
-    if lowered == 'false' or lowered == 'no' then
+    if lowered == 'false' then
       return false, true
     end
   end
@@ -816,6 +869,50 @@ local function _trim(text)
   return (text:gsub('^%s+', ''):gsub('%s+$', ''))
 end
 
+local _DOUBLE_QUOTED_ESCAPES = { n = '\n', t = '\t', r = '\r' }
+
+--- Read the body of a quoted scalar up to its closing quote.
+--- In double quotes, `\` escapes the next character.
+--- In single quotes, `''` stands for one quote.
+--- The closing quote must be the last character of the text.
+--- @param text string Trimmed scalar text, opening quote included
+--- @param line_number number Line number for errors
+--- @return string|nil value Unquoted value
+--- @return string|nil err
+local function _parse_quoted(text, line_number)
+  local quote = text:sub(1, 1)
+  local style = quote == '"' and 'double-quoted' or 'single-quoted'
+  local out = {}
+  local index = 2
+  while index <= #text do
+    local char = text:sub(index, index)
+    if quote == '"' and char == '\\' then
+      if index == #text then
+        break
+      end
+      local escaped = text:sub(index + 1, index + 1)
+      out[#out + 1] = _DOUBLE_QUOTED_ESCAPES[escaped] or escaped
+      index = index + 2
+    elseif char == quote and quote == "'" and text:sub(index + 1, index + 1) == "'" then
+      out[#out + 1] = "'"
+      index = index + 2
+    elseif char == quote then
+      if index ~= #text then
+        local rest = text:sub(index + 1)
+        if not rest:match('^%s') and rest:find(quote, 1, true) then
+          return nil, _yaml_error(line_number, 'unescaped ' .. quote .. ' inside a ' .. style .. ' scalar')
+        end
+        return nil, _yaml_error(line_number, 'text after the closing quote of a ' .. style .. ' scalar')
+      end
+      return table.concat(out), nil
+    else
+      out[#out + 1] = char
+      index = index + 1
+    end
+  end
+  return nil, _yaml_error(line_number, 'unterminated ' .. style .. ' scalar')
+end
+
 --- Parse a scalar, giving numbers and booleans their real Lua types.
 --- @param text string Scalar text
 --- @param line_number number Line number for errors
@@ -830,23 +927,8 @@ local function _parse_scalar(text, line_number)
 
   local first = text:sub(1, 1)
 
-  if first == '"' then
-    if #text < 2 or text:sub(-1) ~= '"' then
-      return nil, _yaml_error(line_number, 'unterminated double-quoted scalar')
-    end
-    return (text:sub(2, -2):gsub('\\(.)', function(escaped)
-      if escaped == 'n' then return '\n' end
-      if escaped == 't' then return '\t' end
-      if escaped == 'r' then return '\r' end
-      return escaped
-    end)), nil
-  end
-
-  if first == "'" then
-    if #text < 2 or text:sub(-1) ~= "'" then
-      return nil, _yaml_error(line_number, 'unterminated single-quoted scalar')
-    end
-    return (text:sub(2, -2):gsub("''", "'")), nil
+  if first == '"' or first == "'" then
+    return _parse_quoted(text, line_number)
   end
 
   if first == '&' or first == '*' or first == '!' then
@@ -1791,7 +1873,7 @@ local function _check_object(value, spec, path, context)
 
   if type(spec.properties) == 'table' then
     local sub, filled = _validate_map(value, spec.properties, path, context, {
-      unknown = spec.additionalProperties == false and 'error' or 'ignore',
+      unknown = spec.additionalProperties == false and 'warn' or 'ignore',
       additional = type(spec.additionalProperties) == 'table' and spec.additionalProperties or nil,
     })
 
@@ -2153,7 +2235,7 @@ end
 --- carry on with a nil schema and fail later somewhere unrelated.
 ---
 --- @param filename string|nil Path to the schema file (defaults to '_schema.yml')
---- @return table|nil schema Schema with {['$schema'], options, shortcodes, formats, projects, attributes, classes}
+--- @return table|nil schema Schema with {['$schema'], options, shortcodes, formats, projects, attributes, classes, cells}
 --- @return string|nil err Why the schema could not be read
 --- @usage local schema, err = M.load_schema('_schema.yml')
 function M.load_schema(filename)
@@ -2170,6 +2252,7 @@ function M.load_schema(filename)
     projects = raw.projects or {},
     attributes = raw.attributes or {},
     classes = raw.classes or {},
+    cells = raw.cells or {},
   }, nil
 end
 
@@ -2381,7 +2464,55 @@ function M.validate_attributes(attributes, group, schema, options)
   return _finish(context, merged)
 end
 
+--- Validate the comment-pipe options of one code cell against the `cells`
+--- section. The language is matched case-insensitively, because Quarto treats
+--- `{Typst}` and `{typst}` as the same cell language. Undeclared options are
+--- ignored by default, because a cell legitimately carries options from Quarto
+--- and from other filters.
+--- @param options table Map of option values, as read from the comment-pipe lines
+--- @param language string Cell language, such as 'typst'
+--- @param schema table Loaded schema
+--- @param opts table|nil {unknown = 'warn'|'error'|'ignore'}
+--- @return boolean valid
+--- @return table errors
+--- @return table warnings
+--- @return table merged
+--- @return table findings
+--- @usage local valid, errors, warnings, merged = M.validate_cells(cell_options, 'typst', schema)
+function M.validate_cells(options, language, schema, opts)
+  opts = opts or {}
+  local entry
+  if schema and type(schema.cells) == 'table' and type(language) == 'string' then
+    entry = _lookup(schema.cells, language)
+    if entry == nil then
+      local wanted = language:lower()
+      for key, candidate in pairs(schema.cells) do
+        if type(key) == 'string' and key:lower() == wanted then
+          entry = candidate
+          break
+        end
+      end
+    end
+  end
+
+  local context = _new_context()
+  if type(entry) ~= 'table' or type(entry.options) ~= 'table' then
+    return _finish(context, options or {})
+  end
+
+  local merged = _validate_map(options or {}, entry.options, language, context, {
+    unknown = opts.unknown or 'ignore',
+  })
+  return _finish(context, merged)
+end
+
 --- Validate the options of one output format against the `formats` section.
+--- Quarto merges the options of the selected format into the top level of the
+--- metadata, so the values are read from there. The format name is never a key.
+--- A value is collected only when a descriptor declares its name, which keeps
+--- the document's own keys, such as `title`, out of the merge. The `unknown`
+--- option therefore has nothing to report here, and is kept so that the entry
+--- points keep one signature.
 --- @param meta table Document metadata
 --- @param format string Format name, such as 'html' or 'typst'
 --- @param schema table Loaded schema
@@ -2401,11 +2532,54 @@ function M.validate_format(meta, format, schema, options)
     return _finish(context, {})
   end
 
+  -- Each value is stored under the spelling the document wrote, never under the
+  -- declared name. `_validate_map` is what moves an alias or the other spelling
+  -- to the declared name, and it needs the original key to say which two
+  -- spellings a document supplied for one field.
+  --
+  -- `_lookup` returns the first spelling it finds, so a document that wrote one
+  -- name in both spellings loses the other. Every other entry point reports the
+  -- loser through the `unknown` option, which has nothing to report here, so the
+  -- collection reports it in the same words `_validate_map` uses.
   local values = {}
-  local format_meta = meta and _lookup(meta, format)
-  if format_meta ~= nil then
-    for key, value in pairs(format_meta) do
-      values[tostring(key)] = _convert_pandoc_value(value)
+  for field, raw_spec in pairs(descriptors) do
+    local spec = _compile(raw_spec)
+
+    -- One entry per name, and not one per spelling. `_lookup` reads both
+    -- spellings of whichever entry is kept, so an alias that is only the other
+    -- spelling of a name already listed adds nothing. Probing it as well would
+    -- collect the two spellings under separate keys, and one mistake would then
+    -- be reported three times, once by each probe and once by `_validate_map`.
+    local names = { field }
+    local listed = { [(field:gsub('_', '-'))] = true }
+    if type(spec) == 'table' and type(spec.aliases) == 'table' then
+      for _, alias in ipairs(spec.aliases) do
+        -- A schema file is not read against the meta-schema, so an unquoted
+        -- `no` reaches here as a boolean. `_lookup` skips a key that is not a
+        -- string everywhere else, and so does this.
+        if type(alias) == 'string' then
+          local normalised = (alias:gsub('_', '-'))
+          if not listed[normalised] then
+            listed[normalised] = true
+            names[#names + 1] = alias
+          end
+        end
+      end
+    end
+
+    for _, name in ipairs(names) do
+      local value, found_key = _lookup(meta, name)
+      if value ~= nil then
+        values[found_key] = _convert_pandoc_value(value)
+
+        for _, other in ipairs({ (name:gsub('%-', '_')), (name:gsub('_', '-')) }) do
+          if other ~= found_key and meta[other] ~= nil then
+            _report(context, 'warning', format .. '.' .. field, 'aliases',
+              string.format('was given as both "%s" and "%s"; "%s" was used.',
+                found_key, other, found_key))
+          end
+        end
+      end
     end
   end
 

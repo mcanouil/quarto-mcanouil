@@ -30,11 +30,12 @@ local function strip_ansi(text)
 end
 
 --- The level of one line, raised by the markers quarto-cli passes on.
+--- Typst writes a compile warning as `warning: ` at the start of a line.
 --- @param line string
 --- @param record_level string
 --- @return string
 local function line_level(line, record_level)
-  if line:match('^%(W%) ') or line:match('^WARNING') or line:match('^%[WARNING%]') then
+  if line:match('^%(W%) ') or line:match('^WARNING') or line:match('^%[WARNING%]') or line:match('^warning: ') then
     return 'WARN'
   end
   if line:match('^%(E%) ') or line:match('^ERROR') or line:match('^FATAL') or line:match('^%[ERROR%]') then
