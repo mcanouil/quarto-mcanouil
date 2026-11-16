@@ -39,6 +39,11 @@
     return element;
   }
 
+  function textOf(key) {
+    var strings = ui.config.strings || {};
+    return typeof strings[key] === 'string' ? strings[key] : key;
+  }
+
   function labelOf(name) {
     var group = ui.config.groups.filter(function (item) {
       return item.name === name;
@@ -140,8 +145,8 @@
     }
     var section = make('div', 'veil-section');
     var heading = make('div', 'veil-heading');
-    heading.textContent = 'Level';
-    var group = make('div', 'veil-ladder', { role: 'group', 'aria-label': 'Level' });
+    heading.textContent = textOf('veil-level');
+    var group = make('div', 'veil-ladder', { role: 'group', 'aria-label': textOf('veil-level') });
     var levels = [0].concat(state.levels.slice().sort(function (a, b) {
       return a - b;
     }));
@@ -169,7 +174,7 @@
     }
     var section = make('div', 'veil-section');
     var heading = make('div', 'veil-heading');
-    heading.textContent = 'Groups';
+    heading.textContent = textOf('veil-groups');
     section.appendChild(heading);
     names.forEach(function (name) {
       var control = make('button', 'veil-switch', { type: 'button', role: 'switch', 'aria-checked': 'false' });
@@ -269,7 +274,7 @@
     var popover = make('div', 'veil-popover veil-' + position + (withButton ? ' veil-with-button' : ''), {
       id: 'veil-popover',
       role: 'dialog',
-      'aria-label': 'Veil'
+      'aria-label': textOf('veil-name')
     });
     popover.hidden = true;
     [buildLadder(), buildSwitches()].forEach(function (section) {
@@ -286,8 +291,8 @@
   function buildButton(position) {
     var button = make('button', 'veil-button veil-' + position, {
       type: 'button',
-      title: 'Veil',
-      'aria-label': 'Veil',
+      title: textOf('veil-name'),
+      'aria-label': textOf('veil-name'),
       'aria-haspopup': 'dialog',
       'aria-expanded': 'false',
       'aria-controls': 'veil-popover'
@@ -300,14 +305,8 @@
   // The Tools panel of the Reveal.js menu has no API, so the entry goes into
   // its list. The menu builds the panel after this module starts.
   function toolsList() {
-    var tabs = document.querySelectorAll('.slide-menu-toolbar [data-panel]');
-    for (var i = 0; i < tabs.length; i += 1) {
-      if (tabs[i].textContent.trim() === 'Tools') {
-        var panel = document.querySelector('.slide-menu-panel[data-panel="' + tabs[i].getAttribute('data-panel') + '"]');
-        return panel && panel.querySelector('ul.slide-menu-items');
-      }
-    }
-    return null;
+    var tool = document.querySelector('.slide-menu-panel .slide-tool-item');
+    return tool ? tool.parentNode : null;
   }
 
   function addMenuEntry() {
@@ -328,7 +327,7 @@
       key.textContent = menuKey;
       link.appendChild(key);
     }
-    link.appendChild(document.createTextNode(' Veil…'));
+    link.appendChild(document.createTextNode(' ' + textOf('veil-name') + '…'));
     link.addEventListener('click', function (event) {
       event.preventDefault();
       var menu = window.Reveal.getPlugin && window.Reveal.getPlugin('menu');
@@ -366,7 +365,7 @@
       return;
     }
     if (typeof deck.registerKeyboardShortcut === 'function' && ui.config.keys.menu) {
-      deck.registerKeyboardShortcut(ui.config.keys.menu, 'Open the Veil popover');
+      deck.registerKeyboardShortcut(ui.config.keys.menu, textOf('veil-open-popover'));
     }
     watchMenu();
   }

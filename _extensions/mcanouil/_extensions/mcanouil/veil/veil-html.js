@@ -26,20 +26,30 @@
   // the slides again, so a deck finds the elements on each change.
   var cache = null;
 
+  // The fragment of a link to a place on this page, or an empty string.
+  // Quarto makes the links of a website absolute, so the link is compared by
+  // its resolved URL and not by the text of its `href`. The query is not
+  // compared, because the state in the URL changes after Quarto writes the
+  // links.
+  function pageFragment(link) {
+    var samePage = link.origin === location.origin && link.pathname === location.pathname;
+    return samePage ? link.hash : '';
+  }
+
   // The `li` of each table of contents link, by the identifier it points to.
   function tocEntries() {
     var entries = {};
     document.querySelectorAll(TOC_LINKS).forEach(function (link) {
-      var href = link.getAttribute('href');
+      var hash = pageFragment(link);
       var item = link.closest('li');
-      if (href.charAt(0) !== '#' || !item) {
+      if (hash.length < 2 || !item) {
         return;
       }
       var id;
       try {
-        id = decodeURIComponent(href.slice(1));
+        id = decodeURIComponent(hash.slice(1));
       } catch (error) {
-        id = href.slice(1);
+        id = hash.slice(1);
       }
       (entries[id] = entries[id] || []).push(item);
     });

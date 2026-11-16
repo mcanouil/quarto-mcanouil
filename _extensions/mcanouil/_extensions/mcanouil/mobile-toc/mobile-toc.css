@@ -52,12 +52,31 @@
   outline-offset: 2px;
 }
 
-body:has(> .mobile-toc-pill) #quarto-back-to-top {
-  left: calc(50% + (var(--mobile-toc-offset-left, 0px) - var(--mobile-toc-offset-x, 0px)) / 2);
-  bottom: calc(
-    var(--mobile-toc-inset-block, 1rem) + env(safe-area-inset-bottom) + var(--mobile-toc-offset-y, 0px) +
-      var(--mobile-toc-pill-height, 44px) + 0.75rem
+:root:has(.mobile-toc-pill) {
+  --mobile-toc-clearance: calc(
+    var(--mobile-toc-pill-height, 44px) + var(--mobile-toc-inset-block, 1rem) + env(safe-area-inset-bottom)
   );
+  scroll-padding-bottom: calc(var(--mobile-toc-clearance) + var(--mobile-toc-offset-y, 0px));
+}
+
+/* Scroll padding cannot lift the end of the page above the pill, so the page gets room to scroll further.
+   The zoom offset stays out of it, because it changes on every frame of a pan and would resize the page.
+   Print hides the pill but keeps it in the page, so only the screen query stops the room from printing. */
+@media screen {
+  body:has(.mobile-toc-pill) {
+    padding-bottom: var(--mobile-toc-clearance);
+  }
+
+  /* Back-to-top sits above the pill, so the end of the page also needs room for it and a gap on each side.
+     Before Quarto first shows it, its height is not known, and 2.5rem is about its size. */
+  body:has(.mobile-toc-pill):has(#quarto-back-to-top) {
+    padding-bottom: calc(var(--mobile-toc-clearance) + var(--mobile-toc-back-to-top-height, 2.5rem) + 1.5rem);
+  }
+}
+
+body:has(.mobile-toc-pill) #quarto-back-to-top {
+  left: calc(50% + (var(--mobile-toc-offset-left, 0px) - var(--mobile-toc-offset-x, 0px)) / 2);
+  bottom: calc(var(--mobile-toc-clearance) + var(--mobile-toc-offset-y, 0px) + 0.75rem);
 }
 
 .mobile-toc-sheet {
@@ -134,7 +153,7 @@ body:has(> .mobile-toc-pill) #quarto-back-to-top {
 }
 
 @starting-style {
-  .mobile-toc-sheet:popover-open {
+  dialog.mobile-toc-sheet[open] {
     transform: translateY(100%);
   }
 }
@@ -171,6 +190,21 @@ body:has(> .mobile-toc-pill) #quarto-back-to-top {
 @media (prefers-reduced-motion: reduce) {
   .mobile-toc-sheet {
     transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .mobile-toc-sheet a.active {
+    border-inline-start: 3px solid Highlight;
+    padding-inline-start: calc(0.5rem - 3px);
+  }
+
+  .mobile-toc-sheet ul ul a.active {
+    padding-inline-start: calc(1.2rem - 3px);
+  }
+
+  .mobile-toc-sheet ul ul ul a.active {
+    padding-inline-start: calc(1.9rem - 3px);
   }
 }
 

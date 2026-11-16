@@ -116,13 +116,18 @@
     };
   }
 
+  function text(key) {
+    var strings = core.config.strings || {};
+    return typeof strings[key] === 'string' ? strings[key] : key;
+  }
+
   function ladderText(resolved) {
     var shown = core.config.groups.filter(function (group) {
       return window.VeilState.has(resolved.ladder, group.name) && resolved.ladder[group.name] <= resolved.setting;
     }).map(function (group) {
       return core.labels[group.name];
     });
-    return 'Level ' + resolved.setting + ' · ' + (shown.length > 0 ? shown.join(', ') : 'none');
+    return text('veil-level') + ' ' + resolved.setting + ' · ' + (shown.length > 0 ? shown.join(', ') : text('veil-none'));
   }
 
   // The text of the toast: the ladder when the setting changed or a ladder
@@ -135,7 +140,7 @@
     }
     Object.keys(after.independent).forEach(function (name) {
       if (before.independent[name] !== after.independent[name]) {
-        parts.push((core.labels[name] || name) + ' · ' + (after.independent[name] ? 'shown' : 'hidden'));
+        parts.push((core.labels[name] || name) + ' · ' + text(after.independent[name] ? 'veil-shown' : 'veil-hidden'));
       }
     });
     if (parts.length === 0 && hasLadder) {
@@ -281,6 +286,7 @@
     document.documentElement.classList.add('veil-ready');
     document.addEventListener('keydown', onKey);
     ui('mount', api, config);
+    document.dispatchEvent(new CustomEvent('veil:ready', { detail: snapshot(resolved) }));
   }
 
   window.Veil = api;

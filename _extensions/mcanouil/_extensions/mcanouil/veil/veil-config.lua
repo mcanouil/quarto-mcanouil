@@ -97,8 +97,9 @@ end
 --- @param resolved table The resolved state
 --- @param used table Set of the used group names
 --- @param is_revealjs boolean
+--- @param strings table The interface text of `veil-language`
 --- @return string json
-function M.encode(options, known, resolved, used, is_revealjs)
+function M.encode(options, known, resolved, used, is_revealjs, strings)
   local groups = config_groups(options.groups, known, used)
   local json = quarto.json.encode({
     groups = groups,
@@ -109,6 +110,7 @@ function M.encode(options, known, resolved, used, is_revealjs)
       position = options.button.position,
     },
     toast = options.toast,
+    strings = strings,
   })
   return (json:gsub('<', '\\u003c'))
 end
