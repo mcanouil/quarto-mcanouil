@@ -1,0 +1,47 @@
+---
+title: Section references
+lang: en-GB
+sender:
+  name: Mickaël Canouil
+  address:
+    street: 12 Example Street
+    zip: 59000
+    city: Lille
+    country: France
+recipient:
+  name: Company Ltd
+  address:
+    street: 10 Station Road
+    zip: 75008
+    city: Paris
+    country: France
+invoice:
+  number: 2026-014
+  issued: 2026-11-01
+  due: 2026-12-01
+  reference: REF-2026-014
+  items:
+    - description: Workshop
+      quantity: 1
+      unit-price: 1200
+      vat: 20
+extensions:
+  mcanouil:
+    type: invoice
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In an invoice, whose headings have no number, a reference to a section links to the heading with the supplement and the heading text.
+        check: bash _checks/xref.sh section 'Section Introduction'
+        warnings: exhaustive
+    mcanouil-typst:
+      noErrors: true
+      ensureTypstFileRegexMatches:
+        - ['See #ref\(<sec-intro>, supplement: \[']
+---
+
+{{< include _section-refs.qmd >}}

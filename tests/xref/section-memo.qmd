@@ -1,0 +1,27 @@
+---
+title: Section references
+extensions:
+  mcanouil:
+    type: memo
+    kind: note
+    memo:
+      to: Data team
+      from: M. Canouil
+      date: 11 Nov 2026
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In a memo, whose headings have no number, a reference to a section links to the heading with the supplement and the heading text.
+        check: bash _checks/xref.sh section 'Section Introduction'
+        warnings: exhaustive
+    mcanouil-typst:
+      noErrors: true
+      ensureTypstFileRegexMatches:
+        - ['See #ref\(<sec-intro>, supplement: \[']
+---
+
+{{< include _section-refs.qmd >}}

@@ -43,6 +43,27 @@ $workshop.typ()$
   workshop: mc-workshop,
 )
 
+// Answer a reference. Several types leave their headings unnumbered, and
+// Typst cannot reference a heading without a number, so a reference to an
+// unnumbered heading links to it with the supplement and the heading text,
+// such as "Section Introduction". Any other reference stays as Typst writes it.
+// - it: the reference.
+#let mc-heading-ref(it) = {
+  let target = it.element
+  if target == none or target.func() != heading or target.numbering != none {
+    return it
+  }
+  let supplement = if it.supplement == auto {
+    target.supplement
+  } else if type(it.supplement) == function {
+    (it.supplement)(target)
+  } else {
+    it.supplement
+  }
+  let words = if supplement in (none, []) { target.body } else { [#supplement~#target.body] }
+  link(target.location(), words)
+}
+
 // Answer the document of a type: the text, heading, code and link styles that
 // every type shares, then the function of the type. Code has no ligatures and
 // no contextual alternates, so it reads as typed.
@@ -63,5 +84,6 @@ $workshop.typ()$
   show raw: set text(font: fonts.monospace, ligatures: false, features: ("calt": 0))
   show link: set text(fill: tokens.link)
   show: mc-quotes.with(meta)
+  show ref: mc-heading-ref
   mc-types.at(type)(meta + (layout: layout, kind: kind), body)
 }
