@@ -1,10 +1,10 @@
 title: Typst Extras
 author: Mickaël Canouil
-version: 0.1.0
+version: 0.1.1
 quarto-required: ">=1.11.9"
 contributes:
   filters:
     - path: typst-extras.lua
       at: post-quarto
-source: mcanouil/quarto-typst-extras@0.1.0
+source: mcanouil/quarto-typst-extras@0.1.1
 source-type: github

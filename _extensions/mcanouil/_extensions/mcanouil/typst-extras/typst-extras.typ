@@ -74,7 +74,8 @@
 ))
 
 /// Return the prefix of a number at a location. Needs `context`.
-/// It is `""` in the body without chapters, `"<chapter>."` in the body with chapters,
+/// It is `""` in the body without chapters, `"<chapter>."` in the body with chapters
+/// (`""` before the first numbered level-1 heading),
 /// the appendix letter and `appendix-delimiter` in an appendix,
 /// and `supplementary-prefix` in a supplementary section.
 /// The appendix letter comes from the heading counter, which `typst-extras-part-start` sets to 0.
@@ -89,7 +90,7 @@
     numbering("A", calc.max(chapter, 1)) + config.appendix-delimiter
   } else if part == "supplementary" {
     config.supplementary-prefix
-  } else if config.chapters {
+  } else if config.chapters and chapter > 0 {
     str(chapter) + "."
   } else {
     ""
