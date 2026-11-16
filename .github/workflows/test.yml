@@ -11,11 +11,18 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: test-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   test:
     if: github.event.pull_request.draft == false
     uses: mcanouil/quarto-extension-test/.github/workflows/extension-test.yml@0.4.0
     with:
+      # The extension requires Quarto 1.12.1, which is only on the pre-release
+      # channel until Quarto 1.12 is released.
+      quarto-channels: '["pre-release"]'
       apt-packages: poppler-utils
       quarto-tools: verapdf
       # The HTML checks measure the rendered page in a headless Chromium.
