@@ -2,8 +2,8 @@
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
---- @brief Chapters and special sections of a Typst report
---- @description Arranges the special sections of a report that typst-extras
+--- @brief Chapters and special sections of a Typst document
+--- @description Arranges the special sections of a document that typst-extras
 --- does not handle. The references, a level 1 heading with the class
 --- `references`, are not numbered and move to the end of a single document;
 --- typst-extras, which runs after this filter, then puts the `appendix` and
@@ -380,24 +380,18 @@ local function meta_text(meta, key)
   return meta[key] ~= nil and pandoc.utils.stringify(meta[key]) or ''
 end
 
---- Arrange a Typst document by its type. A report gets its chapters and special sections; an article
---- gets its bibliography placed.
+--- Arrange a Typst document: the references move to the end with their headings unnumbered, in every type,
+--- and the bibliography goes in the `refs` div. A book numbers its appendices instead, and the full layout of a
+--- report adds its chapter openings.
 --- @param doc pandoc.Pandoc
 --- @return pandoc.Pandoc
 local function arrange(doc)
   if not quarto.doc.is_format('typst') then
     return doc
   end
-  local doc_type = meta_text(doc.meta, 'mcanouil-type')
-  if doc_type == 'article' then
-    return place_bibliography(doc)
-  end
-  if doc_type ~= 'report' then
-    return doc
-  end
   doc.blocks = number_book(doc.blocks) or M.reorder(doc.blocks)
   doc = place_bibliography(doc)
-  if meta_text(doc.meta, 'mcanouil-layout') == 'full' then
+  if meta_text(doc.meta, 'mcanouil-type') == 'report' and meta_text(doc.meta, 'mcanouil-layout') == 'full' then
     doc.blocks = open_chapters(doc.blocks, M.chapter_toc_depth(doc.meta))
   end
   return doc
