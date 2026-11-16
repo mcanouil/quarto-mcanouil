@@ -193,9 +193,13 @@ The formats run them in a fixed order.
 
 Do not list an embedded tool again in your own `filters:`.
 The format already runs it.
-A second entry runs the tool twice, which can give double decoration or wrong output.
 
 :::
+
+A project can keep its own copy of an embedded tool, for example to work on that tool.
+When the copy is under `_extensions/`, with any owner such as `_extensions/local/veil/`, the embedded tool does nothing.
+Name your copy in your own `filters:`, so that it runs.
+If you do not name it, neither copy runs.
 
 | Tool | Version | Formats | Default |
 | --- | --- | --- | --- |
