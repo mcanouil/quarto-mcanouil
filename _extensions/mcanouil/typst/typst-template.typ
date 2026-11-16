@@ -6,6 +6,8 @@ $decoration.typ()$
 
 $quote.typ()$
 
+$code-window.typ()$
+
 $motifs.typ()$
 
 $chrome.typ()$
@@ -84,6 +86,7 @@ $workshop.typ()$
   show raw: set text(font: fonts.monospace, ligatures: false, features: ("calt": 0))
   show link: set text(fill: tokens.link)
   show: mc-quotes.with(meta)
+  show: mc-code-windows.with(meta)
   show ref: mc-heading-ref
   mc-types.at(type)(meta + (layout: layout, kind: kind), body)
 }
