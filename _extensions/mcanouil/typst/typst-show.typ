@@ -16,6 +16,9 @@ $endif$
 $if(title)$
     title: [$title$],
 $endif$
+$if(mcanouil-document-title)$
+    document-title: $mcanouil-document-title$,
+$endif$
 $if(subtitle)$
     subtitle: [$subtitle$],
 $endif$

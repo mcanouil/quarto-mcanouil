@@ -491,6 +491,53 @@ local function disable_gitlink(meta)
   end
 end
 
+--- @type string Message when a document that needs a title has none.
+M.NO_TITLE_MESSAGE = 'mcanouil: the document has no title, and a PDF/UA-1 document needs one; set title: in the front matter.'
+
+--- Answer the text of a metadata value, or nil when it is unset or empty.
+--- @param value any Metadata value
+--- @return string|nil Text
+local function text_of(value)
+  if value == nil then
+    return nil
+  end
+  local text = pandoc.utils.stringify(value)
+  return text ~= '' and text or nil
+end
+
+--- Answer the title of the PDF of a document that has no `title`: the subject of a letter, the invoice label and
+--- number of an invoice. Any other type has no fallback.
+--- @param meta table Document metadata
+--- @param doc_type string Document type
+--- @return string|nil Title
+function M.fallback_title(meta, doc_type)
+  if doc_type == 'letter' then
+    return text_of(meta.subject)
+  end
+  if doc_type == 'invoice' then
+    local label = labels.get('mcanouil-invoice-title')
+    local number = type(meta.invoice) == 'table' and text_of(meta.invoice.number)
+    return number and (label .. ' ' .. number) or label
+  end
+  return nil
+end
+
+--- Deliver the title of the PDF as `mcanouil-document-title`, a Typst string, when the document has no `title`.
+--- Stops the render when the type has no fallback: the PDF needs a title, and PDF/UA-1 (the format default) needs one too.
+--- @param meta table Document metadata
+--- @param doc_type string Document type
+local function deliver_document_title(meta, doc_type)
+  if text_of(meta.title) then
+    return
+  end
+  local title = M.fallback_title(meta, doc_type)
+  if title then
+    meta['mcanouil-document-title'] = pandoc.MetaInlines({ pandoc.RawInline('typst', labels.typst_string(title)) })
+  else
+    fail.stop(M.NO_TITLE_MESSAGE)
+  end
+end
+
 --- Deliver the type and the resolved slots to Typst as `mcanouil-type`,
 --- `mcanouil-layout`, `mcanouil-kind`, `mcanouil-header` and `mcanouil-footer`.
 --- Stops the render, with a message, when the type cannot be rendered.
@@ -511,6 +558,7 @@ local function deliver(meta)
   meta['mcanouil-layout'] = resolved.layout
   meta['mcanouil-kind'] = resolved.kind
   deliver_margin(meta, resolved.type)
+  deliver_document_title(meta, resolved.type)
   if resolved.type == 'memo' then
     local fields = pandoc.List()
     for _, field in ipairs(M.memo_fields(meta, resolved.kind)) do

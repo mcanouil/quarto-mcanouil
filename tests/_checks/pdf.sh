@@ -286,7 +286,23 @@ code_window_theme() {
 	}
 }
 
+# Succeed when the title in the metadata of the PDF is a given text.
+# $1 title.
+doc_title() {
+	local title
+	title="$(pdfinfo "${output}" | sed -n 's/^Title:[[:space:]]*//p')"
+	[ "${title}" = "$1" ] || {
+		printf '# title: %s\n' "${title}"
+		return 1
+	}
+}
+
 case "${1:-}" in
+doc-title)
+	find_verapdf
+	expect "doc-title" "the PDF title '${2:?doc-title needs a title}'" doc_title "$2"
+	expect "doc-title-ua1" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
+	;;
 code-window)
 	find_verapdf
 	expect "typst-code-window-theme-${2:?code-window needs a preset}" "the traffic lights and the ${2} frame and title bar from the tokens, see code_window_theme_test" \

@@ -334,4 +334,14 @@ cases['resolve-workshop-every-format'] = function()
   end
 end
 
+cases['fallback-title'] = function()
+  in_english(function()
+    assert_equal(document.fallback_title({ subject = 'Training proposal' }, 'letter'), 'Training proposal', 'letter subject')
+    assert_equal(document.fallback_title({}, 'letter'), nil, 'letter with no subject')
+    assert_equal(document.fallback_title({ invoice = { number = '2026-014' } }, 'invoice'), 'Invoice 2026-014', 'invoice number')
+    assert_equal(document.fallback_title({}, 'invoice'), 'Invoice', 'invoice with no number')
+    assert_equal(document.fallback_title({ subject = 'A subject' }, 'article'), nil, 'article')
+  end)
+end
+
 return cases
