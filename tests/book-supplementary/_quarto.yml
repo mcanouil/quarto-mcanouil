@@ -1,0 +1,31 @@
+project:
+  type: book
+
+book:
+  title: Supplementary book
+  author:
+    - name: Test Author
+      email: test@example.org
+  chapters:
+    - index.qmd
+    - sections/01-results.qmd
+    - sections/02-supplementary.qmd
+  appendices:
+    - sections/appendix-listings.qmd
+
+format:
+  mcanouil-typst:
+    keep-typ: true
+
+extensions:
+  mcanouil:
+    type: report
+    layout: full
+
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In a mcanouil book, typst-extras numbers the supplementary chapter S1 with its floats Figure S1, the body chapters keep their numbers, and the book appendices stay lettered with A.1 sections and the Appendix kicker.
+        check: bash _checks/extras.sh book
+        timeout: 300

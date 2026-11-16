@@ -3,11 +3,13 @@
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
 --- @brief Chapters and special sections of a Typst report
---- @description Numbers the special sections of a report: references are not
---- numbered, appendices are numbered A.1 and supplementary sections I.1. In a
---- single document they are level 1 headings with the class `references`,
---- `appendix` or `supplementary`, moved to the end in that order. In a book
---- project the appendices are the `book.appendices` chapters, kept in place.
+--- @description Arranges the special sections of a report that typst-extras
+--- does not handle. The references, a level 1 heading with the class
+--- `references`, are not numbered and move to the end of a single document;
+--- typst-extras, which runs after this filter, then puts the `appendix` and
+--- `supplementary` sections after them. In a book project the appendices are
+--- the `book.appendices` chapters, kept in place and numbered A.1 here,
+--- because typst-extras leaves them to the book.
 --- Places the bibliography where the `refs` div is. In the full layout, adds
 --- after each numbered chapter heading the call that ends its divider page and
 --- writes its chapter contents page, with the introduction line of the
@@ -19,11 +21,12 @@ local labels = require('lib.labels')
 
 local M = {}
 
---- @type string[] Special section kinds, in the order they come at the end of a document.
-M.SPECIAL = { 'references', 'appendix', 'supplementary' }
+--- @type string[] Special section kinds that a class marks.
+M.SPECIAL = { 'references' }
 
---- @type table<string, string> Heading numbering of each special section kind.
-M.NUMBERING = { references = 'none', appendix = '"A.1"', supplementary = '"I.1"' }
+--- @type table<string, string> Heading numbering of each special section kind that starts with Typst code:
+--- the appendices of a book.
+M.NUMBERING = { appendix = '"A.1"' }
 
 --- @type integer Default of `extensions.mcanouil.chapter-toc-depth`.
 M.DEFAULT_CHAPTER_TOC_DEPTH = 2
@@ -39,7 +42,7 @@ local BOOK_MARKER = '^<!%-%- quarto%-file%-metadata: ([^ ]+) %-%->$'
 
 --- Answer the Typst code that starts a special section: the heading counter
 --- restarts, the numbering changes, and the `mc-part` state names the kind.
---- @param kind string `references`, `appendix` or `supplementary`
+--- @param kind string `appendix`, for the appendices of a book
 --- @return string Typst code, at the top level of the document
 function M.section_start(kind)
   return table.concat({
@@ -64,32 +67,45 @@ local function special_kind(block)
   return nil
 end
 
---- Move the special sections of a single document to its end, in the order
---- of `M.SPECIAL`, each kind after the code that starts it. A special
---- section runs from its heading to the next level 1 heading.
+--- Answer whether a level 1 heading opens the references, and mark the
+--- headings of the references unnumbered.
+--- @param block pandoc.Block
+--- @param in_references boolean Whether the blocks before are in the references
+--- @return boolean Whether the block is in the references
+local function mark_references(block, in_references)
+  if block.t ~= 'Header' then
+    return in_references
+  end
+  if block.level == 1 then
+    in_references = special_kind(block) == 'references'
+  end
+  if in_references and not block.classes:includes('unnumbered') then
+    block.classes:insert('unnumbered')
+  end
+  return in_references
+end
+
+--- Move the references of a single document to its end, with their headings
+--- unnumbered. The references run from their heading to the next level 1
+--- heading. The headings carry the class `unnumbered` rather than a raw block
+--- that changes the numbering, because typst-extras then moves the appendix and
+--- supplementary sections after them, and would take such a block along with
+--- the section before the references.
 --- @param blocks pandoc.Blocks|table Document blocks
 --- @return pandoc.Blocks Blocks
 function M.reorder(blocks)
   local kept = pandoc.Blocks({})
-  local moved = {}
-  local current = nil
+  local moved = pandoc.Blocks({})
+  local in_references = false
   for _, block in ipairs(blocks) do
-    if block.t == 'Header' and block.level == 1 then
-      current = special_kind(block)
-    end
-    if current then
-      moved[current] = moved[current] or pandoc.Blocks({})
-      moved[current]:insert(block)
+    in_references = mark_references(block, in_references)
+    if in_references then
+      moved:insert(block)
     else
       kept:insert(block)
     end
   end
-  for _, kind in ipairs(M.SPECIAL) do
-    if moved[kind] then
-      kept:insert(pandoc.RawBlock('typst', M.section_start(kind)))
-      kept:extend(moved[kind])
-    end
-  end
+  kept:extend(moved)
   return kept
 end
 
@@ -230,26 +246,31 @@ local function appendix_marker(block)
   return nil
 end
 
---- Start the appendices of a book before the first appendix item, and start
---- any special section that a chapter heading marks with a class.
+--- Start the appendices of a book with the first appendix item, and mark the
+--- headings of the references unnumbered. The start goes inside the part
+--- divider that Quarto wraps around the marker, when there is one, so that it
+--- comes after the blocks that typst-extras puts before the divider to end a
+--- supplementary part, which restore the heading counter.
 --- @param blocks pandoc.Blocks Document blocks
 --- @return pandoc.Blocks|nil Blocks, or nil when the document is not a book
 local function number_book(blocks)
   local result = pandoc.Blocks({})
-  local is_book, in_appendix = false, false
+  local is_book, in_appendix, in_references = false, false, false
   for _, block in ipairs(blocks) do
     local appendix = appendix_marker(block)
     if appendix ~= nil then
       is_book = true
       if appendix and not in_appendix then
         in_appendix = true
-        result:insert(pandoc.RawBlock('typst', M.section_start('appendix')))
+        local start = pandoc.RawBlock('typst', M.section_start('appendix'))
+        if block.t == 'Div' then
+          block.content:insert(1, start)
+        else
+          result:insert(start)
+        end
       end
     end
-    local kind = special_kind(block)
-    if kind ~= nil then
-      result:insert(pandoc.RawBlock('typst', M.section_start(kind)))
-    end
+    in_references = mark_references(block, in_references)
     result:insert(block)
   end
   return is_book and result or nil

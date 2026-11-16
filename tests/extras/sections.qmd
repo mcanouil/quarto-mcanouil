@@ -1,0 +1,50 @@
+---
+title: Appendix and supplementary sections
+author: Test Author
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: article
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In a mcanouil article, typst-extras moves the appendix and the supplementary sections to the end, letters the appendix (Appendix A, A.1, Figure A.1, (A.1)), numbers the supplementary floats S1, and keeps the body numbers flat.
+        check: bash _checks/extras.sh sections
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+      ensureTypstFileRegexMatches:
+        - ['#typst-extras-part-start\("appendix"', '#typst-extras-part-start\("supplementary"']
+---
+
+# Supplementary material {.supplementary}
+
+The material that did not fit in the article.
+
+![A supplementary grey rectangle.](figure.svg){#fig-supp fig-alt="A grey rectangle."}
+
+| Arm     | Patients |
+|---------|---------:|
+| Placebo |       40 |
+
+: Supplementary patients by arm. {#tbl-supp}
+
+# Extra analyses {.appendix #sec-extra}
+
+The analyses that support the results.
+
+## Data sources
+
+![An appendix grey rectangle.](figure.svg){#fig-apx fig-alt="A grey rectangle."}
+
+$$
+y = a x + b
+$$ {#eq-apx alt="y equals a x plus b."}
+
+# Results
+
+![A body grey rectangle.](figure.svg){#fig-body fig-alt="A grey rectangle."}
+
+See @fig-body, @fig-apx, @eq-apx, @fig-supp, @tbl-supp and @sec-extra.

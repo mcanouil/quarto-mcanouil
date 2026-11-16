@@ -7,12 +7,12 @@ _quarto:
   tests:
     run:
       extension-test:
-        description: An equation with an alt attribute keeps its alternative text in the Typst output and in the PDF tags.
+        description: An unlabelled equation with an alt attribute gets its alternative text from typst-extras, in the Typst output and in the PDF tags.
         check: bash _checks/accessibility.sh math-alt
     mcanouil-typst:
       noErrorsOrWarnings: true
       ensureTypstFileRegexMatches:
-        - ['alt: "Mass equals energy over the speed of light squared\."']
+        - ['#math\.equation\(block: false, alt: "Mass equals energy over the speed of light squared\.", \$[^$]+\$\.body\)', '#math\.equation\(block: true, alt: "The sum of one over n squared tends to pi squared over six\.", ']
 ---
 
 The relation is [$m = E / c^2$]{alt="Mass equals energy over the speed of light squared."} in short.

@@ -23,6 +23,7 @@ contributes:
         - preview-colour
         - path: lua/mcanouil-post.lua
           at: post-quarto
+        - typst-extras
       extensions:
         preview-colour:
           text: false
@@ -69,6 +70,9 @@ contributes:
           - html/scheme-dark.scss
     typst:
       date-format: long
+      number-sections: true
+      crossref:
+        appendix-delim: ":"
       font-paths: fonts
       pdf-standard: ua-1
       extensions:

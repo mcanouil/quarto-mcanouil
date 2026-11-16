@@ -1,0 +1,33 @@
+---
+title: Lists of floats
+author: Test Author
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  typst-extras:
+    list-of: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With typst-extras list-of, a mcanouil report opens its body with a list of figures and a list of tables, each entry a caption.
+        check: bash _checks/extras.sh list-of
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+      ensureTypstFileRegexMatches:
+        - ['#typst-extras-list-of\(']
+---
+
+# Results
+
+![The first grey rectangle.](figure.svg){#fig-first fig-alt="A grey rectangle."}
+
+![The second grey rectangle.](figure.svg){#fig-second fig-alt="Another grey rectangle."}
+
+| Arm     | Patients |
+|---------|---------:|
+| Placebo |       40 |
+| Active  |       42 |
+
+: Patients by arm. {#tbl-arms}

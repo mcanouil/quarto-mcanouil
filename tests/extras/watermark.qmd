@@ -1,0 +1,37 @@
+---
+title: Watermark
+author:
+  - name: Test Author
+    email: test@example.org
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: report
+    layout: full
+  typst-extras:
+    watermark: DRAFT
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With typst-extras watermark, every page of a full mcanouil report, the cover and the chapter dividers included, carries the watermark text.
+        check: bash _checks/extras.sh watermark
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+      ensureTypstFileRegexMatches:
+        - ['#set page\(foreground: typst-extras-watermark\(text: "DRAFT"']
+---
+
+# Introduction
+
+The first chapter.
+
+## Background
+
+{{< lipsum 1 >}}
+
+# Discussion
+
+The second chapter.

@@ -1,0 +1,36 @@
+---
+title: Numbering by chapter
+author: Test Author
+crossref:
+  chapters: true
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: article
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With crossref.chapters, typst-extras numbers the figures and equations of a mcanouil article by section (Figure 2.1, (1.1)), on top of the numbering.typ partial of Quarto, which the mcanouil partials keep.
+        check: bash _checks/extras.sh chapters
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+      ensureTypstFileRegexMatches:
+        - ['#let equation-numbering = "\(1\)"[\s\S]*#let equation-numbering = typst-extras-wrap\(equation-numbering']
+---
+
+# Methods
+
+![A first grey rectangle.](figure.svg){#fig-one fig-alt="A grey rectangle."}
+
+$$
+y = a x + b
+$$ {#eq-one alt="y equals a x plus b."}
+
+# Results
+
+![A second grey rectangle.](figure.svg){#fig-two fig-alt="A grey rectangle."}
+
+See @fig-one, @fig-two and @eq-one.

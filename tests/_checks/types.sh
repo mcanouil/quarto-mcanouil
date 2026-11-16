@@ -187,16 +187,21 @@ chapter_toc_links() {
 	[ "${entries}" -ge 3 ] && [ "${links}" -eq "${entries}" ] && [ "${mixed}" -eq 0 ]
 }
 
-# Succeed when appendices are numbered A.1, supplementary sections I.1, and references are unnumbered,
-# in the order references, appendices, supplementary sections.
+# Succeed when the references are unnumbered and come first, then the appendix, lettered by typst-extras
+# (A, A.1), then the supplementary section, numbered S1. The appendix divider and the contents show the
+# letter, the chapter contents page the kicker Appendix A, and the running header Appendix A: Listings.
 appendix_numbering() {
 	local text order
 	text="$(pdf_text "${output}")"
 	grep -qE '(^|[[:space:]])A\.1[[:space:]]+Subject listings' <<<"${text}" &&
-		grep -qE '(^|[[:space:]])I\.1[[:space:]]+Extra table' <<<"${text}" &&
+		grep -qE '(^|[[:space:]])S1\.1[[:space:]]+Extra table' <<<"${text}" &&
 		! grep -qE '[0-9A-Z][[:space:]]+References' <<<"${text}" &&
-		order="$(contents_entries 2 | grep -oE '(References|A[[:space:]]+Listings|I[[:space:]]+Extra tables)' | tr -s ' ' | tr '\n' '|')" &&
-		[ "${order}" = 'References|A Listings|I Extra tables|' ]
+		tr -d '[:space:]' <<<"${text}" | grep -qF 'APPENDIXAInthischapter' &&
+		tr -d '[:space:]' <<<"${text}" | grep -qF 'SUPPLEMENTARYS1Inthischapter' &&
+		grep -qE '^[[:space:]]*A[[:space:]]*$' <<<"${text}" &&
+		grep -qF 'Appendix A: Listings' <<<"${text}" &&
+		order="$(contents_entries 2 | grep -oE '(References|A[[:space:]]+Listings|S1[[:space:]]+Extra tables)' | tr -s ' ' | tr '\n' '|')" &&
+		[ "${order}" = 'References|A Listings|S1 Extra tables|' ]
 }
 
 # Succeed when the first chapter contents page lists the sections and hides the subsections.
@@ -308,7 +313,7 @@ full)
 	expect "references-same-page" "the references heading and the first reference on the same page" references_same_page
 	expect "full-closing-page" "the contact, the ORCID, the licence and the colophon on the last page" closing_page
 	expect "chapter-toc-links" "one link annotation for each entry of the chapter contents page" chapter_toc_links 4
-	expect "appendix-numbering" "appendices numbered A.1, supplementary sections I.1, unnumbered references, in that order" appendix_numbering
+	expect "appendix-numbering" "unnumbered references, then Appendix A with A.1 sections, then S1 with S1.1 sections, in that order" appendix_numbering
 	;;
 full-depth)
 	expect "chapter-toc-depth" "the sections and not the subsections on the chapter contents page" chapter_toc_depth_one

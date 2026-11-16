@@ -6,9 +6,36 @@
 // @copyright 2026 Mickaël Canouil
 // @author Mickaël Canouil
 
-// The kind of the part of the document in force: chapter, references,
-// appendix or supplementary. The code that starts a special section updates it.
+// The kind of the part of the document in force: chapter, or appendix in a
+// book. The code that starts the appendices of a book updates it.
 #let mc-part = state("mc-part", "chapter")
+
+// The part that typst-extras sets: body, appendix or supplementary. It is
+// the state of its Typst library, read by key, so that it works when
+// typst-extras is not active and its library is not included.
+#let mc-extras-part = state("typst-extras-part", "body")
+
+// Answer the kind of the part of a location: appendix or supplementary from
+// typst-extras, else the kind of mc-part.
+// - loc: a location.
+#let part-at(loc) = {
+  let extras = mc-extras-part.at(loc)
+  if extras != "body" { extras } else { mc-part.at(loc) }
+}
+
+// Answer the number of a numbered level 1 heading, without a label: the
+// letter of an appendix, such as "A", where typst-extras writes
+// "Appendix A" in the heading, else the number of its own numbering, such as
+// "3" or "S1".
+// - chapter: a numbered level 1 heading.
+#let chapter-number(chapter) = {
+  let levels = counter(heading).at(chapter.location())
+  if part-at(chapter.location()) == "appendix" {
+    numbering("A", ..levels)
+  } else {
+    numbering(chapter.numbering, ..levels)
+  }
+}
 
 // Answer dot leaders that fill the rest of a line, tagged as an artefact.
 #let leaders() = {
@@ -16,13 +43,22 @@
   box(width: 1fr, pdf.artifact(text(fill: colours.muted, repeat[.])))
 }
 
-// Answer the main table of contents.
+// Answer the main table of contents. An appendix entry shows its letter in
+// the number column, as a chapter shows its number, in place of the
+// "Appendix A" label that typst-extras writes in the heading.
 // - depth: deepest heading level that it lists.
 #let main-contents(depth: 2) = {
   let colours = tokens()
   show link: set text(fill: colours.ink)
   show outline.entry.where(level: 1): set block(above: 1.1em)
   show outline.entry.where(level: 1): set text(weight: "bold")
+  show outline.entry.where(level: 1): it => {
+    let target = it.element
+    if target.func() != heading or target.numbering == none or part-at(target.location()) != "appendix" {
+      return it
+    }
+    link(target.location(), it.indented(chapter-number(target), it.inner()))
+  }
   set outline.entry(fill: leaders())
   outline(title: mc-labels.at("mcanouil-contents"), depth: depth)
 }
@@ -43,9 +79,9 @@
 // "Chapter 3" or "Appendix A".
 // - chapter: a numbered level 1 heading.
 #let chapter-label(chapter) = {
-  let part = mc-part.at(chapter.location())
+  let part = part-at(chapter.location())
   let key = if part in ("appendix", "supplementary") { "mcanouil-" + part } else { "mcanouil-chapter" }
-  mc-labels.at(key) + " " + numbering(chapter.numbering, ..counter(heading).at(chapter.location()))
+  mc-labels.at(key) + " " + chapter-number(chapter)
 }
 
 // Answer the contents page of a chapter: the label of the chapter, the
