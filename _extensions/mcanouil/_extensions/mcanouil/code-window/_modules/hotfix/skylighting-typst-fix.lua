@@ -95,7 +95,7 @@ local function build_skylighting_override()
     block(
       fill: bgcolor,
       width: 100%%,
-      inset: 8pt,
+      inset: _cw-body-inset.get(),
       radius: 2pt,
       stroke: 0.5pt + _border-colour,
       blocks,
