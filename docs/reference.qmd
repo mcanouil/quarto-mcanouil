@@ -193,9 +193,17 @@ The formats run them in a fixed order.
 
 Do not list an embedded tool again in your own `filters:`.
 The format already runs it.
-A second entry runs the tool twice, which can give double decoration or wrong output.
+If your project has no copy of the tool, Quarto stops with an error.
 
 :::
+
+A project can keep its own copy of an embedded tool, for example to work on that tool.
+When the copy is under `_extensions/`, with any owner such as `_extensions/local/veil/`, and you name it in your own `filters:`, the embedded filters of that tool do not run.
+Only your copy runs.
+If you do not name your copy, the embedded filters run as usual.
+
+This applies to filters only.
+The `mcanouil-revealjs` format still loads the embedded Reveal.js plugins of veil and codefrag, and the embedded iconify shortcode stays available.
 
 | Tool | Version | Formats | Default |
 | --- | --- | --- | --- |

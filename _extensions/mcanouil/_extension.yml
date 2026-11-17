@@ -10,29 +10,40 @@ contributes:
         - iconify
       filters:
         - lua/mcanouil.lua
-        - offset-headings
-        - div-reuse
-        - toc-depth
-        - highlight-text
-        - iconify
-        - prism
-        - code-window
-        - veil
-        - typst-render
-        - gitlink
-        - preview-colour
+        - path: bundled/offset-headings.lua
+          at: pre-ast
+        - path: bundled/div-reuse.lua
+          at: post-quarto
+        - path: bundled/toc-depth.lua
+        - path: bundled/highlight-text.lua
+        - path: bundled/iconify.lua
+        - path: bundled/prism.lua
+          at: pre-ast
+        - path: bundled/code-window.lua
+          at: pre-quarto
+        - path: bundled/veil.lua
+          at: pre-quarto
+        - path: bundled/typst-render.lua
+          at: pre-quarto
+        - path: bundled/typst-render-math.lua
+          at: post-quarto
+        - path: bundled/gitlink.lua
+          at: post-quarto
+        - path: bundled/preview-colour.lua
+          at: post-quarto
         - path: lua/mcanouil-post.lua
           at: post-quarto
-        - typst-extras
+        - path: bundled/typst-extras.lua
+          at: post-quarto
       extensions:
         preview-colour:
           text: false
           code: false
     html:
       filters:
-        - mobile-toc
-        - collapse-output
-        - remember
+        - path: bundled/mobile-toc.lua
+        - path: bundled/collapse-output.lua
+        - path: bundled/remember.lua
       extensions:
         remember:
           enabled: false
@@ -102,10 +113,11 @@ contributes:
         - typst/typst-show.typ
     revealjs:
       filters:
-        - cascade
-        - codefrag
-        - collapse-output
-        - remember
+        - path: bundled/cascade.lua
+          at: pre-ast
+        - path: bundled/codefrag.lua
+        - path: bundled/collapse-output.lua
+        - path: bundled/remember.lua
       extensions:
         remember:
           enabled: false

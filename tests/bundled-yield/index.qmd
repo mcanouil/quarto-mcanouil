@@ -1,0 +1,25 @@
+---
+title: A project copy of an embedded extension
+author: Test Author
+date: 2026-01-01
+engine: markdown
+format:
+  mcanouil-html: default
+filters:
+  - veil
+_quarto:
+  tests:
+    mcanouil-html:
+      ensureFileRegexMatches:
+        - ['id="project-veil"', 'class="light-content"']
+        - ['id="veil-config"', 'veil-0\.']
+---
+
+The project keeps its own copy of veil under `_extensions/project/veil/`, and names it in `filters`.
+Only that copy runs, and the other embedded tools still run.
+
+::: {.veil group="answers"}
+Hidden text.
+:::
+
+[Highlighted text]{fg="#ffffff" bg="#b22222"}

@@ -1,0 +1,7 @@
+title: Veil stand-in
+author: Test Author
+version: 9.9.9
+contributes:
+  filters:
+    - path: veil.lua
+      at: pre-quarto
