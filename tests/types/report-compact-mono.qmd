@@ -1,0 +1,28 @@
+---
+title: Compact report
+author: Test Author
+subtitle: A subtitle long enough to run beside the corner motif and wrap onto a second line of text
+abstract: |
+  This abstract opens page 1.
+
+  A second abstract paragraph that is long enough to reach the right margin of the page if nothing narrows it, so the check sees any text under the corner motif.
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: mono
+    type: report
+    layout: compact
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The compact report of the mono preset starts on page 1 with the title block, the abstract and the body.
+        check: bash _checks/types.sh compact mono
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mcanouil-document\(\s*"report",\s*"compact",\s*none']
+---
+
+{{< include _compact.qmd >}}

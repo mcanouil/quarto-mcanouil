@@ -1,0 +1,22 @@
+---
+title: "Short^[Titlenote set beside the title, long enough to run over several lines of the margin column.]"
+reference-location: margin
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: mono
+    type: article
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A margin note in the title on page 1 of the mono article is moved below the shapes of the corner motif.
+        check: bash _checks/article.sh short mono
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mcanouil-document\(\s*"article",\s*"standard",\s*none']
+---
+
+{{< include _article-short.qmd >}}

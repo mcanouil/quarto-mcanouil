@@ -1,0 +1,17 @@
+---
+title: A title and nothing else
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: terminal
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A compact report of the terminal preset with a title only, no author and no abstract, compiles without a Typst warning.
+        check: bash _checks/convergence.sh title-only-terminal
+---
+
+The body starts under the title.

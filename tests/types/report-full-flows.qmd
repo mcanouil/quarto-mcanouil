@@ -1,0 +1,183 @@
+---
+title: Clinical study report
+author: Test Author
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: report
+    layout: full
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A chapter of 40 sections has a chapter contents page that flows onto a second page.
+        check: bash _checks/types.sh full-flows
+---
+
+# Long chapter
+
+A chapter with many sections.
+
+## Section 1
+
+Text of section 1.
+
+## Section 2
+
+Text of section 2.
+
+## Section 3
+
+Text of section 3.
+
+## Section 4
+
+Text of section 4.
+
+## Section 5
+
+Text of section 5.
+
+## Section 6
+
+Text of section 6.
+
+## Section 7
+
+Text of section 7.
+
+## Section 8
+
+Text of section 8.
+
+## Section 9
+
+Text of section 9.
+
+## Section 10
+
+Text of section 10.
+
+## Section 11
+
+Text of section 11.
+
+## Section 12
+
+Text of section 12.
+
+## Section 13
+
+Text of section 13.
+
+## Section 14
+
+Text of section 14.
+
+## Section 15
+
+Text of section 15.
+
+## Section 16
+
+Text of section 16.
+
+## Section 17
+
+Text of section 17.
+
+## Section 18
+
+Text of section 18.
+
+## Section 19
+
+Text of section 19.
+
+## Section 20
+
+Text of section 20.
+
+## Section 21
+
+Text of section 21.
+
+## Section 22
+
+Text of section 22.
+
+## Section 23
+
+Text of section 23.
+
+## Section 24
+
+Text of section 24.
+
+## Section 25
+
+Text of section 25.
+
+## Section 26
+
+Text of section 26.
+
+## Section 27
+
+Text of section 27.
+
+## Section 28
+
+Text of section 28.
+
+## Section 29
+
+Text of section 29.
+
+## Section 30
+
+Text of section 30.
+
+## Section 31
+
+Text of section 31.
+
+## Section 32
+
+Text of section 32.
+
+## Section 33
+
+Text of section 33.
+
+## Section 34
+
+Text of section 34.
+
+## Section 35
+
+Text of section 35.
+
+## Section 36
+
+Text of section 36.
+
+## Section 37
+
+Text of section 37.
+
+## Section 38
+
+Text of section 38.
+
+## Section 39
+
+Text of section 39.
+
+## Section 40
+
+Text of section 40.
+

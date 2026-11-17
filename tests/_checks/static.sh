@@ -40,7 +40,13 @@ no_label_text_outside_language_files() {
 	[ -z "${found}" ]
 }
 
+# Succeed when no Typst file chooses a document type with a comparison.
+type_dispatch_no_flags() {
+	[ "$(grep -rc 'if type ==' "${ext_dir}/typst" | awk -F: '{ total += $NF } END { print total + 0 }')" -eq 0 ]
+}
+
 expect "no-sass-colour-fns" "no Sass colour function on a preset token" no_sass_colour_fns
 expect "no-hex-outside-presets" "no hex colour outside presets/" no_hex_outside_presets
 expect "no-label-text-outside-language-files" "no label text in lua/ or typst/" no_label_text_outside_language_files
+expect "type-dispatch-no-flags" "no 'if type ==' in typst/" type_dispatch_no_flags
 tap_done

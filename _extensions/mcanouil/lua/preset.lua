@@ -9,6 +9,7 @@
 --- metadata for Typst.
 
 --- @type string Directory of the extension, the parent of `lua/`.
+local fail = require('lib.fail')
 local EXTENSION_DIR = debug.getinfo(1, 'S').source:match('^@(.*)[/\\]lua[/\\][^/\\]+$')
 
 local colour = dofile(EXTENSION_DIR .. '/_vendor/quarto-lua-modules/colour.lua')
@@ -23,7 +24,7 @@ M.DEFAULT = 'gold'
 
 --- @type string[] Colour tokens of every preset, in each scheme.
 M.TOKENS = {
-  'paper', 'ink', 'muted', 'tint', 'line',
+  'paper', 'ink', 'muted', 'tint', 'card', 'line',
   'accent', 'accent-high', 'accent-low', 'accent-text', 'link',
   'ground-1', 'ground-2', 'on-ground-accent', 'on-ground-text', 'on-ground-title', 'chrome',
   'note', 'tip', 'warning', 'important', 'caution',
@@ -88,7 +89,7 @@ local function to_hex(value, role, mode)
   if compact:match('^rgb%(%d+,%d+,%d+%)$') then
     return colour.RGB_to_HTML(compact):lower()
   end
-  error(string.format(
+  fail.raise(string.format(
     'mcanouil: cannot read the colour "%s" of the brand role "%s" (%s); use a hex value, rgb() or a CSS colour name.',
     value, role, mode
   ))
@@ -106,7 +107,7 @@ function M.resolve_name(name)
       return name
     end
   end
-  error(string.format(
+  fail.raise(string.format(
     'mcanouil: unknown preset "%s" in extensions.mcanouil.preset; use one of %s.',
     name, table.concat(M.PRESETS, ', ')
   ))
@@ -119,7 +120,7 @@ function M.read(name)
   local path = EXTENSION_DIR .. '/presets/' .. name .. '.yml'
   local file = io.open(path, 'r')
   if not file then
-    error('mcanouil: cannot open the preset file ' .. path .. '.')
+    fail.raise('mcanouil: cannot open the preset file ' .. path .. '.')
   end
   local text = file:read('a')
   file:close()
@@ -322,11 +323,12 @@ local function deliver(meta)
     end
     meta['mcanouil-fonts'] = typst_fonts
     meta['mcanouil-motif'] = data.motif
+    meta['mcanouil-preset'] = name
   end
   return meta
 end
 
 --- @type table Filter step of the entry filter.
-M.filter = { Meta = deliver }
+M.filter = { Meta = fail.guard(deliver) }
 
 return M

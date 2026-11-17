@@ -1,0 +1,30 @@
+---
+title: Polygenic scores and type 2 diabetes
+author:
+  - name: Ana Author
+    roles:
+      - conceptualization: lead
+      - writing: equal
+  - name: Ben Writer
+    roles:
+      - conceptualization: equal
+      - supervision
+abstract: A polygenic score predicts the risk of type 2 diabetes.
+bibliography: references.bib
+reference-location: margin
+format: mcanouil-html
+extensions:
+  mcanouil:
+    type: article
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The article in HTML sets margin notes in the margin column and ends with the CRediT table.
+    mcanouil-html:
+      ensureFileRegexMatches:
+        - - '<div class="[^"]*column-margin[^"]*">[\s\S]*Footnoted remark set in the margin\.[\s\S]*Sidenote set beside its paragraph\.'
+          - 'class="references[\s\S]*<h1[^>]*>Author contributions \(CRediT\)</h1>[\s\S]*<th[^>]*>AA</th>[\s\S]*<th[^>]*>Conceptualization</th>[\s\S]*L Lead'
+---
+
+{{< include _article.qmd >}}

@@ -1,0 +1,21 @@
+---
+title: Unknown slot
+format: mcanouil-typst
+extensions:
+  mcanouil:
+    footer:
+      middle: Text
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: An unknown footer slot stops the render and names the slot.
+        errors: strict
+    mcanouil-typst:
+      shouldError: true
+      printsMessage:
+        level: ERROR
+        regex: 'mcanouil: unknown slot "footer\.middle" in extensions\.mcanouil; use left, centre \(or center\) and right\.'
+---
+
+A paragraph.

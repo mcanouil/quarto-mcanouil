@@ -7,6 +7,7 @@
 --- (the user logo wins, the preset fills in), warns when the user logo has no
 --- alt text, and delivers the logo to Typst as the `mcanouil-logo` metadata.
 
+local fail = require('lib.fail')
 local labels = require('lib.labels')
 local preset = require('preset')
 
@@ -27,7 +28,7 @@ local FORMATS = { svg = 'svg', png = 'png', jpg = 'jpg', jpeg = 'jpg', gif = 'gi
 function M.format_of(path)
   local format = FORMATS[(path:match('%.([^./\\]+)$') or ''):lower()]
   if format == nil then
-    error(string.format('mcanouil: the logo "%s" must be an svg, png, jpg, gif or webp file.', path))
+    fail.raise(string.format('mcanouil: the logo "%s" must be an svg, png, jpg, gif or webp file.', path))
   end
   return format
 end
@@ -56,7 +57,7 @@ end
 local function read_file(path)
   local file = io.open(path, 'rb')
   if not file then
-    error('mcanouil: cannot open the logo file ' .. path .. '.')
+    fail.raise('mcanouil: cannot open the logo file ' .. path .. '.')
   end
   local content = file:read('a')
   file:close()
@@ -127,6 +128,6 @@ local function deliver(meta)
 end
 
 --- @type table Filter step of the entry filter.
-M.filter = { Meta = deliver }
+M.filter = { Meta = fail.guard(deliver) }
 
 return M
