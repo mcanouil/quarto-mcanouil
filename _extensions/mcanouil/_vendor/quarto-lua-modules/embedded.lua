@@ -1,4 +1,4 @@
---- MC Embedded - Load a filter that an extension bundles, unless the project has its own copy
+--- MC Embedded - Load a filter that an extension bundles, unless the page runs the project's own copy
 --- @module "embedded"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
@@ -23,10 +23,11 @@ local M = {}
 -- with `_quarto.withScriptFile`, which is internal to Quarto, for the load and
 -- for every handler call.
 --
--- Quarto gives a filter no list of the filters that a page names, so the
--- module skips the bundled filter when the project has a copy at all. A
--- project that has a copy of a bundled extension but does not name it in
--- `filters` gets neither copy.
+-- The module skips the bundled filter only when the page runs a filter from
+-- the project copy, which it reads from Quarto's internal
+-- `param('quarto-filters')`. A copy that the page does not name leaves the
+-- bundled filter on. Without that list, a project copy alone skips the
+-- bundled filter.
 -- Remove when: never.
 
 local MANIFESTS = { '_extension.yml', '_extension.yaml' }
@@ -45,18 +46,46 @@ local function has_manifest(dir)
   return false
 end
 
+--- List the entries of a directory, or none when it cannot be read.
+--- @param dir string
+--- @return table<integer, string>
+local function entries(dir)
+  local listed, names = pcall(pandoc.system.list_directory, dir)
+  if not listed then
+    return {}
+  end
+  table.sort(names)
+  return names
+end
+
+--- Tell whether a directory lists an entry with exactly this name.
+--- The comparison is exact, so it holds on a file system that ignores case.
+--- @param dir string
+--- @param name string
+--- @return boolean
+local function lists(dir, name)
+  for _, entry in ipairs(entries(dir)) do
+    if entry == name then
+      return true
+    end
+  end
+  return false
+end
+
 --- Find a copy of an extension in one `_extensions/` folder.
 --- Looks for `<name>/` and `<owner>/<name>/`, with any owner.
 --- @param extensions string The `_extensions/` folder
 --- @param name string The extension name, such as `veil`
 --- @return string|nil The directory of the copy, or nil when there is none
 local function find_copy_in(extensions, name)
-  local candidates = { pandoc.path.join({ extensions, name }) }
-  local listed, owners = pcall(pandoc.system.list_directory, extensions)
-  if listed then
-    table.sort(owners)
-    for _, owner in ipairs(owners) do
-      candidates[#candidates + 1] = pandoc.path.join({ extensions, owner, name })
+  local candidates = {}
+  if lists(extensions, name) then
+    candidates[1] = pandoc.path.join({ extensions, name })
+  end
+  for _, owner in ipairs(entries(extensions)) do
+    local owner_dir = pandoc.path.join({ extensions, owner })
+    if lists(owner_dir, name) then
+      candidates[#candidates + 1] = pandoc.path.join({ owner_dir, name })
     end
   end
   for _, dir in ipairs(candidates) do
@@ -65,6 +94,34 @@ local function find_copy_in(extensions, name)
     end
   end
   return nil
+end
+
+--- Normalise a directory and drop a trailing separator, except at a root
+--- such as `/` or `C:\\`.
+--- @param dir string
+--- @return string
+local function directory(dir)
+  dir = pandoc.path.normalize(dir)
+  local trimmed = dir:gsub('[/\\]+$', '')
+  if trimmed == '' or trimmed:match('^%a:$') then
+    return dir
+  end
+  return trimmed
+end
+
+--- Tell whether a path is a directory or lies inside it.
+--- Paths are compared by whole components, so `/a/proj` does not hold
+--- `/a/project`.
+--- @param path string
+--- @param dir string
+--- @return boolean
+local function inside(path, dir)
+  path = pandoc.path.normalize(path)
+  dir = directory(dir)
+  if dir:sub(-1) == pandoc.path.separator then
+    return path:sub(1, #dir) == dir
+  end
+  return path == dir or path:sub(1, #dir + 1) == dir .. pandoc.path.separator
 end
 
 --- The folders whose `_extensions/` Quarto reads for the input file.
@@ -81,11 +138,15 @@ local function search_roots()
   if root == nil then
     return { dir }
   end
-  root = pandoc.path.normalize(root)
+  root = directory(root)
   local roots = {}
-  while dir ~= root and dir:sub(1, #root) == root do
+  while dir ~= root and inside(dir, root) do
     roots[#roots + 1] = dir
-    dir = pandoc.path.directory(dir)
+    local parent = pandoc.path.directory(dir)
+    if parent == dir then
+      break
+    end
+    dir = parent
   end
   roots[#roots + 1] = root
   return roots
@@ -104,6 +165,37 @@ local function find_project_copy(name)
     end
   end
   return nil
+end
+
+--- Tell whether the page runs a filter from a directory.
+--- Quarto lists the filters of the page in its internal `param('quarto-filters')`.
+--- @param dir string The directory of the project copy
+--- @return boolean|nil True or false, or nil when Quarto gives no list
+local function page_runs_from(dir)
+  if type(_G.param) ~= 'function' then
+    return nil
+  end
+  local read, listed = pcall(_G.param, 'quarto-filters')
+  if not read or type(listed) ~= 'table' then
+    return nil
+  end
+  local keys = { 'entryPoints', 'beforeQuartoFilters', 'afterQuartoFilters' }
+  local known = false
+  for _, key in ipairs(keys) do
+    known = known or type(listed[key]) == 'table'
+  end
+  if not known then
+    return nil
+  end
+  for _, key in ipairs(keys) do
+    for _, filter in ipairs(listed[key] or {}) do
+      local path = type(filter) == 'table' and filter.path or filter
+      if type(path) == 'string' and inside(path, dir) then
+        return true
+      end
+    end
+  end
+  return false
 end
 
 --- Call a function with a file on top of Quarto's script stack.
@@ -138,7 +230,9 @@ local function wrap_filter(file, filter)
   return wrapped
 end
 
---- Load a bundled filter, or skip it when the project has its own copy.
+--- Load a bundled filter, or skip it when the page runs a filter from the
+--- project's own copy. Without a filter list from Quarto, a project copy
+--- alone skips the bundled filter.
 --- The entry runs in its own environment, with `PANDOC_SCRIPT_FILE` set to
 --- its path, as Quarto runs a filter. An entry that returns nothing gives the
 --- functions it defines as its filter.
@@ -154,8 +248,16 @@ function M.load(name, file)
   end
   local copy = find_project_copy(name)
   if copy ~= nil then
-    quarto.log.debug('[embedded] ' .. name .. ' is skipped: the project has its own copy in ' .. copy .. '.')
-    return {}
+    local runs = page_runs_from(copy)
+    if runs == true then
+      quarto.log.debug('[embedded] ' .. name .. ' is skipped: the page runs the project copy in ' .. copy .. '.')
+      return {}
+    end
+    if runs == nil then
+      quarto.log.debug('[embedded] ' .. name .. ' is skipped: this Quarto gives no filter list, so the project copy in ' .. copy .. ' wins.')
+      return {}
+    end
+    quarto.log.debug('[embedded] ' .. name .. ' runs: the page does not name the project copy in ' .. copy .. '.')
   end
   if type(_quarto) ~= 'table' or type(_quarto.withScriptFile) ~= 'function' then
     error('[embedded] Could not load ' .. name .. ' from ' .. file ..
