@@ -36,7 +36,7 @@ Nothing from 0.x carries over, so a 0.x document needs new front matter.
 - feat: Report a key nested inside an option that the schema does not declare, such as a typo in a nested setting. Only top-level keys were checked before. (#136)
 - feat: Check the badge, card, card-grid, panel, executive-summary, and CodeBlock attribute groups against the schema, so a value the schema rejects is now named. (#136)
 - feat: Check the format options against the schema for all three declared formats, so a format option the schema rejects is now named. (#136)
-- feat: The embedded filters of a tool do not run when your project has its own copy of it under `_extensions/`, so only your copy runs. (#161)
+- feat: The embedded filters of a tool do not run when your project has its own copy of it under `_extensions/` and names it in `filters:`, so only your copy runs. (#161)
 
 ### Bug Fixes
 
