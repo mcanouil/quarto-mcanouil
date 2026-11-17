@@ -1,0 +1,77 @@
+# mcanouil - terminal preset
+# Colour tokens for the light and dark schemes, fonts and logos of the terminal preset.
+# This file and the other preset files are the only files of the extension with colour values.
+#
+# @license MIT
+# @copyright 2026 Mickaël Canouil
+# @author Mickaël Canouil
+# The terminal preset is dark only: the light map repeats the dark map.
+
+light:
+  paper: "#101216"
+  ink: "#d8dee9"
+  muted: "#a3acb9"
+  tint: "#16191e"
+  line: "#2a2f37"
+  accent: "#3fa34d"
+  accent-high: "#7ee08a"
+  accent-low: "#1d4a24"
+  accent-text: "#7ee08a"
+  link: "#6cb6ff"
+  ground-1: "#101216"
+  ground-2: "#13261a"
+  on-ground-accent: "#7ee08a"
+  on-ground-text: "#d8dee9"
+  on-ground-title: "#ffffff"
+  chrome: "#101216"
+  note: "#66aaff"
+  tip: "#66cc99"
+  warning: "#ffaa44"
+  important: "#ff6666"
+  caution: "#ddcc66"
+  note-text: "#66aaff"
+  tip-text: "#66cc99"
+  warning-text: "#ffaa44"
+  important-text: "#ff6666"
+  caution-text: "#ddcc66"
+
+dark:
+  paper: "#101216"
+  ink: "#d8dee9"
+  muted: "#a3acb9"
+  tint: "#16191e"
+  line: "#2a2f37"
+  accent: "#3fa34d"
+  accent-high: "#7ee08a"
+  accent-low: "#1d4a24"
+  accent-text: "#7ee08a"
+  link: "#6cb6ff"
+  ground-1: "#101216"
+  ground-2: "#13261a"
+  on-ground-accent: "#7ee08a"
+  on-ground-text: "#d8dee9"
+  on-ground-title: "#ffffff"
+  chrome: "#101216"
+  note: "#66aaff"
+  tip: "#66cc99"
+  warning: "#ffaa44"
+  important: "#ff6666"
+  caution: "#ddcc66"
+  note-text: "#66aaff"
+  tip-text: "#66cc99"
+  warning-text: "#ffaa44"
+  important-text: "#ff6666"
+  caution-text: "#ddcc66"
+
+fonts:
+  base: JetBrains Mono
+  headings: JetBrains Mono
+  monospace: JetBrains Mono
+  generic:
+    base: monospace
+    headings: monospace
+    monospace: monospace
+
+logo:
+  light: logos/logo-light.svg
+  dark: logos/logo-dark.svg

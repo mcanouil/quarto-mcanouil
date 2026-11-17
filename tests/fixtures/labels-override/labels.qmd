@@ -1,0 +1,7 @@
+---
+title: Labels
+lang: en
+language: my-labels.yml
+---
+
+A paragraph.

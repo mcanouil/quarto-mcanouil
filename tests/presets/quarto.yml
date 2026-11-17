@@ -1,0 +1,4 @@
+extensions:
+  mcanouil:
+    preset: quarto
+keep-typ: true
