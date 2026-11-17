@@ -1,0 +1,29 @@
+---
+title: Quarto 1.11 migration
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: terminal
+    type: memo
+    kind: note
+    memo:
+      to: Data team
+      from: M. Canouil
+      date: 11 Nov 2026
+    footer:
+      left: Internal
+      centre: Memo 2026-07
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In the terminal preset, a note memo has the banner with its kind label, the to, from and date rows in a table, and the band on its page.
+        check: bash _checks/memo.sh kind note terminal
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mcanouil-document\(\s*"memo",\s*"standard",\s*"note"']
+---
+
+{{< include _note.qmd >}}

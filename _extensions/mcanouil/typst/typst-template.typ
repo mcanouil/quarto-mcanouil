@@ -24,10 +24,13 @@ $report.typ()$
 
 $article.typ()$
 
+$memo.typ()$
+
 // The document types, each a function (meta, body) -> content.
 #let mc-types = (
   report: mc-report,
   article: mc-article,
+  memo: mc-memo,
 )
 
 // Answer the document of a type: the text, heading, code and link styles that

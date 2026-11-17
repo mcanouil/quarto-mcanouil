@@ -33,6 +33,21 @@ M.DEFAULT_TYPE = 'report'
 M.TYPES = {
   report = { 'compact', 'full' },
   article = { 'standard' },
+  memo = { 'standard' },
+}
+
+--- @type table<string, string[]> The kinds of the types that vary by kind, the default kind first.
+M.KINDS = {
+  memo = { 'note', 'minutes', 'agenda', 'brief' },
+}
+
+--- @type table<string, string[]> The banner fields of each memo kind, in order. A key names the
+--- metadata `extensions.mcanouil.memo.<key>` and the label `mcanouil-memo-<key>`.
+M.MEMO_FIELDS = {
+  note = { 'to', 'from', 'date' },
+  minutes = { 'date-time', 'present', 'absent' },
+  agenda = { 'date-time', 'place', 'participants' },
+  brief = { 'date', 'audience', 'purpose' },
 }
 
 --- @type table<string, table<string, string>> Margin note columns of the types that set one, as the
@@ -72,6 +87,10 @@ M.DEFAULTS = {
   deck = {
     header = { left = '', centre = '', right = '' },
     footer = { left = 'speaker', centre = 'title', right = 'page' },
+  },
+  memo = {
+    header = { left = '', centre = '', right = '' },
+    footer = { left = 'author', centre = 'version', right = 'page' },
   },
 }
 
@@ -316,7 +335,64 @@ function M.resolve(meta, format)
       'mcanouil: unknown layout "%s" for type "%s"; use %s.', layout, doc_type, table.concat(layouts, ', ')
     )
   end
-  return { type = doc_type, layout = layout, kind = option(options, 'kind') }
+  local kind = option(options, 'kind')
+  local kinds = M.KINDS[doc_type]
+  if kinds then
+    kind = kind or kinds[1]
+    if not contains(kinds, kind) then
+      local sorted = { table.unpack(kinds) }
+      table.sort(sorted)
+      return nil, string.format(
+        'mcanouil: unknown kind "%s" for type "%s"; use %s.', kind, doc_type, table.concat(sorted, ', ')
+      )
+    end
+  end
+  return { type = doc_type, layout = layout, kind = kind }
+end
+
+--- Answer the value of a memo banner field, in the document metadata.
+--- @param meta table Document metadata
+--- @param key string Field key
+--- @return any|nil Value, or nil when the field is not set or is empty
+local function memo_value(meta, key)
+  local options = meta.extensions and meta.extensions.mcanouil or {}
+  local memo = options.memo or {}
+  local sources = {}
+  local function add(value)
+    if value ~= nil then
+      sources[#sources + 1] = value
+    end
+  end
+  add(memo[key])
+  if key == 'date-time' then
+    add(memo.date)
+  end
+  if key == 'date' or key == 'date-time' then
+    add(meta.date)
+  end
+  for _, value in ipairs(sources) do
+    if pandoc.utils.stringify(value) ~= '' then
+      return value
+    end
+  end
+  return nil
+end
+
+--- Answer the banner fields of a memo that have a value, in the order of the kind.
+--- A field with no value is left out, so the banner has no empty row.
+--- @param meta table Document metadata
+--- @param kind string Memo kind
+--- @return table[] Fields, each with `key` and `value` (inlines)
+function M.memo_fields(meta, kind)
+  local fields = {}
+  for _, key in ipairs(M.MEMO_FIELDS[kind] or {}) do
+    local value = memo_value(meta, key)
+    if value ~= nil then
+      local inlines = pandoc.utils.type(value) == 'Inlines' and value or pandoc.Inlines(pandoc.utils.stringify(value))
+      fields[#fields + 1] = { key = key, value = inlines }
+    end
+  end
+  return fields
 end
 
 --- Set the margin note column of a document type that has one, so Quarto sets up the margin
@@ -352,6 +428,13 @@ local function deliver(meta)
   meta['mcanouil-layout'] = resolved.layout
   meta['mcanouil-kind'] = resolved.kind
   deliver_margin(meta, resolved.type)
+  if resolved.type == 'memo' then
+    local fields = pandoc.List()
+    for _, field in ipairs(M.memo_fields(meta, resolved.kind)) do
+      fields:insert({ key = pandoc.MetaString(field.key), value = pandoc.MetaInlines(field.value) })
+    end
+    meta['mcanouil-memo-fields'] = pandoc.MetaList(fields)
+  end
   local furniture = M.furniture(meta)
   for _, part in ipairs(M.PARTS) do
     local delivered = {}
