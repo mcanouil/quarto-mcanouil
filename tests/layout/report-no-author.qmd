@@ -1,0 +1,18 @@
+---
+title: No author
+version: Version 1.2
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The footer drops the missing author without a leading separator.
+        check: bash _checks/pdf.sh report-no-author
+    mcanouil-typst:
+---
+
+# Introduction
+
+{{< lipsum 2 >}}

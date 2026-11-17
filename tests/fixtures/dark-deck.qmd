@@ -1,8 +1,0 @@
----
-title: Dark deck
-brand-mode: dark
----
-
-## Slide
-
-A paragraph.

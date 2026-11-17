@@ -1,6 +1,0 @@
----
-title: Labels
-lang: en
----
-
-A paragraph.

@@ -1,5 +1,0 @@
----
-title: Bad contrast
----
-
-A paragraph.

@@ -1,0 +1,19 @@
+---
+title: Bad dark ink
+brand-mode: dark
+brand: _brand.yml
+format: mcanouil-typst
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A dark ink that fails the contrast check stops a brand-mode dark Typst render.
+        errors: strict
+    mcanouil-typst:
+      shouldError: true
+      printsMessage:
+        level: ERROR
+        regex: 'ink on paper \(dark\)'
+---
+
+A paragraph.

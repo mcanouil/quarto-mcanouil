@@ -1,0 +1,13 @@
+---
+title: Source rules
+format: mcanouil-html
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The source of the extension uses no Sass colour function on a token, no hex colour outside the presets, and no label text outside the language files.
+        check: bash _checks/static.sh
+    mcanouil-html:
+---
+
+A paragraph.
