@@ -11,7 +11,8 @@ format:
   mcanouil-typst: default
   mcanouil-html:
     toc: true
-  mcanouil-revealjs: default
+  mcanouil-revealjs:
+    output-file: example-revealjs.html
 extensions:
   mcanouil:
     preset: gold
