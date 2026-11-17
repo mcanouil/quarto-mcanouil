@@ -42,9 +42,12 @@ h6,
   font-family: var(--mc-font-headings);
 }
 
+// Code reads as typed: no ligatures and no contextual alternates.
 code,
 kbd,
 pre,
 samp {
   font-family: var(--mc-font-mono);
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
 }

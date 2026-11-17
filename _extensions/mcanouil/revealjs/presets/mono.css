@@ -84,3 +84,9 @@
   color: var(--mc-paper);
   background: var(--mc-accent);
 }
+
+/* Workshop exercise: a thick start edge, as the mono callouts. */
+.reveal .mc-ws-exercise {
+  border-width: 0 0 0 4px;
+  border-radius: 0;
+}

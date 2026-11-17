@@ -1,0 +1,56 @@
+---
+title: Callouts
+author: Mickaël Canouil
+date: 2026-11-13
+format:
+  mcanouil-html: default
+  mcanouil-revealjs: default
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: workshop
+    event: Mastering Quarto CLI
+    session:
+      number: 2
+      total: 7
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A solution that starts with a heading and has a name, an identifier, an extra class and a data attribute keeps all of them, and its name joins its label; a reference to a sol- id links to that solution with no warning, in the HTML page, the deck and the PDF handout.
+        check: bash _checks/workshop.sh solution-attrs
+---
+
+# Session overview
+
+## Callouts {#callouts}
+
+::: {.exercise duration="5 min"}
+
+Highlight a warning with a callout.
+
+::: {#workedanswer .solution .worked name="Worked answer" data-level="easy"}
+
+### Step by step
+
+The worked answer wraps the text in a warning callout.
+
+:::
+
+:::
+
+## Cross-reference ids {#cross-reference-ids}
+
+::: {.exercise duration="5 min"}
+
+Give a solution an id with the sol- prefix, then compare with @sol-a.
+
+::: {.solution #sol-a}
+
+The second answer keeps the id the author wrote.
+
+:::
+
+:::

@@ -1,0 +1,108 @@
+/*-- scss:defaults --*/
+
+// Workshop: the blocks of a session on slides (objectives, prerequisites,
+// exercises, solutions and checkpoints), as in html/workshop.scss. Each block
+// has a text label, so none relies on colour alone. A solution is a block of
+// the veil group "solutions", hidden until the presenter shows the group.
+$mc-ws-mark-size: 0.5em !default;
+
+/*-- scss:rules --*/
+
+.reveal .mc-ws {
+  margin: 0.5em 0;
+  padding: 0.5em 0.75em;
+  border: 1px solid var(--mc-line);
+  border-radius: var(--mc-radius, 0.25rem);
+  background-color: var(--mc-tint);
+  font-size: 0.85em;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  .mc-ws {
+    font-size: 1em;
+  }
+}
+
+.reveal .mc-ws-label {
+  margin: 0 0 0.4em;
+  color: var(--mc-accent-text);
+  font-family: var(--mc-font-ui);
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+
+  &::before {
+    content: "" / "";
+    display: inline-block;
+    width: $mc-ws-mark-size;
+    height: $mc-ws-mark-size;
+    margin-inline-end: 0.5em;
+    background-color: currentColor;
+    vertical-align: 0.05em;
+  }
+}
+
+.reveal .mc-ws-exercise {
+  border-color: var(--mc-accent);
+  background-color: var(--mc-paper);
+}
+
+.reveal .mc-ws-solution {
+  border-style: dashed;
+}
+
+.reveal .mc-ws-checkpoint {
+  border-width: 0 0 0 4px;
+  border-color: var(--mc-tip);
+  border-radius: 0;
+
+  > .mc-ws-label {
+    color: var(--mc-tip-text);
+  }
+}
+
+// The duration of the session on the title slide, as the date.
+.reveal .slides section.mc-title-slide .mc-duration {
+  margin: 0.3em 0 0;
+  color: var(--mc-on-ground-text);
+  font-size: 0.55em;
+}
+
+.reveal .slides section.mc-title-slide .mc-duration-label {
+  color: var(--mc-on-ground-accent);
+  font-family: var(--mc-font-ui);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+// The solution fades in when the presenter shows it, unless the viewer asked
+// for reduced motion.
+@keyframes mc-ws-reveal {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal .mc-ws-solution:not([data-veil-hidden]) {
+    animation: mc-ws-reveal 0.3s ease-out;
+  }
+}
+
+@media (forced-colors: active) {
+  .reveal .mc-ws-label::before {
+    display: none;
+  }
+}

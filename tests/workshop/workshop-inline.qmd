@@ -1,0 +1,26 @@
+---
+title: Authoring essentials
+author: Mickaël Canouil
+date: 2026-11-13
+lang: en-GB
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: workshop
+    solutions: inline
+    event: Mastering Quarto CLI
+    session:
+      number: 2
+      total: 7
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With solutions set to inline, the PDF handout prints each solution in its exercise, with no page link.
+        check: bash _checks/workshop.sh inline
+---
+
+{{< include _workshop.qmd >}}

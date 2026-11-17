@@ -9,6 +9,7 @@ set -euo pipefail
 #        deck.sh long-title <preset>   title, section and closing text clear of the motif
 #        deck.sh dark <preset>         axe on a brand-mode: dark deck
 #        deck.sh closing-refs          the bibliography stays off the closing slide
+#        deck.sh workshop <preset>     workshop blocks, solutions in a hidden veil group, no ligatures, guarded motion, axe
 #
 # Exits 77 for a format other than Reveal.js.
 #
@@ -21,6 +22,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 [ "${format}" = revealjs ] || skip_format deck.sh
 need python3
+need node
 
 readonly SPEAKER_EVENT='Mickaël Canouil · useR! 2026 · Warwick'
 readonly TALK_TITLE='Quarto extensions'
@@ -280,10 +282,16 @@ with open(source, encoding="utf-8") as handle:
 with open(probe, "w", encoding="utf-8") as handle:
     handle.write(html.replace("</body>", inject + "</body>"))
 PY
-	"${browser_bin}" --headless --disable-gpu --hide-scrollbars --window-size=1600,900 \
-		--virtual-time-budget=20000 --dump-dom "file://${probe}${PROBE_QUERY:-}" 2>/dev/null |
-		python3 -I -c 'import html, re, sys; m = re.search(r"<pre id=\"mc-probe\">(.*?)</pre>", sys.stdin.read(), re.S); print(html.unescape(m.group(1)) if m else "")'
+	node "$(dirname "${BASH_SOURCE[0]}")/deck-probe-run.mjs" "${browser_bin}" "${probe}" "${PROBE_QUERY:-}" || true
 	rm -f "${probe}"
+}
+
+# Set probe_lines to the lines of probe_slides, and say so in the TAP output
+# when the probe wrote nothing before its timeout.
+# $@ slide ids.
+probe() {
+	probe_lines="$(probe_slides "$@")"
+	[ -n "${probe_lines}" ] || printf '# probe: no output (budget expired?)\n'
 }
 
 # Succeed when the text of a slide is clear of its motif: every line box and
@@ -386,6 +394,82 @@ axe_clean() {
 	rm -rf "${scratch}"
 }
 
+# Answer the path of the Reveal.js theme stylesheet that the deck links.
+theme_css() {
+	local href
+	href="$(grep -oE 'href="[^"]*/revealjs/dist/theme/quarto[^"]*\.css"' "${output}" | head -n 1 | sed -E 's/^href="(.*)"$/\1/')"
+	[ -n "${href}" ] && printf '%s/%s' "$(dirname "${output}")" "${href}"
+}
+
+# Succeed when both solutions are in the veil group "solutions", hidden
+# until the presenter shows the group, with a visible "Solution" label, and
+# the group is declared hidden.
+workshop_veil() {
+	python3 -I - "${output}" <<'PY'
+import json
+import re
+import sys
+
+html = open(sys.argv[1], encoding="utf-8").read()
+problems = []
+solutions = re.findall(r"<div\b([^>]*\bmc-ws-solution\b[^>]*)>(.*?)</div>", html, re.S)
+if len(solutions) != 2:
+    problems.append("%d div.mc-ws-solution, expected 2" % len(solutions))
+for attrs, body in solutions:
+    if 'data-veil-group="solutions"' not in attrs or "veil" not in re.search(r'class="([^"]*)"', attrs).group(1).split():
+        problems.append("a solution outside the veil group solutions: %s" % attrs)
+    if "data-veil-hidden" not in attrs:
+        problems.append("a solution shown by default: %s" % attrs)
+    if not re.search(r'<p class="mc-ws-label"[^>]*>Solution</p>', body):
+        problems.append("a solution without its label")
+config = re.search(r'<script type="application/json" id="veil-config">(.*?)</script>', html, re.S)
+config = json.loads(config.group(1)) if config else {}
+names = [g.get("name") for g in config.get("groups", [])]
+if "solutions" not in names or config.get("state", {}).get("independent", {}).get("solutions") is not False:
+    problems.append("no hidden group solutions in the veil configuration: %r" % config)
+for problem in problems:
+    print("# " + problem)
+sys.exit(1 if problems else 0)
+PY
+}
+
+# Succeed when the blocks show their labels, the title slide the session as
+# its kicker, and the footer the event, the session and the slide number.
+workshop_deck_labels() {
+	local label text
+	for label in Objectives Prerequisites 'Exercise 2.1 · 15 min · solo' 'Exercise 2.2 · 20 min · pairs' Checkpoint; do
+		grep -qE "<p class=\"mc-ws-label\" id=\"[^\"]+\">${label}</p>" "${output}" || {
+			printf '# missing label: %s\n' "${label}"
+			return 1
+		}
+	done
+	text="$(slide_field title-slide 10)"
+	[[ "${text}" == *'Session 2 of 7'* ]] && [[ "${text}" == *'90 min'* ]] &&
+		[ "$(footer_slot left)" = 'Mastering Quarto CLI' ] && [ "$(footer_slot centre)" = 'Session 2' ] &&
+		has "${output}" 'class="mc-slot mc-slot-right mc-slot-page"'
+}
+
+# Succeed when the theme turns ligatures and contextual alternates off in code.
+deck_no_ligatures() {
+	local css
+	css="$(theme_css)"
+	[ -f "${css}" ] && grep -qE 'font-variant-ligatures: ?none' "${css}" && grep -qE '"calt" 0' "${css}"
+}
+
+# Succeed when the probe read the label of the blocks on the workshop slides,
+# each at its contrast ratio.
+workshop_colours() {
+	local colours slide missing=0
+	colours="$(awk '$2 == "colour"' <<<"${probe_lines}")"
+	for slide in before-we-start exercise-front-matter checkpoint; do
+		awk -v s="${slide}" '$1 == s && $3 == ".mc-ws-label" { found = 1 } END { exit !found }' <<<"${colours}" || {
+			printf '# missing: %s .mc-ws-label\n' "${slide}"
+			missing=1
+		}
+	done
+	awk '$4 + 0 < $5 + 0 { print "# low contrast: " $0; bad = 1 } END { exit bad }' <<<"${colours}" && [ "${missing}" = 0 ]
+}
+
 slides="$(slide_table)"
 
 case "${1:-}" in
@@ -401,23 +485,34 @@ gold | mono | quarto | terminal)
 	expect "deck-quote-attribution-${1}" "the attribution of the quote without its dash" quote_attribution
 	expect "deck-axe-light-${1}" "no axe-core violation in the ${1} deck" axe_clean
 	find_browser
-	probe_lines="$(probe_slides title-slide brand-presets why-presets checks one-rule why-presets-after-dark mc-closing)"
+	probe title-slide brand-presets why-presets checks one-rule why-presets-after-dark mc-closing
 	expect "deck-section-body-order-${1}" "section slide body below the number, the title and its rule" section_body_after_title checks body
 	expect "deck-section-bare-${1}" "section slide with no body: the number ends and the title starts on the middle line" section_body_after_title brand-presets bare
 	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
-	probe_lines="$(PROBE_QUERY='?print-pdf' probe_slides brand-presets checks)"
+	PROBE_QUERY='?print-pdf' probe brand-presets checks
 	expect "deck-section-body-order-print-${1}" "the same order and middle line in the print layout of a PDF export" section_body_after_title checks body
 	expect "deck-section-bare-print-${1}" "the same middle line in print, with no body" section_body_after_title brand-presets bare
 	;;
 long-title)
 	find_browser
-	probe_lines="$(probe_slides title-slide a-section-title-long-enough-to-wrap-over-several-lines-of-the-slide mc-closing)"
+	probe title-slide a-section-title-long-enough-to-wrap-over-several-lines-of-the-slide mc-closing
 	expect "long-title-no-overlap-title-${2:?long-title needs a preset}" "title slide text clear of the ${2} motif" text_clear_of_motif title-slide
 	expect "long-title-no-overlap-section-${2}" "section slide text clear of the ${2} motif" text_clear_of_motif a-section-title-long-enough-to-wrap-over-several-lines-of-the-slide
 	expect "long-title-no-overlap-closing-${2}" "closing slide text clear of the ${2} motif" text_clear_of_motif mc-closing
 	;;
 closing-refs)
 	expect "deck-closing-no-refs" "the bibliography in the deck, and not on the closing slide" closing_without_refs
+	;;
+workshop)
+	preset="${2:?workshop needs a preset}"
+	expect "workshop-deck-veil-${preset}" "both solutions in the hidden veil group solutions, with their label" workshop_veil
+	expect "workshop-deck-labels-${preset}" "block labels, the session kicker and duration, event | session | slide number in the footer" workshop_deck_labels
+	expect "no-ligatures-deck-${preset}" "font-variant-ligatures: none and calt off in the deck code" deck_no_ligatures
+	expect "workshop-reduced-motion-deck-${preset}" "workshop motion only inside prefers-reduced-motion: no-preference" motion_guarded "$(theme_css)"
+	expect "workshop-deck-axe-${preset}" "no axe-core violation in the ${preset} workshop deck" axe_clean
+	find_browser
+	probe before-we-start exercise-front-matter checkpoint
+	expect "workshop-deck-contrast-${preset}" "block labels at 4.5:1 or more, as the browser paints them" workshop_colours
 	;;
 dark)
 	expect "deck-axe-dark-${2:?dark needs a preset}" "no axe-core violation in the ${2} brand-mode: dark deck" axe_clean

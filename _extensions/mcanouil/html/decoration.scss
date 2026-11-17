@@ -28,7 +28,8 @@
   nav#TOC::before,
   #TOC > #toc-title::after,
   #TOC a.nav-link.active::after,
-  #quarto-sidebar .sidebar-title::after {
+  #quarto-sidebar .sidebar-title::after,
+  .mc-ws-label::before {
     display: none;
   }
 

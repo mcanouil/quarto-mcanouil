@@ -38,7 +38,7 @@ options:
   footer:
     type: object
     additionalProperties: false
-    description: "Content of the three footer slots of Typst pages and Reveal.js slides. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter, page and speaker (the authors and the event). An empty string leaves the slot empty. A slot that is not set takes the default of the document type; a deck shows the speaker and the event, the talk title, and the slide number."
+    description: "Content of the three footer slots of Typst pages and Reveal.js slides. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter, page, speaker (the authors and the event), event and session (for example "Session 2"). An empty string leaves the slot empty. A slot that is not set takes the default of the document type; a deck shows the speaker and the event, the talk title, and the slide number; a workshop shows the event, the session and the page or slide number."
     properties:
       left:
         type: string
@@ -84,3 +84,46 @@ options:
       licence:
         type: string
         description: "Licence line of the closing slide, for example `Slides: example.org/talk · CC BY 4.0`."
+  session:
+    type: object
+    additionalProperties: false
+    description: "Session of a workshop: its number and the number of sessions. The kicker shows \"Session 2 of 7\", exercises are numbered 2.1, 2.2, and the session field of the footer shows \"Session 2\". Set it as `extensions: { mcanouil: { session: { number: 2, total: 7 } } }`."
+    properties:
+      number:
+        type: [number, string]
+        description: "Number of the session."
+      total:
+        type: [number, string]
+        description: "Number of sessions of the workshop."
+  duration:
+    type: string
+    description: "Duration of a workshop session, for example `90 min`. The title block shows it beside the date."
+  solutions:
+    type: string
+    enum:
+      - end
+      - inline
+      - hide
+    default: end
+    description: "Place of the exercise solutions in the PDF handout of a workshop: end collects them on the last pages behind a \"Solution: page n\" link in each exercise, inline prints each one in its exercise, hide leaves them out. HTML shows each solution as a closed disclosure and Reveal.js as a block of the veil group solutions, hidden until shown."
+
+classes:
+  objectives:
+    description: "Workshop block: what the session teaches. It shows the label Objectives."
+  prerequisites:
+    description: "Workshop block: what the session needs. It shows the label Prerequisites."
+  exercise:
+    description: "Workshop block: an exercise, labelled with its number, its duration and its format. It can hold a solution block."
+  solution:
+    description: "Workshop block, inside an exercise: the solution of the exercise. HTML shows it as a closed disclosure, Reveal.js as a block of the veil group solutions, and the PDF handout as the solutions option says."
+  checkpoint:
+    description: "Workshop block: a check of the work so far. It shows the label Checkpoint."
+
+attributes:
+  exercise:
+    duration:
+      type: string
+      description: "Time the exercise takes, for example `15 min`, shown in its label."
+    format:
+      type: string
+      description: "How the exercise is done, for example `pairs` or `solo`, shown in its label."
