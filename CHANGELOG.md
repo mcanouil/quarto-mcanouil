@@ -28,6 +28,7 @@ Nothing from 0.x carries over, so a 0.x document needs new front matter.
 - feat: Let a Typst cross-reference to a heading without a number read as its title, such as "Section Introduction". (#155)
 - feat: Embed quarto-typst-extras for lists of figures and tables, watermarks, maths alt text, and appendix and supplementary numbering. Supplementary sections are numbered S1, with floats such as Figure S1. (#157)
 - feat: Style the code windows of HTML pages, decks and Typst PDFs to match each preset. (#158)
+- feat: The embedded filters of a tool do not run when your project has its own copy of it under `_extensions/` and names it in `filters:`, so only your copy runs. (#161)
 
 ## 0.22.0 (2026-09-23)
 
@@ -36,7 +37,6 @@ Nothing from 0.x carries over, so a 0.x document needs new front matter.
 - feat: Report a key nested inside an option that the schema does not declare, such as a typo in a nested setting. Only top-level keys were checked before. (#136)
 - feat: Check the badge, card, card-grid, panel, executive-summary, and CodeBlock attribute groups against the schema, so a value the schema rejects is now named. (#136)
 - feat: Check the format options against the schema for all three declared formats, so a format option the schema rejects is now named. (#136)
-- feat: The embedded filters of a tool do not run when your project has its own copy of it under `_extensions/` and names it in `filters:`, so only your copy runs. (#161)
 
 ### Bug Fixes
 
