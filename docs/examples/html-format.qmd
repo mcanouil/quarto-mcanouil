@@ -1,90 +1,64 @@
 ---
 title: "HTML format"
-subtitle: "The title block, the navbar, and the grid."
-description: "Worked examples of the mcanouil-html options, and of the options whose value depends on whether a document is part of a website."
+subtitle: "One accessible page per document, in light and dark."
+description: "What mcanouil-html gives a page: the title block, the contents and sidebar per preset, the page footer, the components, and the accessibility targets."
 ---
-
-The [Reference](../reference.qmd#mcanouil-html) lists the format options.
-The [Reference](../reference.qmd#options-under-extensions.mcanouil) lists the document options.
-
-## A document
 
 ```yaml
----
-title: "My Document"
 format: mcanouil-html
----
 ```
 
-## The layout style
+`mcanouil-html` renders the `report`, `article`, `memo` and `workshop` types as one page.
+A Quarto book also renders with it.
+The target is WCAG 2.2 AA in every preset, in light and dark.
+
+## Title block
+
+The title block is the banner of the page.
+It holds the kicker, the title, a rule in the style of the preset, the subtitle, the authors, the abstract and the corner motif.
+In a memo, it is the memo banner with the banner fields.
+
+## Contents
+
+The contents is off by default.
+Set `toc: true` to show it:
 
 ```yaml
----
-title: "My Document"
 format:
   mcanouil-html:
-    style: academic
----
+    toc: true
 ```
 
-`style` is matched without regard to case, so `Academic` works, and any value that is not `academic` gives the professional layout.
+When it is on, the contents is a `nav` landmark with a label.
+Each preset has its own look for the contents and the sidebar of a book: the current entry, hover, focus, long titles that wrap, and print.
+The current entry does not rely on colour alone.
 
-## The title block
+Below 768 px, the embedded mobile-toc tool replaces the contents with a button.
+The button opens the contents in a sheet at the bottom of the screen.
 
-The title block is built from three groups, and each one can be switched off.
+## Page footer
 
-```yaml
----
-title: "A paper"
-author: "Mickaël CANOUIL"
-date: last-modified
-abstract: "One paragraph."
-format:
-  mcanouil-html:
-    title-block-abstract: false
-    title-block-meta: false
----
-```
+The page footer shows the three footer slots of the document type.
+See [Header and footer](../reference.qmd#header-and-footer).
 
-Switch off the groups whose metadata a page does not carry.
-A landing page with one author and no abstract reads better with `title-block-abstract` and `title-block-meta` off, which leaves the authors group alone.
+## Components
 
-## Where a default comes from
+Callouts, tabsets, code blocks, tables and block quotes have the style of the preset:
 
-A default is supplied by the project type or by the format, not by the filter that reads it.
-So the same option can differ between a website and a standalone document.
+- `gold`: tinted callouts with a gilded edge, tabs with a gilded underline.
+- `mono`: no fills, a thick top rule in the callout colour, a segmented tab bar.
+- `quarto`: rounded white cards with a soft shadow, pill tabs.
+- `terminal`: dashed boxes with `[!NOTE]` labels, `[ R ]` tabs.
 
-| Option | In a website | In a standalone document |
-| --- | --- | --- |
-| `hide-navbar-title` | `true`, from the project type. | No value, so the navbar title stays visible. |
-| `grid-background` | `false`, from the project type. | `true`, from the format. |
+A callout always has a text label.
+Its icon is decorative.
 
-: Where each value comes from. {.striped .hover tbl-colwidths="[30,35,35]"}
+## Accessibility
 
-A standalone document that wants the website behaviour writes it:
-
-```yaml
----
-title: "My Document"
-format: mcanouil-html
-extensions:
-  mcanouil:
-    hide-navbar-title: true
-    grid-background: false
----
-```
-
-## The grid background
-
-`grid-background` draws a faint grid behind the content.
-
-```yaml
-extensions:
-  mcanouil:
-    grid-background: true
-```
-
-The option is read as text, so only the value `true` turns it on.
-One setting covers an HTML page and a Reveal.js slide background.
-
-The [Reference](../reference.qmd#options-under-extensions.mcanouil) explains the order the three values are applied in.
+- Landmarks for the banner, the contents, the main content and the footer.
+- A skip link as the first focusable element.
+- Focus rings at 3:1 or more, in the link colour of the preset.
+- No decoration under text, and no decoration in the accessibility tree.
+- Forced colours mode removes the decoration and keeps a visible marker on the current entry.
+- Animations play only when the reader has no reduced motion setting.
+- A figure without alt text gives a warning at render time.

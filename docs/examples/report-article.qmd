@@ -1,0 +1,146 @@
+---
+title: "Report and article"
+subtitle: "Two report layouts, a book project, and a single column article."
+description: "The report type in its compact and full layouts, Quarto books, the article type with margin notes and a CRediT table, and how the extension shows authors."
+---
+
+## Compact report
+
+The compact report is the default type.
+It has no cover.
+The title block, the abstract box and the body start on page 1.
+
+```yaml
+title: "Quarterly review"
+author: "Mickaël Canouil"
+abstract: "A short summary of the review."
+format: mcanouil-typst
+```
+
+This front matter gives the same result:
+
+```yaml
+extensions:
+  mcanouil:
+    type: report
+    layout: compact
+```
+
+## Full report
+
+The full layout adds a cover, a main contents, one divider per chapter, a chapter contents page, and a closing page.
+
+```yaml
+title: "Clinical study report"
+version: "Version 1.2"
+license: "CC BY 4.0"
+format: mcanouil-typst
+extensions:
+  mcanouil:
+    type: report
+    layout: full
+    chapter-toc-depth: 2
+```
+
+- In a single document, each level 1 heading is a chapter.
+- Each chapter divider shows the chapter number, the title and one line of introduction.
+- The introduction line is the `description` attribute of the heading, or else the first sentence of the first paragraph.
+- The chapter contents page ("In this chapter") lists the sections to the depth of `chapter-toc-depth`. Each entry is a link.
+- The closing page shows the contact of each author with an email or an ORCID, the licence and copyright, and a colophon.
+
+```markdown
+# Methods {description="How the study was designed and run."}
+```
+
+In `mcanouil-html`, the full layout renders as the compact one.
+Each chapter gets a chapter header with its number, its title and the "In this chapter" list.
+
+## Book project
+
+`mcanouil-typst` renders a Quarto book as a full report.
+Each book chapter is a chapter, and `book: appendices:` gives the lettered appendices.
+
+```{.yaml filename="_quarto.yml"}
+project:
+  type: book
+
+book:
+  title: "Clinical study report"
+  chapters:
+    - index.qmd
+    - sections/01-design.qmd
+    - sections/02-references.qmd
+  appendices:
+    - sections/appendix-a-listings.qmd
+
+format:
+  mcanouil-typst: default
+  mcanouil-html:
+    toc: true
+
+extensions:
+  mcanouil:
+    type: report
+    layout: full
+```
+
+A `description` in the front matter of a chapter file gives its introduction line.
+In `mcanouil-html`, the book keeps the navigation and search of Quarto, with the style of the preset.
+
+## Article
+
+```yaml
+title: "A short paper"
+abstract: "What the paper shows."
+keywords: [quarto, typst]
+bibliography: references.bib
+format: mcanouil-typst
+extensions:
+  mcanouil:
+    type: article
+```
+
+The article has one column and a wide outer margin for margin notes and asides.
+It has a tinted abstract box, keywords, numbered headings and numbered references.
+The `.column-margin` div and the `reference-location: margin` option put content in the margin.
+
+## Authors {#authors}
+
+The extension reads the authors that Quarto normalises, with no keys of its own.
+
+```yaml
+author:
+  - name: Ana Author
+    degrees: PhD
+    orcid: 0000-0002-0724-1961
+    email: ana@example.org
+    corresponding: true
+    equal-contributor: true
+    affiliations:
+      - name: Example University
+        city: Lille
+    roles:
+      - role: conceptualization
+        degree-of-contribution: lead
+      - role: software
+        degree-of-contribution: supporting
+```
+
+- Degrees show in small type after the name.
+- Affiliations get numbers.
+- A corresponding author gets an envelope mark, and an equal contributor an asterisk, each with a legend line.
+- An ORCID shows as a badge with a text alternative.
+
+In an article, the CRediT roles give a table at the end: one row per role, one column per author.
+The marks are L (lead), E (equal) and S (supporting), with a legend.
+
+## Block quotes
+
+If the last paragraph of a block quote starts with `--`, an en dash or an em dash, it is the attribution.
+The dash does not show, and the attribution has the style of the preset.
+
+```markdown
+> Design for the reader who cannot see the colours.
+>
+> -- Mickaël Canouil, 2026
+```
