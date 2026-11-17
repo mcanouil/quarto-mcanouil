@@ -87,5 +87,5 @@ crossref:
   chapters: true
 ```
 
-Use it with types that number their headings: the full report and the article.
+In the types that do not number their headings, such as the compact report, the floats keep flat numbers: Figure 1, Figure 2.
 See the [known limitations](../limitations.qmd) for the other types.

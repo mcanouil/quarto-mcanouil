@@ -155,7 +155,7 @@ The extension also reads these Quarto and Pandoc keys.
 
 | Key | Used by | Description |
 | --- | --- | --- |
-| `title`, `subtitle`, `date` | all | Title block. |
+| `title`, `subtitle`, `date` | all | Title block. A Typst document needs a `title`, which is also the PDF title. A letter without a `title` uses its `subject`. An invoice without a `title` uses "Invoice" and its number. Any other type without a `title` stops the render. |
 | `author`, `affiliations` | all | Authors, as Quarto normalises them. See [Authors](examples/report-article.qmd#authors). |
 | `abstract`, `keywords` | report, article | Abstract box and keywords. |
 | `kicker` | report, article | Small line above the title. A report shows "Report" when it is not set. |
@@ -199,7 +199,7 @@ A second entry runs the tool twice, which can give double decoration or wrong ou
 
 | Tool | Version | Formats | Default |
 | --- | --- | --- | --- |
-| [code-window](https://github.com/mcanouil/quarto-code-window) | 1.8.3 | all | on |
+| [code-window](https://github.com/mcanouil/quarto-code-window) | 1.9.0 | all | on |
 | [div-reuse](https://github.com/mcanouil/quarto-div-reuse) | 1.5.1 | all | on |
 | [gitlink](https://github.com/mcanouil/quarto-gitlink) | 1.14.0 | all | on, off in letters and invoices |
 | [highlight-text](https://github.com/mcanouil/quarto-highlight-text) | 3.0.0 | all | on |
@@ -207,7 +207,7 @@ A second entry runs the tool twice, which can give double decoration or wrong ou
 | [offset-headings](https://github.com/mcanouil/quarto-offset-headings) | 0.5.1 | all | on |
 | [prism](https://github.com/mcanouil/quarto-prism) | 0.6.0 | all | on |
 | [toc-depth](https://github.com/mcanouil/quarto-toc-depth) | 0.7.1 | all | on |
-| [typst-extras](https://github.com/mcanouil/quarto-typst-extras) | 0.1.0 | Typst | on |
+| [typst-extras](https://github.com/mcanouil/quarto-typst-extras) | 0.1.2 | Typst | on |
 | [typst-render](https://github.com/mcanouil/quarto-typst-render) | 0.22.7 | all | on |
 | [veil](https://github.com/mcanouil/quarto-veil) | 0.4.0 | all | on |
 | [mobile-toc](https://github.com/mcanouil/quarto-mobile-toc) | 0.2.5 | HTML | on |

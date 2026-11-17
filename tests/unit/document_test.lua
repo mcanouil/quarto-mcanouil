@@ -334,4 +334,36 @@ cases['resolve-workshop-every-format'] = function()
   end
 end
 
+cases['fallback-title'] = function()
+  in_english(function()
+    assert_equal(document.fallback_title({ subject = 'Training proposal' }, 'letter'), 'Training proposal', 'letter subject')
+    assert_equal(document.fallback_title({}, 'letter'), nil, 'letter with no subject')
+    assert_equal(document.fallback_title({ invoice = { number = '2026-014' } }, 'invoice'), 'Invoice 2026-014', 'invoice number')
+    assert_equal(document.fallback_title({}, 'invoice'), 'Invoice', 'invoice with no number')
+    assert_equal(document.fallback_title({ subject = 'A subject' }, 'article'), nil, 'article')
+  end)
+end
+
+cases['deliver-strings-escaped'] = function()
+  local function literal(value)
+    return value[1].text
+  end
+  local letter = { ['signature-image'] = pandoc.Inlines('sig"n\\a.svg') }
+  document.deliver_strings(letter, 'letter')
+  assert_equal(literal(letter['mcanouil-letter-strings']['signature-image']), '"sig\\"n\\\\a.svg"', 'letter signature-image')
+  local invoice = {
+    sender = { email = pandoc.Inlines('a"b@example.org') },
+    invoice = { penalty = pandoc.Inlines('40 "flat"'), items = { { description = pandoc.Inlines('Book'), vat = pandoc.Inlines('5\\5') } } },
+  }
+  document.deliver_strings(invoice, 'invoice')
+  local strings = invoice['mcanouil-invoice-strings']
+  assert_equal(literal(strings.email), '"a\\"b@example.org"', 'invoice email')
+  assert_equal(literal(strings.penalty), '"40 \\"flat\\""', 'invoice penalty')
+  assert_equal(literal(strings.issued), '""', 'invoice issued, unset')
+  local item = invoice['mcanouil-invoice-items'][1]
+  assert_equal(literal(item.vat), '"5\\\\5"', 'invoice item vat')
+  assert_equal(item.quantity, nil, 'invoice item quantity, unset')
+  assert_equal(pandoc.utils.stringify(item.description), 'Book', 'invoice item description')
+end
+
 return cases

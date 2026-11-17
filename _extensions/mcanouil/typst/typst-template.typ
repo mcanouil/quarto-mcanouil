@@ -72,16 +72,17 @@ $workshop.typ()$
 // - type: key of mc-types.
 // - layout: layout of the type.
 // - kind: kind of the type, or none.
-// - meta: dictionary of the document: title, subtitle, kicker, date, authors,
-//   affiliations, email, abstract, abstract-title, keywords, lang, region,
+// - meta: dictionary of the document: title, document-title (the PDF title of a
+//   document with no title), subtitle, kicker, date, authors,
+//   affiliations, email, abstract, abstract-title, keywords, lang, region (none when unset),
 //   version, licence, copyright, toc-depth, mode, tokens, fonts, header,
 //   footer, motif-name, and for a workshop session and duration.
 // - body: the content of the document.
 #let mcanouil-document(type, layout, kind, meta, body) = {
   let tokens = meta.tokens
   let fonts = meta.fonts
-  set document(title: meta.at("title", default: ""))
-  set text(lang: meta.lang, region: meta.region, font: fonts.base, fill: tokens.ink)
+  set document(title: meta.at("title", default: meta.at("document-title", default: "")))
+  set text(lang: meta.lang, region: meta.at("region", default: none), font: fonts.base, fill: tokens.ink)
   show heading: set text(font: fonts.headings)
   show raw: set text(font: fonts.monospace, ligatures: false, features: ("calt": 0))
   show link: set text(fill: tokens.link)

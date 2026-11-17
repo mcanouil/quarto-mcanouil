@@ -45,7 +45,8 @@ extensions:
 - In a single document, each level 1 heading is a chapter.
 - Each chapter divider shows the chapter number, the title and one line of introduction.
 - The introduction line is the `description` attribute of the heading, or else the first sentence of the first paragraph.
-- The chapter contents page ("In this chapter") lists the sections to the depth of `chapter-toc-depth`. Each entry is a link.
+- The chapter contents page ("In this chapter") lists the sections to the depth of `chapter-toc-depth`.
+  Each entry is a link.
 - The closing page shows the contact of each author with an email or an ORCID, the licence and copyright, and a colophon.
 
 ```markdown

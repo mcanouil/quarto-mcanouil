@@ -24,7 +24,7 @@ on:
       quarto:
         type: choice
         description: "Quarto version"
-        default: "release"
+        default: "pre-release"
         options:
           - "release"
           - "pre-release"
@@ -41,4 +41,6 @@ jobs:
       id-token: write
     with:
       use-main-as-release: ${{ inputs.use-main-as-release || false }}
-      quarto: ${{ inputs.quarto || 'release' }}
+      # The extension requires Quarto 1.12.1, which is only on the pre-release
+      # channel until Quarto 1.12 is released.
+      quarto: ${{ inputs.quarto || 'pre-release' }}

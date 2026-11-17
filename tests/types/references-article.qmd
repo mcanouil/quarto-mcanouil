@@ -1,0 +1,32 @@
+---
+title: An article with references
+author: Test Author
+bibliography: references.bib
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: article
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In an article, the references section is not numbered and moves after the body, before the appendix.
+        check: bash _checks/types.sh references-last
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+---
+
+# References {.references}
+
+::: {#refs}
+:::
+
+# Extra analyses {.appendix}
+
+The analyses that support the results.
+
+# Introduction
+
+The study followed a cohort of patients [@doe2020].

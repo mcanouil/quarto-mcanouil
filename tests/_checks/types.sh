@@ -11,6 +11,7 @@ set -euo pipefail
 #        types.sh full-flows
 #        types.sh long-title <preset>
 #        types.sh book
+#        types.sh references-last
 #
 # Exits 77 for a format other than Typst.
 #
@@ -43,8 +44,7 @@ compact_headings_inline() {
 
 # Answer the words of page 1 as "xMin yMin xMax yMax word" in points.
 page1_words() {
-	pdftotext -bbox -f 1 -l 1 "${output}" - |
-		sed -nE 's/.*<word xMin="([0-9.]+)" yMin="([0-9.]+)" xMax="([0-9.]+)" yMax="([0-9.]+)">(.*)<\/word>.*/\1 \2 \3 \4 \5/p'
+	pdf_page_words "${output}" 1
 }
 
 # Succeed when the abstract label starts less than 15 mm below the author line.
@@ -295,7 +295,23 @@ book_appendix_numbering() {
 		! pdf_text "${output}" | grep -qE '[0-9A-Z][[:space:]]+References'
 }
 
+# Succeed when the references heading is unnumbered and comes after the body and before the appendix,
+# and the first reference follows it.
+references_last() {
+	local order
+	! pdf_text "${output}" | grep -qE '[0-9A-Z][[:space:]]+References' &&
+		order="$(pdf_text "${output}" | grep -oE '^[[:space:]]*([0-9]+[[:space:]]+)?(Introduction|References|\[1\] J\. Doe|Appendix A)' |
+			sed -E 's/^[[:space:]]+//; s/^[0-9]+[[:space:]]+//' | tr '\n' '|')" &&
+		{
+			printf '# order: %s\n' "${order}"
+			[ "${order}" = 'Introduction|References|[1] J. Doe|Appendix A|' ]
+		}
+}
+
 case "${1:-}" in
+references-last)
+	expect "references-last" "Introduction, then the unnumbered References and the first reference, then Appendix A" references_last
+	;;
 compact)
 	expect "compact-first-page" "the title, the abstract and the first heading on page 1" compact_first_page
 	expect "compact-headings-inline" "two level 1 headings on page 1" compact_headings_inline

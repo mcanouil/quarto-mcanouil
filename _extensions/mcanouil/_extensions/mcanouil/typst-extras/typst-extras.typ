@@ -58,6 +58,7 @@
 }
 
 /// Part of the document the content sits in: `"body"`, `"appendix"` or `"supplementary"`.
+/// Templates read it by its key, `"typst-extras-part"`, so the key must not change.
 #let typst-extras-part = state("typst-extras-part", "body")
 
 /// Section settings, from `typst-extras-config`, which Lua binds in the header.

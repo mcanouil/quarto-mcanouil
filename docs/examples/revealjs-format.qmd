@@ -33,7 +33,8 @@ A deck from an earlier version of the extension shows at a different scale.
 - Title slide: the event as a kicker, the title, a gilded rule, the subtitle, the speakers and the date.
 - Section slide: a level 1 heading gives a slide on the dark ground with a large section number.
 - Content slide: a level 2 heading.
-- Dark slide: add `.dark` to a level 2 heading. The slide uses the dark tokens of the preset.
+- Dark slide: add `.dark` to a level 2 heading.
+  The slide uses the dark tokens of the preset.
 - Closing slide: from the `closing` option, on the dark ground.
 
 ```markdown

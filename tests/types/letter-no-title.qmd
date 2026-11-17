@@ -1,0 +1,34 @@
+---
+lang: en-GB
+date: 2026-11-11
+sender:
+  name: Mickaël Canouil
+  address:
+    - 12 Example Street
+    - Lille
+place: Lille
+reference: 2026-014
+subject: Training proposal
+address:
+  - Company Ltd
+  - 10 Station Road
+  - London
+opening: Dear Sir or Madam,
+closing: Yours faithfully,
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: letter
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A letter with no title takes its subject as the PDF document title, so the PDF/UA-1 render succeeds.
+        check: bash _checks/pdf.sh doc-title "Training proposal"
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+---
+
+{{< include _letter-body.qmd >}}

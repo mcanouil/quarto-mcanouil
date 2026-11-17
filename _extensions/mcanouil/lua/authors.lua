@@ -66,7 +66,8 @@ local function affiliation_line(affiliation)
   return table.concat(parts, ', ')
 end
 
---- @type string Separator that the CRediT terms put in a role, such as `writing – original draft`.
+--- @type string Separator that the CRediT terms put in a role: an en dash (U+2013) between two spaces, as in
+--- "writing", en dash, "original draft".
 local CREDIT_SEPARATOR = ' \u{2013} '
 
 --- Answer a role term for display: the separator of the CRediT terms becomes a comma.

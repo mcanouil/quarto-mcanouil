@@ -4,18 +4,17 @@ subtitle: "What does not work yet, and what to do in the meantime."
 description: "The known limitations of the mcanouil extension 1.0, each with its effect and a workaround."
 ---
 
-## Chapter numbers in types without heading numbers
-
-`crossref.chapters: true` numbers floats per chapter.
-The compact report, memo, workshop, letter and invoice do not number their headings.
-In these types, `crossref.chapters: true` gives "Figure 0.1".
-Do not use `crossref.chapters` with these types until a later typst-extras release corrects this.
-The full report and the article are not affected.
-
 ## Code windows in Typst
 
-In HTML and Reveal.js, code windows have the style of the preset.
-In Typst, code windows keep the look of code-window, because code-window has no theme hook for Typst yet.
+In Typst, the code area inside a code window keeps the background of the syntax highlighting.
+On a dark preset such as `terminal`, this code area stays light.
+In Typst, the frame of a code window is on all four edges.
+
+## Paper size and margins in Typst
+
+Every Typst type uses A4 paper and its own margins.
+Typst ignores the Quarto options `papersize` and `margin`, and gives no warning.
+Letters and invoices use A4 because NF Z 11-001 and DIN 5008 specify it.
 
 ## NF Z 11-001 geometry
 

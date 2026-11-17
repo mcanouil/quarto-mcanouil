@@ -14,8 +14,7 @@ dpi=100
 
 # Answer the words of page 1 as "xMin yMin xMax yMax word" in millimetres.
 page1_words_mm() {
-	pdftotext -bbox -f 1 -l 1 "${output}" - |
-		sed -nE 's/.*<word xMin="([0-9.]+)" yMin="([0-9.]+)" xMax="([0-9.]+)" yMax="([0-9.]+)">(.*)<\/word>.*/\1 \2 \3 \4 \5/p' |
+	pdf_page_words "${output}" 1 |
 		awk '{ printf "%.2f %.2f %.2f %.2f %s\n", $1 * 25.4 / 72, $2 * 25.4 / 72, $3 * 25.4 / 72, $4 * 25.4 / 72, $5 }'
 }
 

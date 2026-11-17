@@ -20,8 +20,10 @@ Logos and the ORCID badge have alternative text, and tables have tagged header c
 Typst stops the render when the document breaks the standard:
 
 - A heading level is skipped, for example a `###` after a `#`.
-- An image has no alt text. Use `fig-alt` or a caption.
-- A formula has no alt text. See the maths alt text of [typst-extras](../reference.qmd#typst-extras).
+- An image has no alt text.
+  Use `fig-alt` or a caption.
+- A formula has no alt text.
+  See the maths alt text of [typst-extras](../reference.qmd#typst-extras).
 
 Quarto checks each PDF with veraPDF when it is installed.
 To install veraPDF, run this command:

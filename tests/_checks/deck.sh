@@ -250,8 +250,8 @@ find_browser() {
 		"/Applications/Brave Browser.app/Contents/MacOS/Brave Browser" \
 		"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
 		"/Applications/Chromium.app/Contents/MacOS/Chromium" \
-		"$(command -v chromium || true)" "$(command -v chromium-browser || true)" \
-		"$(command -v google-chrome || true)" "$(command -v brave-browser || true)"; do
+		"$(command -v google-chrome || true)" "$(command -v chromium || true)" \
+		"$(command -v chromium-browser || true)" "$(command -v brave-browser || true)"; do
 		if [ -n "${candidate}" ] && [ -x "${candidate}" ]; then
 			browser_bin="${candidate}"
 			return 0

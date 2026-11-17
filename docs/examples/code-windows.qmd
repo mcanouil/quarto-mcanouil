@@ -27,8 +27,8 @@ In HTML and Reveal.js, the window has the style of the preset:
 
 : The code window of each preset in HTML and Reveal.js. {.striped .hover tbl-colwidths="[20,80]"}
 
-In Typst, the window keeps the look of code-window.
-See the [known limitations](../limitations.qmd).
+In Typst, the window takes the frame, the title bar, the traffic lights and the corner radius of the preset.
+See the [known limitations](../limitations.qmd) for the code area.
 
 ## Options
 

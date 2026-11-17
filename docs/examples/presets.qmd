@@ -37,7 +37,8 @@ It is an artefact in the PDF tags and `aria-hidden` in HTML, and forced colours 
 ## Light and dark
 
 - HTML follows the light or dark setting of the reader.
-- Reveal.js is light by default. Title, section and closing slides always use the dark ground of the preset.
+- Reveal.js is light by default.
+  Title, section and closing slides always use the dark ground of the preset.
 - Typst is light by default.
 
 Set `brand-mode: dark` for a dark PDF or a dark deck:

@@ -33,7 +33,8 @@ Run it in the foreground.
 
 - veraPDF, for the PDF/UA-1 checks: `quarto install verapdf`.
 - Poppler (`pdftotext`, `pdftoppm`, `pdfinfo`), for the PDF checks.
-- Node.js and a Chromium-based browser, for the HTML and deck checks. The checks look at `CHROME_PATH`, then `QUARTO_CHROMIUM`, then the installed browsers.
+- Node.js and a Chromium-based browser, for the HTML and deck checks.
+  The checks look at `CHROME_PATH`, then `QUARTO_CHROMIUM`, then the installed browsers.
 
 ## Stale Typst files
 
