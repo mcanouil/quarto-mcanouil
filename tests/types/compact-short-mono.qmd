@@ -1,0 +1,17 @@
+---
+title: Short
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: mono
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With no abstract and a one-line title, a long first paragraph stays clear of the shapes of the mono corner motif.
+        check: bash _checks/types.sh compact-short mono
+---
+
+The long first paragraph starts right under a one-line title, with no abstract, so its first lines begin above the bottom of the corner motif. It has to be long enough to run across the whole text width, which means several lines of ordinary text with nothing to break them, so that any line that starts beside the motif would reach into it if the layout did not hold the text back. The long first paragraph carries on a little longer to make sure that the line count is high enough for the check that counts them.

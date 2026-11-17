@@ -1,0 +1,31 @@
+---
+title: Contents under margin content
+format: mcanouil-html
+toc: true
+number-sections: true
+extensions:
+  mcanouil:
+    preset: gold
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: Margin content next to the contents makes Quarto swap the contents for its overlap toggle, which must be a real button whose closed copy and hidden original stay out of the tab order.
+        check: bash _checks/html.sh overlap
+---
+
+## Design
+
+::: {.column-margin}
+A margin note beside the first section sits where the contents is, so Quarto swaps the contents for its toggle.
+:::
+
+The study follows adults for twenty-four weeks.
+
+## Methods
+
+The analysis follows the plan.
+
+## Results
+
+The results are interim.

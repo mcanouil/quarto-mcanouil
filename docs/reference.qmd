@@ -1,143 +1,273 @@
 ---
 title: "Reference"
-subtitle: "The project type, the formats, and what they share."
-description: "The complete mcanouil extension: the project type, the three format families, the shared components, and the RevealJS options."
+subtitle: "Formats, options, classes and embedded tools."
+description: "Every option of the mcanouil extension: the three formats and their defaults, the options under extensions: mcanouil:, the front matter that each document type reads, the classes, and the embedded tools with their versions."
 ---
 
-## The project type
+## Formats
+
+| Format | Output | Document types |
+| --- | --- | --- |
+| `mcanouil-typst` | PDF, through Typst | `report`, `article`, `memo`, `letter`, `invoice`, `workshop` |
+| `mcanouil-html` | One HTML page, or a Quarto book | `report`, `article`, `memo`, `workshop` |
+| `mcanouil-revealjs` | Reveal.js slides | presentation deck, `workshop` |
+
+: The three formats and the document types that each one renders. {.striped .hover tbl-colwidths="[24,30,46]"}
+
+A `letter` or an `invoice` in HTML or Reveal.js stops the render with a message that names the type and `mcanouil-typst`.
+Reveal.js reads `type` only for `workshop`.
+Any other value, or no value, gives a presentation deck.
+
+The extension has no project type.
+For a website, use the [atelier](https://github.com/mcanouil/quarto-atelier) project type.
+
+### Format defaults
+
+Each format sets these Quarto options.
+You can override each one in your own `format:` block.
+
+| Format | Option | Value | Effect |
+| --- | --- | --- | --- |
+| `mcanouil-typst` | `pdf-standard` | `ua-1` | Every PDF is tagged for PDF/UA-1. See [Typst format](examples/typst-format.qmd#accessible-pdf). |
+| `mcanouil-typst` | `date-format` | `long` | Dates show in full, in the order of the document language. |
+| `mcanouil-typst` | `number-sections` | `true` | See [Heading numbers](examples/typst-format.qmd#heading-numbers). |
+| `mcanouil-typst` | `crossref.appendix-delim` | `":"` | Appendix headings read "Appendix A: Title". |
+| `mcanouil-typst` | `font-paths` | `fonts` | Typst uses the fonts that the extension ships. |
+| `mcanouil-html` | `respect-user-color-scheme` | `true` | The page follows the light or dark setting of the reader. |
+| `mcanouil-html` | `title-block-banner` | `true` | The title block is the banner landmark of the page. |
+| `mcanouil-revealjs` | `width`, `height`, `margin` | `1280`, `720`, `0` | Slides are 16:9 and the motif reaches the slide edges. |
+| `mcanouil-revealjs` | `slide-number` | `c/t` | The slide number shows as "n / total". |
+| `mcanouil-revealjs` | `progress` | `true` | A thin gilded progress bar. |
+| `mcanouil-revealjs` | `center-title-slide` | `false` | The title slide content starts at the top. |
+
+: The Quarto options that each format sets. {.striped .hover tbl-colwidths="[20,24,14,42]"}
+
+The heading shift warning of Quarto is off in `mcanouil-typst` (`extensions: offset-headings: quarto-shift-warning: false`).
+A document that starts at `##` still gets the shift, without the warning.
+
+`toc` is off by default.
+In `mcanouil-html`, set `toc: true` to show the contents.
+In `mcanouil-typst`, the full report always has a main contents, and the other types have none.
+
+## Options
+
+All the options of the extension go under `extensions: mcanouil:`, in the front matter or in `_quarto.yml`.
 
 ```yaml
-project:
-  type: mcanouil
+extensions:
+  mcanouil:
+    preset: gold
+    type: report
+    layout: full
 ```
 
-A pre-configured Quarto website: a branded navbar, a footer, and a favicon, with `mcanouil-html` as the default format.
+### Preset and type
 
-It also sets `back-to-top-navigation`, `page-navigation`, `open-graph`, `twitter-card`, and the source and issue repository actions, each of which a site can override.
+| Option | Values | Default | Description |
+| --- | --- | --- | --- |
+| `preset` | `gold`, `mono`, `quarto`, `terminal` | `gold` | Colours, fonts, style and motif for every format. See [Presets](examples/presets.qmd). |
+| `type` | `report`, `article`, `memo`, `letter`, `invoice`, `workshop` | `report` | Document type. |
+| `layout` | `compact`, `full` | `compact` | Layout of a `report`. The other types have one layout. |
+| `kind` | `note`, `minutes`, `agenda`, `brief` | `note` | Kind of a `memo`. |
+| `memo` | map | none | Banner fields of a memo. See [Memo](examples/memo.qmd). |
+| `chapter-toc-depth` | number, 1 or more | `2` | Heading levels under a chapter that the chapter contents list. `1` lists the sections only. |
+| `letter-standard` | `nf`, `din` | from `lang` | Geometry of a letter or an invoice. See [Letter and invoice](examples/letter-invoice.qmd). |
 
-## The formats
+: Options for the preset and the document type. {.striped .hover tbl-colwidths="[20,30,12,38]"}
 
-| Format | Output | Notes |
+An unknown preset, type, layout, kind or standard stops the render.
+The message names the value and lists the values that you can use.
+
+### Header and footer
+
+`header` and `footer` each have three slots: `left`, `centre` and `right`.
+`center` is an alias of `centre`.
+Content in a slot is aligned to the left, centred, or aligned to the right.
+
+```yaml
+extensions:
+  mcanouil:
+    header:
+      left: title
+      right: chapter
+    footer:
+      centre: "Confidential"
+      right: page
+```
+
+A slot holds text, or the name of one of these fields:
+
+| Field | Content |
+| --- | --- |
+| `title` | Document title. |
+| `subtitle` | Document subtitle. |
+| `author` | Author names. With more than two authors, the first name and "et al.". |
+| `date` | Document date. |
+| `version` | The `version` key of the front matter. |
+| `chapter` | Title of the chapter in force at the top of the page (Typst). |
+| `page` | Page number as "n / total", or the slide number in a deck. |
+| `speaker` | The authors and the `event`, joined by a middle dot. |
+| `event` | The `event` option. |
+| `session` | "Session n", from the `session` option. |
+
+: The fields that a header or footer slot can show. {.striped .hover tbl-colwidths="[20,80]"}
+
+An empty string leaves the slot empty.
+A slot that you do not set takes the default of the document type:
+
+| Type | Header (left, centre, right) | Footer (left, centre, right) |
 | --- | --- | --- |
-| `mcanouil-html` | HTML | Professional or academic layouts. |
-| `mcanouil-typst` | PDF, through Typst | Light and dark modes, and four document types: report, invoice, letter, CV. |
-| `mcanouil-revealjs` | Slides | Light and dark modes, section outlines, and a closing slide. |
+| `report` | title, empty, chapter | author, version, page |
+| `article` | title, empty, empty | author, version, page |
+| `memo` | empty, empty, empty | author, version, page |
+| `letter` | empty, empty, empty | empty, empty, page |
+| `invoice` | empty, empty, empty | empty, empty, page |
+| `workshop` | empty, empty, empty | event, session, page |
+| deck | not used | speaker, title, page |
 
-: The three format families. {.striped .hover tbl-colwidths="[26,22,52]"}
+: The default slots of each document type. {.striped .hover tbl-colwidths="[16,42,42]"}
 
-### `mcanouil-html`
+The header is used in Typst only.
+The footer is used in Typst, in the HTML page footer, and in Reveal.js.
+In a deck, only `page` in the right slot shows the slide number.
+With any other value there, the slide number is off and the render gives a warning.
+A Quarto `footer` in a deck replaces the three slots.
+An unknown slot name, or both `centre` and `center` in one part, stops the render.
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `style` | `professional`, `academic` | `professional` | The layout variant. Matched case insensitively. |
-| `title-block-authors` | boolean | `true` | Show the authors, affiliations, and corresponding author. |
-| `title-block-abstract` | boolean | `true` | Show the abstract and the keywords. |
-| `title-block-meta` | boolean | `true` | Show the dates, the DOI, and the categories. |
+### Decks and workshops
 
-: Options under `mcanouil-html`. {.striped .hover tbl-colwidths="[26,20,12,42]"}
+| Option | Type | Description |
+| --- | --- | --- |
+| `event` | text | Event of a deck or a workshop, for example `useR! 2026 · Warwick`. It shows above the title and in the `speaker` and `event` fields. |
+| `speakers` | list of `photo` and `alt` | Speaker photos on the title slide, one entry per author, in the order of the authors. A photo without `alt` gives a warning. |
+| `closing` | `true`, or a map of `title`, `links` and `licence` | Closing slide of a deck. Links show as plain text, so they read in a PDF export too. |
+| `session` | map of `number` and `total` | Session of a workshop. The kicker shows "Session 2 of 7" and exercises are numbered 2.1, 2.2. |
+| `duration` | text | Duration of a workshop session, for example `90 min`, shown beside the date. |
+| `solutions` | `end`, `inline`, `hide` | Place of the solutions in the PDF handout of a workshop. Default `end`. |
 
-### `mcanouil-typst`
+: Options for decks and workshops. {.striped .hover tbl-colwidths="[16,26,58]"}
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `document-type` | `report`, `invoice`, `letter`, `cv` | `report` | The template the document is built from. |
-| `style` | `professional`, `academic` | `professional` | The layout variant. |
-| `brand-mode` | `light`, `dark` | `light` | The brand palette. |
-| `show-corner-brackets` | boolean | `true` | Corner bracket decorations. |
-| `show-margin-decoration` | boolean | `true` | Coloured bars along the page margins. |
-| `show-title-page-background` | boolean | `true` | A geometric background on the title page. |
-| `show-heading-underlines` | boolean | `true` | Gradient underlines below headings. |
-| `show-logo` | boolean | `true` | The logo in the header. |
-| `section-page` | boolean | `true` | A title page before each top-level section. |
-| `section-pagebreak` | boolean | `true` | A page break before each section title page. |
-| `list-of` | boolean | `true` | Lists of figures and tables. |
+See [Reveal.js format](examples/revealjs-format.qmd) and [Workshop](examples/workshop.qmd).
 
-: Options under `mcanouil-typst`. {.striped .hover tbl-colwidths="[28,20,10,42]"}
+## Front matter
 
-### `mcanouil-revealjs`
+The extension also reads these Quarto and Pandoc keys.
 
-`brand-mode` is `light` or `dark`, and is `dark` here rather than the `light` the Typst format uses.
+| Key | Used by | Description |
+| --- | --- | --- |
+| `title`, `subtitle`, `date` | all | Title block. A Typst document needs a `title`, which is also the PDF title. A letter without a `title` uses its `subject`. An invoice without a `title` uses "Invoice" and its number. Any other type without a `title` stops the render. |
+| `author`, `affiliations` | all | Authors, as Quarto normalises them. See [Authors](examples/report-article.qmd#authors). |
+| `abstract`, `keywords` | report, article | Abstract box and keywords. |
+| `kicker` | report, article | Small line above the title. A report shows "Report" when it is not set. |
+| `version` | all | `version` field of the slots. |
+| `license`, `copyright` | report | Licence and copyright on the closing page of a full report. |
+| `brand-mode` | Typst, Reveal.js | `dark` gives a dark PDF or a dark deck. |
+| `lang` | all | Labels and date order. See [Labels and dates](examples/typst-format.qmd#labels-and-dates). |
+| `sender`, `address`, `place`, `reference`, `your-reference`, `subject`, `opening`, `closing`, `signature-image`, `cc`, `encl`, `ps` | letter | Letter fields. |
+| `sender`, `recipient`, `invoice`, `bank` | invoice | Invoice data. |
 
-Everything else a deck exposes is set under `extensions.mcanouil`, below.
+: The front matter keys that the extension reads. {.striped .hover tbl-colwidths="[30,18,52]"}
 
-## Options under `extensions.mcanouil`
+## Classes and attributes
 
-| Option | Default | Applies to | Description |
-| --- | --- | --- | --- |
-| `grid-background` | `false` | HTML, RevealJS | A grid overlay behind the content. |
-| `hide-navbar-title` | `true` | HTML | Hide the navbar brand and title. |
-| `section-outline` | `true` | RevealJS | A subsection outline on section slides. |
-| `date-superscript` | `true` | RevealJS | Ordinal dates as 1st, 2nd, 3rd. |
-| `hide-title-slide-chrome` | `true` | RevealJS | Hide the menu, logo, and footer on the title slide. |
-| `favicon-from-logo` | `true` | RevealJS | A favicon built from the slide logo. |
-| `code-annotation-fragments` | `true` | RevealJS | Step through code annotations as fragments. |
-| `debug-borders` | `false` | RevealJS | Borders on slide regions, for layout work. |
+| Class | Where | Effect |
+| --- | --- | --- |
+| `.references` | level 1 heading | The references section. It is not numbered and moves to the end, before the appendices. |
+| `.appendix` | level 1 heading | An appendix, lettered A, B. It moves to the end of a single document. |
+| `.supplementary` | level 1 heading | A supplementary section, numbered S1, S2. It moves to the end of a single document. |
+| `.objectives`, `.prerequisites`, `.checkpoint` | div, workshop | Labelled workshop blocks. |
+| `.exercise` | div, workshop | Numbered exercise, with optional `duration` and `format` attributes. |
+| `.solution` | div inside `.exercise`, workshop | Solution of the exercise. |
+| `.dark` | slide heading, deck | The slide uses the dark tokens of the preset. |
 
-: Options under `extensions.mcanouil`. {.striped .hover tbl-colwidths="[28,10,16,46]"}
+: The classes that the extension reads. {.striped .hover tbl-colwidths="[24,26,50]"}
 
-::: {.callout-note}
-`grid-background` has three different values depending on where you read it from.
-The option itself defaults to `false`, the formats turn it on, and the project type turns it back off, so a document gets the grid and a website does not unless it asks for one.
+See [Special sections](examples/special-sections.qmd) and [Workshop](examples/workshop.qmd).
+
+## Embedded tools {#embedded-tools}
+
+The extension embeds these tools, each pinned at a release.
+The formats run them in a fixed order.
+
+::: {.callout-important}
+
+Do not list an embedded tool again in your own `filters:`.
+The format already runs it.
+If your project has no copy of the tool, Quarto stops with an error.
+
 :::
 
-### Code windows
+A project can keep its own copy of an embedded tool, for example to work on that tool.
+When the copy is under `_extensions/`, with any owner such as `_extensions/local/veil/`, and you name it in your own `filters:`, the embedded filters of that tool do not run.
+Only your copy runs.
+If you do not name your copy, the embedded filters run as usual.
 
-Set under `extensions.mcanouil.code-window`.
+This applies to filters only.
+The `mcanouil-revealjs` format still loads the embedded Reveal.js plugins of veil and codefrag, and the embedded iconify shortcode stays available.
 
-| Option | Type | Default | Description |
+| Tool | Version | Formats | Default |
 | --- | --- | --- | --- |
-| `enabled` | boolean | `true` | Apply window chrome to code blocks. |
-| `auto-filename` | boolean | `true` | Label each block with a filename derived from its language. |
-| `style` | `default`, `macos`, `windows` | `macos` | The window decoration. An unknown value falls back to `macos` with a warning. |
-| `wrapper` | string | `mcanouil-code-window` | The Typst function the block is wrapped in. |
+| [code-window](https://github.com/mcanouil/quarto-code-window) | 1.9.0 | all | on |
+| [div-reuse](https://github.com/mcanouil/quarto-div-reuse) | 1.5.1 | all | on |
+| [gitlink](https://github.com/mcanouil/quarto-gitlink) | 1.14.0 | all | on, off in letters and invoices |
+| [highlight-text](https://github.com/mcanouil/quarto-highlight-text) | 3.0.0 | all | on |
+| [iconify](https://github.com/mcanouil/quarto-iconify) | 4.2.2 | all | on |
+| [offset-headings](https://github.com/mcanouil/quarto-offset-headings) | 0.5.1 | all | on |
+| [prism](https://github.com/mcanouil/quarto-prism) | 0.6.0 | all | on |
+| [toc-depth](https://github.com/mcanouil/quarto-toc-depth) | 0.7.1 | all | on |
+| [typst-extras](https://github.com/mcanouil/quarto-typst-extras) | 0.1.2 | Typst | on |
+| [typst-render](https://github.com/mcanouil/quarto-typst-render) | 0.22.7 | all | on |
+| [veil](https://github.com/mcanouil/quarto-veil) | 0.4.0 | all | on |
+| [mobile-toc](https://github.com/mcanouil/quarto-mobile-toc) | 0.2.5 | HTML | on |
+| [revealjs-cascade](https://github.com/mcanouil/quarto-revealjs-cascade) | 2.1.1 | Reveal.js | on |
+| [revealjs-codefrag](https://github.com/mcanouil/quarto-revealjs-codefrag) | 1.2.1 | Reveal.js | on |
+| [revealjs-tabset](https://github.com/mcanouil/quarto-revealjs-tabset) | 1.5.0 | Reveal.js | on |
+| [preview-colour](https://github.com/mcanouil/quarto-preview-colour) | 2.1.1 | all | opt-in |
+| [collapse-output](https://github.com/mcanouil/quarto-collapse-output) | 1.6.1 | HTML, Reveal.js | opt-in |
+| [remember](https://github.com/mcanouil/quarto-remember) | 2.1.0 | HTML, Reveal.js | opt-in |
 
-: Code window options. {.striped .hover tbl-colwidths="[24,22,18,36]"}
+: The embedded tools, their versions, the formats that run them, and whether they are on by default. {.striped .hover tbl-colwidths="[30,12,26,32]"}
 
-A single block overrides the project with `code-window-enabled`, `code-window-no-auto-filename`, and `code-window-style` as code block attributes.
+A tool that is on does nothing until you use its syntax, apart from code-window, which decorates every code block.
+Each tool reads its own options under `extensions: <tool>:`.
+For example, `extensions: gitlink: enabled: true` turns gitlink back on in a letter.
 
-## Shortcodes
+To turn on an opt-in tool, set its option:
 
-| Shortcode | Attributes |
-| --- | --- |
-| `{{{< divider >}}}` | `style` (`solid`, `dashed`, `dotted`, `ornamental`, `gradient`; `solid`), `label`, `thickness` (`1pt`), `width` (`50%`). |
-| `{{{< value-box >}}}` | `value` (`0`), `unit`, `label`, `icon`, `colour` (`info`). |
-| `{{{< progress >}}}` | `value` (`0`), `label`, `colour` (`info`), `show-value` (`true`), `height`. |
-| `{{{< badge >}}}` | `text`, `icon`, `colour` (`neutral`). |
+```yaml
+extensions:
+  preview-colour:
+    code: true
+  collapse-output:
+    collapse-all-outputs: true
+  remember:
+    enabled: true
+```
 
-: The shortcodes, with defaults in brackets. {.striped .hover tbl-colwidths="[24,76]"}
+collapse-output also works per cell, with the `output-fold` attribute.
 
-`colour` accepts a theme name or a colour value, and `color` is accepted as a spelling of it.
+### typst-extras {#typst-extras}
 
-::: {.callout-note}
-`{{{< badge >}}}` renders in HTML and RevealJS only.
-In Typst it produces nothing, and a badge is written as `[text]{.badge}` instead.
-:::
+typst-extras adds these features to `mcanouil-typst`, under `extensions: typst-extras:`:
 
-## Divs
+- `list-of`: lists of figures, tables and listings at the start of the body.
+- `watermark`: a text or an image on every page, for example `watermark: DRAFT`.
+- `sections`: `appendix-delimiter` (default `.`, as in Figure A.1) and `supplementary-prefix` (default `S`, as in Figure S1).
+- Numbering of `.appendix` and `.supplementary` sections, with their floats, equations and cross-references.
+- Chapter numbering of floats with Quarto's `crossref.chapters: true`.
+- Alt text for maths: an `alt` attribute on a span or a div that holds one formula.
 
-| Class | Attributes |
-| --- | --- |
-| `.panel` | `title`, `icon`, `style` (one of ten themes; `subtle`). |
-| `.executive-summary` | `title` (`Executive Summary`), `show-corner-brackets` (`true`). |
-| `.card-grid` | `columns` (`3`). |
-| `.card` | `title`, `style` (`subtle`, `outlined`, `filled`; `subtle`), `colour`. |
-| `.card-footer` | The footer of a card. |
-| `.highlight` | A content emphasis block. |
-| `.badge` | `colour` (`neutral`), `icon`. The Typst spelling of the badge shortcode. |
-| `.references`, `.appendix`, `.supplementary` | The special sections. |
+```yaml
+extensions:
+  typst-extras:
+    list-of: [fig, tbl]
+    watermark: DRAFT
+    sections:
+      supplementary-prefix: "S"
+```
 
-: The divs and spans the formats style. {.striped .hover tbl-colwidths="[28,72]"}
+```markdown
+[$E = mc^2$]{alt="E equals m c squared"}
+```
 
-## What the formats share
-
-- **Brand theming**, through `brand.yml`: colours, typography, and logos, consistent across all three.
-- **Components**: the shortcodes and divs above, rendered natively per format rather than as HTML passed through.
-- **Code windows**: window decoration on code blocks, with per-block overrides.
-- **Special sections**: appendices and supplementary sections that relocate themselves and number separately, in Typst.
-- **Accessibility**: alt text on maths, a palette whose semantic colours are chosen to meet WCAG AA at 4.5:1, and Typst show rules written to keep the tag structure PDF/UA-1 expects.
-
-## Limitations
-
-- The formats are opinionated by design: they are one person's brand rather than a neutral starting point.
-- Typst-only features, the special sections among them, have no HTML equivalent.
-- The palette is chosen against the WCAG AA threshold; nothing measures the contrast of a colour you supply yourself.
+See [Special sections](examples/special-sections.qmd) and the [known limitations](limitations.qmd).

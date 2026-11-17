@@ -1,0 +1,7 @@
+# Introduction {#sec-intro}
+
+The first section.
+
+# Discussion
+
+See @sec-intro for the context.

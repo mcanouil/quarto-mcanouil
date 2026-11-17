@@ -1,0 +1,16 @@
+---
+title: Document in a subdirectory
+author: Test Author
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A document in a subdirectory of a project finds the fonts and the motif of the extension.
+        check: bash _checks/pdf.sh subdir
+    mcanouil-typst:
+---
+
+A paragraph.

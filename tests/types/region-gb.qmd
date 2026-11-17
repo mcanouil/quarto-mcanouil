@@ -1,0 +1,19 @@
+---
+title: A report
+lang: en-GB
+date: 2026-11-11
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A document with lang en-GB gives Typst the region GB, and the long date takes the British order.
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+      ensureTypstFileRegexMatches:
+        - ['region: "GB"', 'date: \[#\[\]11 November 2026\]']
+---
+
+A paragraph.

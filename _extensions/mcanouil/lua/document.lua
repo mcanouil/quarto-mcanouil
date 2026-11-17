@@ -1,0 +1,642 @@
+--- @module "document"
+--- @license MIT
+--- @copyright 2026 Mickaël Canouil
+--- @author Mickaël Canouil
+--- @brief Document type and page furniture
+--- @description Reads `extensions.mcanouil.type`, `layout` and `kind`, stops the
+--- render for a type that the format cannot render, and delivers the choice to
+--- Typst. Reads `extensions.mcanouil.header` and `extensions.mcanouil.footer`,
+--- fills the slots the user leaves out from the defaults of the document type,
+--- and delivers the resolved content of each slot to Typst.
+
+local fail = require('lib.fail')
+local labels = require('lib.labels')
+
+local M = {}
+
+--- @type string[] Slot names, in output order.
+M.SLOTS = { 'left', 'centre', 'right' }
+
+--- @type table<string, boolean> Slot names, as a set.
+local SLOT_NAMES = { left = true, centre = true, right = true }
+
+--- @type string[] Furniture parts.
+M.PARTS = { 'header', 'footer' }
+
+--- @type table<string, string> Other spellings of a slot name.
+local ALIASES = { center = 'centre' }
+
+--- @type string Document type used when `extensions.mcanouil.type` is not set.
+M.DEFAULT_TYPE = 'report'
+
+--- @type table<string, string[]> The document types that Typst renders, with the layouts of each.
+M.TYPES = {
+  report = { 'compact', 'full' },
+  article = { 'standard' },
+  memo = { 'standard' },
+  letter = { 'standard' },
+  invoice = { 'standard' },
+  workshop = { 'standard' },
+}
+
+--- @type table<string, string[]> The kinds of the types that vary by kind, the default kind first.
+M.KINDS = {
+  memo = { 'note', 'minutes', 'agenda', 'brief' },
+}
+
+--- @type table<string, string[]> The banner fields of each memo kind, in order. A key names the
+--- metadata `extensions.mcanouil.memo.<key>` and the label `mcanouil-memo-<key>`.
+M.MEMO_FIELDS = {
+  note = { 'to', 'from', 'date' },
+  minutes = { 'date-time', 'present', 'absent' },
+  agenda = { 'date-time', 'place', 'participants' },
+  brief = { 'date', 'audience', 'purpose' },
+}
+
+--- @type table<string, table<string, string>> Margin note columns of the types that set one, as the
+--- `margin-geometry` metadata of Quarto: the distance to the page edge, the width and the separation
+--- from the text, for the inner (left) and outer (right) margin.
+M.MARGIN_GEOMETRY = {
+  article = {
+    inner = { far = '12mm', width = '0mm', separation = '8mm' },
+    outer = { far = '8mm', width = '42mm', separation = '8mm' },
+    clearance = '12pt',
+  },
+}
+
+--- @type table<string, table<string, string>> Page margin above and below the text of the types that set a margin note column.
+M.MARGIN_VERTICAL = { article = { top = '25mm', bottom = '25mm' } }
+
+--- @type string[] Document types that only `mcanouil-typst` renders.
+M.PDF_ONLY = { 'letter', 'invoice' }
+
+--- @type string The only format that renders a PDF-only type.
+local PDF_FORMAT = 'mcanouil-typst'
+
+--- @type table<string, string> Format name of each Quarto output format.
+local FORMAT_NAMES = { typst = 'mcanouil-typst', revealjs = 'mcanouil-revealjs', html = 'mcanouil-html' }
+
+--- @type table<string, table> Default slots of each document type, one row
+--- per type. A value is a field name, or `''` for an empty slot.
+M.DEFAULTS = {
+  report = {
+    header = { left = 'title', centre = '', right = 'chapter' },
+    footer = { left = 'author', centre = 'version', right = 'page' },
+  },
+  article = {
+    header = { left = 'title', centre = '', right = '' },
+    footer = { left = 'author', centre = 'version', right = 'page' },
+  },
+  deck = {
+    header = { left = '', centre = '', right = '' },
+    footer = { left = 'speaker', centre = 'title', right = 'page' },
+  },
+  memo = {
+    header = { left = '', centre = '', right = '' },
+    footer = { left = 'author', centre = 'version', right = 'page' },
+  },
+  letter = {
+    header = { left = '', centre = '', right = '' },
+    footer = { left = '', centre = '', right = 'page' },
+  },
+  invoice = {
+    header = { left = '', centre = '', right = '' },
+    footer = { left = '', centre = '', right = 'page' },
+  },
+  workshop = {
+    header = { left = '', centre = '', right = '' },
+    footer = { left = 'event', centre = 'session', right = 'page' },
+  },
+}
+
+--- @type table<string, string|false> Fields a slot can name. A string is the
+--- Typst call that renders the field; `false` means the value comes from the
+--- metadata key of the same name, except `author`; `speaker`: the authors
+--- and `extensions.mcanouil.event`, joined by a middle dot; `event`:
+--- `extensions.mcanouil.event`; and `session`: the session label and
+--- `extensions.mcanouil.session.number`, for example "Session 2".
+M.FIELDS = {
+  title = false,
+  subtitle = false,
+  author = false,
+  date = false,
+  version = false,
+  chapter = '#chapter-title()',
+  page = '#page-number()',
+  speaker = false,
+  event = false,
+  session = false,
+}
+
+--- Read a slot value from the metadata.
+--- @param value any Metadata value, or a field name from the defaults
+--- @return table Slot: `kind` is `field`, `text` or `empty`, and `value` the field name or the inlines
+local function read_slot(value)
+  local text = type(value) == 'string' and value or pandoc.utils.stringify(value)
+  if text == '' then
+    return { kind = 'empty' }
+  end
+  if M.FIELDS[text] ~= nil then
+    return { kind = 'field', value = text }
+  end
+  local inlines = pandoc.utils.type(value) == 'Inlines' and value or pandoc.Inlines(value)
+  return { kind = 'text', value = inlines }
+end
+
+--- Read the user slots of one part, with the `center` alias.
+--- @param part string `header` or `footer`
+--- @param options table|nil User value of `extensions.mcanouil.<part>`
+--- @return table<string, any> Metadata value of each slot the user sets
+local function user_slots(part, options)
+  local slots = {}
+  if options == nil then
+    return slots
+  end
+  for key, value in pairs(options) do
+    local slot = ALIASES[key] or key
+    if not SLOT_NAMES[slot] then
+      fail.raise(string.format(
+        'mcanouil: unknown slot "%s.%s" in extensions.mcanouil; use left, centre (or center) and right.',
+        part, key
+      ))
+    end
+    if slots[slot] ~= nil then
+      fail.raise(string.format(
+        'mcanouil: both "%s.centre" and "%s.center" are set in extensions.mcanouil; keep one.',
+        part, part
+      ))
+    end
+    slots[slot] = value
+  end
+  return slots
+end
+
+--- Answer the header and footer slots of a document: the user value of each
+--- slot, or the default of the document type.
+--- @param meta table Document metadata
+--- @param doc_type string|nil Document type; nil reads `extensions.mcanouil.type`
+--- @return table `header` and `footer`, each with `left`, `centre` and `right` slots
+function M.furniture(meta, doc_type)
+  local options = meta.extensions and meta.extensions.mcanouil or {}
+  doc_type = doc_type or (options.type and pandoc.utils.stringify(options.type)) or M.DEFAULT_TYPE
+  local defaults = M.DEFAULTS[doc_type] or M.DEFAULTS[M.DEFAULT_TYPE]
+  local furniture = {}
+  for _, part in ipairs(M.PARTS) do
+    local user = user_slots(part, options[part])
+    furniture[part] = {}
+    for _, slot in ipairs(M.SLOTS) do
+      local value = user[slot]
+      if value == nil then
+        value = defaults[part][slot]
+      end
+      furniture[part][slot] = read_slot(value)
+    end
+  end
+  return furniture
+end
+
+--- Answer the display name of one author entry.
+--- @param entry any Author metadata: inlines, or a map with `name`
+--- @return string|any Name inlines, or nil
+local function author_name(entry)
+  if pandoc.utils.type(entry) == 'table' and entry.name ~= nil then
+    local name = entry.name
+    if pandoc.utils.type(name) == 'table' and name.literal ~= nil then
+      return name.literal
+    end
+    return name
+  end
+  return entry
+end
+
+--- @type integer Most authors that a slot names; with more, it names the first one and "et al.".
+M.MAX_SLOT_AUTHORS = 2
+
+--- Answer the author names of a document, joined by commas. With more than
+--- `M.MAX_SLOT_AUTHORS` authors, answer the first name and the "et al." label,
+--- so the slot stays on one line.
+--- @param meta table Document metadata
+--- @param et_al string|nil Label that follows the first name; nil reads it in the document language
+--- @return pandoc.Inlines Names
+local function authors(meta, et_al)
+  local value = meta.author
+  if value == nil then
+    return pandoc.Inlines({})
+  end
+  local entries = pandoc.utils.type(value) == 'List' and value or { value }
+  local names = {}
+  for _, entry in ipairs(entries) do
+    local name = author_name(entry)
+    if name ~= nil and pandoc.utils.stringify(name) ~= '' then
+      names[#names + 1] = pandoc.Inlines(name)
+    end
+  end
+  local inlines = pandoc.Inlines({})
+  if #names > M.MAX_SLOT_AUTHORS then
+    inlines:extend(names[1])
+    inlines:extend({ pandoc.Space(), pandoc.Str(et_al or labels.get('mcanouil-et-al')) })
+    return inlines
+  end
+  for index, name in ipairs(names) do
+    if index > 1 then
+      inlines:extend({ pandoc.Str(','), pandoc.Space() })
+    end
+    inlines:extend(name)
+  end
+  return inlines
+end
+
+--- Answer the speaker and the event, joined by a middle dot.
+--- @param names pandoc.Inlines Author names
+--- @param event any|nil Event, as metadata inlines or text
+--- @return pandoc.Inlines Content of the slot
+function M.speaker_event(names, event)
+  local inlines = pandoc.Inlines(names)
+  if event ~= nil and pandoc.utils.stringify(event) ~= '' then
+    if #inlines > 0 then
+      inlines:extend({ pandoc.Space(), pandoc.Str('·'), pandoc.Space() })
+    end
+    inlines:extend(pandoc.Inlines(event))
+  end
+  return inlines
+end
+
+--- Answer the number of the session of a workshop, `extensions.mcanouil.session.number`.
+--- @param meta table Document metadata
+--- @return string|nil Number, or nil when it is not set
+function M.session_number(meta)
+  local options = meta.extensions and meta.extensions.mcanouil or {}
+  local session = options.session
+  if type(session) ~= 'table' or session.number == nil then
+    return nil
+  end
+  local number = pandoc.utils.stringify(session.number)
+  return number ~= '' and number or nil
+end
+
+--- Answer the content of a slot. A field with no value gives empty inlines.
+--- @param slot table Slot from `M.furniture`
+--- @param meta table Document metadata
+--- @param et_al string|nil Label that follows the first of many authors; nil reads it in the document language
+--- @return pandoc.Inlines Content
+function M.resolve_slot(slot, meta, et_al)
+  if slot.kind == 'empty' then
+    return pandoc.Inlines({})
+  end
+  if slot.kind == 'text' then
+    return slot.value
+  end
+  local call = M.FIELDS[slot.value]
+  if call then
+    return pandoc.Inlines({ pandoc.RawInline('typst', call) })
+  end
+  if slot.value == 'author' then
+    return authors(meta, et_al)
+  end
+  local options = meta.extensions and meta.extensions.mcanouil or {}
+  if slot.value == 'speaker' then
+    return M.speaker_event(authors(meta, et_al), options.event)
+  end
+  if slot.value == 'event' then
+    return options.event ~= nil and pandoc.Inlines(options.event) or pandoc.Inlines({})
+  end
+  if slot.value == 'session' then
+    local number = M.session_number(meta)
+    return number and pandoc.Inlines(labels.get('mcanouil-session') .. ' ' .. number) or pandoc.Inlines({})
+  end
+  local value = meta[slot.value]
+  if value == nil then
+    return pandoc.Inlines({})
+  end
+  return pandoc.Inlines(value)
+end
+
+--- Read a string option of the extension.
+--- @param options table `extensions.mcanouil`
+--- @param key string Option name
+--- @return string|nil Value, or nil when the option is not set
+local function option(options, key)
+  local value = options[key]
+  if value == nil then
+    return nil
+  end
+  local text = pandoc.utils.stringify(value)
+  return text ~= '' and text or nil
+end
+
+--- @param list string[]
+--- @param value string
+--- @return boolean
+local function contains(list, value)
+  for _, item in ipairs(list) do
+    if item == value then
+      return true
+    end
+  end
+  return false
+end
+
+--- @param map table<string, any>
+--- @return string[] Sorted keys
+local function sorted_keys(map)
+  local keys = {}
+  for key in pairs(map) do
+    keys[#keys + 1] = key
+  end
+  table.sort(keys)
+  return keys
+end
+
+--- Answer the document type, layout and kind of a document for a format.
+--- Quarto replaces the global `error` with a logger that returns, so a failure
+--- is returned and the caller stops the render.
+--- @param meta table Document metadata
+--- @param format string `mcanouil-typst`, `mcanouil-html` or `mcanouil-revealjs`
+--- @return table|nil `type`, `layout` and `kind`; `layout` and `kind` are nil when unset or unused
+--- @return string|nil Message, when the format cannot render the type or the type or layout is not known
+function M.resolve(meta, format)
+  local options = meta.extensions and meta.extensions.mcanouil or {}
+  local doc_type = option(options, 'type')
+  if doc_type and format ~= PDF_FORMAT and contains(M.PDF_ONLY, doc_type) then
+    return nil, string.format('mcanouil: type "%s" supports %s only, not %s.', doc_type, PDF_FORMAT, format)
+  end
+  if format == 'mcanouil-revealjs' then
+    return { type = doc_type == 'workshop' and 'workshop' or 'deck' }
+  end
+  doc_type = doc_type or M.DEFAULT_TYPE
+  local layouts = M.TYPES[doc_type]
+  if not layouts then
+    return nil, string.format('mcanouil: unknown type "%s"; use %s.', doc_type, table.concat(sorted_keys(M.TYPES), ', '))
+  end
+  local layout = option(options, 'layout') or layouts[1]
+  if not contains(layouts, layout) then
+    return nil, string.format(
+      'mcanouil: unknown layout "%s" for type "%s"; use %s.', layout, doc_type, table.concat(layouts, ', ')
+    )
+  end
+  local kind = option(options, 'kind')
+  local kinds = M.KINDS[doc_type]
+  if kinds then
+    kind = kind or kinds[1]
+    if not contains(kinds, kind) then
+      local sorted = { table.unpack(kinds) }
+      table.sort(sorted)
+      return nil, string.format(
+        'mcanouil: unknown kind "%s" for type "%s"; use %s.', kind, doc_type, table.concat(sorted, ', ')
+      )
+    end
+  end
+  return { type = doc_type, layout = layout, kind = kind }
+end
+
+--- Answer the value of a memo banner field, in the document metadata.
+--- @param meta table Document metadata
+--- @param key string Field key
+--- @return any|nil Value, or nil when the field is not set or is empty
+local function memo_value(meta, key)
+  local options = meta.extensions and meta.extensions.mcanouil or {}
+  local memo = options.memo or {}
+  local sources = {}
+  local function add(value)
+    if value ~= nil then
+      sources[#sources + 1] = value
+    end
+  end
+  add(memo[key])
+  if key == 'date-time' then
+    add(memo.date)
+  end
+  if key == 'date' or key == 'date-time' then
+    add(meta.date)
+  end
+  for _, value in ipairs(sources) do
+    if pandoc.utils.stringify(value) ~= '' then
+      return value
+    end
+  end
+  return nil
+end
+
+--- Answer the banner fields of a memo that have a value, in the order of the kind.
+--- A field with no value is left out, so the banner has no empty row.
+--- @param meta table Document metadata
+--- @param kind string Memo kind
+--- @return table[] Fields, each with `key` and `value` (inlines)
+function M.memo_fields(meta, kind)
+  local fields = {}
+  for _, key in ipairs(M.MEMO_FIELDS[kind] or {}) do
+    local value = memo_value(meta, key)
+    if value ~= nil then
+      local inlines = pandoc.utils.type(value) == 'Inlines' and value or pandoc.Inlines(pandoc.utils.stringify(value))
+      fields[#fields + 1] = { key = key, value = inlines }
+    end
+  end
+  return fields
+end
+
+--- @type string[] Letter standards: DIN 5008 form B and NF Z 11-001.
+M.LETTER_STANDARDS = { 'din', 'nf' }
+
+--- @type table<string, string> Letter standard that each document language selects. Other languages select `nf`.
+M.LETTER_STANDARD_BY_LANGUAGE = { de = 'din', fr = 'nf' }
+
+--- @type string Letter standard of the languages that M.LETTER_STANDARD_BY_LANGUAGE does not list.
+M.LETTER_STANDARD_DEFAULT = 'nf'
+
+--- Answer the standard of a letter or an invoice: `extensions.mcanouil.letter-standard`, else the one of the document
+--- language (`fr` gives `nf`, `de` gives `din`), else `nf`.
+--- @param meta table Document metadata
+--- @return string|nil Standard, `din` or `nf`
+--- @return string|nil Message, when the option names an unknown standard
+function M.letter_standard(meta)
+  local options = meta.extensions and meta.extensions.mcanouil or {}
+  local chosen = option(options, 'letter-standard')
+  if chosen then
+    if not contains(M.LETTER_STANDARDS, chosen) then
+      return nil, string.format(
+        'mcanouil: unknown letter-standard "%s"; use %s.', chosen, table.concat(M.LETTER_STANDARDS, ', ')
+      )
+    end
+    return chosen
+  end
+  local lang = meta.lang and pandoc.utils.stringify(meta.lang):lower():match('^%a+') or ''
+  return M.LETTER_STANDARD_BY_LANGUAGE[lang] or M.LETTER_STANDARD_DEFAULT
+end
+
+--- Set the margin note column of a document type that has one, so Quarto sets up the margin
+--- layout whether or not the document has a margin note.
+--- @param meta table Document metadata
+--- @param doc_type string Document type
+local function deliver_margin(meta, doc_type)
+  local geometry = M.MARGIN_GEOMETRY[doc_type]
+  if geometry == nil then
+    return
+  end
+  meta['margin-geometry'] = geometry
+  meta.margin = meta.margin or M.MARGIN_VERTICAL[doc_type]
+end
+
+--- @type string[] Fields of `invoice` that Typst reads as strings.
+M.INVOICE_STRINGS = { 'issued', 'due', 'fee', 'penalty', 'currency' }
+
+--- @type string[] Fields of an invoice item that Typst reads as strings.
+M.ITEM_STRINGS = { 'quantity', 'unit-price', 'vat' }
+
+--- Answer a metadata value as a Typst string literal, with the text of raw inlines kept: Quarto passes paths to
+--- Typst as raw Typst inlines.
+--- @param value any Metadata value
+--- @return pandoc.MetaInlines|nil Literal, or nil when the value is unset
+function M.typst_literal(value)
+  if value == nil then
+    return nil
+  end
+  if pandoc.utils.type(value) == 'Inlines' then
+    value = value:walk({ RawInline = function(raw) return pandoc.Str(raw.text) end })
+  end
+  return pandoc.MetaInlines({ pandoc.RawInline('typst', labels.typst_string(pandoc.utils.stringify(value))) })
+end
+
+--- Deliver the metadata that the letter and invoice templates read as strings, as escaped Typst string literals,
+--- so a double quote or a backslash in a value cannot break the Typst source: `mcanouil-letter-strings`
+--- (`signature-image`), `mcanouil-invoice-strings` (`email` of the sender and the `M.INVOICE_STRINGS` of
+--- `invoice`, empty when unset, so the invoice template stops on a missing date with its own message) and
+--- `mcanouil-invoice-items` (each item, with its `M.ITEM_STRINGS` as literals).
+--- @param meta table Document metadata
+--- @param doc_type string `letter` or `invoice`
+function M.deliver_strings(meta, doc_type)
+  if doc_type == 'letter' then
+    meta['mcanouil-letter-strings'] = pandoc.MetaMap({ ['signature-image'] = M.typst_literal(meta['signature-image']) })
+    return
+  end
+  local invoice = type(meta.invoice) == 'table' and meta.invoice or {}
+  local sender = type(meta.sender) == 'table' and meta.sender or {}
+  local strings = { email = M.typst_literal(sender.email) }
+  for _, key in ipairs(M.INVOICE_STRINGS) do
+    strings[key] = M.typst_literal(invoice[key] or '')
+  end
+  meta['mcanouil-invoice-strings'] = pandoc.MetaMap(strings)
+  local items = pandoc.List()
+  for _, item in ipairs(type(invoice.items) == 'table' and invoice.items or {}) do
+    local delivered = { description = item.description, details = item.details }
+    for _, key in ipairs(M.ITEM_STRINGS) do
+      delivered[key] = M.typst_literal(item[key])
+    end
+    items:insert(pandoc.MetaMap(delivered))
+  end
+  meta['mcanouil-invoice-items'] = pandoc.MetaList(items)
+end
+
+--- Turn the gitlink filter off for a document, so that a reference such as `abcd1234` in the metadata of a
+--- letter or an invoice prints as written instead of becoming a commit badge. A setting of the author stays.
+--- @param meta table Document metadata
+local function disable_gitlink(meta)
+  if type(meta.extensions) ~= 'table' then
+    meta.extensions = pandoc.MetaMap({})
+  end
+  local gitlink = meta.extensions.gitlink
+  if gitlink == nil then
+    meta.extensions.gitlink = pandoc.MetaMap({ enabled = false })
+  elseif type(gitlink) == 'table' and gitlink.enabled == nil then
+    gitlink.enabled = false
+  end
+end
+
+--- @type string Message when a document that needs a title has none.
+M.NO_TITLE_MESSAGE = 'mcanouil: the document has no title, and a PDF/UA-1 document needs one; set title: in the front matter.'
+
+--- Answer the text of a metadata value, or nil when it is unset or empty.
+--- @param value any Metadata value
+--- @return string|nil Text
+local function text_of(value)
+  if value == nil then
+    return nil
+  end
+  local text = pandoc.utils.stringify(value)
+  return text ~= '' and text or nil
+end
+
+--- Answer the title of the PDF of a document that has no `title`: the subject of a letter, the invoice label and
+--- number of an invoice. Any other type has no fallback.
+--- @param meta table Document metadata
+--- @param doc_type string Document type
+--- @return string|nil Title
+function M.fallback_title(meta, doc_type)
+  if doc_type == 'letter' then
+    return text_of(meta.subject)
+  end
+  if doc_type == 'invoice' then
+    local label = labels.get('mcanouil-invoice-title')
+    local number = type(meta.invoice) == 'table' and text_of(meta.invoice.number)
+    return number and (label .. ' ' .. number) or label
+  end
+  return nil
+end
+
+--- Deliver the title of the PDF as `mcanouil-document-title`, a Typst string, when the document has no `title`.
+--- Stops the render when the type has no fallback: the PDF needs a title, and PDF/UA-1 (the format default) needs one too.
+--- @param meta table Document metadata
+--- @param doc_type string Document type
+local function deliver_document_title(meta, doc_type)
+  if text_of(meta.title) then
+    return
+  end
+  local title = M.fallback_title(meta, doc_type)
+  if title then
+    meta['mcanouil-document-title'] = pandoc.MetaInlines({ pandoc.RawInline('typst', labels.typst_string(title)) })
+  else
+    fail.stop(M.NO_TITLE_MESSAGE)
+  end
+end
+
+--- Deliver the type and the resolved slots to Typst as `mcanouil-type`,
+--- `mcanouil-layout`, `mcanouil-kind`, `mcanouil-header` and `mcanouil-footer`.
+--- Stops the render, with a message, when the type cannot be rendered.
+--- @param meta table Document metadata
+--- @return table Metadata
+local function deliver(meta)
+  local format = quarto.doc.is_format('typst') and FORMAT_NAMES.typst
+    or quarto.doc.is_format('revealjs') and FORMAT_NAMES.revealjs
+    or FORMAT_NAMES.html
+  local resolved, message = M.resolve(meta, format)
+  if not resolved then
+    fail.stop(message)
+  end
+  if format ~= FORMAT_NAMES.typst then
+    return meta
+  end
+  meta['mcanouil-type'] = resolved.type
+  meta['mcanouil-layout'] = resolved.layout
+  meta['mcanouil-kind'] = resolved.kind
+  deliver_margin(meta, resolved.type)
+  deliver_document_title(meta, resolved.type)
+  if resolved.type == 'memo' then
+    local fields = pandoc.List()
+    for _, field in ipairs(M.memo_fields(meta, resolved.kind)) do
+      fields:insert({ key = pandoc.MetaString(field.key), value = pandoc.MetaInlines(field.value) })
+    end
+    meta['mcanouil-memo-fields'] = pandoc.MetaList(fields)
+  end
+  if resolved.type == 'letter' or resolved.type == 'invoice' then
+    local standard, standard_message = M.letter_standard(meta)
+    if not standard then
+      fail.stop(standard_message)
+    end
+    meta['mcanouil-' .. resolved.type .. '-standard'] = standard
+    M.deliver_strings(meta, resolved.type)
+    disable_gitlink(meta)
+  end
+  local furniture = M.furniture(meta)
+  for _, part in ipairs(M.PARTS) do
+    local delivered = {}
+    for _, slot in ipairs(M.SLOTS) do
+      delivered[slot] = pandoc.MetaInlines(M.resolve_slot(furniture[part][slot], meta))
+    end
+    meta['mcanouil-' .. part] = delivered
+  end
+  return meta
+end
+
+--- @type table Filter step of the entry filter.
+M.filter = { Meta = fail.guard(deliver) }
+
+return M

@@ -1,0 +1,165 @@
+---
+title: "Letter and invoice"
+subtitle: "Two PDF types with an address window and fold marks."
+description: "The letter and invoice types of the mcanouil extension: their fields, the NF Z 11-001 and DIN 5008 standards, the languages, and the page furniture."
+---
+
+The `letter` and `invoice` types render in `mcanouil-typst` only.
+In another format, the render stops with a message that names the type and `mcanouil-typst`.
+
+## Letter
+
+The field names are those of [quarto-letter](https://github.com/mcanouil/quarto-letter), so a quarto-letter document needs no changes.
+
+```yaml
+title: "Training proposal"
+lang: en-GB
+date: 2026-11-11
+sender:
+  name: Mickaël Canouil
+  address:
+    - 12 Example Street
+    - Lille
+  email: mickael@example.org
+place: Lille
+reference: "2026-014"
+your-reference: "AB-12"
+subject: "Training proposal"
+address:
+  - Company Ltd
+  - 10 Station Road
+  - London
+opening: "Dear Sir or Madam,"
+closing: "Yours faithfully,"
+signature-image: signature.svg
+cc:
+  - Alex Copy
+encl:
+  - Programme
+ps: "Remember the date."
+format: mcanouil-typst
+extensions:
+  mcanouil:
+    type: letter
+```
+
+| Field | Content |
+| --- | --- |
+| `sender` | `name`, `address` (list of lines), `email`, `phone`. If it is not set, the letter uses the name of the first author. |
+| `address` | Recipient, as a list of lines, in the address window. |
+| `place`, `date` | Place and date line. |
+| `reference`, `your-reference` | Reference line, or the reference block in DIN 5008. |
+| `subject` | Subject line. |
+| `opening`, `closing` | Salutation and complimentary close. |
+| `signature-image` | Image of the signature. Its alt text comes from the labels. |
+| `cc`, `encl`, `ps` | Copies, enclosures and postscript. |
+
+: The fields of a letter. {.striped .hover tbl-colwidths="[28,72]"}
+
+The body of the document is the body of the letter.
+
+## Invoice
+
+The data model is that of [quarto-invoice](https://github.com/mcanouil/quarto-invoice).
+
+```yaml
+title: "Consulting 2026"
+lang: en-GB
+sender:
+  name: Mickaël Canouil
+  email: mickael@example.org
+  registration: "123 456 789"
+  vat: FR1234567890
+  address:
+    street: 12 Example Street
+    zip: 59000
+    city: Lille
+    country: France
+recipient:
+  name: Company Ltd
+  address:
+    street: 10 Station Road
+    zip: 75008
+    city: Paris
+    country: France
+invoice:
+  number: "2026-014"
+  issued: 2026-11-01
+  due: 2026-12-01
+  reference: REF-2026-014
+  fee: 2.28
+  penalty: 40
+  currency: EUR
+  items:
+    - description: Workshop
+      details: Two days on site
+      quantity: 2
+      unit-price: 1200
+      vat: 20
+bank:
+  bic: AZERTYUI
+  iban: FR12 1234 4567 7890 1234 5678 901
+format: mcanouil-typst
+extensions:
+  mcanouil:
+    type: invoice
+```
+
+- Typst calculates the totals in the smallest unit of the currency, so 3 × 33.33 gives 99.99.
+- The VAT shows for each rate.
+- `sender: exempted: true` removes the VAT column and adds the exemption label.
+  A text value adds your own mention.
+- `fee` is the late fee in percent, and `penalty` is the fixed recovery cost.
+- The items table has tagged header cells and tabular figures.
+
+## Standards
+
+The `letter-standard` option sets the page geometry of a letter and an invoice.
+
+| Value | Standard | Address window |
+| --- | --- | --- |
+| `nf` | NF Z 11-001 | Right, fold marks at thirds. |
+| `din` | DIN 5008 form B | Left, with a reference block, fold marks and a punch mark. |
+
+: The two letter standards. {.striped .hover tbl-colwidths="[14,28,58]"}
+
+If you do not set `letter-standard`, the document language selects the standard:
+
+- `lang: fr` gives `nf`.
+- `lang: de` gives `din`.
+- Any other language gives `nf`.
+
+```yaml
+extensions:
+  mcanouil:
+    type: letter
+    letter-standard: din
+```
+
+::: {.callout-warning}
+
+The NF Z 11-001 dimensions come from secondary sources, because the standard text is not free.
+They are not verified against the AFNOR standard.
+Before you print letters for window envelopes, do a test print with one envelope.
+
+:::
+
+The DIN 5008 dimensions come from published descriptions of form B.
+The marks are artefacts in the PDF tags.
+The PDF does not draw the window outline, because an outline shows through the envelope window.
+
+## Languages
+
+Letter and invoice labels exist in English and French.
+German (`lang: de`) has the letter labels only, for example "Ihr Zeichen" and "Unser Zeichen".
+A German invoice uses the English labels.
+To add your own labels, see [Labels and dates](typst-format.qmd#labels-and-dates).
+
+## Page furniture
+
+The first page has the corner motif of the preset, so the footer starts on page 2.
+The default footer of both types shows the page number in the right slot.
+
+gitlink is off by default in letters and invoices.
+As a result, a reference such as `abcd1234` shows as written, not as a link to a commit.
+To turn gitlink on, set `extensions: gitlink: enabled: true`.

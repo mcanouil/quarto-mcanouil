@@ -1,359 +1,194 @@
-# Schema for the mcanouil extension
-# Provides configuration validation and IDE support for options,
-# shortcodes, formats, attributes, and classes.
-
 $schema: https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json
-
 options:
-  grid-background:
-    type: boolean
-    default: false
-    description: "Enable a subtle grid background on HTML pages and Reveal.js slides."
-  section-outline:
-    type: boolean
-    default: true
-    description: "Show subsection outline on section slides (Reveal.js)."
-  date-superscript:
-    type: boolean
-    default: true
-    description: "Format ordinal dates with superscript suffixes (1st, 2nd, 3rd)."
-  hide-title-slide-chrome:
-    type: boolean
-    default: true
-    description: "Hide menu, logo, and footer on the title slide (Reveal.js)."
-  favicon-from-logo:
-    type: boolean
-    default: true
-    description: "Generate favicon from the slide logo (Reveal.js)."
-  code-annotation-fragments:
-    type: boolean
-    default: true
-    description: "Enable code annotation fragment navigation (Reveal.js)."
-  debug-borders:
-    type: boolean
-    default: false
-    description: "Show debug borders on slides for layout troubleshooting (Reveal.js)."
-  hide-navbar-title:
-    type: boolean
-    default: true
-    description: "Hide the navbar brand and title (HTML)."
-  code-window:
+  preset:
+    type: string
+    enum:
+      - gold
+      - mono
+      - quarto
+      - terminal
+    default: gold
+    description: "Preset for every format: colours, fonts and style. Set it as `extensions: { mcanouil: { preset: <name> } }` in the front matter or in `_quarto.yml`."
+  type:
+    type: string
+    enum:
+      - report
+      - article
+      - memo
+      - letter
+      - invoice
+      - workshop
+    default: report
+    description: "Document type. mcanouil-typst renders every type; mcanouil-html renders report, article, memo and workshop; mcanouil-revealjs reads only workshop and gives a deck for any other type. letter and invoice stop the render in HTML and Reveal.js. Set it as `extensions: { mcanouil: { type: <name> } }`."
+  layout:
+    type: string
+    enum:
+      - compact
+      - full
+      - standard
+    description: "Layout of the document type. A report takes compact (the default) or full; every other type has the one layout standard. Set it as `extensions: { mcanouil: { layout: <name> } }`."
+  kind:
+    type: string
+    enum:
+      - note
+      - minutes
+      - agenda
+      - brief
+    description: "Kind of a memo: note (the default), minutes, agenda or brief. The kind chooses the banner fields. Set it as `extensions: { mcanouil: { kind: <name> } }`."
+  memo:
     type: object
-    description: "Configuration for code block window decorations."
     additionalProperties: false
+    description: "Banner fields of a memo. Each kind shows its own fields: note shows to, from and date; minutes shows date-time, present and absent; agenda shows date-time, place and participants; brief shows date, audience and purpose. A field with no value is left out."
     properties:
-      enabled:
-        type: boolean
-        default: true
-        description: "Enable code-window styling on code blocks."
-      auto-filename:
-        type: boolean
-        default: true
-        description: "Automatically generate filename labels from the code block language."
-      style:
+      to:
         type: string
-        default: "macos"
-        enum: [default, macos, windows]
-        description: "Window decoration style."
-      wrapper:
+        description: "Recipients of a note."
+      from:
         type: string
-        default: "mcanouil-code-window"
-        description: "Typst wrapper function name for code-window rendering."
-      hotfix:
-        type: object
-        description: "Hot-fix toggles for Typst output workarounds."
-        additionalProperties: false
-        properties:
-          code-annotations:
-            type: [boolean, object]
-            default: true
-            description: "Enable code annotation processing for Typst."
-          skylighting:
-            type: [boolean, object]
-            default: true
-            description: "Fix Typst Skylighting block styling."
-
-shortcodes:
-  divider:
-    description: "Render a decorative divider line."
-    attributes:
-      style:
+        description: "Author of a note."
+      date:
         type: string
-        default: "solid"
-        enum: [solid, dashed, dotted, ornamental, gradient]
-        description: "Border style of the divider line."
-      label:
+        description: "Date of a note or a brief. When it is not set, the banner uses the document date."
+      date-time:
         type: string
-        description: "Optional text label displayed on the divider."
-      thickness:
+        description: "Date and time of a meeting, for minutes and agendas. When it is not set, the banner uses memo date, then the document date."
+      present:
         type: string
-        default: "1pt"
-        description: "Thickness of the divider line (CSS length)."
-        completion:
-          type: size
-      width:
+        description: "People present at the meeting of the minutes."
+      absent:
         type: string
-        default: "50%"
-        description: "Width of the divider (CSS length or percentage)."
-        completion:
-          type: size
-
-  value-box:
-    description: "Render a value display box with number, label, and optional icon."
-    attributes:
-      value:
+        description: "People absent from the meeting of the minutes."
+      place:
         type: string
-        default: "0"
-        description: "The numeric or text value to display."
-      unit:
+        description: "Place of the meeting of an agenda."
+      participants:
         type: string
-        description: "Unit label displayed next to the value."
-      label:
+        description: "Participants of the meeting of an agenda."
+      audience:
         type: string
-        description: "Descriptive label below the value."
-      icon:
+        description: "Audience of a brief."
+      purpose:
         type: string
-        description: "Icon character or shortcut name (up, down, stable). Accepts any UTF-8 character."
-      colour:
+        description: "Purpose of a brief."
+  chapter-toc-depth:
+    type: number
+    minimum: 1
+    default: 2
+    description: "Number of heading levels under a chapter that the chapter contents page of a full report lists. 1 lists the sections only, 2 adds the subsections. Set it as `extensions: { mcanouil: { chapter-toc-depth: <n> } }`."
+  letter-standard:
+    type: string
+    enum:
+      - nf
+      - din
+    description: "Standard of a letter or an invoice: nf follows NF Z 11-001 with the address window on the right, din follows DIN 5008 form B with the address window on the left and a reference block. When it is not set, the language of the document chooses: fr gives nf, de gives din, and any other language gives nf. Set it as `extensions: { mcanouil: { letter-standard: <name> } }`."
+  header:
+    type: object
+    additionalProperties: false
+    description: "Content of the three header slots of Typst pages. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter and page. An empty string leaves the slot empty. A slot that is not set takes the default of the document type."
+    properties:
+      left:
         type: string
-        default: "info"
-        aliases: [color]
-        description: "Colour theme (success, warning, danger, info, neutral) or a hex code. Typst output also accepts a colour name such as blue; HTML ignores a name. A value naming no colour uses the foreground colour."
-        completion:
-          type: color
-
-  progress:
-    description: "Render a progress bar."
-    attributes:
-      value:
-        type: integer
-        default: 0
-        minimum: 0
-        maximum: 100
-        description: "Progress percentage (0 to 100)."
-      label:
+        description: "Content of the left header slot, aligned left."
+      centre:
         type: string
-        description: "Label displayed above the progress bar."
-      colour:
+        aliases: [center]
+        description: "Content of the centre header slot, centred."
+      right:
         type: string
-        default: "info"
-        aliases: [color]
-        description: "Colour theme (success, warning, danger, info, neutral) or a hex code. Any other value falls back to the info colour."
-        completion:
-          type: color
-      show-value:
-        type: boolean
-        default: true
-        description: "Whether to display the percentage inside the bar."
-      height:
+        description: "Content of the right header slot, aligned right."
+  footer:
+    type: object
+    additionalProperties: false
+    description: "Content of the three footer slots of Typst pages and Reveal.js slides. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter, page, speaker (the authors and the event), event and session (for example \"Session 2\"). An empty string leaves the slot empty. A slot that is not set takes the default of the document type; a deck shows the speaker and the event, the talk title, and the slide number; a workshop shows the event, the session and the page or slide number."
+    properties:
+      left:
         type: string
-        description: "Height of the progress bar (CSS length). Defaults to 1.5em for HTML, 1.2em for Reveal.js."
-        completion:
-          type: size
-
-  badge:
-    description: "Render an inline badge (HTML and Reveal.js only; Typst uses span syntax)."
-    attributes:
-      text:
+        description: "Content of the left footer slot, aligned left."
+      centre:
         type: string
-        description: "Badge label text."
-      icon:
+        aliases: [center]
+        examples: ["Confidential"]
+        description: "Content of the centre footer slot, centred."
+      right:
         type: string
-        description: "Icon character or shortcut name."
-      colour:
+        examples: [page]
+        description: "Content of the right footer slot, aligned right. In a Reveal.js deck, only `page` here shows the slide number."
+  event:
+    type: string
+    description: "Event of a Reveal.js deck, for example `useR! 2026 · Warwick`. The title slide shows it above the title, and the left footer slot after the speaker. Set it as `extensions: { mcanouil: { event: <text> } }`."
+  speakers:
+    type: array
+    description: "Photos of the speakers on the title slide of a Reveal.js deck, one entry per author, in the order of the authors. A photo without alt text gives a warning."
+    items:
+      type: object
+      additionalProperties: false
+      properties:
+        photo:
+          type: string
+          description: "Photo file (svg, png, jpg, gif or webp), relative to the document. The deck embeds it."
+        alt:
+          type: string
+          description: "Alt text of the photo."
+  closing:
+    type: [object, boolean]
+    additionalProperties: false
+    description: "Closing slide of a Reveal.js deck, on the ground of the preset. `true` adds it with the default title; a map sets its parts. Links are shown as plain text, so they read in a PDF export too."
+    properties:
+      title:
         type: string
-        default: "neutral"
-        aliases: [color]
-        description: "Colour theme for the badge."
-        completion:
-          type: color
-
-formats:
-  mcanouil-html:
-    style:
-      type: string
-      default: "professional"
-      enum: [professional, academic]
-      enumCaseInsensitive: true
-      description: "Template style variant for the HTML format."
-    title-block-authors:
-      type: boolean
-      default: true
-      description: "Show authors, affiliations, and corresponding author in the title block."
-    title-block-abstract:
-      type: boolean
-      default: true
-      description: "Show abstract and keywords in the title block."
-    title-block-meta:
-      type: boolean
-      default: true
-      description: "Show dates, DOI, and categories in the title block."
-
-  mcanouil-typst:
-    document-type:
-      type: string
-      default: "report"
-      enum: [report, invoice, letter, cv]
-      enumCaseInsensitive: true
-      description: "Document type template to use."
-    brand-mode:
-      type: string
-      default: "light"
-      enum: [light, dark]
-      description: "Brand colour mode for the document."
-    style:
-      type: string
-      default: "professional"
-      enum: [professional, academic]
-      enumCaseInsensitive: true
-      description: "Template style variant."
-    show-corner-brackets:
-      type: boolean
-      default: true
-      description: "Show signature corner bracket decorations."
-    show-margin-decoration:
-      type: boolean
-      default: true
-      description: "Show coloured bars along page margins."
-    show-title-page-background:
-      type: boolean
-      default: true
-      description: "Show geometric background on the title page."
-    show-heading-underlines:
-      type: boolean
-      default: true
-      description: "Show gradient underlines below headings."
-    show-logo:
-      type: boolean
-      default: true
-      description: "Display logo in the header."
-    section-page:
-      type: boolean
-      default: true
-      description: "Insert section title pages before each top-level section."
-    section-pagebreak:
-      type: boolean
-      default: true
-      description: "Insert a page break before each section title page."
-    list-of:
-      type: boolean
-      default: true
-      description: "Include lists of figures and tables."
-
-  mcanouil-revealjs:
-    brand-mode:
-      type: string
-      default: "dark"
-      enum: [light, dark]
-      description: "Brand colour mode for the presentation."
-
-attributes:
-  panel:
-    title:
-      type: string
-      description: "Panel header title."
-    icon:
-      type: string
-      description: "Icon character displayed before the title."
-    style:
-      type: string
-      default: "subtle"
-      description: "Colour theme for the panel border."
-      enum:
-        [
-          info,
-          success,
-          warning,
-          danger,
-          caution,
-          neutral,
-          subtle,
-          emphasis,
-          accent,
-          outline,
-        ]
-
-  executive-summary:
-    title:
-      type: string
-      default: "Executive Summary"
-      description: "Title for the executive summary section."
-    show-corner-brackets:
-      type: boolean
-      default: true
-      description: "Show decorative corner brackets."
-
-  card-grid:
-    columns:
-      type: string
-      default: "3"
-      description: "Number of columns in the card grid."
-
-  card:
-    title:
-      type: string
-      description: "Card header title."
-    style:
-      type: string
-      default: "subtle"
-      description: "Visual style for the card."
-      enum: [subtle, outlined, filled]
-    colour:
-      type: string
-      aliases: [color]
-      description: "Custom accent colour for the card: a hex code or a colour name such as blue, honoured in both HTML and Typst output. In Typst a value naming no colour uses the muted colour."
-      completion:
-        type: color
-
-  # Highlight block for emphasising content (no user-facing attributes).
-  highlight: {}
-
-  CodeBlock:
-    code-window-enabled:
-      type: boolean
-      default: true
-      description: "Whether to apply window chrome to this specific code block."
-    code-window-no-auto-filename:
-      type: boolean
-      default: false
-      description: "Suppress the auto-generated filename for this specific code block."
-    code-window-style:
-      type: string
-      enum: [default, macos, windows]
-      description: "Override the global window decoration style for this specific code block."
-
-  badge:
-    colour:
-      type: string
-      default: "neutral"
-      aliases: [color]
-      description: "Colour theme for the badge."
-      completion:
-        type: color
-    icon:
-      type: string
-      description: "Icon character displayed before the badge text."
+        description: "Title of the closing slide. Default: \"Thank you\" in the document language."
+      links:
+        type: array
+        items:
+          type: string
+        description: "Links of the closing slide, one per line, as plain text."
+      licence:
+        type: string
+        description: "Licence line of the closing slide, for example `Slides: example.org/talk · CC BY 4.0`."
+  session:
+    type: object
+    additionalProperties: false
+    description: "Session of a workshop: its number and the number of sessions. The kicker shows \"Session 2 of 7\", exercises are numbered 2.1, 2.2, and the session field of the footer shows \"Session 2\". Set it as `extensions: { mcanouil: { session: { number: 2, total: 7 } } }`."
+    properties:
+      number:
+        type: [number, string]
+        description: "Number of the session."
+      total:
+        type: [number, string]
+        description: "Number of sessions of the workshop."
+  duration:
+    type: string
+    description: "Duration of a workshop session, for example `90 min`. The title block shows it beside the date."
+  solutions:
+    type: string
+    enum:
+      - end
+      - inline
+      - hide
+    default: end
+    description: "Place of the exercise solutions in the PDF handout of a workshop: end collects them on the last pages behind a \"Solution: page n\" link in each exercise, inline prints each one in its exercise, hide leaves them out. HTML shows each solution as a closed disclosure and Reveal.js as a block of the veil group solutions, hidden until shown."
 
 classes:
-  panel:
-    description: "Styled panel container with title, icon, and colour theme."
-  executive-summary:
-    description: "Executive summary section with title and decorative brackets."
-  card-grid:
-    description: "Grid layout for card components."
-  card:
-    description: "Card component with title, style, and colour options."
-  card-footer:
-    description: "Footer section within a card component."
-  highlight:
-    description: "Content emphasis block."
-  badge:
-    description: "Inline badge element with colour and icon."
-  panel-tabset:
-    description: "Tabbed panel container."
-  references:
-    description: "Special section for references."
-  appendix:
-    description: "Special section for appendix content."
-  supplementary:
-    description: "Special section for supplementary material."
+  objectives:
+    description: "Workshop block: what the session teaches. It shows the label Objectives."
+  prerequisites:
+    description: "Workshop block: what the session needs. It shows the label Prerequisites."
+  exercise:
+    description: "Workshop block: an exercise, labelled with its number, its duration and its format. It can hold a solution block."
+  solution:
+    description: "Workshop block, inside an exercise: the solution of the exercise. HTML shows it as a closed disclosure, Reveal.js as a block of the veil group solutions, and the PDF handout as the solutions option says."
+  checkpoint:
+    description: "Workshop block: a check of the work so far. It shows the label Checkpoint."
+
+attributes:
+  exercise:
+    duration:
+      type: string
+      description: "Time the exercise takes, for example `15 min`, shown in its label."
+    format:
+      type: string
+      description: "How the exercise is done, for example `pairs` or `solo`, shown in its label."
+  solution:
+    name:
+      type: string
+      description: "Name of the solution, added to its label, for example `Worked answer` gives \"Solution · Worked answer\". When it is not set and the solution starts with a heading, that heading is the name."

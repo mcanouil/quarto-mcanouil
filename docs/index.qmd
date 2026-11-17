@@ -1,16 +1,17 @@
 ---
 title: "Mickaël Canouil's Brand"
-subtitle: "One brand across HTML, Typst, and RevealJS."
-description: "What the mcanouil extension provides: a project type, three formats, and the components they share."
+subtitle: "Reports, letters, workshops and decks in one style."
+description: "What the mcanouil extension provides: three formats, four presets, six document types, and a set of embedded tools, with accessibility first."
 authors:
   - name: "Mickaël CANOUIL, _Ph.D._"
     orcid: "0000-0002-3396-4549"
     url: "https://mickael.canouil.fr"
 ---
 
-A personal brand spread across a website, a report, and a talk usually means three themes drifting apart.
-
-`mcanouil` is one extension carrying all three: a project type for the website, and formats for HTML, Typst, and RevealJS that share a `brand.yml`, a component set, and a look.
+`mcanouil` is a Quarto extension with three formats: `mcanouil-typst` for PDF, `mcanouil-html` and `mcanouil-revealjs`.
+One preset gives the colours, fonts, style and motif of all three formats.
+The extension has six document types, from a full report to an invoice.
+The targets are WCAG 2.2 AA in HTML and Reveal.js, and PDF/UA-1 in PDF.
 
 [See a report rendered by this site](preview.pdf).
 
@@ -22,8 +23,8 @@ A personal brand spread across a website, a report, and a talk usually means thr
 quarto add {{< var extension.reference >}}
 ```
 
-This will install the extension under the `_extensions` subdirectory.
-If you are using version control, you will want to check in this directory.
+This command installs the extension in the `_extensions` directory.
+If you use version control, commit this directory.
 
 ::: {.btn-group role="group" aria-label="Quarto Wizard installer options"}
 
@@ -33,44 +34,63 @@ If you are using version control, you will want to check in this directory.
 
 :::
 
+The extension needs Quarto 1.12.1 or later.
+To check the PDF tags, install veraPDF with `quarto install verapdf`.
+
 ## Quick start
 
-A website:
+Render one document to the three formats:
 
 ```yaml
-project:
-  type: mcanouil
-```
-
-A document, a report, or a deck:
-
-```yaml
-format: mcanouil-html
-```
-
-```yaml
+title: "My report"
 format:
-  mcanouil-typst:
-    style: professional
-    brand-mode: light
+  mcanouil-typst: default
+  mcanouil-html: default
+  mcanouil-revealjs: default
+extensions:
+  mcanouil:
+    preset: gold
 ```
+
+Select a document type:
 
 ```yaml
-format:
-  mcanouil-revealjs:
-    brand-mode: dark
+extensions:
+  mcanouil:
+    type: report
+    layout: full
 ```
 
-See the [Reference](reference.qmd) for the three formats and what they share, and the [Examples](examples.qmd) for worked front matter.
+| Type | Formats | Use |
+| --- | --- | --- |
+| `report` | Typst, HTML | Compact report, or full report with a cover and chapter dividers. Also Quarto books. |
+| `article` | Typst, HTML | One column with margin notes and a CRediT table. |
+| `memo` | Typst, HTML | Note, minutes, agenda or brief, with a banner. |
+| `letter` | Typst | Letter with an address window, NF Z 11-001 or DIN 5008. |
+| `invoice` | Typst | Invoice with calculated totals. |
+| `workshop` | Typst, HTML, Reveal.js | Session handout, page and deck with exercises and solutions. |
 
-## Where it works
+: The six document types. {.striped .hover tbl-colwidths="[16,24,60]"}
 
-HTML, Typst, and RevealJS, plus the project type that ties a website together.
+A document without a type in `mcanouil-revealjs` is a presentation deck.
+
+::: {.callout-important}
+
+The extension embeds its tools, for example code-window, gitlink and veil.
+Do not list them again in your own `filters:`.
+See [Embedded tools](reference.qmd#embedded-tools).
+
+:::
+
+## Version 1.0
+
+Version 1.0 is a new extension.
+The options, components and document types of the 0.x versions do not exist in 1.0, and there is no migration path.
+The [Changelog](changelog.qmd) lists the earlier versions.
 
 ## Links
 
-- [Reference](reference.qmd) for the project type, the formats, and the components.
-- [Examples](examples.qmd) for worked front matter.
-- [A rendered report](preview.pdf), built by this site.
-- [Changelog](changelog.qmd) for what each release changed.
+- [Reference](reference.qmd) for every format, option, class and embedded tool.
+- [Guides](examples.qmd) for each preset, type and format.
+- [Known limitations](limitations.qmd).
 - [Source and issues](https://github.com/mcanouil/quarto-mcanouil) on GitHub.

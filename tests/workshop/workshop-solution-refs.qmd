@@ -1,0 +1,36 @@
+---
+title: Solution references
+author: Mickaël Canouil
+date: 2026-11-13
+format:
+  mcanouil-html: default
+  mcanouil-revealjs: default
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: workshop
+    session:
+      number: 2
+      total: 7
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A reference to a solution inside another solution, and a citation list of solutions, link to each solution with its label and no warning, in the HTML page, the deck and the PDF handout with the solutions at the end.
+    mcanouil-html:
+      ensureFileRegexMatches:
+        - ['builds on <a href="#sol-a" class="quarto-xref">Solution 2\.1</a>', 'Compare <a href="#sol-b" class="quarto-xref">Solution 2\.2</a>, <a href="#sol-a" class="quarto-xref">Solution 2\.1</a> before']
+        - ['\?@sol-']
+    mcanouil-revealjs:
+      ensureFileRegexMatches:
+        - ['builds on <a href="#/sol-a" class="quarto-xref">Solution 2\.1</a>', 'Compare <a href="#/sol-b" class="quarto-xref">Solution 2\.2</a>, <a href="#/sol-a" class="quarto-xref">Solution 2\.1</a> before']
+        - ['\?@sol-']
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['builds on #link\(<sol-a>\)\[Solution 2\.1\]', 'Compare #link\(<sol-b>\)\[Solution 2\.2\], #link\(<sol-a>\)\[Solution 2\.1\] before', '#mc-ws-solution-heading\("Solution 2\.2"\) <sol-b>']
+        - ['\?@sol-']
+---
+
+{{< include _workshop-solution-refs.qmd >}}

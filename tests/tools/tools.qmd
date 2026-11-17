@@ -1,0 +1,87 @@
+---
+title: Tools
+author: Test Author
+date: 2026-01-01
+engine: markdown
+toc: true
+format:
+  mcanouil-html: default
+  mcanouil-revealjs: default
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  gitlink:
+    platform: github
+    repository-name: mcanouil/quarto-mcanouil
+  veil:
+    groups:
+      - name: expert
+        shown: false
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: Each embedded tool runs, and the opt-in tools stay off.
+        check: bash _checks/tools.sh
+    mcanouil-html:
+      ensureFileRegexMatches:
+        - ['<section id="offset" class="level3">', 'id="TOC"', 'class="light-content"', '<iconify-icon', 'data-prism="yes"', 'sourceCode python cw-auto', 'assets/typst-render/', 'gitlink-badge', 'mobile-toc/mobile-toc\.css']
+        - ['href="#hidden-from-contents" id="toc-', 'preview-colour', 'collapse-output', 'quarto-remember']
+    mcanouil-revealjs:
+      ensureFileRegexMatches:
+        - ['data-veil-hidden', 'RevealVeil', 'RevealJsCodefrag', 'RevealJsTabset']
+        - ['preview-colour', 'collapse-output', 'quarto-remember']
+    mcanouil-typst:
+---
+
+# Tools
+
+## Group
+
+The offset heading below sits under this one, so no heading level is skipped,
+as PDF/UA requires.
+
+## Offset {offset-headings-by=1}
+
+A reference to #12 and an icon {{< iconify mdi home >}}.
+
+[Highlighted]{colour="#cc0000"} text, and the colour `#336699` in code.
+
+::: {#source}
+Reusable content.
+:::
+
+::: {reuse="source"}
+:::
+
+::: {.veil group="expert"}
+Expert content.
+:::
+
+```{.python}
+print("hello")
+```
+
+```{typst}
+#strong[Rendered by Typst]
+```
+
+::: {html:data-prism="yes"}
+Conditional attributes.
+:::
+
+## Hidden from contents {toc-depth=0}
+
+Text.
+
+## Tabs {.tabset}
+
+Text.
+
+## Cascade
+
+Before the rule.
+
+---
+
+After the rule.

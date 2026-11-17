@@ -1,0 +1,33 @@
+---
+title: Training proposal
+lang: en-GB
+date: 2026-11-11
+sender:
+  name: Mickaël Canouil
+  address:
+    - 12 Example Street
+    - Lille
+place: Lille
+reference: 2026-014
+subject: Training proposal
+address:
+  - Company Ltd
+  - 10 Station Road
+  - London
+opening: Dear Sir or Madam,
+closing: Yours faithfully,
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: letter
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: An English letter takes the NF geometry with English labels and an English date.
+        check: bash _checks/letter.sh en
+---
+
+{{< include _letter-body.qmd >}}

@@ -1,0 +1,27 @@
+---
+title: Solution references
+author: Mickaël Canouil
+date: 2026-11-13
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: workshop
+    solutions: inline
+    session:
+      number: 2
+      total: 7
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With solutions set to inline, a reference to a solution inside another solution, and a citation list of solutions, link to each solution with its label and no warning.
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['builds on #link\(<sol-a>\)\[Solution 2\.1\]', 'Compare #link\(<sol-b>\)\[Solution 2\.2\], #link\(<sol-a>\)\[Solution 2\.1\] before', '\] <sol-b>']
+        - ['\?@sol-']
+---
+
+{{< include _workshop-solution-refs.qmd >}}

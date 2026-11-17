@@ -1,0 +1,35 @@
+---
+title: Schulungsangebot
+lang: de
+date: 2026-11-11
+sender:
+  name: Mickaël Canouil
+  address:
+    - Beispielstrasse 12
+    - 10115 Berlin
+  email: mickael@example.org
+place: Berlin
+reference: 2026-014
+your-reference: A-77
+subject: Schulungsangebot
+address:
+  - Beispiel GmbH
+  - Bahnhofstrasse 10
+  - 80331 München
+opening: Sehr geehrte Damen und Herren,
+closing: Mit freundlichen Grüßen
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: letter
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A German letter follows DIN 5008 form B, the address window on the left, the reference block on the right and the German labels.
+        check: bash _checks/letter.sh din
+---
+
+{{< include _letter-body.qmd >}}

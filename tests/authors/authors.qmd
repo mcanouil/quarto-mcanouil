@@ -1,0 +1,71 @@
+---
+title: Survival analysis of the cohort
+subtitle: A 24-week follow-up
+date: 2026-11-11
+author:
+  - name:
+      given: Mickaël
+      family: Canouil
+    degrees: [Ph.D.]
+    orcid: 0000-0002-3396-4549
+    email: contact@example.org
+    corresponding: true
+    equal-contributor: true
+    affiliations:
+      - ref: inserm
+      - ref: imperial
+  - name: Ana Author
+    degrees: [M.Sc.]
+    orcid: 0000-0001-2345-6789
+    equal-contributor: true
+    affiliations:
+      - ref: inserm
+  - name: Ben Writer
+    degrees: [M.D., Ph.D.]
+    affiliations:
+      - ref: imperial
+  - name: Cleo Reader
+    affiliations:
+      - ref: inserm
+  - name: Dan Plotter
+    affiliations:
+      - ref: imperial
+  - name: Eve Fitter
+    affiliations:
+      - ref: inserm
+  - name: Finn Checker
+    affiliations:
+      - ref: imperial
+  - name: Gus Elder
+    deceased: true
+    affiliations:
+      - ref: imperial
+affiliations:
+  - id: inserm
+    name: Inserm U1283
+    department: Department of Genomics
+    city: Lille
+    country: France
+  - id: imperial
+    name: Imperial College London
+    department: School of Public Health
+    city: London
+    country: UK
+abstract: This is the abstract of the study.
+keywords: [survival, cohort]
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The title block shows degrees, affiliation numbers, the author marks with their legends and an ORCID badge with alternative text.
+        check: bash _checks/authors.sh
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+---
+
+# Introduction
+
+{{< lipsum 2 >}}

@@ -1,0 +1,13 @@
+---
+title: Unit tests
+format: mcanouil-html
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The Lua unit tests of the extension modules pass.
+        check: bash _checks/unit.sh
+    mcanouil-html:
+---
+
+A paragraph.

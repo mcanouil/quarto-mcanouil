@@ -1,0 +1,122 @@
+/*-- scss:defaults --*/
+
+// Workshop: the blocks of a session (objectives, prerequisites, exercises,
+// solutions and checkpoints). Each block has a text label, so none relies on
+// colour alone; the square mark before the label is decoration, with an empty
+// alternative text, and forced colours remove it (see decoration.scss).
+$mc-ws-mark-size: 0.5em !default;
+
+/*-- scss:rules --*/
+
+.mc-ws {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--mc-line);
+  border-radius: var(--mc-radius, 0.25rem);
+  background-color: var(--mc-tint);
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+.mc-ws-label {
+  margin: 0 0 0.5rem;
+  color: var(--mc-accent-text);
+  font-family: var(--mc-font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+
+  &::before {
+    content: "" / "";
+    display: inline-block;
+    width: $mc-ws-mark-size;
+    height: $mc-ws-mark-size;
+    margin-inline-end: 0.5em;
+    background-color: currentColor;
+    vertical-align: 0.05em;
+  }
+}
+
+.mc-ws-exercise {
+  border-color: var(--mc-accent);
+  background-color: var(--mc-paper);
+}
+
+.mc-ws-checkpoint {
+  border-width: 0 0 0 4px;
+  border-color: var(--mc-tip);
+  border-radius: 0;
+
+  > .mc-ws-label {
+    color: var(--mc-tip-text);
+  }
+}
+
+details.mc-ws-solution {
+  margin: 0.75rem 0 0;
+  padding: 0.5rem 0 0;
+  border: 0;
+  border-top: 1px dashed var(--mc-line);
+  border-radius: 0;
+  background-color: transparent;
+
+  > summary {
+    color: var(--mc-accent-text);
+    font-family: var(--mc-font-ui);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  &[open] > summary {
+    margin-bottom: 0.5rem;
+  }
+}
+
+// The solution fades in when it opens, for a reader who has not asked for
+// reduced motion only.
+@keyframes mc-ws-reveal {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  details.mc-ws-solution[open] > :not(summary) {
+    animation: mc-ws-reveal 0.2s ease-out;
+  }
+}
+
+@include mc-preset(mono) {
+  .mc-ws-exercise {
+    border-width: 0 0 0 4px;
+    border-radius: 0;
+  }
+
+  .mc-ws-label::before {
+    border-radius: 0;
+  }
+}
+
+@include mc-preset(quarto) {
+  .mc-ws-exercise {
+    background-color: var(--mc-card);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--mc-ink) 12%, transparent);
+  }
+
+  .mc-ws-label::before {
+    border-radius: 50%;
+  }
+}
+
+@include mc-preset(terminal) {
+  .mc-ws:is(.mc-ws-objectives, .mc-ws-prerequisites, .mc-ws-exercise) {
+    border-style: dashed;
+  }
+}

@@ -1,0 +1,18 @@
+---
+title: Generic font family
+brand: _brand.yml
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A user brand whose base font family is only a CSS generic family keeps the preset family in Typst, so the render does not stop on an empty font list.
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+      ensureTypstFileRegexMatches:
+        - ['base: \("Source Serif 4", \)']
+---
+
+A paragraph.

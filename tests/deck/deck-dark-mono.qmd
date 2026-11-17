@@ -1,0 +1,31 @@
+---
+title: Quarto extensions
+subtitle: Build, share and maintain your own formats
+author: Mickaël Canouil
+date: 2026-07-08
+brand-mode: dark
+format: mcanouil-revealjs
+extensions:
+  mcanouil:
+    preset: mono
+    event: useR! 2026 · Warwick
+    speakers:
+      - photo: speaker.svg
+        alt: Portrait of Mickaël Canouil
+    closing:
+      links:
+        - mickael.canouil.fr
+        - "@mickael.canouil.fr"
+        - github.com/mcanouil
+      licence: "Slides: m.canouil.dev/user2026 · CC BY 4.0"
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The mono deck with brand-mode dark passes axe.
+        check: bash _checks/deck.sh dark mono
+    mcanouil-revealjs:
+      noErrorsOrWarnings: true
+---
+
+{{< include _deck.qmd >}}

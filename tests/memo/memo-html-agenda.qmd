@@ -1,0 +1,24 @@
+---
+title: Planning meeting
+format: mcanouil-html
+extensions:
+  mcanouil:
+    preset: gold
+    type: memo
+    kind: agenda
+    memo:
+      date-time: 18 Nov 2026, 10:00
+      place: Room 4
+      participants: MC, AA, BW, CD
+    footer:
+      left: Internal
+      centre: Memo 2026-07
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In HTML, an agenda memo has the date and time, place and participants fields in the banner.
+        check: bash _checks/html.sh memo agenda gold
+---
+
+{{< include _note.qmd >}}

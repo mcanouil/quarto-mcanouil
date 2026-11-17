@@ -1,0 +1,24 @@
+---
+title: Steering committee
+format: mcanouil-html
+extensions:
+  mcanouil:
+    preset: gold
+    type: memo
+    kind: minutes
+    memo:
+      date-time: 11 Nov 2026, 14:00
+      present: MC, AA, BW
+      absent: CD
+    footer:
+      left: Internal
+      centre: Memo 2026-07
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In HTML, a minutes memo has the date and time, present and absent fields in the banner.
+        check: bash _checks/html.sh memo minutes gold
+---
+
+{{< include _note.qmd >}}

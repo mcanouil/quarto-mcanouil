@@ -1,43 +1,28 @@
 ---
-title: "Examples"
+title: "Guides"
 subtitle: "Worked front matter, one page per topic."
-description: "How to configure the three formats, write the components, and organise a document, with one page for each group of options."
+description: "How to select a preset, write each document type, and use the three formats of the mcanouil extension, with one page for each topic."
 ---
 
-The [rendered report](preview.pdf) on this site is built by the format as the site is published.
+An option goes in one of three places:
 
-An option belongs in one of three places.
+- A Quarto format option goes under `format: mcanouil-html:`, `mcanouil-typst:` or `mcanouil-revealjs:`.
+- An option of the extension goes under `extensions: mcanouil:`.
+- An attribute or a class goes on the element.
 
-- A format option goes under `format: mcanouil-html:`, `mcanouil-typst:`, or `mcanouil-revealjs:`.
-- A document option goes under `extensions: mcanouil:`.
-- A block attribute goes on the element itself.
-
-## The pages
-
-| Page | What it covers |
+| Page | Topic |
 | --- | --- |
-| [Components](examples/components.qmd) | The `divider`, `value-box`, `progress`, and `badge` shortcodes, and the colour and icon values they accept. |
-| [Containers](examples/panels-and-cards.qmd) | Panels, cards, highlights, and the executive summary, and the two ways a card gets a footer. |
-| [Special sections and tabsets](examples/special-sections.qmd) | What the Typst filters move, renumber, and unwrap. |
-| [HTML format](examples/html-format.qmd) | The layout style, the title block groups, and where each default comes from. |
-| [Typst format](examples/typst-format.qmd) | Document types, page decoration, section pages, and sending a class to a Typst function. |
-| [Reveal.js format](examples/revealjs-format.qmd) | Section outlines, ordinal dates, and the two options for laying a deck out. |
-| [Code windows](examples/code-windows.qmd) | Window chrome per project and per block, and the three Typst hot-fixes. |
+| [Presets](examples/presets.qmd) | The four presets, `_brand.yml`, light and dark, and the contrast check. |
+| [Report and article](examples/report-article.qmd) | Compact and full reports, Quarto books, articles, authors and block quotes. |
+| [Special sections](examples/special-sections.qmd) | References, appendices and supplementary sections in Typst. |
+| [Memo](examples/memo.qmd) | The four memo kinds and their banner fields. |
+| [Letter and invoice](examples/letter-invoice.qmd) | The fields, the two standards and the languages. |
+| [Workshop](examples/workshop.qmd) | Session metadata, workshop blocks and solutions. |
+| [HTML format](examples/html-format.qmd) | Title block, contents, footer, components and accessibility. |
+| [Typst format](examples/typst-format.qmd) | PDF/UA-1, heading numbers, cross-references, labels and dates. |
+| [Reveal.js format](examples/revealjs-format.qmd) | Slide types, speakers, the closing slide and the footer. |
+| [Code windows](examples/code-windows.qmd) | The code window of each preset. |
 
-: What each page of this section shows. {.striped .hover tbl-colwidths="[26,74]"}
+: The pages of the guides. {.striped .hover tbl-colwidths="[26,74]"}
 
-## A website
-
-```yaml
-project:
-  type: mcanouil
-```
-
-The project type supplies a branded navbar, a page footer, and a favicon, and it sets `mcanouil-html` as the default format, so a site needs nothing else to be branded.
-
-It also supplies a value for several document options.
-A standalone document has no project type, so some of its options resolve differently, which [HTML format](examples/html-format.qmd#where-a-default-comes-from) sets out.
-
-## Source
-
-The repository ships a starting point you can copy: [`example.qmd`](https://github.com/mcanouil/quarto-mcanouil/blob/main/example.qmd).
+The repository also has a starting point that you can copy: [`example.qmd`](https://github.com/mcanouil/quarto-mcanouil/blob/main/example.qmd).

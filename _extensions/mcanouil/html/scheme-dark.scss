@@ -1,0 +1,8 @@
+/*-- scss:defaults --*/
+
+// Quarto marks a stylesheet dark from the blackness of $body-bg, and sets the
+// body class from that mark. The colours themselves come from var(--mc-*).
+$body-bg: black !default;
+$body-color: white !default;
+
+/*-- scss:rules --*/

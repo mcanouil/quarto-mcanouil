@@ -1,0 +1,29 @@
+---
+title: Contents and navigation states for a long report title that wraps
+format: mcanouil-html
+toc: true
+toc-depth: 4
+toc-expand: true
+number-sections: true
+other-links:
+  - text: Edit this page
+    href: https://github.com/mcanouil/quarto-mcanouil/edit/main/tests/html/_toc-states.qmd
+    icon: pencil
+  - text: View source
+    href: https://github.com/mcanouil/quarto-mcanouil/blob/main/tests/html/_toc-states.qmd
+    icon: code
+  - text: Report an issue
+    href: https://github.com/mcanouil/quarto-mcanouil/issues/new
+    icon: bug
+extensions:
+  mcanouil:
+    preset: terminal
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The terminal contents covers three numbered levels, long titles, the current entry, hover, focus, the actions row, the narrow-screen pill and sheet, print and forced colours.
+        check: bash _checks/html.sh toc terminal
+---
+
+{{< include _toc-states.qmd >}}

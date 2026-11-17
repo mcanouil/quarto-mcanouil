@@ -1,0 +1,9 @@
+# Results
+
+The results of the study.
+
+## Main outcome
+
+![A body grey rectangle.](../figure.svg){#fig-body fig-alt="A grey rectangle."}
+
+See @fig-body and @fig-supp.

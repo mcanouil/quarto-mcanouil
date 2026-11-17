@@ -1,0 +1,25 @@
+---
+title: Bad solutions option
+format: mcanouil-typst
+extensions:
+  mcanouil:
+    type: workshop
+    solutions: appendix
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: An unknown solutions value stops the render and names the known values.
+        errors: strict
+    mcanouil-typst:
+      shouldError: true
+      printsMessage:
+        level: ERROR
+        regex: 'mcanouil: unknown solutions "appendix"; use end, inline, hide\.'
+---
+
+::: {.exercise}
+
+A task.
+
+:::

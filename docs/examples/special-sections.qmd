@@ -1,116 +1,91 @@
 ---
-title: "Special sections and tabsets"
-subtitle: "What the Typst filters move, renumber, and unwrap."
-description: "Worked examples of the references, appendix, and supplementary headings, and of what a panel-tabset becomes in Typst output."
+title: "Special sections"
+subtitle: "References, appendices and supplementary material in Typst."
+description: "How mcanouil-typst orders and numbers the references, appendix and supplementary sections of a single document and of a book, with the embedded typst-extras tool."
 ---
 
-Two filters reorganise a document for Typst output.
-Neither one acts on HTML or on a Reveal.js deck.
+Three classes on a level 1 heading make a special section.
+The embedded [typst-extras](../reference.qmd#typst-extras) tool numbers the appendix and supplementary sections in every Typst document type.
 
-The options of the format itself are on [Typst format](typst-format.qmd).
+| Class | Numbering | Example |
+| --- | --- | --- |
+| `.references` | none | References |
+| `.appendix` | letters | Appendix A: Title, A.1, Figure A.1, (A.1) |
+| `.supplementary` | `S` prefix | S1, S1.1, Figure S1, Table S1 |
 
-## The classes go on a heading
+: The special sections and their numbers. {.striped .hover tbl-colwidths="[22,18,60]"}
 
-A special section is marked on the heading, not on a div.
+## Single document
+
+In a single document, the special sections move to the end, in this order:
+
+1. The body.
+2. The references.
+3. The appendices.
+4. The supplementary sections.
+
+You can write them anywhere in the source.
 
 ```markdown
-## References {.references}
+# Introduction
 
-## Appendix {.appendix}
+The study has two arms [@doe2026].
 
-## Supplementary material {.supplementary}
-```
+# Supplementary material {.supplementary}
 
-A section runs from its heading to the next ordinary heading of the same level or a higher one.
-Everything in between travels with it.
+![A supplementary figure.](extra.svg){#fig-extra fig-alt="A grey rectangle."}
 
-## What the filter does
+# Extra analyses {.appendix}
 
-Each special section is moved to the end of the document.
-The order is always references, then appendix, then supplementary, whatever order the source uses.
+## Data sources
 
-At the start of each section:
+# References {.references}
 
-- The heading counter resets to zero.
-- The figure counter resets to zero.
-- References get no heading numbering.
-- An appendix and a supplementary section each get their own numbering scheme.
-
-So a figure in an appendix is numbered from one again, under the appendix scheme, rather than continuing the sequence of the body.
-
-## A worked document
-
-```markdown
----
-title: "A report"
-format: mcanouil-typst
----
-
-## Introduction
-
-The body of the report.
-
-## Appendix {.appendix}
-
-A table that supports the argument.
-
-## Results
-
-More of the body.
-
-## References {.references}
-```
-
-The appendix heading is followed by an ordinary heading of the same level, `Results`, so the appendix holds one section only.
-`Results` stays in the body.
-The rendered document ends with the references, and then the appendix, in that order, whichever came first in the source.
-
-## In HTML output
-
-The extension does nothing here, and Quarto does.
-
-Quarto has its own appendix, and it collects a section marked `{.appendix}` or `{.references}` into it, at the foot of the page.
-A section marked `{.supplementary}` is left where it is written, because that class is the extension's own.
-
-So the classes move a section in both formats, for different reasons, and they do not move the same set.
-The numbering stays as Quarto produces it, because the renumbering is the Typst filter's work.
-
-Set `appendix-style: none` to keep every section in source order:
-
-```yaml
----
-title: "A report"
-format:
-  mcanouil-html:
-    appendix-style: none
----
-```
-
-A document that must read the same in both formats should either set that, or write its sections in the order the Typst output produces, which is references, then appendix, then supplementary.
-
-## Tabsets
-
-A tabset is Quarto's own `.panel-tabset` div.
-
-```markdown
-::: {.panel-tabset}
-
-## R
-
-The R version.
-
-## Python
-
-The Python version.
-
+::: {#refs}
 :::
 ```
 
-HTML output gives the tabbed interface Quarto normally produces.
+The bibliography goes in the `#refs` div.
+The references stay last before the appendices.
+An appendix heading reads "Appendix A: Extra analyses", and the running header uses the same text.
+A cross-reference to the appendix reads "Appendix A".
+The body floats keep their plain numbers: Figure 1, Figure 2.
 
-Typst has no tabs, so the filter unwraps the div and turns the structure into headings.
-Each tab name becomes a heading, at level 2 at the shallowest.
-Any heading written inside a tab moves below the tab name, so the outline still nests correctly.
+To change the numbers, use the `sections` options of typst-extras:
 
-The [Reference](../reference.qmd#divs) lists the classes.
-The [Limitations](../reference.qmd#limitations) section states which features are Typst only.
+```yaml
+extensions:
+  typst-extras:
+    sections:
+      appendix-delimiter: ""
+      supplementary-prefix: "SM"
+```
+
+With these values, Figure A.1 becomes Figure A1, and Figure S1 becomes Figure SM1.
+
+## Book project
+
+In a book, the appendices come from `book: appendices:` in `_quarto.yml`, not from the `.appendix` class.
+They are lettered A, B, with sub-headings A.1, A.2.
+To make supplementary chapters, put `.supplementary` on the level 1 heading of the last chapters.
+In a book, a supplementary chapter stays where it is.
+
+```{.markdown filename="sections/04-extra.qmd"}
+# Extra material {.supplementary}
+
+## Extra figure
+```
+
+This chapter is "S1 Extra material", with a sub-heading "S1.1 Extra figure" and floats numbered Figure S1.
+
+## Chapter numbers in captions
+
+Set Quarto's `crossref.chapters: true` to number floats per chapter: Figure 1.1, Figure 2.1.
+
+```yaml
+crossref:
+  chapters: true
+```
+
+In the types that do not number their headings, such as the compact report, the floats keep flat numbers: Figure 1, Figure 2.
+See the [known limitations](../limitations.qmd) for the other types.

@@ -1,0 +1,16 @@
+---
+title: Preset logo
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With no user logo, the preset logo reaches Typst with its alt text and no warning.
+        check: bash _checks/accessibility.sh logo-preset
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+---
+
+A paragraph.

@@ -1,0 +1,38 @@
+---
+title: Proposal
+lang: en-GB
+date: 2026-11-11
+author: Mickaël Canouil
+sender:
+  name: Mickaël Canouil
+  address:
+    - 12 Example Street
+    - Lille
+place: Lille
+subject: Training proposal
+address:
+  - Company Ltd
+  - 10 Station Road
+opening: Dear Sir or Madam,
+closing: Yours faithfully,
+signature-image: signature.svg
+cc:
+  - Alex Copy
+encl:
+  - Programme
+ps: Remember the date.
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: letter
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A letter prints the subject, opening, body, closing, signature, cc, enclosures and postscript in that order, with a signature image.
+        check: bash _checks/letter.sh fields
+---
+
+{{< include _letter-body.qmd >}}

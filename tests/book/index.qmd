@@ -1,0 +1,14 @@
+---
+_quarto:
+  tests:
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mcanouil-document\(\s*"report",\s*"full",\s*none', 'mc-part-divider\.update\(true\)']
+    mcanouil-html:
+      ensureFileRegexMatches:
+        - ['<nav id="quarto-sidebar"', '<meta name="mcanouil-preset" content="gold">']
+---
+
+# Preface {.unnumbered}
+
+This report follows the clinical study report demonstration: the same sources render as a Typst book and as single documents.

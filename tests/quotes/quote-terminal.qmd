@@ -1,0 +1,21 @@
+---
+title: Block quotes
+author: Test Author
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: terminal
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The terminal preset styles a block quote in its own way, turns a closing dash paragraph into the attribution, keeps the decoration out of the tag tree, and keeps the text readable.
+        check: bash _checks/quotes.sh terminal
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mc-preset = "terminal"', 'attribution: \[']
+---
+
+{{< include _quotes.qmd >}}

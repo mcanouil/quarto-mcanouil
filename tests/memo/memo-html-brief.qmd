@@ -1,0 +1,27 @@
+---
+title: Release readiness
+date: 2026-11-11
+lang: en-GB
+format: mcanouil-html
+extensions:
+  mcanouil:
+    preset: gold
+    type: memo
+    kind: brief
+    memo:
+      audience: Product leads
+      purpose: Agree the go or no go for the release
+    footer:
+      left: Internal
+      centre: Memo 2026-08
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In HTML, a brief memo has the date, audience and purpose fields in the banner, taking the date from the document.
+        check: bash _checks/html.sh memo brief gold
+---
+
+## Status
+
+All blocking issues are closed and the last build passes.

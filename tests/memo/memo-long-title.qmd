@@ -1,0 +1,22 @@
+---
+title: A very long title for a memo about the migration of every document of the data team to the new release that runs over several lines of the banner and keeps going past where a short title would stop
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: memo
+    memo:
+      to: Data team
+      from: M. Canouil
+      date: 11 Nov 2026
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In a memo banner, a long title wraps inside the banner and stays clear of the corner motif and of the bottom band.
+        check: bash _checks/memo.sh long-title gold
+---
+
+{{< include _note.qmd >}}

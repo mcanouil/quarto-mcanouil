@@ -1,0 +1,26 @@
+---
+title: Planning meeting
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: memo
+    kind: agenda
+    memo:
+      date-time: 18 Nov 2026, 10:00
+      place: Room 4
+      participants: MC, AA, BW, CD
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: An agenda memo has the date and time, the place and the participants in the banner, and numbered items in the body.
+        check: bash _checks/memo.sh kind agenda gold
+---
+
+1. Welcome and apologies (5 min, MC)
+2. Review of the last actions (10 min, AA)
+3. Release plan (20 min, BW)
+4. Any other business (5 min)

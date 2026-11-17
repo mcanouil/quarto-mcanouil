@@ -1,0 +1,33 @@
+---
+title: Section references
+lang: en-GB
+date: 2026-11-11
+sender:
+  name: Mickaël Canouil
+  address:
+    - 12 Example Street
+    - Lille
+address:
+  - Company Ltd
+  - 10 Station Road
+  - London
+extensions:
+  mcanouil:
+    type: letter
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In a letter, whose headings have no number, a reference to a section links to the heading with the supplement and the heading text.
+        check: bash _checks/xref.sh section 'Section Introduction'
+        warnings: exhaustive
+    mcanouil-typst:
+      noErrors: true
+      ensureTypstFileRegexMatches:
+        - ['See #ref\(<sec-intro>, supplement: \[']
+---
+
+{{< include _section-refs.qmd >}}

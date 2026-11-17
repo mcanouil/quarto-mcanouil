@@ -1,0 +1,33 @@
+# Session overview
+
+## First step {#first-step}
+
+::: {.exercise duration="5 min"}
+
+Write the first answer.
+
+::: {.solution #sol-a}
+
+The first answer starts the work.
+
+:::
+
+:::
+
+## Second step {#second-step}
+
+::: {.exercise duration="5 min"}
+
+Build on the first answer.
+
+::: {.solution #sol-b}
+
+The second answer builds on @sol-a.
+
+:::
+
+:::
+
+## Review {#review}
+
+Compare [@sol-b; @sol-a] before the checkpoint.

@@ -1,0 +1,20 @@
+---
+title: Section references
+author: Test Author
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With number-sections from the Typst default of the format, a compact report still leaves its headings unnumbered, and a reference to a section links to the heading with the supplement and the heading text.
+        check: bash _checks/xref.sh section 'Section Introduction'
+        warnings: exhaustive
+    mcanouil-typst:
+      noErrors: true
+      ensureTypstFileRegexMatches:
+        - ['See #ref\(<sec-intro>, supplement: \[']
+---
+
+{{< include _section-refs.qmd >}}

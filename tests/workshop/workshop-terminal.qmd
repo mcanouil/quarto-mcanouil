@@ -1,0 +1,29 @@
+---
+title: Authoring essentials
+subtitle: Write, structure and cross-reference a document
+author: Mickaël Canouil
+date: 2026-11-13
+lang: en-GB
+format:
+  mcanouil-html: default
+  mcanouil-revealjs: default
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: terminal
+    type: workshop
+    event: Mastering Quarto CLI
+    session:
+      number: 2
+      total: 7
+    duration: 90 min
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The terminal workshop session renders to an HTML page with closed solution disclosures, a PDF handout with the solutions at the end behind page links, and a deck with the solutions in a hidden veil group, each with labelled blocks, no code ligatures and no unguarded motion.
+        check: bash _checks/workshop.sh terminal
+---
+
+{{< include _workshop.qmd >}}

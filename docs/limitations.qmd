@@ -1,0 +1,44 @@
+---
+title: "Known limitations"
+subtitle: "What does not work yet, and what to do in the meantime."
+description: "The known limitations of the mcanouil extension 1.0, each with its effect and a workaround."
+---
+
+## Code windows in Typst
+
+In Typst, the code area inside a code window keeps the background of the syntax highlighting.
+On a dark preset such as `terminal`, this code area stays light.
+In Typst, the frame of a code window is on all four edges.
+
+## Paper size and margins in Typst
+
+Every Typst type uses A4 paper and its own margins.
+Typst ignores the Quarto options `papersize` and `margin`, and gives no warning.
+Letters and invoices use A4 because NF Z 11-001 and DIN 5008 specify it.
+
+## NF Z 11-001 geometry
+
+The NF Z 11-001 dimensions of letters and invoices are not verified against the AFNOR standard.
+Do a test print with a window envelope before you send letters.
+
+## German labels
+
+German has the letter labels only.
+A German invoice and the other types use the English labels.
+Add your own labels with a language file, as [Labels and dates](examples/typst-format.qmd#labels-and-dates) shows.
+
+## Solution identifiers with a hyphen
+
+Quarto stops on a `.solution` with an identifier such as `#worked-answer` ([quarto-dev/quarto-cli#15113](https://github.com/quarto-dev/quarto-cli/issues/15113)).
+Use the `sol-` prefix with no other hyphen, or an identifier without a hyphen.
+
+## Footer band of an HTML memo
+
+If all three footer slots are empty, an HTML memo has no footer band.
+The PDF memo always has the band.
+
+## veraPDF
+
+Quarto checks the PDF/UA-1 tags only when veraPDF is installed.
+Without veraPDF, each render gives a warning.
+Run `quarto install verapdf` to install it.

@@ -1,0 +1,20 @@
+---
+title: A letter
+format: mcanouil-html
+extensions:
+  mcanouil:
+    type: letter
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The letter type stops an HTML render with the type and the supported format.
+        errors: strict
+    mcanouil-html:
+      shouldError: true
+      printsMessage:
+        level: ERROR
+        regex: 'mcanouil: type "letter" supports mcanouil-typst only, not mcanouil-html\.'
+---
+
+A paragraph.

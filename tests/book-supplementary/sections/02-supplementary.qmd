@@ -1,0 +1,7 @@
+# Extra material {.supplementary}
+
+The material that did not fit in the results.
+
+## Extra figure
+
+![A supplementary grey rectangle.](../figure.svg){#fig-supp fig-alt="A grey rectangle."}

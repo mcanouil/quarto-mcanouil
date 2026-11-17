@@ -1,0 +1,21 @@
+---
+title: Smoke
+author: Test Author
+date: 2026-01-01
+format:
+  mcanouil-html: default
+  mcanouil-revealjs: default
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With no preset set, the gold preset applies in every format.
+        check: bash _checks/tokens.sh default
+    mcanouil-html:
+    mcanouil-revealjs:
+    mcanouil-typst:
+---
+
+{{< include _smoke.qmd >}}

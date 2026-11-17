@@ -1,0 +1,18 @@
+---
+title: Labels
+lang: en
+language: my-labels.yml
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A user language file overrides one label and leaves the others.
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mcanouil-exercise: "Task"', 'mcanouil-solution: "Solution"']
+---
+
+A paragraph.

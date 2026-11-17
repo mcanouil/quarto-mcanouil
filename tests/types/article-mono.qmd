@@ -1,0 +1,47 @@
+---
+title: Polygenic scores and type 2 diabetes
+subtitle: A cohort analysis
+author:
+  - name: Ana Author
+    corresponding: true
+    email: ana@example.org
+    affiliations:
+      - name: Inserm U1283
+        city: Lille
+    roles:
+      - conceptualization: lead
+      - formal analysis: lead
+      - writing: equal
+  - name: Ben Writer
+    affiliations:
+      - name: Imperial College London
+    roles:
+      - conceptualization: equal
+      - formal analysis: supporting
+      - writing: equal
+      - supervision
+abstract: |
+  A polygenic score predicts the risk of type 2 diabetes, and this abstract sits in a tinted box.
+keywords: [genetics, diabetes, risk]
+date: 2026-11-11
+bibliography: references.bib
+reference-location: margin
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: mono
+    type: article
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The article of the mono preset has the title block, margin notes in the outer margin, numbered references and a CRediT table at the end.
+        check: bash _checks/article.sh mono
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mcanouil-document\(\s*"article",\s*"standard",\s*none']
+---
+
+{{< include _article.qmd >}}

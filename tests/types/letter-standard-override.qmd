@@ -1,0 +1,33 @@
+---
+title: Proposition de formation
+lang: fr
+date: 2026-11-11
+sender:
+  name: Mickaël Canouil
+  address:
+    - 12 rue Exemple
+    - 59000 Lille
+place: Lille
+subject: Proposition de formation
+address:
+  - Company SAS
+  - 10 avenue de la Gare
+  - 75008 Paris
+opening: Madame, Monsieur,
+closing: Cordialement,
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: letter
+    letter-standard: din
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: letter-standard overrides the standard of the language, so a French letter can follow DIN 5008 with French labels.
+        check: bash _checks/letter.sh override
+---
+
+{{< include _letter-body.qmd >}}

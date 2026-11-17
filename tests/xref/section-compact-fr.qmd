@@ -1,0 +1,21 @@
+---
+title: Section references
+author: Test Author
+lang: fr
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In French, a reference to an unnumbered section takes the French supplement that Quarto gives.
+        check: bash _checks/xref.sh section 'Section Introduction'
+        warnings: exhaustive
+    mcanouil-typst:
+      noErrors: true
+      ensureTypstFileRegexMatches:
+        - ['See #ref\(<sec-intro>, supplement: \[']
+---
+
+{{< include _section-refs.qmd >}}

@@ -1,0 +1,24 @@
+---
+title: Survival analysis
+author:
+  - name: First Author
+  - name: Second Author
+  - name: Third Author
+version: Version 1.2
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: gold
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With more than two authors, the footer author slot shows the first author and "et al." on one line.
+        check: bash _checks/pdf.sh footer-et-al
+---
+
+# Introduction
+
+{{< lipsum 2 >}}

@@ -1,0 +1,21 @@
+---
+title: Logo without alt text
+brand: _brand.yml
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A user brand logo with no alt text warns and names the file.
+        warnings: exhaustive
+    mcanouil-typst:
+      noErrors: true
+      printsMessage:
+        level: WARN
+        regex: 'mcanouil: the logo "figure\.svg" has no alt text\. Add alt to the logo in _brand\.yml\.'
+        count: 1
+---
+
+A paragraph.

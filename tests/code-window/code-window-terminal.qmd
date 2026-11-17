@@ -1,0 +1,21 @@
+---
+title: Code windows
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: terminal
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The terminal Typst code windows keep the traffic lights and take the terminal frame and title bar from the tokens, with no warning and a PDF/UA-1 PDF.
+        check: bash _checks/pdf.sh code-window terminal
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+      ensureTypstFileRegexMatches:
+        - ['#code-window\(filename: "analysis\.R", is-auto: false, style: "macos"', 'show: mc-code-windows\.with\(meta\)']
+---
+
+{{< include _code-window.qmd >}}

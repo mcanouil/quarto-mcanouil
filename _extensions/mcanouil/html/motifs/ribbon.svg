@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="mc-motif mc-motif-ribbon" style="color: currentColor" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="mc-motif-ribbon-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" style="stop-color: var(--mc-accent-high, currentColor)"/>
+      <stop offset="0.55" style="stop-color: var(--mc-accent, currentColor)"/>
+      <stop offset="1" style="stop-color: var(--mc-accent-low, currentColor)"/>
+    </linearGradient>
+  </defs>
+  <path d="M40 0 L52 0 L100 48 L100 60 Z" fill="url(#mc-motif-ribbon-fill)" opacity="0.55"/>
+  <path d="M56 0 L62 0 L100 38 L100 44 Z" fill="url(#mc-motif-ribbon-fill)" opacity="0.35"/>
+  <path d="M66 0 L69 0 L100 31 L100 34 Z" fill="url(#mc-motif-ribbon-fill)" opacity="0.25"/>
+</svg>

@@ -1,0 +1,39 @@
+---
+title: Appendix and supplementary sections without number-sections
+author: Test Author
+number-sections: false
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: article
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: With number-sections set to false, an article keeps its numbered body headings and the Appendix A and S1 headings, and the sub-headings of the appendix and the supplementary section have no number.
+        check: bash _checks/extras.sh sections-unnumbered
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+---
+
+# Results
+
+The body of the article.
+
+# Extra {.appendix}
+
+The analyses that support the results.
+
+## Sub one
+
+The first appendix section.
+
+# More {.supplementary}
+
+The material that did not fit in the article.
+
+## Sub two
+
+The first supplementary section.

@@ -3,39 +3,40 @@ title: "The Typst format"
 subtitle: "Rendered by the documentation site"
 author: "Mickaël CANOUIL"
 date: last-modified
-format:
-  mcanouil-typst:
-    style: professional
-    brand-mode: light
+lang: en-GB
+brand: false
+abstract: |
+  This report is produced by `mcanouil-typst` when the site is published.
+  The layout, the type and the colours come from the extension.
+format: mcanouil-typst
+extensions:
+  mcanouil:
+    preset: gold
 ---
 
-## A section
+# A section {#sec-section}
 
-This document is produced by `mcanouil-typst` as the site is published, so the layout, the typography, and the colours are the extension rather than a description of it.
+This document is a compact report, the default type.
+The title block, this abstract and the body start on page 1.
+The corner motif of the gold preset is in the top right corner.
 
-## The components
+# Components
 
-The shortcodes and the divs are rendered natively by each format rather than passed through as HTML.
+::: {.callout-note}
 
-{{< value-box value="99" unit="%" label="Coverage" colour="success" >}}
-
-{{< progress value="72" label="Progress" colour="info" >}}
-
-{{< divider style="gradient" label="A divider" >}}
-
-::: {.panel title="A panel" style="accent"}
-
-Panels carry a title, an optional icon, and one of ten colour themes.
+A callout keeps its text label and the colour of its type.
 
 :::
 
-## A table
+> Design for the reader who cannot see the colours.
+>
+> -- Mickaël Canouil, 2026
 
 | Option | Effect |
 | --- | --- |
-| `style` | Chooses between the professional and academic layouts. |
-| `brand-mode` | Chooses between the light and dark palettes. |
+| `preset` | Selects the colours, fonts, style and motif. |
+| `type` | Selects the document type. |
 
-: The two options this document sets. {tbl-colwidths="[30,70]"}
+: Two options of the extension. {tbl-colwidths="[30,70]"}
 
-The same brand drives the HTML and RevealJS formats, so a report, a page, and a deck look like one another.
+See @sec-section for the start of the report.

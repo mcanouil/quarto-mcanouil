@@ -1,0 +1,16 @@
+## Methods
+
+Data were analysed with [R 4.5](https://www.r-project.org) and a Cox model.
+Hazard ratios are adjusted for age and sex.
+
+### Model
+
+The model has one stratum for each site.
+
+## Results
+
+The hazard ratio is below one in every stratum.
+
+## Discussion
+
+The cohort is small, so the intervals are wide.
