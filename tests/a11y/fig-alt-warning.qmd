@@ -1,0 +1,39 @@
+---
+title: Figure alt text
+format:
+  mcanouil-html: default
+  mcanouil-revealjs: default
+  mcanouil-typst: default
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A figure with no alt text warns once, and a figure with fig-alt does not.
+        warnings: exhaustive
+    mcanouil-html: &warns
+      noErrors: true
+      printsMessage:
+        - level: WARN
+          regex: 'mcanouil: figure "figure\.svg" has no alt text\. Add fig-alt\.'
+          count: 1
+        - level: WARN
+          regex: 'mcanouil: figure "fig-plain" has no alt text\. Add fig-alt\.'
+          count: 1
+    mcanouil-revealjs: *warns
+    mcanouil-typst:
+      # Typst stops a PDF/UA-1 render on an image with no alt text, after the warning.
+      shouldError: true
+      printsMessage:
+        - level: WARN
+          regex: 'mcanouil: figure "figure\.svg" has no alt text\. Add fig-alt\.'
+          count: 1
+        - level: WARN
+          regex: 'mcanouil: figure "fig-plain" has no alt text\. Add fig-alt\.'
+          count: 1
+---
+
+![](figure.svg)
+
+![A captioned figure.](figure.svg){#fig-plain}
+
+![A described figure.](figure.svg){#fig-described fig-alt="A grey rectangle."}

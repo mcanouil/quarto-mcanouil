@@ -49,10 +49,14 @@ contributes:
       pdf-standard: ua-1
       template-partials:
         - typst/lib/tokens.typ
+        - typst/lib/labels.typ
         - typst/lib/slots.typ
         - typst/lib/decoration.typ
         - typst/lib/motifs.typ
         - typst/lib/chrome.typ
+        - typst/lib/logo.typ
+        - typst/lib/authors.typ
+        - typst/lib/title.typ
         - typst/typst-template.typ
         - typst/typst-show.typ
     revealjs:
