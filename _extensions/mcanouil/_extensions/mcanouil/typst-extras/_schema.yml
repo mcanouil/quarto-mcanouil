@@ -1,0 +1,103 @@
+# _schema.yml for "typst-extras" filter extension
+# Describes options and element attributes for IDE tooling.
+
+$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json
+
+options:
+  list-of:
+    type: [boolean, array, object]
+    description: "Add lists of floats at the start of the body. Use true for every kind, a list of kinds, or a map."
+    examples:
+      - true
+      - [fig, tbl]
+    items:
+      type: string
+      description: "A float kind: fig, tbl, lst or a custom kind from crossref.custom."
+    properties:
+      kinds:
+        type: [boolean, array]
+        default: true
+        description: "The kinds to list. Use true for every kind present, or a non-empty list of kinds in the order to show. false is an error."
+        items:
+          type: string
+          description: "A float kind: fig, tbl, lst or a custom kind from crossref.custom."
+      titles:
+        type: object
+        description: "Titles that replace the default title of one kind. The key is the kind and the value is the title."
+        additionalProperties:
+          type: string
+          description: "The title of the list."
+      page-break:
+        type: boolean
+        default: false
+        description: "Put a page break between the lists and after the last one."
+  watermark:
+    type: [string, object]
+    description: "Draw a watermark on every page. A string is the text. Use a map for an image or for more control."
+    examples:
+      - "DRAFT"
+    properties:
+      text:
+        type: string
+        description: "The watermark text. Set text or image, not both."
+      image:
+        type: string
+        description: "The path of the watermark image, relative to the document. Set text or image, not both."
+      opacity:
+        type: string
+        default: "15%"
+        pattern: "^-?[0-9]+\\.?[0-9]*%$"
+        description: "The opacity of the text, as a percentage from 0% to 100%. An image does not accept it."
+      angle:
+        type: string
+        pattern: "^-?[0-9]+\\.?[0-9]*(deg|rad)$"
+        description: "The rotation, in deg or rad. The default is -45deg for text and 0deg for an image."
+      size:
+        type: string
+        default: "4em"
+        pattern: "^-?[0-9]+\\.?[0-9]*(pt|mm|cm|in|em)$"
+        description: "The size of the text, as a Typst length in pt, mm, cm, in or em, such as 4em or 48pt."
+      colour:
+        type: string
+        default: "gray"
+        description: "The colour of the text. Use a Typst colour name such as gray or red, or a hex colour such as \"#cc0000\"."
+        completion:
+          type: color
+      position:
+        type: string
+        default: "center"
+        enum: [center, top, bottom, left, right, top-left, top-right, bottom-left, bottom-right]
+        description: "Where the watermark sits on the page."
+      width:
+        type: string
+        default: "50%"
+        pattern: "^-?[0-9]+\\.?[0-9]*(%|pt|mm|cm|in|em)$"
+        description: "The width of an image, as a percentage or a Typst length in pt, mm, cm, in or em, such as 8cm."
+  sections:
+    type: object
+    description: "Settings for the numbering of appendix and supplementary sections."
+    properties:
+      appendix-delimiter:
+        type: string
+        default: "."
+        description: "The text between the appendix letter and the number, as in Figure A.1. Use an empty string for Figure A1."
+      supplementary-prefix:
+        type: string
+        default: "S"
+        description: "The prefix of supplementary headings and floats, as in S1 and Figure S1."
+
+attributes:
+  Span:
+    alt:
+      type: string
+      description: "Alternative text for a Span that holds only one formula. Typst writes it into the PDF. The formula must have no label."
+  Div:
+    alt:
+      type: string
+      description: "Alternative text for a Div that holds only one display formula. Typst writes it into the PDF. The formula must have no label."
+
+classes:
+  appendix:
+    description: "On a level-1 heading in a single document, move the section to the end as an appendix. In a book, use the appendices list instead."
+  supplementary:
+    description: "On a level-1 heading, make the section supplementary. In a single document it moves to the end, after the appendices. In a book it stays where it is."

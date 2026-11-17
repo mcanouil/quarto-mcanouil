@@ -123,7 +123,7 @@
           size: mc-chapter-number-size,
           weight: "bold",
           fill: gradient.linear(colours.at("accent-high"), colours.at("on-ground-accent"), angle: 90deg),
-          numbering(it.numbering, ..counter(heading).at(it.location())),
+          chapter-number(it),
         )))
       }
       block(text(size: 2.4em, weight: "bold", fill: colours.at("on-ground-title"), it.body))

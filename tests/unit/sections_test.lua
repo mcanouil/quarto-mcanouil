@@ -88,9 +88,11 @@ cases['sections-reorder'] = function()
   }
   assert_equal(
     texts(sections.reorder(blocks)),
-    'Intro|a|Methods|c|raw:references|References|raw:appendix|Listings|b|raw:supplementary|Extra|d',
-    'special sections at the end, in the order references, appendix, supplementary'
+    'Intro|a|Listings|b|Methods|c|Extra|d|References',
+    'the references at the end; appendix and supplementary sections are left to typst-extras'
   )
+  assert_equal(blocks[5].classes:includes('unnumbered'), true, 'the references heading is unnumbered')
+  assert_equal(blocks[1].classes:includes('unnumbered'), false, 'a body heading stays numbered')
 end
 
 cases['sections-reorder-keeps-plain'] = function()
@@ -100,8 +102,7 @@ end
 
 cases['sections-start-numbering'] = function()
   assert_equal(sections.section_start('appendix'):find('numbering: "A.1"', 1, true) ~= nil, true, 'appendix A.1')
-  assert_equal(sections.section_start('supplementary'):find('numbering: "I.1"', 1, true) ~= nil, true, 'supplementary I.1')
-  assert_equal(sections.section_start('references'):find('numbering: none', 1, true) ~= nil, true, 'references unnumbered')
+  assert_equal(sections.NUMBERING.supplementary, nil, 'supplementary numbering is left to typst-extras')
 end
 
 cases['sections-title-block-description'] = function()
