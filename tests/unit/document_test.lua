@@ -172,4 +172,23 @@ cases['resolve-revealjs-workshop'] = function()
   assert_equal(document.resolve(type_options({ type = 'workshop' }), 'mcanouil-revealjs').type, 'workshop', 'workshop')
 end
 
+cases['furniture-deck-default'] = function()
+  local furniture = document.furniture({}, 'deck')
+  assert_equal(furniture.header.left.kind, 'empty', 'header left')
+  assert_equal(furniture.footer.left.value, 'speaker', 'footer left')
+  assert_equal(furniture.footer.centre.value, 'title', 'footer centre')
+  assert_equal(furniture.footer.right.value, 'page', 'footer right')
+end
+
+cases['slot-speaker-event'] = function()
+  local meta = {
+    author = pandoc.MetaInlines({ pandoc.Str('Ada') }),
+    extensions = { mcanouil = { event = pandoc.MetaInlines({ pandoc.Str('useR!'), pandoc.Space(), pandoc.Str('2026') }) } },
+  }
+  local text = pandoc.utils.stringify(document.resolve_slot({ kind = 'field', value = 'speaker' }, meta))
+  assert_equal(text, 'Ada · useR! 2026', 'speaker and event')
+  meta.extensions = nil
+  assert_equal(pandoc.utils.stringify(document.resolve_slot({ kind = 'field', value = 'speaker' }, meta)), 'Ada', 'speaker only')
+end
+
 return cases

@@ -1,0 +1,89 @@
+/*
+ * mcanouil - terminal preset of the Reveal.js deck
+ * Console: a prompt and a cursor on slide titles, brackets around the kicker,
+ * a heading marker before slide titles, dashed boxes and rules, square corners,
+ * and block quotes in a dashed box with a bracketed label. The prompt, the
+ * cursor, the markers and the label are hidden from assistive technology.
+ *
+ * @license MIT
+ * @copyright 2026 Mickaël Canouil
+ * @author Mickaël Canouil
+ */
+
+:root {
+  --mc-radius: 0;
+}
+
+.reveal-viewport {
+  background: linear-gradient(135deg, var(--mc-ground-1), var(--mc-ground-2));
+}
+
+.reveal .slides section.mc-ground :is(h1, h2)::before,
+.reveal .slides section.mc-title-slide h1.title::before {
+  content: "$ " / "";
+  color: var(--mc-on-ground-accent);
+}
+
+.reveal .slides section.mc-ground > :is(h1, h2)::after,
+.reveal .slides section.mc-title-slide h1.title::after {
+  content: "" / "";
+  display: inline-block;
+  width: 0.5em;
+  height: 0.9em;
+  margin: 0 0 0 0.15em;
+  border-radius: 0;
+  vertical-align: -0.1em;
+  background: var(--mc-on-ground-accent);
+}
+
+.reveal .slides section.mc-ground > :is(h1, h2),
+.reveal .slides section.mc-title-slide h1.title {
+  padding-bottom: 0.25em;
+  background: repeating-linear-gradient(90deg, var(--mc-on-ground-accent) 0 12px, transparent 12px 18px) left bottom / 38% 3px no-repeat;
+}
+
+.reveal .mc-kicker::before {
+  content: "[ " / "";
+}
+
+.reveal .mc-kicker::after {
+  content: " ]" / "";
+}
+
+.reveal .slides section.mc-section > .mc-section-number {
+  font-weight: 400;
+  color: var(--mc-on-ground-accent);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.reveal .slides section:not(.mc-ground) > h2::before {
+  content: "## " / "";
+  color: var(--mc-accent-text);
+}
+
+.reveal div.sourceCode,
+.reveal .code-with-filename,
+.reveal div.callout,
+.reveal div.callout.callout-style-default,
+.reveal div.callout.callout-style-simple {
+  border-style: dashed;
+}
+
+.reveal figure.mc-quote {
+  margin-top: 1.6em;
+  padding: 0.7em 0.6em 0.3em;
+  border: 1px dashed var(--mc-line);
+}
+
+.reveal figure.mc-quote::before {
+  content: "[" attr(data-mc-label) "]" / "";
+  position: absolute;
+  top: -0.7em;
+  left: 0.5em;
+  padding: 0 0.3em;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  color: var(--mc-accent-text);
+  background: var(--mc-paper);
+}

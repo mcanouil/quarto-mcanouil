@@ -1,0 +1,61 @@
+/*
+ * mcanouil - gold preset of the Reveal.js deck
+ * Editorial: a small-caps kicker, a gilded rule under slide titles, a radius of 5px,
+ * and a gilded edge beside block quotes.
+ *
+ * @license MIT
+ * @copyright 2026 Mickaël Canouil
+ * @author Mickaël Canouil
+ */
+
+:root {
+  --mc-radius: 5px;
+  --mc-font-ui: system-ui, sans-serif;
+}
+
+.reveal .mc-kicker {
+  font-variant: small-caps;
+}
+
+.reveal .slides section:not(.mc-ground) > h2::after {
+  content: "";
+  display: block;
+  width: 2.2em;
+  height: 3px;
+  margin-top: 0.2em;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--mc-accent), var(--mc-accent-high));
+}
+
+.reveal figure.mc-quote {
+  padding: 0.1em 0 0.1em 0.8em;
+  font-size: 1.05em;
+}
+
+.reveal figure.mc-quote::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: linear-gradient(var(--mc-accent-low), var(--mc-accent-high), var(--mc-accent-low));
+}
+
+.reveal figure.mc-quote blockquote {
+  font-style: italic;
+}
+
+.reveal figure.mc-quote figcaption.mc-quote-attribution {
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  color: var(--mc-accent-text);
+}
+
+@media (forced-colors: active) {
+  .reveal .slides section > h2::after,
+  .reveal figure.mc-quote::before {
+    display: none;
+  }
+}

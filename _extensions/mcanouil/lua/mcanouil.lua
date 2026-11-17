@@ -17,6 +17,7 @@ local math_alt_text = require(quarto.utils.resolve_path('math-alt-text.lua'):gsu
 local sections = require(quarto.utils.resolve_path('sections.lua'):gsub('%.lua$', ''))
 local quote = require(quarto.utils.resolve_path('quote.lua'):gsub('%.lua$', ''))
 local html_page = require(quarto.utils.resolve_path('html-page.lua'):gsub('%.lua$', ''))
+local deck = require(quarto.utils.resolve_path('deck.lua'):gsub('%.lua$', ''))
 
 --- @type table[] The filter steps, run in order.
 local STEPS = {
@@ -31,6 +32,7 @@ local STEPS = {
   sections.pre_filter,
   quote.filter,
   html_page.filter,
+  deck.filter,
 }
 
 return STEPS

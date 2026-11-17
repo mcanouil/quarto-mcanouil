@@ -95,5 +95,14 @@ contributes:
         - veil
         - tabset
         - codefrag
+      template-partials:
+        - revealjs/partials/title-slide.html
+      slide-number: c/t
+      progress: true
+      width: 1280
+      height: 720
+      margin: 0
+      center-title-slide: false
       theme:
         - revealjs/theme.scss
+        - revealjs/slides.scss

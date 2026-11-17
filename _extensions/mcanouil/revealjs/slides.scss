@@ -1,0 +1,256 @@
+/*-- scss:defaults --*/
+
+// Side of the corner motif, as a share of the slide width: title and closing
+// slides, and section slides.
+$mc-motif-title: 40% !default;
+$mc-motif-section: 70% !default;
+
+/*-- scss:rules --*/
+
+// Every slide keeps the text off its edges; Reveal.js has no margin, so the
+// motif of a ground slide reaches the edges of the slide.
+.reveal .slides section:not(.stack) {
+  box-sizing: border-box;
+  padding: 36px var(--mc-slide-pad) 56px;
+}
+
+// Ground slides: title, section and closing slides on the gradient of the
+// preset, full height, with the motif in the top right corner. Lua sets the
+// gradient as the slide background, and the ground tokens on the slide.
+.reveal .slides section.mc-ground {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 var(--mc-slide-pad);
+  overflow: hidden;
+  color: var(--mc-on-ground-text);
+}
+
+.reveal .slides section.mc-ground :is(h1, h2) {
+  color: var(--mc-on-ground-title);
+}
+
+.reveal .slides section.mc-ground a {
+  color: var(--mc-on-ground-accent);
+}
+
+.reveal .slides section.mc-ground :focus-visible {
+  outline-color: var(--mc-on-ground-accent);
+}
+
+.reveal .slides section.mc-ground > :is(h1, h2)::after {
+  content: "";
+  display: block;
+  width: 38%;
+  height: 4px;
+  margin-top: 0.3em;
+  border-radius: 2px;
+  background: var(--mc-gilded);
+}
+
+// The motif is decoration: it bleeds to the top and right edges of the slide,
+// takes no pointer, and reads nothing to assistive technology.
+.reveal .slides section.mc-ground > .mc-motif {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: $mc-motif-title;
+  height: auto;
+  aspect-ratio: 1;
+  margin: 0;
+  pointer-events: none;
+}
+
+.reveal .slides section.mc-section > .mc-motif {
+  width: $mc-motif-section;
+}
+
+// Title slide: kicker, title, gilded rule, subtitle and speakers, at the
+// bottom left. The text column ends left of the shapes of every motif.
+.reveal .slides section.mc-title-slide .mc-title-content {
+  position: absolute;
+  left: var(--mc-slide-pad);
+  bottom: 48px;
+  max-width: 70%;
+}
+
+.reveal .slides section.mc-title-slide h1.title {
+  margin: 0.1em 0 0;
+  font-size: 2.5em;
+  line-height: 1.1;
+}
+
+.reveal .slides section.mc-title-slide.mc-title-long h1.title {
+  font-size: 1.6em;
+}
+
+.reveal .slides section.mc-title-slide h1.title::after {
+  content: "";
+  display: block;
+  width: 38%;
+  height: 4px;
+  margin-top: 0.3em;
+  border-radius: 2px;
+  background: var(--mc-gilded);
+}
+
+.reveal .slides section.mc-title-slide .subtitle {
+  margin: 0.4em 0 0;
+  font-size: 0.8em;
+  color: var(--mc-on-ground-text);
+}
+
+.reveal .mc-kicker {
+  margin: 0;
+  font-family: var(--mc-font-ui);
+  font-size: 0.6em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mc-on-ground-accent);
+}
+
+.reveal .mc-speakers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em 1.5em;
+  margin-top: 0.8em;
+}
+
+.reveal .mc-speaker {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.reveal .slides section .mc-speaker-photo {
+  width: 64px;
+  height: 64px;
+  margin: 0;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.reveal .mc-speaker-text {
+  margin: 0;
+  font-size: 0.6em;
+  line-height: 1.3;
+  color: var(--mc-on-ground-text);
+}
+
+.reveal .mc-speaker-name {
+  font-weight: 700;
+  color: var(--mc-on-ground-title);
+}
+
+.reveal .slides section.mc-title-slide .date {
+  margin: 0.6em 0 0;
+  font-size: 0.55em;
+  color: var(--mc-on-ground-text);
+}
+
+// Section slides: a grid reads the number, the title with its rule, then the
+// body, in this order. The number ends on the middle line and the title starts
+// on it, both left of the motif; the body follows the title. Reveal.js sets the
+// display of the current slide in a style attribute, so the grid needs
+// !important.
+.reveal .slides section.mc-section {
+  display: grid !important;
+  grid-template-rows: 50% auto;
+  grid-template-columns: minmax(0, 50%);
+  align-content: start;
+}
+
+// Reveal.js print rules, `html.reveal-print .reveal .slides section`, set
+// `display: block` and a padding of 0, both !important. One more class gives
+// these rules the precedence, so a PDF export keeps the grid and the side
+// padding.
+html.reveal-print .reveal .slides section.mc-section {
+  display: grid !important;
+  padding: 0 var(--mc-slide-pad) !important;
+}
+
+.reveal .slides section.mc-section > :not(.mc-motif) {
+  grid-column: 1;
+  margin: 0;
+}
+
+.reveal .slides section.mc-section > :not(.mc-motif, h1, .mc-section-number) {
+  margin-top: 0.8em;
+  font-size: 0.75em;
+}
+
+.reveal .slides section.mc-section > .mc-section-number {
+  grid-row: 1;
+  align-self: end;
+}
+
+.reveal .slides section.mc-section > h1 {
+  grid-row: 2;
+  font-size: 1.9em;
+  line-height: 1.15;
+}
+
+.reveal .slides section.mc-section.mc-long > h1 {
+  font-size: 1.3em;
+}
+
+.reveal .slides section.mc-section > .mc-section-number {
+  font-family: var(--mc-font-headings);
+  font-size: 5.5em;
+  font-weight: 700;
+  line-height: 0.95;
+  color: var(--mc-accent-high);
+  background: linear-gradient(180deg, var(--mc-accent-high), var(--mc-on-ground-accent));
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// Closing slide: below the motif, the title, the links one per line as plain
+// text, and the licence. A padding in percent follows the slide width, as the
+// motif side does; the shapes of every motif end above 62% of its side.
+.reveal .slides section.mc-closing {
+  padding-top: $mc-motif-title * 0.62 + 4%;
+}
+
+.reveal .slides section.mc-closing > h2 {
+  font-size: 1.9em;
+}
+
+.reveal .slides section.mc-closing .mc-closing-links ul {
+  margin: 0.6em 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75em;
+}
+
+.reveal .slides section.mc-closing .mc-closing-links li {
+  margin: 0.1em 0;
+}
+
+.reveal .slides section.mc-closing .mc-closing-licence p {
+  margin: 0.8em 0 0;
+  font-size: 0.6em;
+  color: var(--mc-on-ground-text);
+}
+
+// Two columns: aligned at the top, with a gap.
+.reveal .slides section .columns {
+  display: flex;
+  gap: 1.5em;
+  align-items: flex-start;
+}
+
+// Decoration is not content: forced colours remove it.
+@media (forced-colors: active) {
+  .reveal .mc-motif,
+  .reveal .progress,
+  .reveal .slides section.mc-ground > :is(h1, h2)::after,
+  .reveal .slides section.mc-title-slide h1.title::after {
+    display: none;
+  }
+
+  .reveal .slides section.mc-section > .mc-section-number {
+    -webkit-text-fill-color: currentColor;
+    background: none;
+  }
+}

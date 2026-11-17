@@ -1,0 +1,88 @@
+/*
+ * mcanouil - quarto preset of the Reveal.js deck
+ * Documentation: a pill kicker, an accent bar beside slide titles, a radius of
+ * 9px, code windows on the card, and block quotes on a card with a round quote
+ * mark and the attribution in a pill.
+ *
+ * @license MIT
+ * @copyright 2026 Mickaël Canouil
+ * @author Mickaël Canouil
+ */
+
+:root {
+  --mc-radius: 9px;
+}
+
+.reveal .mc-kicker {
+  display: inline-block;
+  padding: 0.15em 0.7em;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--mc-on-ground-title);
+  background: color-mix(in srgb, var(--mc-on-ground-title) 14%, transparent);
+}
+
+.reveal .slides section:not(.mc-ground) > h2 {
+  position: relative;
+  padding-left: 0.5em;
+}
+
+.reveal .slides section:not(.mc-ground) > h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  bottom: 0.1em;
+  width: 5px;
+  border-radius: 3px;
+  background: var(--mc-accent);
+}
+
+.reveal .code-with-filename,
+.reveal .code-with-filename div.sourceCode,
+.reveal .code-with-filename pre,
+.reveal .code-with-filename pre code {
+  background-color: var(--mc-card);
+}
+
+.reveal figure.mc-quote {
+  padding: 0.6em 0.9em 0.6em 2.6em;
+  border-radius: var(--mc-radius);
+  background: var(--mc-card);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--mc-ink) 12%, transparent);
+}
+
+.reveal figure.mc-quote::before {
+  content: "\201C" / "";
+  position: absolute;
+  left: 0.6em;
+  top: 0.55em;
+  width: 1.3em;
+  height: 1.3em;
+  border-radius: 50%;
+  font-family: var(--mc-font-headings);
+  font-weight: 700;
+  line-height: 1.5em;
+  text-align: center;
+  color: var(--mc-on-ground-title);
+  background: var(--mc-chrome);
+}
+
+.reveal figure.mc-quote blockquote {
+  color: var(--mc-ink);
+}
+
+.reveal figure.mc-quote figcaption.mc-quote-attribution {
+  display: inline-block;
+  padding: 0.05em 0.7em;
+  border-radius: 999px;
+  color: var(--mc-accent-text);
+  background: var(--mc-tint);
+}
+
+@media (forced-colors: active) {
+  .reveal .slides section > h2::before {
+    display: none;
+  }
+}

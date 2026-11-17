@@ -49,6 +49,30 @@ cases['contrast-pair-of-one-preset'] = function()
   assert_equal(#contrast.check(pairs_to_check, get_colour, { 'light' }, 'gold'), 0, 'skipped for another preset')
 end
 
+cases['contrast-pair-of-one-scheme'] = function()
+  local pairs_to_check = { { name = 'fg on bg', fg_token = 'fg', bg_token = 'bg', threshold = 4.5, mode = 'dark' } }
+  local colours = { light = { fg = '#cccccc', bg = '#ffffff' }, dark = { fg = '#cccccc', bg = '#ffffff' } }
+  local function get_colour(mode, token) return colours[mode][token] end
+  local failures = contrast.check(pairs_to_check, get_colour, { 'light', 'dark' })
+  assert_equal(#failures, 1, 'checked in its scheme only')
+  assert_equal(failures[1].mode, 'dark', 'failing scheme')
+end
+
+cases['contrast-pairs-cover-the-deck'] = function()
+  local seen = {}
+  for _, pair in ipairs(contrast.PAIRS) do
+    seen[string.format('%s on %s %g %s', pair.fg_token, pair.bg_token, pair.threshold, pair.mode or 'all')] = true
+  end
+  for _, name in ipairs({
+    'paper on accent-text 4.5 all', 'ground-1 on on-ground-accent 4.5 all', 'on-ground-text on paper 4.5 dark',
+    'ink on ground-2 4.5 all', 'muted on ground-2 4.5 all',
+    'muted on paper 3 all', 'on-ground-text on ground-1 3 all', 'on-ground-text on paper 3 dark',
+    'on-ground-accent on ground-1 3 all', 'on-ground-accent on ground-2 3 all',
+  }) do
+    assert_equal(seen[name], true, 'pair ' .. name)
+  end
+end
+
 cases['contrast-pairs-cover-the-spec'] = function()
   local seen = {}
   for _, pair in ipairs(contrast.PAIRS) do
