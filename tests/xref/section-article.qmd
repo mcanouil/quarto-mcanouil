@@ -1,0 +1,23 @@
+---
+title: Section references
+author: Test Author
+extensions:
+  mcanouil:
+    type: article
+format:
+  mcanouil-typst:
+    keep-typ: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In an article, whose sections have numbers, a reference to a section keeps the number that Typst writes.
+        check: bash _checks/xref.sh section 'Section 1'
+        warnings: exhaustive
+    mcanouil-typst:
+      noErrors: true
+      ensureTypstFileRegexMatches:
+        - ['See #ref\(<sec-intro>, supplement: \[']
+---
+
+{{< include _section-refs.qmd >}}
