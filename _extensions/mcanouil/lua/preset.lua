@@ -114,7 +114,7 @@ end
 
 --- Read a preset data file.
 --- @param name string Preset name
---- @return table Preset data: `light`, `dark`, `fonts` and `logo`
+--- @return table Preset data: `light`, `dark`, `fonts`, `motif` and `logo`
 function M.read(name)
   local path = EXTENSION_DIR .. '/presets/' .. name .. '.yml'
   local file = io.open(path, 'r')
@@ -321,6 +321,7 @@ local function deliver(meta)
       typst_fonts[role] = M.typst_families(font.family)
     end
     meta['mcanouil-fonts'] = typst_fonts
+    meta['mcanouil-motif'] = data.motif
   end
   return meta
 end

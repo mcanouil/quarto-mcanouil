@@ -1,5 +1,5 @@
 # mcanouil - quarto preset
-# Colour tokens for the light and dark schemes, fonts and logos of the quarto preset.
+# Colour tokens for the light and dark schemes, fonts, motif and logos of the quarto preset.
 # This file and the other preset files are the only files of the extension with colour values.
 #
 # @license MIT
@@ -70,6 +70,8 @@ fonts:
     base: sans-serif
     headings: sans-serif
     monospace: monospace
+
+motif: ribbon
 
 logo:
   light: logos/logo-light.svg

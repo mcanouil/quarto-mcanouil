@@ -8,7 +8,8 @@ set -euo pipefail
 # in CHECKS. Quarto does not follow symbolic links, so the extension is copied
 # into a temporary work directory.
 #
-# Requires: quarto, and pdftotext and pdfinfo from poppler.
+# Requires: quarto, pdftotext, pdfinfo, pdffonts and pdftoppm from poppler,
+# and docker for the veraPDF checks of tests/a11y/run.sh.
 #
 # Usage: tests/run.sh [--only <glob>]
 
@@ -20,11 +21,12 @@ if [ "${1:-}" = "--only" ]; then
 	only="${2:?--only needs a glob}"
 fi
 
-work_dir="$(mktemp -d)"
+work_dir="$(cd "$(mktemp -d)" && pwd -P)"
 trap 'rm -rf "${work_dir}"' EXIT
 
 cp -R "${repo_dir}/_extensions" "${work_dir}/_extensions"
 cp -R "${tests_dir}/fixtures/." "${work_dir}/"
+cp -R "${tests_dir}/projects" "${work_dir}/projects"
 
 passed=0
 failed=0
@@ -58,11 +60,14 @@ output_extension() {
 #   - the "pandoc" and "metadata" headers, which are bold escape sequences;
 #   - the indented lines of the resolved pandoc options and metadata;
 #   - "[typst]: Compiling ... DONE";
+#   - "[verapdf]: Validating ... against PDF/UA1...PASSED", with a green
+#     PASSED, and the colour reset that follows it on its own line;
 #   - "Output created: <file>".
-# Anything else, a "WARN:" or "ERROR:" line or a filter message, is a problem.
+# Anything else, a "WARN:" or "ERROR:" line, a failed veraPDF validation or a
+# filter message, is a problem.
 # $1 stderr file.
 unexpected_stderr() {
-	grep -Ev $'^$|^\033\\[1m(pandoc|metadata)|^[[:space:]]|^\\[typst\\]: Compiling .*DONE$|^Output created: ' "$1" || true
+	grep -Ev $'^$|^\033\\[1m(pandoc|metadata)|^[[:space:]]|^\\[typst\\]: Compiling .*DONE$|^\\[verapdf\\]: Validating .* against PDF/UA1\\.\\.\\.\033\\[32mPASSED$|^\033\\[39m$|^Output created: ' "$1" || true
 }
 
 # Render a fixture once, without a check of its stderr, and answer the path of
@@ -218,6 +223,141 @@ reaches() {
 	revealjs) css_rule "$1" ':root' | grep -qF -- "${value}" ;;
 	typst) typ_token "$1" "$3" "$4" ;;
 	esac
+}
+
+# Answer the text of one page of a PDF, with the layout kept.
+# $1 PDF file. $2 page number.
+pdf_page_text() {
+	pdftotext -layout -f "$2" -l "$2" "$1" -
+}
+
+# Answer the last line of a page of a PDF that holds text: the footer.
+# $1 PDF file. $2 page number.
+pdf_footer() {
+	pdf_page_text "$1" "$2" | grep -v '^[[:space:]]*$' | tail -n 1
+}
+
+# Answer the first line of a page of a PDF that holds text: the header.
+# $1 PDF file. $2 page number.
+pdf_header() {
+	pdf_page_text "$1" "$2" | grep -v '^[[:space:]]*$' | head -n 1
+}
+
+# Render page 1 of a PDF to a PPM image at 50 dpi, once, and answer its path.
+# $1 PDF file.
+page1_image() {
+	local image="${1%.pdf}-page1"
+	if [ ! -f "${image}.ppm" ]; then
+		pdftoppm -r 50 -f 1 -l 1 -singlefile "$1" "${image}"
+	fi
+	printf '%s.ppm' "${image}"
+}
+
+# Answer the width and height of a binary PPM image.
+# $1 PPM file.
+ppm_size() {
+	LC_ALL=C sed -n 2p "$1"
+}
+
+# Answer the red, green and blue values of one pixel of a binary PPM image,
+# whose header is "P6", the size and "255" on three lines.
+# $1 PPM file. $2 x. $3 y.
+pixel() {
+	local width height header
+	read -r width height <<<"$(ppm_size "$1")"
+	header=$((3 + ${#width} + 1 + ${#height} + 1 + 4))
+	od -An -tu1 -j $((header + ($3 * width + $2) * 3)) -N 3 "$1" | awk 'NF { print $1, $2, $3 }'
+}
+
+# Answer the red, green and blue values of a hex colour.
+# $1 colour, "#rrggbb".
+hex_rgb() {
+	printf '%d %d %d' "0x${1:1:2}" "0x${1:3:2}" "0x${1:5:2}"
+}
+
+# Answer the distance of two colours, as the sum of the channel differences.
+# $1 and $2 colours, "r g b".
+colour_distance() {
+	awk -v a="$1" -v b="$2" 'BEGIN {
+		split(a, x, " "); split(b, y, " "); d = 0
+		for (i = 1; i <= 3; i++) { v = x[i] - y[i]; d += (v < 0 ? -v : v) }
+		print d
+	}'
+}
+
+# Succeed when a pixel shows the motif: it differs from the paper, and it is
+# closer to the motif colour than the paper is.
+# $1 pixel, "r g b". $2 paper, "r g b". $3 motif colour, "r g b".
+shows_motif() {
+	local from_paper to_colour paper_to_colour
+	from_paper="$(colour_distance "$1" "$2")"
+	to_colour="$(colour_distance "$1" "$3")"
+	paper_to_colour="$(colour_distance "$2" "$3")"
+	[ "${from_paper}" -gt 8 ] && [ "${to_colour}" -lt "${paper_to_colour}" ]
+}
+
+# Answer the value of a Typst expression that uses a top-level binding of a
+# kept Typst file. `typst eval --in` does not give the scope of the file, so the
+# expression imports the binding. `quarto typst` writes the value to stderr, so
+# both streams are read, and any diagnostic fails.
+# $1 kept Typst file, absolute. $2 binding name. $3 expression.
+typst_value() {
+	local value
+	value="$(quarto typst eval "{ import \"$1\": $2; $3 }" --root / 2>&1)" || return 1
+	if grep -qE '^(error|warning)' <<<"${value}"; then
+		printf '%s\n' "${value}" >&2
+		return 1
+	fi
+	printf '%s\n' "${value}"
+}
+
+# Answer the side of the page 1 motif of a rendered PDF, in pixels at 50 dpi,
+# from the motif size that the kept Typst file uses.
+# $1 PDF file.
+motif_side_px() {
+	local points
+	points="$(typst_value "${1%.pdf}.typ" mc-first-page-motif-size 'mc-first-page-motif-size.pt()' || printf 0)"
+	awk -v p="${points}" 'BEGIN { printf "%d", p * 50 / 72 }'
+}
+
+# Answer the pixel of a page 1 image at a point of the top right motif, given
+# in motif units (the 100 by 100 view box). The last column and the first row
+# of the image are only partly on the page, so the point is kept off them.
+# $1 PPM file. $2 motif side in pixels. $3 motif x. $4 motif y.
+motif_pixel() {
+	local width height x y
+	read -r width height <<<"$(ppm_size "$1")"
+	x="$(awk -v w="${width}" -v s="$2" -v m="$3" 'BEGIN { x = int(w - (100 - m) / 100 * s); if (x > w - 2) x = w - 2; print x }')"
+	y="$(awk -v s="$2" -v m="$4" 'BEGIN { y = int(m / 100 * s); if (y < 1) y = 1; print y }')"
+	pixel "$1" "${x}" "${y}"
+}
+
+# Answer the shapes of the motifs of the Typst library, one line each:
+# "<motif> <kind> <numbers...> <opacity>".
+# $1 kept Typst file of a render.
+typst_motif_shapes() {
+	typst_value "$1" mc-motif-lines 'mc-motif-lines().join("\n")' | sed -E 's/^"//; s/"$//' | sed 's/\\n/\n/g'
+}
+
+# Answer the shapes of an SVG motif file, in the format of typst_motif_shapes.
+# $1 motif name. $2 SVG file.
+svg_motif_shapes() {
+	grep -oE '<(path|rect|circle) [^>]*>' "$2" | awk -v name="$1" '
+		function attr(tag, key,   m) {
+			if (match(tag, " " key "=\"[^\"]*\"")) { m = substr(tag, RSTART + length(key) + 3, RLENGTH - length(key) - 4); return m }
+			return ""
+		}
+		{
+			kind = substr($1, 2)
+			if (kind == "path") {
+				d = attr($0, "d"); gsub(/[MLZ]/, " ", d); gsub(/ +/, " ", d); sub(/^ /, "", d); sub(/ $/, "", d)
+				print name, "polygon", d, attr($0, "opacity")
+			} else if (kind == "rect") {
+				print name, "rect", attr($0, "x"), attr($0, "y"), attr($0, "width"), attr($0, "height"), attr($0, "opacity")
+			} else {
+				print name, "circle", attr($0, "cx"), attr($0, "cy"), attr($0, "r"), attr($0, "opacity")
+			}
+		}'
 }
 
 check_smoke_renders() {
@@ -579,6 +719,199 @@ check_no_label_text_outside_language_files() {
 	fi
 }
 
+check_slots_three_only() {
+	local typ calls ok=1 line
+	typ="$(render report typst gold)"
+	typ="${typ%.pdf}.typ"
+	calls="$(grep -E '^[[:space:]]*[^/[:space:]].*slots\(' "${typ}" | grep -vF '#let slots(' || true)"
+	[ "$(grep -c . <<<"${calls}")" -ge 2 ] || ok=0
+	while IFS= read -r line; do
+		[ -n "${line}" ] || continue
+		[ "$(grep -oE '[a-z-]+: ' <<<"${line#*slots(}" | tr -d ' ' | tr '\n' ' ')" = "left: centre: right: " ] || ok=0
+	done <<<"${calls}"
+	if [ "${ok}" = 1 ]; then
+		report pass slots-three-only ""
+	else
+		report fail slots-three-only "every slots( call of the Typst output with left:, centre: and right: only, found: ${calls}"
+	fi
+}
+
+check_center_alias() {
+	local output
+	output="$(render center-alias typst gold)"
+	if has "${output%.pdf}.typ" 'centre: [Middle slot]' && pdf_header "${output}" 2 | grep -qF 'Middle slot'; then
+		report pass center-alias ""
+	else
+		report fail center-alias "header.center 'Middle slot' in the centre slot of the page 2 header"
+	fi
+}
+
+check_page_number_format() {
+	local output total footer
+	output="$(render report typst gold)"
+	total="$(pdf_page_count "${output}")"
+	footer="$(pdf_footer "${output}" 2)"
+	# The layout mode of pdftotext drops the narrow spaces around the slash,
+	# so the number is read from the text in content stream order.
+	if [ "${total}" -ge 3 ] && grep -qE "^[[:space:]]*Test Author[[:space:]]+Version 1\.2[[:space:]]+2 ?/ ?${total}[[:space:]]*$" <<<"${footer}" &&
+		pdftotext -raw -f 2 -l 2 "${output}" - | tr -d '\f' | grep -qE "(^| )2 / ${total}$"; then
+		report pass page-number-format ""
+	else
+		report fail page-number-format "the page 2 footer 'Test Author | Version 1.2 | 2 / ${total}', found '${footer}'"
+	fi
+}
+
+check_report_header() {
+	local output header
+	output="$(render report typst gold)"
+	header="$(pdf_header "${output}" 3)"
+	if grep -qE '^[[:space:]]*Survival analysis[[:space:]]+(Study design|Results)[[:space:]]*$' <<<"${header}" &&
+		! pdf_header "${output}" 1 | grep -qE 'Survival analysis[[:space:]]+[A-Z]'; then
+		report pass report-header ""
+	else
+		report fail report-header "the page 3 header 'Survival analysis | | <chapter>', and no header on page 1, found '${header}'"
+	fi
+}
+
+check_furniture_missing_metadata() {
+	local output footer
+	output="$(render report-no-author typst gold)"
+	footer="$(pdf_footer "${output}" 1)"
+	if grep -qE '^[[:space:]]*Version 1\.2[[:space:]]+1 ?/ ?1[[:space:]]*$' <<<"${footer}"; then
+		report pass furniture-missing-metadata ""
+	else
+		report fail furniture-missing-metadata "the footer 'Version 1.2 | 1 / 1' with no leading separator, found '${footer}'"
+	fi
+}
+
+check_pdfua_default() {
+	local output ok=1
+	output="$(render report typst gold)"
+	pdfinfo -meta "${output}" | grep -qE 'pdfuaid:part(>|=")1' || ok=0
+	"${tests_dir}/a11y/run.sh" pdf "${output}" >"${output%.pdf}.verapdf" 2>&1 || ok=0
+	if [ "${ok}" = 1 ]; then
+		report pass pdfua-default ""
+	else
+		report fail pdfua-default "a PDF/UA-1 identification and no veraPDF ua1 failure: $(tail -n 5 "${output%.pdf}.verapdf")"
+	fi
+}
+
+check_decoration_artefact() {
+	local preset output ok=1
+	for preset in gold mono quarto terminal; do
+		output="$(render report typst "${preset}")"
+		pdfinfo -struct-text "${output}" >"${output%.pdf}.struct"
+		[ -s "${output%.pdf}.struct" ] || ok=0
+		! grep -qE 'Figure|Artifact|Shape' "${output%.pdf}.struct" || ok=0
+		! pdf_page_text "${output}" 1 | grep -qE '[■□▲△●○◆◇]' || ok=0
+		grep -qE '^Document' "${output%.pdf}.struct" || ok=0
+		"${tests_dir}/a11y/run.sh" pdf "${output}" >/dev/null 2>&1 || ok=0
+		has "${output%.pdf}.typ" 'motif(' || ok=0
+	done
+	if [ "${ok}" = 1 ]; then
+		report pass decoration-artefact ""
+	else
+		report fail decoration-artefact "a motif call, a tag tree without decoration, no motif glyph in the text, and veraPDF ua1 compliance, in every preset"
+	fi
+}
+
+# Motif sample points of each preset, in motif units: "x,y" pairs inside a
+# shape. The first pair is the shape nearest the corner, the last one is on the
+# right edge at mid motif height or the nearest shape to it.
+declare -A MOTIF_POINTS=(
+	[gold]="99.5,0.5 99.5,50"
+	[mono]="99.5,0.5 81,0.5 99.5,32 99.5,50"
+	[quarto]="46,0.5 99.5,54"
+	[terminal]="96,4 96,53"
+)
+
+# Token of the colour that each preset motif uses on a light page; a dark
+# page uses accent-high.
+declare -A MOTIF_TOKEN=([gold]=accent [mono]=accent [quarto]=accent [terminal]=accent-high)
+
+check_motif_corner() {
+	local preset output image side mode paper colour point ok
+	for preset in gold mono quarto terminal; do
+		ok=1
+		output="$(render report typst "${preset}")"
+		image="$(page1_image "${output}")"
+		side="$(motif_side_px "${output}")"
+		mode=light
+		[ "${preset}" = terminal ] && mode=dark
+		paper="$(hex_rgb "$(preset_value "${preset}" "${mode}" paper)")"
+		colour="$(hex_rgb "$(preset_value "${preset}" "${mode}" "${MOTIF_TOKEN[${preset}]}")")"
+		[ "${side}" -gt 50 ] || ok=0
+		for point in ${MOTIF_POINTS[${preset}]}; do
+			shows_motif "$(motif_pixel "${image}" "${side}" "${point%,*}" "${point#*,}")" "${paper}" "${colour}" || ok=0
+		done
+		if [ "${ok}" = 1 ]; then
+			report pass "motif-corner-${preset}" ""
+		else
+			report fail "motif-corner-${preset}" "the ${preset} motif colour at the motif points ${MOTIF_POINTS[${preset}]} of page 1"
+		fi
+	done
+}
+
+check_motif_geometry_match() {
+	local typ name typst_lines svg_lines ok=1
+	typ="$(render report typst gold)"
+	typst_lines="$(typst_motif_shapes "${typ%.pdf}.typ" || true)"
+	[ -n "${typst_lines}" ] || ok=0
+	for name in facets steps ribbon dots; do
+		svg_lines="$(svg_motif_shapes "${name}" "${repo_dir}/_extensions/mcanouil/html/motifs/${name}.svg" 2>/dev/null || true)"
+		[ -n "${svg_lines}" ] || ok=0
+		[ "$(grep "^${name} " <<<"${typst_lines}")" = "${svg_lines}" ] || ok=0
+	done
+	if [ "${ok}" = 1 ]; then
+		report pass motif-geometry-match ""
+	else
+		report fail motif-geometry-match "the same shapes, points and opacities in typst/lib/motifs.typ and html/motifs/<name>.svg"
+	fi
+}
+
+check_subdir_assets() {
+	local dir="${work_dir}/projects/single" output ok=1 image side paper colour
+	cp -R "${repo_dir}/_extensions" "${dir}/_extensions"
+	if ! (cd "${dir}" && quarto render chapters/sub.qmd --to mcanouil-typst \
+		--metadata-file "${tests_dir}/presets/gold.yml" >sub.out 2>sub.err); then
+		ok=0
+	fi
+	[ -z "$(unexpected_stderr "${dir}/sub.err")" ] || ok=0
+	output="$(find "${dir}" -name 'sub.pdf' | head -n 1)"
+	if [ -f "${output}" ]; then
+		pdffonts "${output}" | grep -q 'SourceSerif4' || ok=0
+		image="$(page1_image "${output}")"
+		side="$(motif_side_px "${output}")"
+		paper="$(hex_rgb "$(preset_value gold light paper)")"
+		colour="$(hex_rgb "$(preset_value gold light accent)")"
+		shows_motif "$(motif_pixel "${image}" "${side}" 99.5 0.5)" "${paper}" "${colour}" || ok=0
+	else
+		ok=0
+	fi
+	if [ "${ok}" = 1 ]; then
+		report pass subdir-assets ""
+	else
+		report fail subdir-assets "chapters/sub.qmd of a project to render quietly with Source Serif 4 and the motif: $(cat "${dir}/sub.err" 2>/dev/null | tail -n 3)"
+	fi
+}
+
+check_typst_dark_mode() {
+	local output image width height ok=1 dir="${work_dir}/typst-dark" code=0
+	output="$(render typst-dark typst gold)"
+	image="$(page1_image "${output}")"
+	read -r width height <<<"$(ppm_size "${image}")"
+	[ "$(colour_distance "$(pixel "${image}" $((width * 3 / 10)) 3)" "$(hex_rgb "$(preset_value gold dark paper)")")" -le 3 ] || ok=0
+	has "${output%.pdf}.typ" 'mc-mode = "dark"' || ok=0
+	cp -R "${repo_dir}/_extensions" "${dir}/_extensions"
+	(cd "${dir}" && quarto render bad.qmd --to mcanouil-typst >bad.out 2>bad.err) || code=$?
+	[ "${code}" != 0 ] && has "${dir}/bad.err" 'ink on paper (dark)' || ok=0
+	if [ "${ok}" = 1 ]; then
+		report pass typst-dark-mode ""
+	else
+		report fail typst-dark-mode "the gold dark paper on page 1 of a brand-mode: dark PDF, and a contrast failure on a dark pair"
+	fi
+}
+
 CHECKS=(
 	smoke-renders
 	tool-active
@@ -604,6 +937,17 @@ CHECKS=(
 	label-fallback
 	label-override
 	no-label-text-outside-language-files
+	slots-three-only
+	center-alias
+	page-number-format
+	report-header
+	furniture-missing-metadata
+	pdfua-default
+	decoration-artefact
+	motif-corner
+	motif-geometry-match
+	subdir-assets
+	typst-dark-mode
 )
 
 for name in "${CHECKS[@]}"; do

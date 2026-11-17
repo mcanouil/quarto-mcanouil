@@ -1,0 +1,11 @@
+---
+title: Centre alias
+extensions:
+  mcanouil:
+    header:
+      center: Middle slot
+---
+
+# Introduction
+
+{{< lipsum 8 >}}

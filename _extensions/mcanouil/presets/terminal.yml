@@ -1,5 +1,5 @@
 # mcanouil - terminal preset
-# Colour tokens for the light and dark schemes, fonts and logos of the terminal preset.
+# Colour tokens for the light and dark schemes, fonts, motif and logos of the terminal preset.
 # This file and the other preset files are the only files of the extension with colour values.
 #
 # @license MIT
@@ -71,6 +71,8 @@ fonts:
     base: monospace
     headings: monospace
     monospace: monospace
+
+motif: dots
 
 logo:
   light: logos/logo-light.svg

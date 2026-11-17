@@ -1,0 +1,17 @@
+---
+title: Survival analysis
+author: Test Author
+version: Version 1.2
+---
+
+# Introduction
+
+{{< lipsum 4 >}}
+
+# Study design
+
+{{< lipsum 6 >}}
+
+# Results
+
+{{< lipsum 6 >}}

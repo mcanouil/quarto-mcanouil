@@ -1,0 +1,8 @@
+---
+title: No author
+version: Version 1.2
+---
+
+# Introduction
+
+{{< lipsum 2 >}}

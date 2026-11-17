@@ -9,3 +9,33 @@ options:
       - terminal
     default: gold
     description: "Preset for every format: colours, fonts and style. Set it as `extensions: { mcanouil: { preset: <name> } }` in the front matter or in `_quarto.yml`."
+  header:
+    type: object
+    additional-properties: false
+    description: "Content of the three header slots of Typst pages. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter and page. An empty string leaves the slot empty. A slot that is not set takes the default of the document type."
+    properties:
+      left:
+        type: string
+        description: "Content of the left header slot, aligned left."
+      centre:
+        type: string
+        aliases: [center]
+        description: "Content of the centre header slot, centred."
+      right:
+        type: string
+        description: "Content of the right header slot, aligned right."
+  footer:
+    type: object
+    additional-properties: false
+    description: "Content of the three footer slots of Typst pages. Each slot holds text, or one of the fields title, subtitle, author, date, version, chapter and page. An empty string leaves the slot empty. A slot that is not set takes the default of the document type."
+    properties:
+      left:
+        type: string
+        description: "Content of the left footer slot, aligned left."
+      centre:
+        type: string
+        aliases: [center]
+        description: "Content of the centre footer slot, centred."
+      right:
+        type: string
+        description: "Content of the right footer slot, aligned right."

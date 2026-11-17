@@ -16,6 +16,11 @@ extensions:
 
 # Tools
 
+## Group
+
+The offset heading below sits under this one, so no heading level is skipped,
+as PDF/UA requires.
+
 ## Offset {offset-headings-by=1}
 
 A reference to #12 and an icon {{< iconify mdi home >}}.

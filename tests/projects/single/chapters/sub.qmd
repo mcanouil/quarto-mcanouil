@@ -1,0 +1,6 @@
+---
+title: Document in a subdirectory
+author: Test Author
+---
+
+A paragraph.
