@@ -32,10 +32,15 @@ const child = spawn(browser, [
   "--headless=new", "--disable-gpu", "--no-first-run", "--hide-scrollbars",
   "--remote-debugging-port=0", `--user-data-dir=${profile}`, "--window-size=1600,900",
   "about:blank",
-], { stdio: "ignore" });
+], { stdio: ["ignore", "ignore", "pipe"] });
+let browserError = "";
+child.stderr.on("data", (chunk) => { browserError += chunk; });
 
 const finish = async (text, code) => {
-  const closed = new Promise((resolve) => child.once("exit", resolve));
+  const closed = new Promise((resolve) => {
+    if (child.exitCode !== null || child.signalCode !== null) resolve();
+    else child.once("exit", resolve);
+  });
   child.kill();
   await closed;
   rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
@@ -61,7 +66,7 @@ try {
     }
     if (target === null) await sleep(100);
   }
-  if (target === null) throw new Error(`no DevTools target after 30 s: ${failure}`);
+  if (target === null) throw new Error(`no DevTools target after 30 s: ${failure}${browserError ? `\n${browserError.trim()}` : ""}`);
   const socket = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => {
     socket.onopen = resolve;

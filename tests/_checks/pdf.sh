@@ -256,10 +256,11 @@ code_window_theme_test() {
 # $1 expression.
 typst_in_document() {
 	local value
-	value="$(quarto typst eval --in "${typ}" --root / --font-path "${ext_dir}/fonts" "$1" 2>&1)" || {
+	value="$(QUARTO_LOG_LEVEL=INFO quarto typst eval --in "${typ}" --root / --font-path "${ext_dir}/fonts" "$1" 2>&1)" || {
 		printf '# %s\n' "${value}"
 		return 1
 	}
+	value="$(grep -v '^downloading ' <<<"${value}" || true)"
 	if grep -qE '^(error|warning)' <<<"${value}"; then
 		printf '# %s\n' "${value}"
 		return 1

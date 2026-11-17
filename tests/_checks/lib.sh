@@ -116,9 +116,11 @@ html_fonts_local() {
 }
 
 # Answer the text of a PDF, with the layout kept.
+# Status 141 is SIGPIPE: the reader of a pipe, such as `grep -q`, stopped
+# reading after its match, which is not a failure of pdftotext.
 # $1 PDF file.
 pdf_text() {
-	pdftotext -layout "$1" -
+	pdftotext -layout "$1" - || [ $? -eq 141 ]
 }
 
 # Answer the page count of a PDF.
@@ -130,7 +132,7 @@ pdf_page_count() {
 # Answer the text of one page of a PDF, with the layout kept.
 # $1 PDF file. $2 page number.
 pdf_page_text() {
-	pdftotext -layout -f "$2" -l "$2" "$1" -
+	pdftotext -layout -f "$2" -l "$2" "$1" - || [ $? -eq 141 ]
 }
 
 # Answer the last line of a page of a PDF that holds text: the footer.
@@ -239,11 +241,14 @@ shows_motif() {
 # Answer the value of a Typst expression that uses a top-level binding of a
 # kept Typst file. `typst eval --in` does not give the scope of the file, so the
 # expression imports the binding. `quarto typst` writes the value to stderr, so
-# both streams are read, and any diagnostic fails.
+# both streams are read, and any diagnostic fails. Quarto logs the commands it
+# runs at DEBUG when a GitHub Actions run has debug logging on, so the log level
+# is INFO: WARNING would hide the value too.
 # $1 kept Typst file, absolute. $2 binding name. $3 expression.
 typst_value() {
 	local value
-	value="$(quarto typst eval "{ import \"$1\": $2; $3 }" --root / 2>&1)" || return 1
+	value="$(QUARTO_LOG_LEVEL=INFO quarto typst eval "{ import \"$1\": $2; $3 }" --root / --font-path "${ext_dir}/fonts" 2>&1)" || return 1
+	value="$(grep -v '^downloading ' <<<"${value}" || true)"
 	if grep -qE '^(error|warning)' <<<"${value}"; then
 		printf '%s\n' "${value}" >&2
 		return 1
