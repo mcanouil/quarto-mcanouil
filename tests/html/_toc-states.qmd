@@ -1,0 +1,137 @@
+## Study design and the reasons for a twenty-four week follow-up of the cohort
+
+The cohort follows adults for twenty-four weeks.
+Each site recruits its own participants.
+
+### Eligibility
+
+Adults aged eighteen or more are eligible.
+
+#### Inclusion criteria with a long title that wraps over more than one line in the contents
+
+Participants give written consent.
+
+#### Exclusion criteria
+
+Participants in another trial are not eligible.
+
+### Recruitment
+
+Sites recruit over twelve weeks.
+
+## Methods
+
+The section describes the methods of the study.
+
+### Statistical model
+
+The analysis of the statistical model follows the plan.
+The analysis of the statistical model follows the plan.
+The analysis of the statistical model follows the plan.
+The analysis of the statistical model follows the plan.
+The analysis of the statistical model follows the plan.
+The analysis of the statistical model follows the plan.
+
+### Missing data
+
+The analysis of the missing data follows the plan.
+The analysis of the missing data follows the plan.
+The analysis of the missing data follows the plan.
+The analysis of the missing data follows the plan.
+The analysis of the missing data follows the plan.
+The analysis of the missing data follows the plan.
+
+### Sensitivity analyses
+
+The analysis of the sensitivity analyses follows the plan.
+The analysis of the sensitivity analyses follows the plan.
+The analysis of the sensitivity analyses follows the plan.
+The analysis of the sensitivity analyses follows the plan.
+The analysis of the sensitivity analyses follows the plan.
+The analysis of the sensitivity analyses follows the plan.
+
+
+## Results
+
+The section describes the results of the study.
+
+::: {.column-page}
+
+| Site | Week 0 | Week 4 | Week 8 | Week 12 | Week 16 | Week 20 | Week 24 | Total |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Lille | 40 | 38 | 37 | 35 | 34 | 33 | 31 | 248 |
+| Paris | 52 | 50 | 47 | 45 | 44 | 41 | 40 | 319 |
+
+: Participants seen at each visit, by site. {#tbl-visits}
+
+:::
+
+### Primary outcome
+
+The analysis of the primary outcome follows the plan.
+The analysis of the primary outcome follows the plan.
+The analysis of the primary outcome follows the plan.
+The analysis of the primary outcome follows the plan.
+The analysis of the primary outcome follows the plan.
+The analysis of the primary outcome follows the plan.
+
+### Secondary outcomes
+
+The analysis of the secondary outcomes follows the plan.
+The analysis of the secondary outcomes follows the plan.
+The analysis of the secondary outcomes follows the plan.
+The analysis of the secondary outcomes follows the plan.
+The analysis of the secondary outcomes follows the plan.
+The analysis of the secondary outcomes follows the plan.
+
+
+## Safety
+
+The section describes the safety of the study.
+
+### Adverse events
+
+The analysis of the adverse events follows the plan.
+The analysis of the adverse events follows the plan.
+The analysis of the adverse events follows the plan.
+The analysis of the adverse events follows the plan.
+The analysis of the adverse events follows the plan.
+The analysis of the adverse events follows the plan.
+
+### Serious adverse events
+
+The analysis of the serious adverse events follows the plan.
+The analysis of the serious adverse events follows the plan.
+The analysis of the serious adverse events follows the plan.
+The analysis of the serious adverse events follows the plan.
+The analysis of the serious adverse events follows the plan.
+The analysis of the serious adverse events follows the plan.
+
+
+## Discussion
+
+The section describes the discussion of the study.
+
+### Strengths
+
+The analysis of the strengths follows the plan.
+The analysis of the strengths follows the plan.
+The analysis of the strengths follows the plan.
+The analysis of the strengths follows the plan.
+The analysis of the strengths follows the plan.
+The analysis of the strengths follows the plan.
+
+### Limitations
+
+The analysis of the limitations follows the plan.
+The analysis of the limitations follows the plan.
+The analysis of the limitations follows the plan.
+The analysis of the limitations follows the plan.
+The analysis of the limitations follows the plan.
+The analysis of the limitations follows the plan.
+
+
+## Conclusion
+
+The section describes the conclusion of the study.
+

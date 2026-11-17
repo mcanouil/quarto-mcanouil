@@ -1,0 +1,248 @@
+/*-- scss:defaults --*/
+
+// Room for the corner motif of a callout, so that no text runs under it.
+$mc-callout-motif: 2.5rem !default;
+
+// Bootstrap chevron of a collapsible callout, as a mask: the page paints it
+// in a token colour.
+$mc-callout-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='black' fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E") !default;
+
+// The glyph of the icon of each callout type. The icon is decoration: its
+// generated text has an empty alternative, and the title names the type.
+$mc-callout-glyphs: (
+  note: "i",
+  tip: "\2713",
+  warning: "!",
+  important: "!!",
+  caution: "?",
+) !default;
+
+/*-- scss:rules --*/
+
+// Quarto's own components (callouts, tabsets, code, tables, block quotes)
+// with their colours from the tokens, so that every scheme, terminal
+// included, has no colour that Sass computed from the light Bootstrap values.
+// The presets restyle the same selectors inside mc-preset().
+
+// Callouts
+
+@each $type, $glyph in $mc-callout-glyphs {
+  div.callout-#{$type}.callout {
+    --mc-callout: var(--mc-#{$type});
+    --mc-callout-text: var(--mc-#{$type}-text);
+    border-left-color: var(--mc-callout);
+  }
+
+  div.callout-#{$type}.callout .callout-icon::before {
+    content: $glyph;
+    content: $glyph / "";
+  }
+}
+
+div.callout.callout-style-default,
+div.callout.callout-style-simple {
+  --mc-callout-room: #{$mc-callout-motif};
+  position: relative;
+  padding-inline-end: var(--mc-callout-room);
+  border: 1px solid var(--mc-line);
+  border-inline-start: 4px solid var(--mc-callout);
+  border-radius: var(--mc-radius, 0.375rem);
+  background-color: color-mix(in srgb, var(--mc-callout) 7%, var(--mc-paper));
+  color: var(--mc-ink);
+}
+
+div.callout.callout-style-default > .callout-header,
+div.callout.callout-style-simple > .callout-header {
+  background-color: transparent;
+  color: var(--mc-callout-text);
+  font-family: var(--mc-font-ui, inherit);
+  opacity: 1;
+}
+
+div.callout .callout-body {
+  color: var(--mc-ink);
+}
+
+div.callout.callout-titled .callout-icon::before,
+div.callout:not(.callout-titled) .callout-icon::before {
+  display: inline-grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background-image: none;
+  background-color: var(--mc-callout);
+  color: var(--mc-paper);
+  font: 800 0.65rem/1 var(--mc-font-ui, sans-serif);
+  letter-spacing: -0.05em;
+}
+
+div.callout .callout-toggle::before {
+  background-image: none;
+  background-color: var(--mc-muted);
+  mask: $mc-callout-chevron no-repeat center / contain;
+}
+
+// The corner motif of the preset, from the mask the page defines, in the
+// colour of the callout type. Decoration only: no text runs under it.
+div.callout.callout-style-default::after,
+div.callout.callout-style-simple::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--mc-callout-room);
+  height: var(--mc-callout-room);
+  background-color: var(--mc-callout);
+  mask: var(--mc-motif-mask, linear-gradient(transparent, transparent)) no-repeat top right / contain;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+// Tabsets
+
+.panel-tabset .nav-tabs {
+  --bs-nav-link-color: var(--mc-muted);
+  --bs-nav-link-hover-color: var(--mc-ink);
+  --bs-nav-tabs-border-color: var(--mc-line);
+  --bs-nav-tabs-link-hover-border-color: transparent;
+  --bs-nav-tabs-link-active-color: var(--mc-ink);
+  --bs-nav-tabs-link-active-bg: var(--mc-paper);
+  --bs-nav-tabs-link-active-border-color: var(--mc-line) var(--mc-line) var(--mc-paper);
+  font-family: var(--mc-font-ui, inherit);
+}
+
+.panel-tabset .tab-content {
+  padding: 0.75rem 0 0;
+  border: 0;
+}
+
+// Code
+
+div.sourceCode {
+  border-color: var(--mc-line);
+  border-radius: var(--mc-radius, 0.375rem);
+  background-color: var(--mc-tint);
+}
+
+pre,
+pre.sourceCode {
+  color: var(--mc-ink);
+}
+
+// Highlighting colours from the tokens: each pair is in the contrast check
+// on tint, whatever the scheme and the highlighting style sheet that Quarto
+// loads (terminal reads the light one).
+div.sourceCode pre.sourceCode,
+pre > code.sourceCode > span,
+code.sourceCode > span,
+code span {
+  color: var(--mc-ink);
+}
+
+code span:is(.kw, .cf, .im, .pp) {
+  color: var(--mc-accent-text);
+}
+
+code span:is(.fu, .bu, .ex) {
+  color: var(--mc-link);
+}
+
+code span:is(.st, .ch, .ss, .vs, .sc, .bn) {
+  color: var(--mc-warning-text);
+}
+
+code span:is(.dv, .fl, .cn, .dt) {
+  color: var(--mc-caution-text);
+}
+
+code span:is(.co, .do, .an, .cv, .in, .wa) {
+  color: var(--mc-muted);
+}
+
+code span:is(.at, .va, .op, .ot) {
+  color: var(--mc-note-text);
+}
+
+code span:is(.al, .er) {
+  color: var(--mc-important-text);
+}
+
+p code:not(.sourceCode),
+li code:not(.sourceCode),
+td code:not(.sourceCode) {
+  background-color: var(--mc-tint);
+  color: var(--mc-ink);
+}
+
+body .code-with-filename {
+  --code-window-bg: var(--mc-tint);
+  --code-window-title-bg: var(--mc-tint);
+  border-color: var(--mc-line);
+  border-radius: var(--mc-radius, 0.375rem);
+}
+
+body .code-with-filename .code-with-filename-file {
+  border-bottom-color: var(--mc-line);
+  background-color: var(--mc-tint);
+}
+
+body .code-with-filename .code-with-filename-file pre {
+  color: var(--mc-muted);
+  font-family: var(--mc-font-ui, inherit);
+}
+
+// Tables
+
+.table {
+  --bs-table-color: var(--mc-ink);
+  --bs-table-bg: transparent;
+  --bs-table-border-color: var(--mc-line);
+  --bs-table-striped-color: var(--mc-ink);
+  --bs-table-striped-bg: var(--mc-tint);
+  --bs-table-hover-color: var(--mc-ink);
+  --bs-table-hover-bg: var(--mc-tint);
+  --bs-table-active-color: var(--mc-ink);
+  --bs-table-active-bg: var(--mc-tint);
+}
+
+.panel-caption,
+.figure-caption,
+.subfigure-caption,
+.table-caption,
+figcaption,
+caption {
+  color: var(--mc-muted);
+}
+
+// Block quotes: lua/quote.lua writes each quote as figure.mc-quote around the
+// blockquote, with the attribution as figcaption.mc-quote-attribution and the
+// label of the decoration in data-mc-label. The figure is the box; the
+// blockquote inside it drops the Bootstrap edge and colours.
+
+figure.mc-quote {
+  position: relative;
+  margin: 1.5rem 0;
+  padding: 0.25rem 0 0.25rem 1rem;
+  border-inline-start: 3px solid var(--mc-accent);
+  color: var(--mc-ink);
+  font-size: 1.05rem;
+}
+
+figure.mc-quote > blockquote {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+figure.mc-quote > blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+figure.mc-quote .mc-quote-attribution {
+  margin-top: 0.5rem;
+  color: var(--mc-muted);
+  font-size: 0.86em;
+}

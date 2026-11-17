@@ -41,4 +41,33 @@ cases['quote-attribution-empty'] = function()
   assert_equal(tostring(err):find('holds only a dash', 1, true) ~= nil, true, 'message says what is wrong')
 end
 
+local function html_of(text, label)
+  local block = pandoc.read(text, 'markdown+smart').blocks[1]
+  local result = quote.html(block, label or 'Quote')
+  return result and pandoc.write(pandoc.Pandoc(result), 'html')
+end
+
+cases['quote-html-attribution'] = function()
+  local html = html_of('> Design for the reader.\n>\n> -- *Name*, 2026')
+  local shape = '^<figure class="mc%-quote" data%-mc%-label="Quote">%s*<blockquote>%s*<p>Design for the reader%.</p>%s*'
+    .. '</blockquote>%s*<figcaption class="mc%-quote%-attribution" data%-mc%-label="Quote">%s*<em>Name</em>, 2026%s*'
+    .. '</figcaption>%s*</figure>%s*$'
+  assert_equal(html:find(shape) ~= nil, true, 'figure with the quote and the attribution as its caption: ' .. html)
+end
+
+cases['quote-html-plain'] = function()
+  local html = html_of('> A plain quote.')
+  local shape = '^<figure class="mc%-quote" data%-mc%-label="Quote">%s*<blockquote>%s*<p>A plain quote%.</p>%s*</blockquote>%s*</figure>%s*$'
+  assert_equal(html:find(shape) ~= nil, true, 'figure with the quote and no caption: ' .. html)
+end
+
+cases['quote-html-label-escaped'] = function()
+  local html = html_of('> A quote.', 'Say "hi" & <go>')
+  assert_equal(html:find('data-mc-label="Say &quot;hi&quot; &amp; &lt;go&gt;"', 1, true) ~= nil, true, 'escaped label: ' .. html)
+end
+
+cases['quote-html-alert-left-alone'] = function()
+  assert_equal(html_of('> [!NOTE]\n> A GitHub alert.'), nil, 'an alert stays for Quarto')
+end
+
 return cases

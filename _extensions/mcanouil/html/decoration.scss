@@ -1,0 +1,71 @@
+/*-- scss:defaults --*/
+
+/*-- scss:rules --*/
+
+// Decoration rules that must win over the presets, so this file comes after
+// them in the theme. The selectors repeat those of the rules they undo.
+
+// Decoration is not content: forced colours remove it.
+@media (forced-colors: active) {
+  #title-block-header > .mc-motif,
+  .mc-title-rule,
+  .mc-title-block .title::before,
+  .mc-title-block .title::after,
+  .mc-kicker::before,
+  .mc-kicker::after,
+  main.content h2::before,
+  main.content h2::after,
+  div.callout.callout-style-default::after,
+  div.callout.callout-style-simple::after,
+  div.callout .callout-title-container::before,
+  div.callout .callout-title-container::after,
+  .panel-tabset .nav-tabs .nav-link::before,
+  .panel-tabset .nav-tabs .nav-link::after,
+  .panel-tabset .nav-tabs .nav-link.active::after,
+  figure.mc-quote::before,
+  figure.mc-quote::after,
+  figure.mc-quote .mc-quote-attribution::before,
+  nav#TOC::before,
+  #TOC > #toc-title::after,
+  #TOC a.nav-link.active::after,
+  #quarto-sidebar .sidebar-title::after {
+    display: none;
+  }
+
+  // The current contents entry and the current page keep a mark that is not
+  // colour: an outline in the text colour.
+  #TOC a.nav-link.active,
+  #quarto-sidebar a.sidebar-link.active {
+    outline: 2px solid CanvasText;
+    outline-offset: -2px;
+  }
+
+  // Without its decoration, the active tab keeps a mark that is not colour.
+  .panel-tabset .nav-tabs .nav-link.active {
+    text-decoration: underline 2px;
+    text-underline-offset: 0.3em;
+  }
+
+  // The toggle icon is a mask over its background colour, which forced
+  // colours would replace with the canvas colour.
+  .quarto-color-scheme-toggle:not(.alternate).top-right .bi::before,
+  .quarto-color-scheme-toggle.alternate.top-right .bi::before {
+    forced-color-adjust: none;
+    background-color: ButtonText;
+  }
+}
+
+// No decoration moves by default; this keeps it so if a later rule animates it.
+@media (prefers-reduced-motion: reduce) {
+  #title-block-header > .mc-motif,
+  .mc-title-rule,
+  .mc-title-block .title::after,
+  #TOC a.nav-link,
+  #quarto-sidebar,
+  #quarto-sidebar-glass,
+  #quarto-sidebar .sidebar-item-toggle .bi::before,
+  .quarto-sidebar-toggle-contents {
+    animation: none;
+    transition: none;
+  }
+}

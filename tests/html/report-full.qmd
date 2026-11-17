@@ -1,0 +1,49 @@
+---
+title: Interim analysis report
+format: mcanouil-html
+toc: true
+number-sections: true
+extensions:
+  mcanouil:
+    preset: gold
+    type: report
+    layout: full
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: In the full layout, each chapter of an HTML report has a chapter header with its number, its title and an "In this chapter" list.
+        check: bash _checks/html.sh full
+---
+
+# Introduction {.unnumbered}
+
+The report presents the interim analysis.
+
+# Study design
+
+The study follows adults for twenty-four weeks.
+
+## Objectives
+
+The primary objective is the change in the score.
+
+### Secondary objectives
+
+Secondary objectives are listed in the protocol.
+
+## Design
+
+The design is randomised and double-blind.
+
+# Results
+
+The results are interim.
+
+## Primary outcome
+
+The primary outcome improves.
+
+## Safety
+
+No new safety signal was seen.

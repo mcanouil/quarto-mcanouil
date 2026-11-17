@@ -18,3 +18,6 @@ jobs:
     with:
       apt-packages: poppler-utils
       quarto-tools: verapdf
+      # The HTML checks measure the rendered page in a headless Chromium.
+      node-version: "26"
+      playwright-browsers: chromium

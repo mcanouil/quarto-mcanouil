@@ -19,22 +19,6 @@ set -euo pipefail
 # shellcheck source=/dev/null # lib.sh is checked on its own
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-# Succeed when every @font-face URL of the fonts.css linked from the HTML
-# output names a file that exists, and the output makes no request to a font
-# service.
-html_fonts_local() {
-	local css url found=0
-	css="$(grep -oE 'href="[^"]*fonts\.css"' "${output}" | head -n 1 | sed -E 's/^href="(.*)"$/\1/')"
-	[ -n "${css}" ] || return 1
-	css="$(dirname "${output}")/${css}"
-	[ -f "${css}" ] || return 1
-	while IFS= read -r url; do
-		[ -f "$(dirname "${css}")/${url}" ] || return 1
-		found=1
-	done < <(grep -oE 'url\("[^"]+"\)' "${css}" | sed -E 's/^url\("(.*)"\)$/\1/')
-	[ "${found}" = 1 ] && lacks "${output}" 'fonts.googleapis' && lacks "${output}" 'fonts.gstatic'
-}
-
 # Succeed when the Bootstrap stylesheet linked from the HTML output colours
 # links with the link token.
 links_use_token() {

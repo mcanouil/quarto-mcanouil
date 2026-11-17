@@ -1,3 +1,342 @@
 /*-- scss:defaults --*/
 
+// Geometry shared by the presets. The presets set the values that differ in
+// html/presets/, as custom properties on body.
+$mc-title-gutter: 1.5rem !default;
+$mc-title-pad-top: 2.5rem !default;
+$mc-title-measure: 50rem !default;
+
+// Room under the motif for the scheme toggle, which sits below the motif.
+$mc-toggle-room: 2.75rem !default;
+
+// Quarto colours the current contents entry with $toc-color, behind an
+// !important. Only these rules read it, so it holds a custom property that
+// html/navigation.scss sets to the ink and the presets may change.
+$toc-color: var(--mc-toc-current, var(--mc-link)) !default;
+
+// Quarto draws one focus ring on every focusable element: an outline in the
+// outer colour and a ring of the inner colour in the offset. Both come from
+// the tokens, so the ring is in the link colour on every surface.
+$focus-ring-outer-color: var(--mc-link) !default;
+$focus-ring-inner-color: var(--mc-paper) !default;
+
 /*-- scss:rules --*/
+
+body {
+  --mc-radius: 0px;
+  --mc-font-ui: var(--mc-font-base);
+  --mc-gilded: linear-gradient(90deg, var(--mc-accent-low), var(--mc-accent-high) 50%, var(--mc-accent-low));
+}
+
+// Focus rings in the link colour, which passes 4.5:1 on the paper, so the
+// ring passes the 3:1 of non-text marks.
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--mc-link);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+// Quarto writes the skip link as the first element of body. It shows on focus
+// above the page, so the page does not move.
+#quarto-skip-link:focus {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2000;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--mc-link);
+  border-radius: var(--mc-radius);
+  background-color: var(--mc-paper);
+  color: var(--mc-link);
+  font-family: var(--mc-font-ui);
+  font-weight: 700;
+}
+
+// Scheme toggle: Quarto floats it in the top right corner of the page, where
+// the motif is. It moves below the motif, on a paper pill, and a mask draws
+// the icon in the muted colour, which passes 4.5:1 on the paper.
+$mc-toggle-off: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M11 4a4 4 0 0 1 0 8H8a4.992 4.992 0 0 0 2-4 4.992 4.992 0 0 0-2-4h3zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8zM0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5z'/%3E%3C/svg%3E";
+$mc-toggle-on: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10H5zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z'/%3E%3C/svg%3E";
+
+button.quarto-color-scheme-toggle.top-right {
+  top: calc(var(--mc-motif-size) + 0.5rem);
+  z-index: 10;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--mc-line);
+  border-radius: 999px;
+  background-color: var(--mc-paper);
+  color: var(--mc-muted);
+  line-height: 1;
+}
+
+.quarto-color-scheme-toggle:not(.alternate).top-right .bi::before,
+.quarto-color-scheme-toggle.alternate.top-right .bi::before {
+  background-color: currentColor;
+  background-image: none;
+  mask: url($mc-toggle-off) center / 1rem 1rem no-repeat;
+}
+
+.quarto-color-scheme-toggle.alternate.top-right .bi::before {
+  mask-image: url($mc-toggle-on);
+}
+
+// Title block: a band across the page, the first element of body. The text
+// starts at the body column, and a float as large as the motif keeps the
+// first lines clear of it. The parts of the title block use plain class
+// selectors, so a preset rule with the same selector wins by order.
+#title-block-header.mc-title-block {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 1.5rem;
+  padding-top: $mc-title-pad-top;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--mc-line);
+  background-color: var(--mc-paper);
+  color: var(--mc-ink);
+
+  > .mc-title-text {
+    grid-column: body-content-start / screen-end;
+    padding-inline-end: $mc-title-gutter;
+
+    > :not(.mc-motif-clear) {
+      max-width: $mc-title-measure;
+    }
+  }
+
+  // Quarto removes the underline of title block links, so a link in the
+  // muted text shows by colour alone.
+  a:not(.mc-orcid) {
+    text-decoration: underline;
+  }
+
+  .mc-motif-clear {
+    float: right;
+    width: calc(var(--mc-motif-size) - #{$mc-title-gutter});
+    height: calc(var(--mc-motif-size) + #{$mc-toggle-room} - #{$mc-title-pad-top});
+  }
+}
+
+.mc-kicker {
+  margin: 0 0 0.5rem;
+  color: var(--mc-accent-text);
+  font-family: var(--mc-font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.mc-title-block .title {
+  margin: 0;
+  color: var(--mc-ink);
+  font-family: var(--mc-font-headings);
+  font-size: clamp(1.9rem, 1.4rem + 2vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  overflow-wrap: break-word;
+}
+
+.mc-title-rule {
+  display: block;
+  width: min(45%, 16rem);
+  height: 3px;
+  margin: 0.75rem 0 1rem;
+  border-radius: 2px;
+  background-image: var(--mc-gilded);
+}
+
+.mc-title-block .subtitle {
+  margin: 0 0 1rem;
+  color: var(--mc-muted);
+  font-family: var(--mc-font-headings);
+  font-size: 1.2rem;
+}
+
+// Authors, as in the Typst title block: the name, the degrees in small type,
+// the affiliation numbers, the marks and the ORCID badge.
+.mc-byline {
+  margin-top: 1rem;
+
+  .mc-authors {
+    margin: 0;
+  }
+
+  .mc-author-name {
+    font-weight: 700;
+  }
+
+  .mc-author-degrees {
+    margin-inline-start: 0.3em;
+    color: var(--mc-muted);
+    font-family: var(--mc-font-ui);
+    font-size: 0.75em;
+  }
+
+  .mc-author-affiliations {
+    margin-inline-start: 0.1em;
+    color: var(--mc-accent-text);
+  }
+
+  .mc-author-mark {
+    margin-inline-start: 0.2em;
+    color: var(--mc-muted);
+  }
+
+  .mc-orcid {
+    display: inline-block;
+    margin-inline-start: 0.3em;
+    line-height: 1;
+    vertical-align: -0.1em;
+
+    svg {
+      display: block;
+      width: 0.95em;
+      height: 0.95em;
+    }
+  }
+
+  .mc-orcid-disc {
+    fill: var(--mc-accent);
+  }
+
+  .mc-orcid-glyph {
+    fill: var(--mc-paper);
+  }
+
+  .mc-affiliations,
+  .mc-author-legends {
+    margin: 0.35rem 0 0;
+    padding: 0;
+    color: var(--mc-muted);
+    font-size: 0.85rem;
+    list-style: none;
+  }
+}
+
+.mc-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.75rem;
+  margin: 1rem 0 0;
+  font-size: 0.9rem;
+
+  dt {
+    color: var(--mc-muted);
+    font-family: var(--mc-font-ui);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.mc-block-title {
+  margin: 0 0 0.35rem;
+  color: var(--mc-accent-text);
+  font-family: var(--mc-font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.mc-abstract {
+  display: flow-root;
+  margin: 1.25rem 0 0;
+  padding: 0.9rem 1.1rem;
+  border-inline-start: 3px solid var(--mc-accent);
+  border-radius: var(--mc-radius);
+  background-color: var(--mc-tint);
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+.mc-keywords {
+  margin: 0.9rem 0 0;
+  color: var(--mc-muted);
+  font-size: 0.9rem;
+
+  .mc-block-title {
+    margin-inline-end: 0.4em;
+  }
+}
+
+// Section numbers: Quarto computes their colour from the Sass body colours,
+// which do not follow the tokens.
+.header-section-number {
+  color: var(--mc-muted);
+}
+
+// Section headings of the body. Quarto fades H3 to H6 with opacity, which
+// takes the accent text of the numbers below 4.5:1.
+main.content :is(h3, h4, h5, h6) {
+  opacity: 1;
+}
+
+main.content h2 {
+  margin-top: 2.25rem;
+  padding-bottom: 0;
+  border-bottom: 0;
+  font-family: var(--mc-font-headings);
+  font-weight: 700;
+}
+
+main.content .header-section-number {
+  margin-inline-end: 0.4em;
+  color: var(--mc-accent-text);
+  font-family: var(--mc-font-ui);
+}
+
+// Page footer, with the three slots of the furniture, aligned with the body
+// column as the title block is.
+.mc-page-footer {
+  margin-top: 3rem;
+  padding-block: 1rem;
+  border-top: 1px solid var(--mc-line);
+  background-color: var(--mc-tint);
+  color: var(--mc-muted);
+  font-family: var(--mc-font-ui);
+  font-size: 0.85rem;
+
+  > .mc-slots {
+    display: grid;
+    grid-column: body-content-start / body-content-end;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0.5rem 1.5rem;
+  }
+
+  .mc-slot-centre {
+    text-align: center;
+  }
+
+  .mc-slot-right {
+    text-align: right;
+  }
+
+  @media (max-width: 575.98px) {
+    > .mc-slots {
+      grid-template-columns: 1fr;
+    }
+
+    .mc-slot-centre,
+    .mc-slot-right {
+      text-align: left;
+    }
+
+    .mc-slot:empty {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,16 @@
+---
+title: Authoring essentials
+format: mcanouil-html
+toc: true
+extensions:
+  mcanouil:
+    preset: mono
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The mono HTML components (callouts, tabsets, code windows, tables and block quotes) follow the preset, keep their labels and the tab pattern, and pass axe in light and dark.
+        check: bash _checks/html.sh components mono
+---
+
+{{< include _components.qmd >}}

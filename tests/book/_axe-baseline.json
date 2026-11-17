@@ -1,0 +1,12 @@
+{
+  "signatureScheme": 1,
+  "findings": [
+    {
+      "signature": "region :: #quarto-skip-link",
+      "pages": ["index.html"],
+      "impact": "moderate",
+      "note": "tracked upstream: quarto-cli#14875 (the skip link href of index.html is rewritten to a cross-document URL, so axe does not see a skip link)",
+      "rule": "region"
+    }
+  ]
+}
