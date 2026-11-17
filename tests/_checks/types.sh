@@ -44,8 +44,7 @@ compact_headings_inline() {
 
 # Answer the words of page 1 as "xMin yMin xMax yMax word" in points.
 page1_words() {
-	pdftotext -bbox -f 1 -l 1 "${output}" - |
-		sed -nE 's/.*<word xMin="([0-9.]+)" yMin="([0-9.]+)" xMax="([0-9.]+)" yMax="([0-9.]+)">(.*)<\/word>.*/\1 \2 \3 \4 \5/p'
+	pdf_page_words "${output}" 1
 }
 
 # Succeed when the abstract label starts less than 15 mm below the author line.

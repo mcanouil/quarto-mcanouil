@@ -129,6 +129,14 @@ pdf_page_count() {
 	pdfinfo "$1" | awk '/^Pages:/ { print $2 }'
 }
 
+# Answer the words of a page of a PDF as "xMin yMin xMax yMax word" in points.
+# Status 141 is SIGPIPE, as for pdf_text.
+# $1 PDF file. $2 page number.
+pdf_page_words() {
+	{ pdftotext -bbox -f "$2" -l "$2" "$1" - || [ $? -eq 141 ]; } |
+		sed -nE 's/.*<word xMin="([0-9.]+)" yMin="([0-9.]+)" xMax="([0-9.]+)" yMax="([0-9.]+)">(.*)<\/word>.*/\1 \2 \3 \4 \5/p' || [ $? -eq 141 ]
+}
+
 # Answer the text of one page of a PDF, with the layout kept.
 # $1 PDF file. $2 page number.
 pdf_page_text() {
@@ -238,6 +246,12 @@ shows_motif() {
 	[ "${from_paper}" -gt 8 ] && [ "${to_colour}" -lt "${paper_to_colour}" ]
 }
 
+# Drop the download report of a Typst package from the output of quarto typst:
+# the "downloading" line, the blank lines and the progress lines.
+drop_typst_downloads() {
+	grep -vE '^downloading |^[[:space:]]*$| / .*%\), .*ETA: ' || true
+}
+
 # Answer the value of a Typst expression that uses a top-level binding of a
 # kept Typst file. `typst eval --in` does not give the scope of the file, so the
 # expression imports the binding. `quarto typst` writes the value to stderr, so
@@ -248,7 +262,7 @@ shows_motif() {
 typst_value() {
 	local value
 	value="$(QUARTO_LOG_LEVEL=INFO quarto typst eval "{ import \"$1\": $2; $3 }" --root / --font-path "${ext_dir}/fonts" 2>&1)" || return 1
-	value="$(grep -v '^downloading ' <<<"${value}" || true)"
+	value="$(drop_typst_downloads <<<"${value}")"
 	if grep -qE '^(error|warning)' <<<"${value}"; then
 		printf '%s\n' "${value}" >&2
 		return 1

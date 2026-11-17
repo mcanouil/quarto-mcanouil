@@ -260,7 +260,7 @@ typst_in_document() {
 		printf '# %s\n' "${value}"
 		return 1
 	}
-	value="$(grep -v '^downloading ' <<<"${value}" || true)"
+	value="$(drop_typst_downloads <<<"${value}")"
 	if grep -qE '^(error|warning)' <<<"${value}"; then
 		printf '# %s\n' "${value}"
 		return 1

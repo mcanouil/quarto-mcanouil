@@ -23,8 +23,7 @@ need pdftoppm
 # Answer the words of a page as "xMin yMin xMax yMax word" in points.
 # $1 page number.
 page_words() {
-	pdftotext -bbox -f "$1" -l "$1" "${output}" - |
-		sed -nE 's/.*<word xMin="([0-9.]+)" yMin="([0-9.]+)" xMax="([0-9.]+)" yMax="([0-9.]+)">(.*)<\/word>.*/\1 \2 \3 \4 \5/p'
+	pdf_page_words "${output}" "$1"
 }
 
 # Answer the page width in points.
