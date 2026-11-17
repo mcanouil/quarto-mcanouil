@@ -32,6 +32,13 @@
     display: none;
   }
 
+  // The memo banner and band lose their gradient: forced colours set the text
+  // to the system colour, which would not read on the dark ground.
+  #title-block-header.mc-memo-banner,
+  .mc-page-footer.mc-memo-band {
+    background-image: none;
+  }
+
   // The current contents entry and the current page keep a mark that is not
   // colour: an outline in the text colour.
   #TOC a.nav-link.active,

@@ -1,0 +1,83 @@
+/*-- scss:defaults --*/
+
+// Memo: the title block becomes a banner on the ground gradient of the
+// preset, and the page footer a band on the same ground, as in the Typst memo.
+// The text on them uses the on-ground tokens, which pass 4.5:1 on both ends of
+// the gradient (see lua/contrast.lua).
+$mc-memo-field-width: 9rem !default;
+
+/*-- scss:rules --*/
+
+#title-block-header.mc-memo-banner {
+  border-bottom: 0;
+  background-color: var(--mc-ground-1);
+  background-image: linear-gradient(135deg, var(--mc-ground-1), var(--mc-ground-2));
+  color: var(--mc-on-ground-text);
+
+  .mc-kicker {
+    color: var(--mc-on-ground-accent);
+  }
+
+  .title {
+    color: var(--mc-on-ground-title);
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
+.mc-memo-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, #{$mc-memo-field-width}), 1fr));
+  gap: 0.75rem 1.75rem;
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+
+  dt {
+    color: var(--mc-on-ground-accent);
+    font-family: var(--mc-font-ui);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--mc-on-ground-text);
+    overflow-wrap: anywhere;
+  }
+}
+
+.mc-page-footer.mc-memo-band {
+  border-top: 0;
+  background-color: var(--mc-ground-1);
+  background-image: linear-gradient(90deg, var(--mc-ground-1), var(--mc-ground-2));
+  color: var(--mc-on-ground-text);
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+}
+
+// The kicker label of the preset, drawn for the ground: mono swaps its ink
+// label for the on-ground accent, quarto keeps a pill with a translucent fill.
+@include mc-preset(mono) {
+  #title-block-header.mc-memo-banner .mc-kicker {
+    background-color: var(--mc-on-ground-accent);
+    color: var(--mc-ground-1);
+  }
+
+  #title-block-header.mc-memo-banner .mc-title-rule {
+    background-color: var(--mc-on-ground-accent);
+  }
+}
+
+@include mc-preset(quarto) {
+  #title-block-header.mc-memo-banner .mc-kicker {
+    background-color: color-mix(in srgb, var(--mc-on-ground-title) 14%, transparent);
+    color: var(--mc-on-ground-title);
+  }
+}

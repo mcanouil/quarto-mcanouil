@@ -50,6 +50,7 @@ contributes:
           - html/presets/_mono.scss
           - html/presets/_quarto.scss
           - html/presets/_terminal.scss
+          - html/memo.scss
           - html/decoration.scss
         dark:
           - html/tokens.scss
@@ -61,6 +62,7 @@ contributes:
           - html/presets/_mono.scss
           - html/presets/_quarto.scss
           - html/presets/_terminal.scss
+          - html/memo.scss
           - html/decoration.scss
           - html/scheme-dark.scss
     typst:

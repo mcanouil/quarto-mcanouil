@@ -7,6 +7,7 @@ set -euo pipefail
 # Usage: html.sh title <preset>
 #        html.sh components <preset>
 #        html.sh toc <preset>
+#        html.sh memo <note|minutes|agenda|brief|missing> <preset>
 #        html.sh book
 #        html.sh full
 #        html.sh overlap
@@ -907,12 +908,172 @@ check_subdir() {
 	expect "subdir-assets-html-motif" "the motif in the title block" structure_ok motif-in-title-block
 }
 
+# Answer the banner a memo case expects: the kind label, then one label=value
+# line for each field, in the order of the kind. The "missing" case is a note
+# that leaves out the from field.
+# $1 case: a memo kind, or missing.
+memo_expected() {
+	case "$1" in
+	note) printf '%s\n' Note 'To=Data team' 'From=M. Canouil' 'Date=11 Nov 2026' ;;
+	missing) printf '%s\n' Note 'To=Data team' 'Date=11 Nov 2026' ;;
+	minutes) printf '%s\n' Minutes 'Date and time=11 Nov 2026, 14:00' 'Present=MC, AA, BW' 'Absent=CD' ;;
+	agenda) printf '%s\n' Agenda 'Date and time=18 Nov 2026, 10:00' 'Place=Room 4' 'Participants=MC, AA, BW, CD' ;;
+	brief) printf '%s\n' Brief 'Date=11 November 2026' 'Audience=Product leads' 'Purpose=Agree the go or no go for the release' ;;
+	esac
+}
+
+# Succeed when the memo banner holds the kind label in its kicker, and a
+# definition list with exactly the expected terms and descriptions, in order:
+# a field that has no value has no term, and no description.
+# $1 case, see memo_expected.
+memo_banner_fields() {
+	local expected
+	expected="$(memo_expected "$1")"
+	python3 -I - "${output}" "${expected}" <<'PY'
+import sys
+from html.parser import HTMLParser
+
+expected = sys.argv[2].split("\n")
+VOID = ("br", "img", "path", "stop", "circle", "rect", "meta", "link", "input", "hr")
+
+
+class Banner(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.depth = 0
+        self.banner = False
+        self.kicker = ""
+        self.terms = []
+        self.descriptions = []
+        self.lists = 0
+        self.target = None
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        classes = (attrs.get("class") or "").split()
+        if tag == "header" and attrs.get("id") == "title-block-header":
+            self.depth = 1
+            self.banner = "mc-memo-banner" in classes
+            return
+        if not self.depth:
+            return
+        if tag not in VOID:
+            self.depth += 1
+        if tag == "p" and "mc-kicker" in classes:
+            self.target = "kicker"
+        elif tag == "dl" and "mc-memo-fields" in classes:
+            self.lists += 1
+        elif tag == "dt" and self.lists:
+            self.terms.append("")
+            self.target = "dt"
+        elif tag == "dd" and self.lists:
+            self.descriptions.append("")
+            self.target = "dd"
+
+    def handle_endtag(self, tag):
+        if self.depth and tag not in VOID:
+            self.depth -= 1
+        if tag in ("p", "dt", "dd"):
+            self.target = None
+
+    def handle_data(self, data):
+        if self.target == "kicker":
+            self.kicker += data
+        elif self.target == "dt":
+            self.terms[-1] += data
+        elif self.target == "dd":
+            self.descriptions[-1] += data
+
+
+page = Banner()
+page.feed(open(sys.argv[1], encoding="utf-8").read())
+want_fields = [tuple(line.split("=", 1)) for line in expected[1:]]
+found = list(zip([t.strip() for t in page.terms], [d.strip() for d in page.descriptions]))
+problems = []
+if not page.banner:
+    problems.append("the title block has no mc-memo-banner class")
+if page.kicker.strip() != expected[0]:
+    problems.append("kicker %r, expected %r" % (page.kicker.strip(), expected[0]))
+if page.lists != 1:
+    problems.append("%d dl.mc-memo-fields, expected 1" % page.lists)
+if found != want_fields:
+    problems.append("fields %r, expected %r" % (found, want_fields))
+for problem in problems:
+    print("# " + problem)
+sys.exit(1 if problems else 0)
+PY
+}
+
+# Succeed when the measures of a memo page show the banner and the band on the
+# ground gradient of the preset, and every text on them has a contrast of 4.5:1
+# or more against both ends of the gradient.
+# $1 measures, as JSON. $2 ground-1 of the scheme. $3 ground-2 of the scheme.
+ground_contrast() {
+	python3 -I -c '
+import json, sys
+m = json.loads(sys.argv[1])
+samples = m.get("ground")
+if not samples:
+    sys.exit("# no ground measures: " + sys.argv[1][:200])
+problems = []
+labels = {s["label"] for s in samples}
+for needed in ("kicker", "title", "term", "description", "band"):
+    if needed not in labels:
+        problems.append("no %s sample" % needed)
+for s in samples:
+    if [x.lower() for x in s["stops"]] != [sys.argv[2].lower(), sys.argv[3].lower()]:
+        problems.append("%s %r: gradient %s, expected %s %s" % (s["label"], s["text"], s["stops"], sys.argv[2], sys.argv[3]))
+    elif min(s["ratios"]) < 4.5:
+        problems.append("%s %r: %s on %s = %.2f" % (s["label"], s["text"], s["fg"], s["stops"], min(s["ratios"])))
+for problem in problems[:12]:
+    print("# " + problem)
+sys.exit(1 if problems else 0)
+' "$1" "$2" "$3"
+}
+
+# Check the HTML memo of one case and preset.
+# $1 case: a memo kind, or missing. $2 preset.
+check_memo() {
+	local case="$1" preset="$2" size measures scheme mode
+	structure="$(structure_report)"
+	expect "memo-html-${case}-${preset}" "the kind label, and the fields of the kind in order with none empty, in dl.mc-memo-fields" \
+		memo_banner_fields "${case}"
+	expect "memo-html-landmark-header-${case}-${preset}" "one banner landmark" structure_ok landmark-header
+	expect "memo-html-landmark-main-${case}-${preset}" "one main landmark" structure_ok landmark-main
+	expect "memo-html-landmark-footer-${case}-${preset}" "one footer landmark" structure_ok landmark-footer
+	expect "memo-html-motif-${case}-${preset}" "the motif in the banner" structure_ok motif-in-title-block
+	expect "memo-html-motif-aria-${case}-${preset}" "aria-hidden on the motif" structure_ok motif-aria-hidden
+	expect "memo-html-band-${case}-${preset}" "the footer slots in the band" has "${output}" 'class="mc-page-footer mc-memo-band'
+
+	browser="$(find_browser)"
+	if [ -z "${browser}" ]; then
+		printf 'Bail out! no Chromium browser; set CHROME_PATH\n'
+		exit 1
+	fi
+	for size in 1440,900 320,568; do
+		measures="$(measure "${size%,*}" "${size#*,}")"
+		expect "memo-html-motif-flush-${case}-${preset}-${size%,*}" "the motif flush in the top right corner, no text over it or the toggle" \
+			flush_corner "${measures}"
+	done
+	for scheme in light dark; do
+		mode="${scheme}"
+		[ "${preset}" != terminal ] || mode=dark
+		measures="$(measure 1440 900 "${scheme}")"
+		expect "memo-html-contrast-${case}-${preset}-${scheme}" "banner and band text at 4.5:1 or more on both gradient ends, the gradient from ground-1 to ground-2" \
+			ground_contrast "${measures}" "$(preset_value "${preset}" "${mode}" ground-1)" "$(preset_value "${preset}" "${mode}" ground-2)"
+	done
+	measures="$(measure 1440 900 forced)"
+	expect "memo-html-forced-colors-${case}-${preset}" "motif, rules, banner and band gradients hidden in forced colours" decorations_hidden "${measures}"
+	expect "memo-html-axe-${case}-${preset}" "no axe-core finding in light and dark, at 1440 and 320 pixels" axe_clean
+}
+
 structure=""
 browser=""
 case "${1:-}" in
 title) check_title "${2:?title needs a preset}" ;;
 components) check_components "${2:?components needs a preset}" ;;
 toc) check_toc "${2:?toc needs a preset}" ;;
+memo) check_memo "${2:?memo needs a case}" "${3:?memo needs a preset}" ;;
 book) check_book ;;
 full) check_full ;;
 overlap) check_overlap ;;
