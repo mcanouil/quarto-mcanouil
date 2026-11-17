@@ -1,0 +1,62 @@
+---
+title: Tools
+author: Test Author
+date: 2026-01-01
+engine: markdown
+toc: true
+extensions:
+  gitlink:
+    platform: github
+    repository-name: mcanouil/quarto-mcanouil
+  veil:
+    groups:
+      - name: expert
+        shown: false
+---
+
+# Tools
+
+## Offset {offset-headings-by=1}
+
+A reference to #12 and an icon {{< iconify mdi home >}}.
+
+[Highlighted]{colour="#cc0000"} text, and the colour `#336699` in code.
+
+::: {#source}
+Reusable content.
+:::
+
+::: {reuse="source"}
+:::
+
+::: {.veil group="expert"}
+Expert content.
+:::
+
+```{.python}
+print("hello")
+```
+
+```{typst}
+#strong[Rendered by Typst]
+```
+
+::: {html:data-prism="yes"}
+Conditional attributes.
+:::
+
+## Hidden from contents {toc-depth=0}
+
+Text.
+
+## Tabs {.tabset}
+
+Text.
+
+## Cascade
+
+Before the rule.
+
+---
+
+After the rule.

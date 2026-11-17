@@ -1,0 +1,265 @@
+# Schema for the typst-render extension
+# Provides configuration validation and IDE support for options
+# and for the comment-pipe options of typst code cells.
+
+$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json
+
+options:
+  format:
+    type: string
+    enum: [png, svg, pdf, html]
+    description: "Output format. Auto-detected from output format if not set. Use 'html' for native HTML (semantic markup with MathML maths) in HTML-based output; it requires Typst >= 0.15 and falls back to SVG otherwise."
+  math:
+    type: string
+    enum: [typst]
+    description: "Global only. Set to 'typst' to render every document equation ($...$ and $$...$$) as Typst math syntax (not LaTeX). For HTML output the maths become native MathML (requires Typst >= 0.15); for Typst output the maths pass through unchanged. Quarto equation numbering and cross-references keep working."
+  dpi:
+    type: integer
+    default: 144
+    exclusiveMinimum: 0
+    description: "Pixels per inch for PNG output."
+  width:
+    type: string
+    default: "auto"
+    description: "Page width for image compilation (ignored with output: asis)."
+  height:
+    type: string
+    default: "auto"
+    description: "Page height for image compilation (ignored with output: asis)."
+  margin:
+    type: string
+    default: "0.5em"
+    description: "Page margin for image compilation; block inset with output: asis."
+  background:
+    type: [string, object]
+    default: "none"
+    description: "Page fill for image compilation; block fill with output: asis. Accepts a Typst colour string, 'auto' (reads from _brand.yml), or a map with light/dark keys."
+    additionalProperties: false
+    properties:
+      light:
+        type: string
+        description: "Background colour for light brand mode."
+      dark:
+        type: string
+        description: "Background colour for dark brand mode."
+  foreground:
+    type: [string, object]
+    description: "Text fill colour for rendered images. Accepts a Typst colour string, 'auto' (reads from _brand.yml), or a map with light/dark keys."
+    additionalProperties: false
+    properties:
+      light:
+        type: string
+        description: "Foreground colour for light brand mode."
+      dark:
+        type: string
+        description: "Foreground colour for dark brand mode."
+  preamble:
+    type: [string, array]
+    default: ""
+    description: "Typst code or path(s) to .typ file(s) prepended before user code. Accepts a string or list of strings."
+    items:
+      type: string
+    completion:
+      type: file
+      extensions: [.typ]
+  root:
+    type: string
+    description: "Global only. Root directory for Typst compilation. Relative paths resolve against the document directory; a leading '/' means the project root. Defaults to the document directory."
+    completion:
+      type: directory
+  font-path:
+    type: [string, array]
+    description: "Global only. Path or list of paths to directories containing additional fonts for Typst compilation."
+    items:
+      type: string
+    completion:
+      type: directory
+  package-path:
+    type: string
+    description: "Global only. Path to a directory containing Typst packages for offline or reproducible builds."
+    completion:
+      type: directory
+  input:
+    type: object
+    description: "Key-value pairs passed as --input flags to the Typst CLI, accessible via sys.inputs in Typst code."
+    additionalProperties:
+      type: string
+  cache:
+    type: boolean
+    default: true
+    description: "Cache compiled images to avoid recompilation."
+  cache-refresh:
+    type: boolean
+    default: false
+    description: "Remove stale cache files after each render. Only files matching the current output format are removed."
+  echo:
+    type: [boolean, string]
+    enum: [true, false, fenced]
+    default: false
+    description: "Show Typst source code alongside rendered output. Use 'fenced' to include code block markers. With 'true', Quarto code annotations on the source (// <N> markers plus a following numbered list) are honoured; other values strip the markers."
+  code-fold:
+    type: [boolean, string]
+    enum: [true, false, show]
+    default: false
+    description: "Collapse the echoed source code in a <details> block (HTML output only). Use 'show' to render it expanded."
+  code-summary:
+    type: string
+    default: "Code"
+    description: "Summary text for the code-fold <details> block, rendered as Markdown (HTML output only)."
+  code-line-numbers:
+    type: [boolean, string]
+    default: false
+    description: "Highlight lines of the echoed source. Use a string like '1|3-4' for progressive line highlighting in Reveal.js (steps separated by '|', ranges with '-', sets with ','). Requires echo: true."
+  eval:
+    type: boolean
+    default: true
+    description: "Compile Typst code to image."
+  include:
+    type: boolean
+    default: true
+    description: "Embed block output in the document. Set false to still compile and write output files, but embed nothing."
+  output:
+    type: [boolean, string]
+    enum: [true, false, asis]
+    default: true
+    description: "Show rendered output. Use 'asis' for native passthrough in Typst output."
+  output-location:
+    type: string
+    enum: [fragment, slide, column, column-fragment]
+    description: "Output placement in Reveal.js presentations. Ignored for other formats."
+  classes:
+    type: string
+    description: "Space-separated CSS classes applied to the output image element (e.g., 'r-stretch')."
+  pages:
+    type: string
+    default: "all"
+    description: "Pages to include from multi-page output: 'all', '1', '1-3', '2,5', '3-'."
+  layout-ncol:
+    type: string
+    description: "Number of columns for arranging multi-page output. Omit for vertical stack."
+  align:
+    type: string
+    enum: [left, center, right, default]
+    description: "Horizontal alignment for the rendered image block."
+  output-directory:
+    type: string
+    default: "./assets/typst-render"
+    description: "Default output directory for saving compiled images, resolved relative to the document directory. Images named from a label or a block counter are written to a subdirectory named after the document, so two documents in the same directory do not overwrite each other. Per-block output-filename paths are resolved relative to this directory, without that subdirectory. Set to an empty string to write no image files, leaving them in the render cache."
+    completion:
+      type: directory
+  output-source:
+    type: boolean
+    default: false
+    description: "Also write the compiled Typst source (preamble + colour bindings + user code) next to each saved image, using the same stem with a .typ extension. Has no effect when image saving is disabled with an empty output-directory."
+
+cells:
+  typst:
+    description: "Typst cells rendered by typst-render."
+    options:
+      format:
+        type: string
+        enum: [png, svg, pdf, html]
+        description: "Output format for this block. Use 'html' for native HTML (semantic markup with MathML maths) in HTML-based output; requires Typst >= 0.15."
+      dpi:
+        type: integer
+        exclusiveMinimum: 0
+        description: "Pixels per inch for PNG output."
+      width:
+        type: string
+        description: "Page width for image compilation (ignored with output: asis)."
+      height:
+        type: string
+        description: "Page height for image compilation (ignored with output: asis)."
+      margin:
+        type: string
+        description: "Page margin for image compilation; block inset with output: asis."
+      background:
+        type: string
+        description: "Page fill for image compilation; block fill with output: asis. Use 'auto' to read from _brand.yml."
+      foreground:
+        type: string
+        description: "Text fill colour for this block. Use 'auto' to read from _brand.yml."
+      preamble:
+        type: string
+        description: "Typst code prepended before this block's code, or path to a .typ file."
+        completion:
+          type: file
+          extensions: [.typ]
+      input:
+        type: string
+        description: "Comma-separated key=value pairs passed as --input flags (e.g., 'theme=dark,lang=en')."
+      cache:
+        type: boolean
+        description: "Enable or disable caching for this block."
+      file:
+        type: string
+        description: "Path to external .typ file to render instead of block content."
+        completion:
+          type: file
+          extensions: [.typ]
+      output-directory:
+        type: string
+        description: "Output directory for this block, overrides the global output-directory. Set to an empty string to write no image file for this block."
+        completion:
+          type: directory
+      output-filename:
+        type: string
+        description: "Path to save the compiled image. Leading '/' means project root (ignores output-directory). Otherwise resolved relative to output-directory, without the per-document subdirectory. Auto-generated from label or block counter if omitted."
+        completion:
+          type: file
+          extensions: [.png, .svg, .pdf]
+      output-source:
+        type: boolean
+        description: "Also write the compiled Typst source for this block next to its saved image. Has no effect when image saving is disabled with an empty output-directory."
+      echo:
+        type: [boolean, string]
+        enum: [true, false, fenced]
+        description: "Show source code alongside rendered output. Use 'fenced' to include code block markers. With 'true', Quarto code annotations on the source (// <N> markers plus a following numbered list) are honoured; other values strip the markers."
+      code-fold:
+        type: [boolean, string]
+        enum: [true, false, show]
+        description: "Collapse the echoed source code in a <details> block (HTML output only). Use 'show' to render it expanded."
+      code-summary:
+        type: string
+        description: "Summary text for the code-fold <details> block, rendered as Markdown (HTML output only)."
+      code-line-numbers:
+        type: [boolean, string]
+        description: "Highlight lines of the echoed source. Use a string like '1|3-4' for progressive line highlighting in Reveal.js (steps separated by '|', ranges with '-', sets with ','). Requires echo: true."
+      eval:
+        type: boolean
+        description: "Compile this block to image."
+      include:
+        type: boolean
+        description: "Embed this block's output in the document. Set false to still compile and write output files, but embed nothing."
+      output:
+        type: [boolean, string]
+        enum: [true, false, asis]
+        description: "Show rendered output for this block. Use 'asis' for native passthrough in Typst output."
+      output-location:
+        type: string
+        enum: [fragment, slide, column, column-fragment]
+        description: "Output placement in Reveal.js presentations. Ignored for other formats."
+      classes:
+        type: string
+        description: "Space-separated CSS classes applied to the output image element (e.g., 'r-stretch')."
+      pages:
+        type: string
+        description: "Pages to include from multi-page output: 'all', '1', '1-3', '2,5', '3-'."
+      layout-ncol:
+        type: string
+        description: "Number of columns for arranging multi-page output. Omit for vertical stack."
+      align:
+        type: string
+        enum: [left, center, right, default]
+        description: "Horizontal alignment for the rendered image block."
+      label:
+        type: string
+        description: "Cross-reference label (e.g., 'fig-my-diagram', 'tbl-results')."
+      cap:
+        type: string
+        description: "Caption text for the labelled block."
+        aliases: [fig-cap, tbl-cap, lst-cap]
+      alt:
+        type: string
+        description: "Alternative text for the labelled block."
+        aliases: [fig-alt, tbl-alt, lst-alt]

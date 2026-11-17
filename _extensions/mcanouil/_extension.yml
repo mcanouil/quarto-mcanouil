@@ -5,9 +5,35 @@ quarto-required: ">=1.12.1"
 contributes:
   formats:
     common:
+      shortcodes:
+        - iconify
       filters:
         - lua/mcanouil.lua
+        - offset-headings
+        - div-reuse
+        - toc-depth
+        - highlight-text
+        - iconify
+        - prism
+        - code-window
+        - veil
+        - typst-render
+        - gitlink
+        - preview-colour
+        - path: lua/mcanouil-post.lua
+          at: post-quarto
+      extensions:
+        preview-colour:
+          text: false
+          code: false
     html:
+      filters:
+        - mobile-toc
+        - collapse-output
+        - remember
+      extensions:
+        remember:
+          enabled: false
       theme:
         - html/base.scss
     typst:
@@ -15,5 +41,17 @@ contributes:
         - typst/typst-template.typ
         - typst/typst-show.typ
     revealjs:
+      filters:
+        - cascade
+        - codefrag
+        - collapse-output
+        - remember
+      extensions:
+        remember:
+          enabled: false
+      revealjs-plugins:
+        - veil
+        - tabset
+        - codefrag
       theme:
         - revealjs/theme.scss
