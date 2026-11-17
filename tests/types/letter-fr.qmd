@@ -1,0 +1,37 @@
+---
+title: Proposition de formation
+lang: fr
+date: 2026-11-11
+sender:
+  name: Mickaël Canouil
+  address:
+    - 12 rue Exemple
+    - 59000 Lille
+  email: mickael@example.org
+place: Lille
+reference: 2026-014
+subject: Proposition de formation
+address:
+  - Company SAS
+  - 10 avenue de la Gare
+  - 75008 Paris
+opening: Madame, Monsieur,
+closing: Cordialement,
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: letter
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A French letter follows NF Z 11-001, the address window on the right, fold marks at one third and two thirds, and the French date.
+        check: bash _checks/letter.sh nf
+    mcanouil-typst:
+      ensureTypstFileRegexMatches:
+        - ['mcanouil-document\(\s*"letter",\s*"standard",\s*none']
+---
+
+{{< include _letter-body.qmd >}}

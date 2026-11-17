@@ -64,6 +64,7 @@ contributes:
           - html/decoration.scss
           - html/scheme-dark.scss
     typst:
+      date-format: long
       font-paths: fonts
       pdf-standard: ua-1
       extensions:
@@ -79,11 +80,14 @@ contributes:
         - typst/lib/slots.typ
         - typst/lib/logo.typ
         - typst/lib/authors.typ
+        - typst/lib/address.typ
         - typst/lib/title.typ
         - typst/lib/toc.typ
         - typst/types/report.typ
         - typst/types/article.typ
         - typst/types/memo.typ
+        - typst/types/letter.typ
+        - typst/types/invoice.typ
         - typst/typst-template.typ
         - typst/typst-show.typ
     revealjs:

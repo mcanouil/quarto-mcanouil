@@ -14,7 +14,7 @@ _quarto:
       shouldError: true
       printsMessage:
         level: ERROR
-        regex: 'mcanouil: unknown type "poster"; use article, memo, report\.'
+        regex: 'mcanouil: unknown type "poster"; use article, invoice, letter, memo, report\.'
 ---
 
 A paragraph.

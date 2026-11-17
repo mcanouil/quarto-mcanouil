@@ -1,0 +1,35 @@
+---
+title: Enabled gitlink
+lang: en-GB
+date: 2026-11-11
+sender:
+  name: Mickaël Canouil
+  address:
+    - 12 Example Street
+    - Lille
+place: Lille
+reference: abcd1234
+subject: Training proposal
+address:
+  - Company Ltd
+  - 10 Station Road
+  - London
+opening: Dear Sir or Madam,
+closing: Yours faithfully,
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: letter
+  gitlink:
+    enabled: true
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: A letter whose author enables gitlink keeps that setting, so a reference that looks like a commit hash becomes a badge.
+        check: bash _checks/letter.sh hex-enabled
+---
+
+{{< include _letter-body.qmd >}}

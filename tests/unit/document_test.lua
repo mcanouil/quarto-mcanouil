@@ -133,7 +133,7 @@ end
 
 cases['resolve-unknown-type'] = function()
   fails_with(
-    type_options({ type = 'poster' }), 'mcanouil-typst', 'mcanouil: unknown type "poster"; use article, memo, report.', 'unknown type'
+    type_options({ type = 'poster' }), 'mcanouil-typst', 'mcanouil: unknown type "poster"; use article, invoice, letter, memo, report.', 'unknown type'
   )
 end
 
@@ -257,6 +257,43 @@ end
 
 cases['memo-fields-empty-value-left-out'] = function()
   assert_equal(keys(document.memo_fields(memo_meta({ to = '', from = 'Ana' }), 'note')), 'from', 'empty value')
+end
+
+cases['resolve-letter-layout'] = function()
+  local resolved = document.resolve(type_options({ type = 'letter' }), 'mcanouil-typst')
+  assert_equal(resolved.type, 'letter', 'type')
+  assert_equal(resolved.layout, 'standard', 'layout')
+end
+
+cases['resolve-invoice-layout'] = function()
+  local resolved = document.resolve(type_options({ type = 'invoice' }), 'mcanouil-typst')
+  assert_equal(resolved.type, 'invoice', 'type')
+  assert_equal(resolved.layout, 'standard', 'layout')
+end
+
+local function letter_meta(lang, standard)
+  local meta = { extensions = { mcanouil = { type = 'letter', ['letter-standard'] = standard } } }
+  meta.lang = lang
+  return meta
+end
+
+cases['letter-standard-by-language'] = function()
+  assert_equal(document.letter_standard(letter_meta('fr')), 'nf', 'fr')
+  assert_equal(document.letter_standard(letter_meta('de')), 'din', 'de')
+  assert_equal(document.letter_standard(letter_meta('de-AT')), 'din', 'de-AT')
+  assert_equal(document.letter_standard(letter_meta('en')), 'nf', 'en')
+  assert_equal(document.letter_standard(letter_meta(nil)), 'nf', 'no language')
+end
+
+cases['letter-standard-override'] = function()
+  assert_equal(document.letter_standard(letter_meta('fr', 'din')), 'din', 'fr with din')
+  assert_equal(document.letter_standard(letter_meta('de', 'nf')), 'nf', 'de with nf')
+end
+
+cases['letter-standard-unknown'] = function()
+  local standard, message = document.letter_standard(letter_meta('fr', 'iso'))
+  assert_equal(standard, nil, 'result')
+  assert_equal(message, 'mcanouil: unknown letter-standard "iso"; use din, nf.', 'message')
 end
 
 return cases
