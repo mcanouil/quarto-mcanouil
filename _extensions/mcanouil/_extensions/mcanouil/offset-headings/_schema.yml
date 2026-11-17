@@ -61,7 +61,7 @@ attributes:
       type: boolean
       default: true
       title: Cascade to descendants
-      description: "When true, the offset cascades to every descendant heading until a sibling or ancestor stops it; defaults to the document-level recursive option."
+      description: "When true, the offset cascades to every descendant heading until a sibling or ancestor stops it, and a heading inside a nested block such as a div stops it only inside that block; defaults to the document-level recursive option."
     offset-headings-max-level:
       type: integer
       default: 6

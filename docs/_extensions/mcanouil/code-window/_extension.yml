@@ -9,4 +9,4 @@ contributes:
     - at: post-quarto
       path: _modules/hotfix/typst-title-fix.lua
 source: mcanouil/quarto-code-window@1.5.1
-source-type: registry
+source-type: github

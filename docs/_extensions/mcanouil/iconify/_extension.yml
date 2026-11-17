@@ -8,4 +8,4 @@ contributes:
   filters:
     - iconify-filter.lua
 source: mcanouil/quarto-iconify@4.2.2
-source-type: registry
+source-type: github

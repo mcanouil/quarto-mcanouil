@@ -431,7 +431,6 @@ local function process_div(div)
   if config.method == 'javascript' then
     html_mod.ensure_html_dependency({
       name = 'collapse-output',
-      version = '1.0.0',
       scripts = {
         { path = 'collapse-output.min.js', afterBody = true }
       }
