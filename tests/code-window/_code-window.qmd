@@ -1,0 +1,14 @@
+# Code
+
+A code window with a file name:
+
+```{.r filename="analysis.R"}
+fit <- coxph(Surv(t, e) ~ arm, data = adsl)
+summary(fit) # the model
+```
+
+A code window with the label of its language:
+
+```python
+print("auto label")
+```

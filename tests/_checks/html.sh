@@ -591,6 +591,15 @@ if not eval(sys.argv[2]):
 ' "$1" "$2" "$3"
 }
 
+# Answer one field of the measures, or "missing".
+# $1 measures, as JSON. $2 field.
+measured_field() {
+	python3 -I -c '
+import json, sys
+print(json.loads(sys.argv[1] or "{}").get(sys.argv[2], "missing"))
+' "$1" "$2"
+}
+
 # Succeed when every component text has a contrast of 4.5:1 or more with the
 # colour behind it, and every background belongs to the scheme: dark
 # (relative luminance below 0.2) or light (above 0.4). An active tab may be
@@ -672,6 +681,8 @@ check_components() {
 			measured "${measures}" "m['scheme'] == '${scheme}' or '${preset}' == 'terminal'" 'm["scheme"]'
 		expect "html-component-colours-${preset}-${scheme}" "component text at 4.5:1 or more on ${expected} backgrounds" \
 			component_colours "${measures}" "${expected}"
+		expect "html-code-window-${preset}-${scheme}" "the traffic lights and the ${preset} frame, title bar and body on the code window, see code_window_look in lib.sh" \
+			code_window_matches "$(measured_field "${measures}" codeWindow)" "${preset}"
 	done
 	measures="$(measure 1440 900 forced components)"
 	expect "html-component-decoration-forced-colors-${preset}" "component decorations hidden in forced colours" \

@@ -5,6 +5,50 @@
 // @license MIT
 // @copyright 2026 Mickaël Canouil
 // @author Mickaël Canouil
+// Facts of a code window, as "key=value" words that code_window_matches in
+// lib.sh compares with the look of the preset. A colour is named by every
+// token it equals, joined with "+". The same function is in deck-probe.js.
+const codeWindowFacts = (win) => {
+  if (!win) return "missing";
+  const bar = win.querySelector(".code-with-filename-file");
+  const code = win.querySelector("div.sourceCode pre");
+  const token = (name) => {
+    const probe = document.createElement("span");
+    probe.style.color = `var(--mc-${name})`;
+    win.appendChild(probe);
+    const colour = getComputedStyle(probe).color;
+    probe.remove();
+    return colour;
+  };
+  const named = (colour, names) => names.filter((name) => token(name) === colour).join("+") || "other";
+  let behind = "none";
+  for (let node = code; node && node !== win.parentElement; node = node.parentElement) {
+    const colour = getComputedStyle(node).backgroundColor;
+    if (colour !== "rgba(0, 0, 0, 0)" && colour !== "transparent") {
+      behind = colour;
+      break;
+    }
+  }
+  const frame = getComputedStyle(win);
+  const title = getComputedStyle(bar);
+  const deco = getComputedStyle(bar, "::before");
+  return [
+    "deco=" + (deco.content !== "none" && /url\(/.test(deco.backgroundImage) ? 1 : 0),
+    "icon=" + (parseFloat(deco.height) / parseFloat(title.fontSize)).toFixed(2),
+    "border=" + [
+      parseFloat(frame.borderTopWidth),
+      parseFloat(frame.borderLeftWidth),
+      frame.borderTopStyle,
+      named(frame.borderTopColor, ["line", "ink", "accent"]),
+    ].join("/"),
+    "radius=" + parseFloat(frame.borderTopLeftRadius),
+    "shadow=" + (frame.boxShadow === "none" ? 0 : 1),
+    "title-edge=" + title.borderBottomStyle,
+    "gilded=" + (/gradient/.test(title.backgroundImage) ? 1 : 0),
+    "body=" + named(behind, ["tint", "card"]),
+  ].join(" ");
+};
+
 window.addEventListener("load", () => document.fonts.ready.then(() => {
   const out = { scheme: document.body.classList.contains("quarto-dark") ? "dark" : "light" };
   const shown = (el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden";
@@ -191,5 +235,6 @@ window.addEventListener("load", () => document.fonts.ready.then(() => {
     const b = cue(inactive);
     out.activeCues = Object.keys(a).filter((key) => a[key] !== b[key]);
   }
+  out.codeWindow = codeWindowFacts(document.querySelector("main .code-with-filename"));
   parent.postMessage(JSON.stringify(out), "*");
 }));

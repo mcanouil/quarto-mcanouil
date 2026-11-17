@@ -99,10 +99,19 @@ $mc-quarto-radius: 9px !default;
     box-shadow: 0 1px 2px color-mix(in srgb, var(--mc-ink) 15%, transparent);
   }
 
-  // Code: rounded windows.
+  // Code: rounded windows, the code on the card under a soft shadow.
   body .code-with-filename,
   div.sourceCode {
     border-radius: #{$mc-quarto-radius};
+  }
+
+  body .code-with-filename {
+    --code-window-bg: var(--mc-card);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--mc-ink) 12%, transparent);
+  }
+
+  body .code-with-filename div.sourceCode {
+    background-color: var(--mc-card);
   }
 
   // Block quotes: a card with a round quote icon, the attribution in a pill.

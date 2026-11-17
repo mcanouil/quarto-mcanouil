@@ -88,6 +88,15 @@
   background: var(--mc-paper);
 }
 
+/* Code windows: the dashed frame in the accent colour, as in HTML. */
+.reveal .code-with-filename {
+  border-color: var(--mc-accent);
+}
+
+.reveal .code-with-filename .code-with-filename-file {
+  border-bottom-style: dashed;
+}
+
 /* Workshop blocks: dashed boxes, as the terminal code windows. */
 .reveal .mc-ws:is(.mc-ws-objectives, .mc-ws-prerequisites, .mc-ws-exercise) {
   border-style: dashed;

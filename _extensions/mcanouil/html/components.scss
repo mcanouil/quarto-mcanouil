@@ -175,9 +175,15 @@ td code:not(.sourceCode) {
   color: var(--mc-ink);
 }
 
+// Code windows keep the traffic lights of the embedded code-window, at 0.7
+// times the title bar text (the 4:1 ratio of the drawing kept), so they sit
+// in proportion with the file name in HTML and in Reveal.js.
 body .code-with-filename {
   --code-window-bg: var(--mc-tint);
   --code-window-title-bg: var(--mc-tint);
+  --code-window-icon-height: 0.7em;
+  --code-window-macos-icon-width: 2.8em;
+  --code-window-windows-icon-width: 2.8em;
   border-color: var(--mc-line);
   border-radius: var(--mc-radius, 0.375rem);
 }

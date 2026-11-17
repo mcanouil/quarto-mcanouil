@@ -5,6 +5,7 @@ set -euo pipefail
 # Check hook: the layout of a Typst PDF, read from its text, its pixels and its tag tree.
 #
 # Usage: pdf.sh report <preset>
+#        pdf.sh code-window <preset>
 #        pdf.sh report-no-author
 #        pdf.sh center-alias
 #        pdf.sh subdir
@@ -234,7 +235,64 @@ running_header_in_force() {
 	return 1
 }
 
+# Answer the Typst test that the code-window theme of a preset must pass, in
+# terms of t, the theme, and c, the tokens: the traffic lights at 0.7em, as in
+# HTML and Reveal.js, the file name in the muted colour, and the frame and the
+# title bar of the preset, all from the tokens.
+# $1 preset.
+code_window_theme_test() {
+	printf 't.traffic-light-size == 0.7em and t.traffic-light-gap == 0.35em and t.label == c.muted and t.muted == c.muted and '
+	case "$1" in
+	gold) printf 'type(t.border) == gradient and t.border.stops().map(s => s.at(0)) == (c.at("accent-low"), c.at("accent-high"), c.at("accent-low")) and t.surface == c.tint and t.radius == 5pt' ;;
+	mono) printf 't.border == c.ink and t.stroke-thickness == 1pt and t.surface == c.tint and t.radius == 0pt' ;;
+	quarto) printf 't.border == c.line and t.surface == c.card and t.radius == 9pt' ;;
+	terminal) printf 't.border == c.accent and t.stroke-dash == "dashed" and t.surface == c.tint and t.radius == 0pt' ;;
+	esac
+}
+
+# Answer the value of a Typst expression evaluated in the laid-out document of
+# the kept Typst file, so it can read a state at the location of an element.
+# Fails on an error or a warning.
+# $1 expression.
+typst_in_document() {
+	local value
+	value="$(quarto typst eval --in "${typ}" --root / --font-path "${ext_dir}/fonts" "$1" 2>&1)" || {
+		printf '# %s\n' "${value}"
+		return 1
+	}
+	if grep -qE '^(error|warning)' <<<"${value}"; then
+		printf '# %s\n' "${value}"
+		return 1
+	fi
+	printf '%s\n' "${value}"
+}
+
+# Succeed when both code windows of the document read a code-window theme
+# that passes the test of the preset, at their own location in the laid-out
+# document: the window with "coxph" and the window with "print". A theme set
+# after a window, or not at all, fails. Prints the theme each window reads
+# when the test fails.
+# $1 preset.
+code_window_theme() {
+	local at result
+	at='state("code-window-theme", (:)).at(query(raw.where(text: word)).first().location())'
+	result="$(typst_in_document "{ import \"${typ}\": mc-tokens; let c = mc-tokens; (\"coxph\", \"print\").map(word => { let t = ${at}; t.len() > 0 and $(code_window_theme_test "$1") }) }")" || {
+		printf '%s\n' "${result}"
+		return 1
+	}
+	[ "${result}" = '[true,true]' ] || {
+		typst_in_document "{ (\"coxph\", \"print\").map(word => repr(${at})) }" | sed 's/^/# theme at the windows: /'
+		return 1
+	}
+}
+
 case "${1:-}" in
+code-window)
+	find_verapdf
+	expect "typst-code-window-theme-${2:?code-window needs a preset}" "the traffic lights and the ${2} frame and title bar from the tokens, see code_window_theme_test" \
+		code_window_theme "$2"
+	expect "typst-code-window-ua1-${2}" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
+	;;
 report) check_report "${2:?report needs a preset}" ;;
 report-no-author)
 	expect "furniture-missing-metadata" "the footer 'Version 1.2 | 1 / 1' with no leading separator" furniture_missing_metadata

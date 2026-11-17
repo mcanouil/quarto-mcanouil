@@ -126,7 +126,11 @@ $mc-semantics: note, tip, warning, important, caution;
   font-feature-settings: "liga" 0, "calt" 0;
 }
 
+// Text with no token class takes the ink, not the colour of the light
+// highlighting style sheet, so it reads on the dark slides too.
 .reveal .slides section div.sourceCode code span {
+  color: var(--mc-ink);
+
   &:is(.kw, .cf, .im, .bu, .ex) {
     color: var(--mc-accent-text);
   }
@@ -161,8 +165,13 @@ $mc-semantics: note, tip, warning, important, caution;
   color: var(--mc-muted);
 }
 
-// Code window: the file name of a code block, on a title bar.
+// Code window: the file name of a code block, on a title bar, after the
+// traffic lights of the embedded code-window at 0.7 times the title bar text
+// (the 4:1 ratio of the drawing kept), as in HTML.
 .reveal .code-with-filename {
+  --code-window-icon-height: 0.7em;
+  --code-window-macos-icon-width: 2.8em;
+  --code-window-windows-icon-width: 2.8em;
   border: 1px solid var(--mc-line);
   border-radius: var(--mc-radius);
   overflow: hidden;
@@ -175,13 +184,22 @@ $mc-semantics: note, tip, warning, important, caution;
   font-family: var(--mc-font-ui);
 }
 
+// The title bar has one rule, below it: the frame of Quarto's own title bar
+// would draw a second edge inside the window.
 .reveal .code-with-filename .code-with-filename-file {
+  border: 0;
   border-bottom: 1px solid var(--mc-line);
 }
 
 .reveal .code-with-filename div.sourceCode {
   border: 0;
   border-radius: 0;
+}
+
+// The copy button frame of the code ends on the corners of the window, not on
+// the fixed 8px of code-window, which shows on a window with no side edges.
+.reveal .code-with-filename .code-copy-outer-scaffold {
+  border-radius: 0 0 var(--mc-radius) var(--mc-radius);
 }
 
 // Code annotations: the number in a round mark, in the code and in the list.

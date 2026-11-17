@@ -83,6 +83,7 @@ contributes:
         - typst/lib/labels.typ
         - typst/lib/decoration.typ
         - typst/lib/quote.typ
+        - typst/lib/code-window.typ
         - typst/lib/motifs.typ
         - typst/lib/chrome.typ
         - typst/lib/slots.typ

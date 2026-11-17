@@ -1,8 +1,8 @@
 /*
  * mcanouil - quarto preset of the Reveal.js deck
  * Documentation: a pill kicker, an accent bar beside slide titles, a radius of
- * 9px, code windows on the card, and block quotes on a card with a round quote
- * mark and the attribution in a pill.
+ * 9px, code windows on the card under a soft shadow, and block quotes on a
+ * card with a round quote mark and the attribution in a pill.
  *
  * @license MIT
  * @copyright 2026 Mickaël Canouil
@@ -37,6 +37,10 @@
   width: 5px;
   border-radius: 3px;
   background: var(--mc-accent);
+}
+
+.reveal .code-with-filename {
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--mc-ink) 12%, transparent);
 }
 
 .reveal .code-with-filename,
