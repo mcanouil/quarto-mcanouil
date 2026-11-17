@@ -453,11 +453,12 @@
     if (!ladder || typeof deck.registerKeyboardShortcut !== 'function') {
       return;
     }
+    var strings = config.strings || {};
     if (keys['level-up']) {
-      deck.registerKeyboardShortcut(keys['level-up'], 'Show the next level of content');
+      deck.registerKeyboardShortcut(keys['level-up'], strings['veil-level-up'] || 'veil-level-up');
     }
     if (keys['level-down']) {
-      deck.registerKeyboardShortcut(keys['level-down'], 'Hide the current level of content');
+      deck.registerKeyboardShortcut(keys['level-down'], strings['veil-level-down'] || 'veil-level-down');
     }
   }
 

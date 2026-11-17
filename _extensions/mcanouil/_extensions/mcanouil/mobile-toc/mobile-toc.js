@@ -28,13 +28,12 @@
   };
 
   const start = () => {
-    const toc = document.querySelector("nav#TOC");
+    const toc = document.querySelector("#quarto-margin-sidebar nav#TOC, #quarto-sidebar-toc-left nav#TOC");
     const list = toc?.querySelector(":scope > ul");
     if (
       !list ||
       document.getElementById("TOC-body") ||
-      toc.closest("main") ||
-      !Object.hasOwn(HTMLElement.prototype, "popover") ||
+      typeof window.HTMLDialogElement?.prototype.showModal !== "function" ||
       list.querySelectorAll("a").length < 2
     ) {
       return;
@@ -47,11 +46,9 @@
     const narrow = window.matchMedia(`(width < ${breakpoint})`);
 
     const build = () => {
-      const sheet = document.createElement("div");
+      const sheet = document.createElement("dialog");
       sheet.id = SHEET_ID;
       sheet.className = "mobile-toc-sheet";
-      sheet.popover = "auto";
-      sheet.setAttribute("role", "navigation");
       sheet.setAttribute("aria-labelledby", "mobile-toc-sheet-label");
 
       const header = document.createElement("div");
@@ -63,12 +60,12 @@
       const close = document.createElement("button");
       close.type = "button";
       close.className = "mobile-toc-close";
-      close.setAttribute("popovertarget", SHEET_ID);
-      close.setAttribute("popovertargetaction", "hide");
       close.setAttribute("aria-label", closeLabel);
       close.innerHTML = '<i class="bi bi-x-lg" aria-hidden="true"></i>';
       header.append(sheetLabel, close);
-      sheet.append(header);
+      const landmark = document.createElement("nav");
+      landmark.setAttribute("aria-labelledby", "mobile-toc-sheet-label");
+      sheet.append(header, landmark);
 
       let copy = null;
       const mount = () => {
@@ -81,25 +78,41 @@
           ? document.activeElement.getAttribute("href")
           : null;
         if (copy) copy.replaceWith(fresh);
-        else sheet.append(fresh);
+        else landmark.append(fresh);
         copy = fresh;
+        uncollapse();
         markCurrent();
         if (focusedHref) {
           [...copy.querySelectorAll("a")].find((a) => a.getAttribute("href") === focusedHref)?.focus();
         }
+      };
+      // The side table of contents collapses the branches away from the reading position.
+      // The sheet has no control to expand them, so it lists every entry, also during a collapse animation.
+      const uncollapse = () => {
+        copy.querySelectorAll("ul.collapse, ul.collapsing").forEach((ul) => {
+          ul.classList.remove("collapse", "collapsing");
+          ul.style.removeProperty("height");
+        });
       };
       const markCurrent = () => {
         copy.querySelectorAll("a[aria-current]").forEach((a) => a.removeAttribute("aria-current"));
         const active = copy.querySelectorAll("a.active");
         active[active.length - 1]?.setAttribute("aria-current", "location");
       };
-      const mirrorClasses = () => {
+      const MIRRORED = ["class", "hidden"];
+      const mirrorState = () => {
         const selector = "ul, li, a";
         const source = list.querySelectorAll(selector);
         const target = copy.querySelectorAll(selector);
         source.forEach((el, index) => {
-          if (target[index].className !== el.className) target[index].className = el.className;
+          for (const name of MIRRORED) {
+            const value = el.getAttribute(name);
+            if (target[index].getAttribute(name) === value) continue;
+            if (value === null) target[index].removeAttribute(name);
+            else target[index].setAttribute(name, value);
+          }
         });
+        uncollapse();
         markCurrent();
       };
       mount();
@@ -115,26 +128,62 @@
         }
         heading.focus({ preventScroll: true });
       };
+      // An id may hold a stray percent sign that is not an escape, so try the raw id before decoding.
+      const targetId = (hash) => {
+        const raw = hash.slice(1);
+        if (document.getElementById(raw)) return raw;
+        try {
+          return decodeURIComponent(raw);
+        } catch {
+          return null;
+        }
+      };
       const isPlainSamePageClick = (event, link) =>
         !event.defaultPrevented &&
         !(event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) &&
         link.origin + link.pathname === location.origin + location.pathname;
+      // A click on the backdrop targets the dialog itself, as does a click on its padding.
+      // Close only when the point is outside the dialog box.
+      const onBackdrop = (event) => {
+        if (event.target !== sheet) return false;
+        const box = sheet.getBoundingClientRect();
+        return (
+          event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom
+        );
+      };
+      let pendingHash = null;
       sheet.addEventListener("click", (event) => {
-        const link = event.target.closest("a");
-        if (!link) return;
-        sheet.hidePopover();
-        if (!isPlainSamePageClick(event, link)) return;
-        let id;
-        try {
-          id = decodeURIComponent(link.hash.slice(1));
-        } catch {
+        if (onBackdrop(event)) {
+          sheet.close();
           return;
         }
-        requestAnimationFrame(() => focusHeading(id));
+        const link = event.target.closest("a");
+        if (!link) return;
+        sheet.close();
+        if (!isPlainSamePageClick(event, link)) return;
+        const id = targetId(link.hash);
+        if (id === null) return;
+        // Firefox runs the fragment navigation after the next frame, and it blurs a heading focused before.
+        // Focus after the hash changes, or after the frame and its tasks when the hash stays the same.
+        const focusLater = () => setTimeout(() => focusHeading(id), 0);
+        pendingHash?.abort();
+        if (link.hash === location.hash) {
+          requestAnimationFrame(focusLater);
+          return;
+        }
+        // Another script can cancel the navigation, so stop waiting after a second.
+        const pending = new AbortController();
+        pendingHash = pending;
+        const onHashChange = () => {
+          pending.abort();
+          if (location.hash === link.hash) focusLater();
+        };
+        window.addEventListener("hashchange", onHashChange, { signal: pending.signal });
+        setTimeout(() => pending.abort(), 1000);
       });
 
       // Other scripts may add children inside TOC links, so a copy paired by position can drift.
-      // Clone the list again on any child change, and copy only classes otherwise.
+      // Clone the list again on any child change, and copy only classes and hidden otherwise.
       // Both are coalesced to one update for each animation frame.
       let frame = 0;
       let reclone = false;
@@ -144,7 +193,7 @@
         frame = requestAnimationFrame(() => {
           frame = 0;
           if (reclone) mount();
-          else mirrorClasses();
+          else mirrorState();
           reclone = false;
         });
       });
@@ -152,26 +201,37 @@
         subtree: true,
         childList: true,
         attributes: true,
-        attributeFilter: ["class"],
+        attributeFilter: MIRRORED,
       });
 
       const pill = document.createElement("button");
       pill.type = "button";
       pill.className = "mobile-toc-pill";
-      pill.setAttribute("popovertarget", SHEET_ID);
+      pill.setAttribute("aria-haspopup", "dialog");
+      pill.setAttribute("aria-controls", SHEET_ID);
+      pill.setAttribute("aria-expanded", "false");
       pill.innerHTML = '<i class="bi bi-list-nested" aria-hidden="true"></i>';
       const pillLabel = document.createElement("span");
       pillLabel.className = "mobile-toc-pill-label";
       pillLabel.textContent = label;
       pill.append(pillLabel);
-      document.body.append(pill, sheet);
+      close.addEventListener("click", () => sheet.close());
+      const main = document.querySelector("#quarto-content > main") ?? document.querySelector("main");
+      if (main) main.before(pill, sheet);
+      else document.body.append(pill, sheet);
 
       const root = document.documentElement;
-      const writePillHeight = () => {
-        root.style.setProperty("--mobile-toc-pill-height", `${pill.getBoundingClientRect().height}px`);
-      };
-      const pillObserver = new ResizeObserver(writePillHeight);
-      pillObserver.observe(pill);
+      // Quarto hides back-to-top until the reader scrolls up, so keep the last height it had on screen.
+      const backToTop = document.getElementById("quarto-back-to-top");
+      const heightObserver = new ResizeObserver((entries) => {
+        for (const { target } of entries) {
+          const height = target.getBoundingClientRect().height;
+          if (target === pill) root.style.setProperty("--mobile-toc-pill-height", `${height}px`);
+          else if (height > 0) root.style.setProperty("--mobile-toc-back-to-top-height", `${height}px`);
+        }
+      });
+      heightObserver.observe(pill);
+      if (backToTop) heightObserver.observe(backToTop);
 
       // Content wider than the screen widens the layout viewport on a phone,
       // and a fixed element follows its far edge off screen.
@@ -212,29 +272,55 @@
         apply();
       }
 
-      sheet.addEventListener("toggle", (event) => {
-        if (event.newState !== "open") return;
-        const link = sheet.querySelector("a.active");
+      // showModal() focuses the first control while the sheet still slides in from below the screen,
+      // and on a zoomed page that focus pans the visual viewport.
+      // A hidden sheet has no control to focus, so focus the start link afterwards, without a scroll.
+      pill.addEventListener("click", () => {
+        if (sheet.open) return;
+        sheet.style.visibility = "hidden";
+        sheet.showModal();
+        sheet.style.removeProperty("visibility");
+        pill.setAttribute("aria-expanded", "true");
+        const link = copy.querySelector("a[aria-current]") || copy.querySelector("a");
         if (!link) return;
-        const top = link.offsetTop;
-        const bottom = top + link.offsetHeight;
-        if (top < sheet.scrollTop) sheet.scrollTop = top;
-        else if (bottom > sheet.scrollTop + sheet.clientHeight) sheet.scrollTop = bottom - sheet.clientHeight;
+        const box = sheet.getBoundingClientRect();
+        const linkBox = link.getBoundingClientRect();
+        if (linkBox.top < box.top) sheet.scrollTop += linkBox.top - box.top;
+        else if (linkBox.bottom > box.bottom) sheet.scrollTop += linkBox.bottom - box.bottom;
+        link.focus({ preventScroll: true });
+      });
+      sheet.addEventListener("close", () => {
+        pill.setAttribute("aria-expanded", "false");
+        // Safari does not focus a button on tap, so close() would otherwise leave focus on the body.
+        if (document.activeElement === document.body || sheet.contains(document.activeElement)) pill.focus();
       });
 
+      // When the screen widens, the side table of contents shows again and the pill goes away.
+      // Move focus that was on the pill or in the sheet to the current link there, so it does not drop to the body.
+      const handOverFocus = () => {
+        const active = list.querySelectorAll("a.active");
+        for (const link of [active[active.length - 1], list.querySelector("a")]) {
+          link?.focus();
+          if (document.activeElement === link) return;
+        }
+      };
+
       return () => {
+        const hadFocus = document.activeElement === pill || sheet.contains(document.activeElement);
         listeners.abort();
-        pillObserver.disconnect();
+        pendingHash?.abort();
+        heightObserver.disconnect();
         cancelAnimationFrame(placeFrame);
         area?.remove();
-        ["pill-height", "offset-x", "offset-y", "offset-left"].forEach((name) =>
+        ["pill-height", "back-to-top-height", "offset-x", "offset-y", "offset-left"].forEach((name) =>
           root.style.removeProperty(`--mobile-toc-${name}`),
         );
         observer.disconnect();
         cancelAnimationFrame(frame);
-        if (sheet.matches(":popover-open")) sheet.hidePopover();
+        if (sheet.open) sheet.close();
         pill.remove();
         sheet.remove();
+        if (hadFocus) handOverFocus();
       };
     };
 

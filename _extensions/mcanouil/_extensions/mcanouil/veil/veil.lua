@@ -18,6 +18,7 @@ local VeilState = require((quarto.utils.resolve_path('veil-state.lua'):gsub('%.l
 local collect = require((quarto.utils.resolve_path('veil-collect.lua'):gsub('%.lua$', '')))
 local warn = require((quarto.utils.resolve_path('veil-warn.lua'):gsub('%.lua$', '')))
 local structure = require((quarto.utils.resolve_path('veil-structure.lua'):gsub('%.lua$', '')))
+local language = require((quarto.utils.resolve_path('veil-language.lua'):gsub('%.lua$', '')))
 local config = require((quarto.utils.resolve_path('veil-config.lua'):gsub('%.lua$', '')))
 
 local fail = collect.fail
@@ -46,6 +47,10 @@ local resolved = nil
 --- The slide level of a Reveal.js deck, set by the `Meta` handler.
 --- @type integer
 local slide_level = 2
+
+--- The interface text of the runtime, set by the `Meta` handler.
+--- @type table
+local strings = {}
 
 -- ============================================================================
 -- HELPER FUNCTIONS (PRIVATE)
@@ -207,6 +212,7 @@ local function read_meta(meta)
   known = groups_with_state_names(options)
   resolved = resolve_state(options, known)
   slide_level = tonumber(as_string(meta['slide-level'])) or PANDOC_WRITER_OPTIONS.slide_level or 2
+  strings = language.strings(meta)
   collect.configure(resolved, not has_runtime())
   return meta
 end
@@ -242,7 +248,7 @@ local function check_document(doc)
     if is_revealjs then
       warn.reveal_plugin(doc.meta['revealjs-plugins'])
     end
-    config.add(config.encode(options, known, resolved, collect.collected.used, is_revealjs), is_revealjs)
+    config.add(config.encode(options, known, resolved, collect.collected.used, is_revealjs, strings), is_revealjs)
   end
   return doc
 end
