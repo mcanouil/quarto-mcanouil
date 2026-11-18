@@ -13,12 +13,12 @@ _quarto:
   tests:
     run:
       extension-test:
-        description: The project copy of veil is named in filters and in revealjs-plugins, so the deck uses the copy's plugin and does not warn.
+        description: The project copy of veil is named in filters and in revealjs-plugins, so the deck loads the plugin of the copy after the embedded one, and does not warn.
         warnings: exhaustive
     mcanouil-revealjs:
       noErrors: true
       ensureFileRegexMatches:
-        - ['id="project-veil"', 'reveal-veil/veil-plugin-stub\.js']
+        - ['id="project-veil"', 'reveal-veil/veil-state\.js', 'reveal-veil/veil-plugin-stub\.js']
         - ['id="veil-config"']
 ---
 
