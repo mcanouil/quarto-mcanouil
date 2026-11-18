@@ -5,18 +5,34 @@ date: 2026-01-01
 engine: markdown
 format:
   mcanouil-html: default
+  mcanouil-revealjs: default
 filters:
   - veil
 _quarto:
   tests:
+    run:
+      extension-test:
+        description: The project copy of veil, named in filters, replaces the embedded filter. A deck that does not name the copy in revealjs-plugins too warns once.
+        warnings: exhaustive
     mcanouil-html:
+      noErrors: true
       ensureFileRegexMatches:
         - ['id="project-veil"', 'class="light-content"']
         - ['id="veil-config"', 'veil-0\.']
+    mcanouil-revealjs:
+      noErrors: true
+      printsMessage:
+        level: WARN
+        regex: '\[embedded\] veil: .*Name the copy in both lists\.'
+        count: 1
+      ensureFileRegexMatches:
+        - ['id="project-veil"']
+        - ['id="veil-config"']
 ---
 
 The project keeps its own copy of veil under `_extensions/project/veil/`, and names it in `filters`.
 Only that copy runs, and the other embedded tools still run.
+The deck names the copy in `filters` only, so it warns that the copy is not in `revealjs-plugins`.
 
 ::: {.veil group="answers"}
 Hidden text.

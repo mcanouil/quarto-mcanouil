@@ -1,0 +1,25 @@
+---
+title: A project copy of iconify that filters does not name
+author: Test Author
+date: 2026-01-01
+engine: markdown
+format:
+  mcanouil-html: default
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The project copy of iconify gives the shortcode, but filters does not name it, so the page warns once that the embedded filter runs with it.
+        warnings: exhaustive
+    mcanouil-html:
+      noErrors: true
+      printsMessage:
+        level: WARN
+        regex: '\[embedded\] iconify: .*Name the copy in `filters`\.'
+        count: 1
+      ensureFileRegexMatches:
+        - ['id="project-iconify"']
+        - []
+---
+
+An icon: {{< iconify mdi:home >}}.

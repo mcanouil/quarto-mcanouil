@@ -8,4 +8,4 @@
 
 local embedded = require(quarto.utils.resolve_path('../_vendor/quarto-lua-modules/embedded.lua'):gsub('%.lua$', ''))
 local file = quarto.utils.resolve_path('../_extensions/mcanouil/veil/veil.lua')
-return embedded.load('veil', file)
+return embedded.load('veil', file, { plugin = true })
