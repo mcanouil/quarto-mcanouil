@@ -1,0 +1,31 @@
+---
+title: A deck that names a project copy in revealjs-plugins only
+author: Test Author
+date: 2026-01-01
+engine: markdown
+format:
+  mcanouil-revealjs: default
+revealjs-plugins:
+  - veil
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The project copy of veil is named in revealjs-plugins but not in filters, so the embedded filter runs with the plugin of the copy, and the deck warns once.
+        warnings: exhaustive
+    mcanouil-revealjs:
+      noErrors: true
+      printsMessage:
+        level: WARN
+        regex: '\[embedded\] veil: .*in `revealjs-plugins` but not in `filters`.*Name the copy in both lists\.'
+        count: 1
+      ensureFileRegexMatches:
+        - ['id="veil-config"', 'reveal-veil/veil-plugin-stub\.js']
+        - ['id="project-veil"']
+---
+
+## Slide
+
+::: {.veil group="answers"}
+Hidden text.
+:::
