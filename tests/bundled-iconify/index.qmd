@@ -19,7 +19,7 @@ _quarto:
         count: 1
       ensureFileRegexMatches:
         - ['id="project-iconify"']
-        - []
+        - ['<iconify-icon']
 ---
 
 An icon: {{< iconify mdi:home >}}.

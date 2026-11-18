@@ -32,7 +32,6 @@ _quarto:
 
 The project keeps its own copy of veil under `_extensions/project/veil/`, and names it in `filters`.
 Only that copy runs, and the other embedded tools still run.
-The deck names the copy in `filters` only, so it warns that the copy is not in `revealjs-plugins`.
 
 ::: {.veil group="answers"}
 Hidden text.
