@@ -1,0 +1,8 @@
+title: Iconify stand-in
+author: Test Author
+version: 9.9.9
+contributes:
+  shortcodes:
+    - iconify.lua
+  filters:
+    - iconify-filter.lua

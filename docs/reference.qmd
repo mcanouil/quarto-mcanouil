@@ -202,8 +202,18 @@ When the copy is under `_extensions/`, with any owner such as `_extensions/local
 Only your copy runs.
 If you do not name your copy, the embedded filters run as usual.
 
-This applies to filters only.
-The `mcanouil-revealjs` format still loads the embedded Reveal.js plugins of veil and codefrag, and the embedded iconify shortcode stays available.
+Some tools also give a Reveal.js plugin or a shortcode, and Quarto loads these parts in a different way:
+
+- Reveal.js plugins: the `mcanouil-revealjs` format always loads the embedded plugins of veil, tabset, and codefrag.
+  When you name your copy in `revealjs-plugins:`, the deck also loads the plugin files of your copy, after the embedded files.
+  A file of your copy replaces an embedded file with the same name.
+  For veil and codefrag, name your copy in `filters:` and in `revealjs-plugins:`.
+- Shortcodes: Quarto loads the shortcodes of each extension in your project, also when you do not name it.
+  The shortcode of your copy of iconify always replaces the embedded shortcode, so name your copy in `filters:` too.
+
+The render shows a warning that starts with `[embedded]` in two cases.
+The first case is a deck that names your copy of veil or codefrag in only one of `filters:` and `revealjs-plugins:`.
+The second case is a project that has a copy of iconify that `filters:` does not name.
 
 | Tool | Version | Formats | Default |
 | --- | --- | --- | --- |

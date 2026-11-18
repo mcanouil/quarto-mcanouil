@@ -8,4 +8,4 @@
 
 local embedded = require(quarto.utils.resolve_path('../_vendor/quarto-lua-modules/embedded.lua'):gsub('%.lua$', ''))
 local file = quarto.utils.resolve_path('../_extensions/mcanouil/codefrag/schema-filter.lua')
-return embedded.load('codefrag', file)
+return embedded.load('codefrag', file, { plugin = true })

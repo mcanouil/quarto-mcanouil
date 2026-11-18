@@ -1,0 +1,27 @@
+---
+title: A deck that names a project copy in both lists
+author: Test Author
+date: 2026-01-01
+engine: markdown
+format:
+  mcanouil-revealjs: default
+filters:
+  - veil
+revealjs-plugins:
+  - veil
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The project copy of veil is named in filters and in revealjs-plugins, so the deck loads the plugin of the copy after the embedded one, and does not warn.
+        warnings: exhaustive
+    mcanouil-revealjs:
+      noErrors: true
+      ensureFileRegexMatches:
+        - ['id="project-veil"', 'reveal-veil/veil-state\.js', 'reveal-veil/veil-plugin-stub\.js']
+        - ['id="veil-config"']
+---
+
+## Slide
+
+Text.
