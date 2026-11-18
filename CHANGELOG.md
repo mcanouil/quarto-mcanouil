@@ -34,7 +34,6 @@ Nothing from 0.x carries over, so a 0.x document needs new front matter.
 
 - fix: Warn when your copy of veil or codefrag is in only one of `filters:` and `revealjs-plugins:`, or your copy of iconify is not in `filters:`. (#163)
 
-
 ## 0.22.0 (2026-09-23)
 
 ### New Features
