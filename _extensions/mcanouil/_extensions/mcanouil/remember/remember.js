@@ -21,6 +21,10 @@
   const CHAPTER_KEY = 'quarto-remember-chapter';
   const PROMPT_SHOWN_KEY = 'quarto-remember-prompt-shown';
   const SESSION_ACTIVE_KEY = 'quarto-remember-session-active';
+  const RESUME_NOTE_KEY = 'quarto-remember-resume';
+  const RESUME_NOTE_MAX_AGE = 30000;
+  const RESUME_LOAD_WAIT = 3000;
+  const RESUME_CANCEL_WAIT = 5000;
   const CONFIG_ELEMENT_ID = 'quarto-remember-config';
   const PROMPT_COOLDOWN = 5000;
 
@@ -60,7 +64,9 @@
     }
   }
 
-  const CONFIG = readConfig();
+  // Read in `init()`: the configuration tag comes after this script in the
+  // page head, so it does not exist yet when the script runs.
+  let CONFIG;
 
   /**
    * Feature-detect `localStorage` and `sessionStorage` before any other work.
@@ -115,7 +121,7 @@
     return window.location.pathname;
   }
 
-  let pageIdentifier = computePageIdentifier();
+  let pageIdentifier;
 
   /**
    * Invalidate the cached page identifier whenever the URL changes within
@@ -195,13 +201,23 @@
     }
   }
 
+  // Set when Resume sends the reader to another page, so the handlers of the
+  // page being left do not overwrite the position on the way out. A page
+  // restored from the back-forward cache saves again.
+  let leaving = false;
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+      leaving = false;
+    }
+  });
+
   /**
    * Persist a navigation payload for the current page.
    *
    * @param {object} position
    */
   function savePosition(position) {
-    if (!LOCAL_STORAGE_OK) {
+    if (!LOCAL_STORAGE_OK || leaving) {
       return;
     }
     try {
@@ -698,7 +714,7 @@
       return;
     }
 
-    Reveal.on('ready', () => {
+    const start = () => {
       const stored = getStoredPosition();
 
       if (stored && stored.slideIndices) {
@@ -716,7 +732,15 @@
       window.addEventListener('beforeunload', () => {
         savePosition({ slideIndices: Reveal.getIndices() });
       });
-    });
+    };
+
+    // Quarto initialises Reveal.js before `DOMContentLoaded`, so the deck is
+    // often ready before this runs, and its `ready` event has already fired.
+    if (typeof Reveal.isReady === 'function' && Reveal.isReady()) {
+      start();
+    } else {
+      Reveal.on('ready', start);
+    }
   }
 
   /**
@@ -751,9 +775,100 @@
   }
 
   /**
+   * Record the position that Resume sends the reader to, for the next page.
+   *
+   * @param {{url: string, scrollY: number, hash: string}} position
+   */
+  function writeResumeNote(position) {
+    if (!SESSION_STORAGE_OK) {
+      return;
+    }
+    try {
+      const note = {
+        url: position.url,
+        scrollY: position.scrollY || 0,
+        hash: position.hash || '',
+        at: Date.now()
+      };
+      sessionStorage.setItem(RESUME_NOTE_KEY, JSON.stringify(note));
+    } catch (e) {
+      // sessionStorage refused to write: the target page shows the banner
+      // again, and the reader resumes from there.
+    }
+  }
+
+  /**
+   * Read and remove the resume note. Return it only for the current page and
+   * only while it is fresh, so a redirect that never arrived cannot scroll a
+   * later visit.
+   *
+   * @returns {object|null}
+   */
+  function takeResumeNote() {
+    if (!SESSION_STORAGE_OK) {
+      return null;
+    }
+    try {
+      const raw = sessionStorage.getItem(RESUME_NOTE_KEY);
+      sessionStorage.removeItem(RESUME_NOTE_KEY);
+      if (!raw) {
+        return null;
+      }
+      const note = JSON.parse(raw);
+      const fresh = Date.now() - note.at < RESUME_NOTE_MAX_AGE;
+      return fresh && note.url === window.location.pathname ? note : null;
+    } catch (e) {
+      console.error('Remember: Failed to read the resume note', e);
+      return null;
+    }
+  }
+
+  /**
+   * Send the reader to the page of a position, which restores it on arrival.
+   *
+   * @param {{url: string, scrollY: number, hash: string}} position
+   */
+  function resumeOnPage(position) {
+    writeResumeNote(position);
+    leaving = true;
+    markSessionActive();
+    window.location.href = position.url + (position.hash || '');
+    // A page still here after the wait had its navigation cancelled, for
+    // example with Escape or Stop, or is waiting for a slow server. It saves
+    // again either way. The note stays for a slow server, and expires by age.
+    setTimeout(() => {
+      leaving = false;
+    }, RESUME_CANCEL_WAIT);
+  }
+
+  /**
    * Initialise the HTML/Quarto-book code path.
    */
   function initHTML() {
+    const note = takeResumeNote();
+    if (note) {
+      // Images, maths and fonts above the stored position change the layout
+      // until the page has loaded, so the position is restored after that, or
+      // after a short wait when a slow resource holds the load back.
+      let restored = false;
+      const restore = () => {
+        if (restored) {
+          return;
+        }
+        restored = true;
+        window.removeEventListener('load', restore);
+        restoreScrollPosition(note);
+        setupScrollTracking();
+      };
+      if (document.readyState === 'complete') {
+        restore();
+      } else {
+        window.addEventListener('load', restore);
+        setTimeout(restore, RESUME_LOAD_WAIT);
+      }
+      return;
+    }
+
     const stored = getStoredPosition();
     const chapter = getStoredChapter();
     const sessionActive = isSessionActive();
@@ -768,8 +883,8 @@
         const message = `You were reading a different chapter ${formatTimestamp(stored ? stored.timestamp : Date.now())}. You can return to where you were.`;
         showBanner(message,
           () => {
-            markSessionActive();
-            window.location.href = chapter.url + (chapter.hash || '');
+            const sameChapter = stored && stored.url === chapter.url;
+            resumeOnPage(sameChapter ? stored : { url: chapter.url, scrollY: 0, hash: chapter.hash });
           },
           () => {
             markSessionActive();
@@ -795,7 +910,7 @@
       const storedPath = stored.url || currentPath;
       const isDifferentPage = currentPath !== storedPath;
 
-      const shouldShowPrompt = inBook ? isDifferentPage : (stored.scrollY > 100 || stored.hash);
+      const shouldShowPrompt = isDifferentPage || stored.scrollY > 100 || Boolean(stored.hash);
 
       if (shouldShowPrompt) {
         const message = isDifferentPage
@@ -805,10 +920,10 @@
         showBanner(message,
           () => {
             window.removeEventListener('beforeunload', handleNavigation);
-            markSessionActive();
             if (isDifferentPage) {
-              window.location.href = storedPath + (stored.hash || '');
+              resumeOnPage({ url: storedPath, scrollY: stored.scrollY, hash: stored.hash });
             } else {
+              markSessionActive();
               restoreScrollPosition(stored);
             }
           },
@@ -818,18 +933,6 @@
             clearStoredPosition();
           }
         );
-      } else if (inBook && !isDifferentPage) {
-        window.removeEventListener('beforeunload', handleNavigation);
-        markSessionActive();
-        restoreScrollPosition(stored);
-      } else if (!inBook && !isDifferentPage) {
-        restoreScrollPosition(stored);
-      }
-    } else if (sessionActive && stored) {
-      const currentPath = window.location.pathname;
-      const storedPath = stored.url || currentPath;
-      if (currentPath === storedPath) {
-        restoreScrollPosition(stored);
       }
     }
 
@@ -844,6 +947,8 @@
       console.warn('Remember: localStorage is unavailable; navigation persistence is disabled for this session.');
       return;
     }
+    CONFIG = readConfig();
+    pageIdentifier = computePageIdentifier();
     watchPageIdentifier();
     if (document.querySelector('.reveal')) {
       initRevealJS();
