@@ -28,6 +28,7 @@ readonly SPEAKER_EVENT='Mickaël Canouil · useR! 2026 · Warwick'
 readonly TALK_TITLE='Quarto extensions'
 readonly CLOSING_LINKS=('mickael.canouil.fr' '@mickael.canouil.fr' 'github.com/mcanouil')
 readonly LICENCE='Slides: m.canouil.dev/user2026 · CC BY 4.0'
+readonly GROUND_SLIDES=(title-slide brand-presets mc-closing)
 
 # Answer one line per slide of the deck, tab separated: id, classes,
 # data-background-gradient, data-background-color, data-footer, data-state,
@@ -506,10 +507,10 @@ gold | mono | quarto | terminal)
 	expect "deck-code-window-${1}" "the traffic lights and the ${1} frame, title bar and body on the code window, see code_window_look in lib.sh" \
 		code_window_matches "$(awk '$1 == "pick-a-preset" && $2 == "codewindow" { $1 = ""; $2 = ""; print; exit }' <<<"${probe_lines}")" "$1"
 	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
-	PROBE_WINDOW=800,900 probe title-slide brand-presets mc-closing
-	expect "deck-motif-corner-tall-${1}" "motif in the top right corner of a window taller than the slide" motif_in_corner title-slide brand-presets mc-closing
-	PROBE_WINDOW=1600,700 probe title-slide brand-presets mc-closing
-	expect "deck-motif-corner-wide-${1}" "motif in the top right corner of a window wider than the slide" motif_in_corner title-slide brand-presets mc-closing
+	for window in 800,900:taller 1600,700:wider; do
+		PROBE_WINDOW="${window%:*}" probe "${GROUND_SLIDES[@]}"
+		expect "deck-motif-corner-${window#*:}-${1}" "motif in the top right corner of a window ${window#*:} than the slide" motif_in_corner "${GROUND_SLIDES[@]}"
+	done
 	PROBE_QUERY='?print-pdf' probe brand-presets checks
 	expect "deck-section-body-order-print-${1}" "the same order and middle line in the print layout of a PDF export" section_body_after_title checks body
 	expect "deck-section-bare-print-${1}" "the same middle line in print, with no body" section_body_after_title brand-presets bare

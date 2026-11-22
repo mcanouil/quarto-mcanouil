@@ -29,7 +29,6 @@ $mc-motif-section: 70% !default;
   height: 100%;
   box-sizing: border-box;
   padding: 0 var(--mc-slide-pad);
-  overflow: visible;
   clip-path: inset(calc(-1 * var(--mc-bleed-y)) calc(-1 * var(--mc-bleed-x)) 0 0);
   color: var(--mc-on-ground-text);
 }
