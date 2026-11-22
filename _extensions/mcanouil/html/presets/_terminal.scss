@@ -65,17 +65,7 @@ $mc-terminal-radius: 0px !default;
 
   // Callouts: a dashed frame in the type colour, the label set into its top
   // edge, and a solid start edge one character wide.
-  @include mc-callout-legend(0);
-
-  div.callout.callout-style-default,
-  div.callout.callout-style-simple {
-    border-style: dashed;
-    border-inline-start: 1ch solid var(--mc-callout);
-  }
-
-  div.callout.callout-style-simple.no-icon {
-    border-inline-start-style: solid;
-  }
+  @include mc-callout-legend($mc-terminal-radius, dashed, 1ch);
 
   div.callout.callout-style-default > .callout-header,
   div.callout.callout-style-simple > .callout-header {
@@ -117,7 +107,7 @@ $mc-terminal-radius: 0px !default;
 
   // Code: a line frame on the tint, square, the window title bar a step
   // stronger.
-  @include mc-code-atelier(0);
+  @include mc-code-atelier($mc-terminal-radius);
 
   // Block quotes: a dashed box with a [QUOTE] label on its top edge.
   figure.mc-quote {

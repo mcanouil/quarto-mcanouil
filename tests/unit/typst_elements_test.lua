@@ -13,10 +13,6 @@ cases['typst-elements-math-alt-one-line'] = function()
   assert_equal(typst_elements.math_alt('\n  \\int_0^1 x^2 \\, dx\n  = \\frac{1}{3}\n'), '\\int_0^1 x^2 \\, dx = \\frac{1}{3}', 'display maths on one line')
 end
 
-cases['typst-elements-string-escapes'] = function()
-  assert_equal(typst_elements.typst_string('\\frac{"a"}{b}'), '"\\\\frac{\\"a\\"}{b}"', 'backslashes and quotes')
-end
-
 cases['typst-elements-callout-marker'] = function()
   assert_equal(
     typst_elements.callout_marker('warning', 'simple', true),

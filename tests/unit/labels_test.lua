@@ -55,6 +55,7 @@ end
 
 cases['labels-typst-string'] = function()
   assert_equal(labels.typst_string('a "b" \\c'), '"a \\"b\\" \\\\c"', 'escaped literal')
+  assert_equal(labels.typst_string('a\nb'), '"a\\nb"', 'escaped new line')
 end
 
 return cases

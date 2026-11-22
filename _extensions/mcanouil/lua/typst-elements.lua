@@ -26,6 +26,8 @@
 ---   wrap in `#math.equation(` keeps its call; a Quarto equation call without
 ---   `alt:` gets the TeX source.
 
+local labels = require('lib.labels')
+
 local M = {}
 
 --- @type table<string, boolean> Ballot box marks that Pandoc writes for a task, and their state.
@@ -33,14 +35,6 @@ M.TASK_MARKS = { ['\u{2610}'] = false, ['\u{2612}'] = true }
 
 --- @type string Typst text that closes an equation call opened by typst-extras or by this module.
 local CLOSE_EQUATION = '.body)'
-
---- Format text as a Typst string literal.
---- @param text string Text
---- @return string Literal, with backslashes, quotes and new lines escaped
-function M.typst_string(text)
-  local escaped = text:gsub('\\', '\\\\'):gsub('"', '\\"'):gsub('\n', '\\n')
-  return '"' .. escaped .. '"'
-end
 
 --- Answer the alternative text of maths: its TeX source on one line.
 --- @param tex string TeX source
@@ -57,8 +51,8 @@ end
 function M.callout_marker(kind, appearance, titled)
   return string.format(
     '#metadata((mc-callout: %s, appearance: %s, titled: %s))',
-    M.typst_string(kind),
-    M.typst_string(appearance or 'default'),
+    labels.typst_string(kind),
+    labels.typst_string(appearance or 'default'),
     tostring(titled)
   )
 end
@@ -109,10 +103,31 @@ local function code_box_closing(inline)
   return nil
 end
 
+--- Add inline code to a list of inlines, in the inline code box of the preset.
+--- @param result pandoc.Inlines
+--- @param code pandoc.Code
+local function insert_code(result, code)
+  result:insert(pandoc.RawInline('typst', '#mc-inline-code['))
+  result:insert(code)
+  result:insert(pandoc.RawInline('typst', ']'))
+end
+
+--- Answer whether an inline is one that rewrite_inlines changes.
+--- @param inline pandoc.Inline
+--- @return boolean
+local function rewritable(inline)
+  return inline.t == 'Code'
+    or inline.t == 'Math'
+    or (inline.t == 'RawInline' and (inline.format == 'html' or code_box_closing(inline) ~= nil))
+end
+
 --- Rewrite the maths and the inline code of a list of inlines.
 --- @param inlines pandoc.Inlines
 --- @return pandoc.Inlines|nil
 local function rewrite_inlines(inlines)
+  if not inlines:find_if(rewritable) then
+    return nil
+  end
   local result = pandoc.Inlines({})
   local changed = false
   local index = 1
@@ -129,26 +144,25 @@ local function rewrite_inlines(inlines)
       and after.t == 'RawInline'
       and after.text == closing
     then
-      result:insert(pandoc.RawInline('typst', '#mc-inline-code['))
-      result:insert(code)
-      result:insert(pandoc.RawInline('typst', ']'))
+      insert_code(result, code)
       changed = true
       index = index + 3
     elseif inline.t == 'Code' then
-      result:insert(pandoc.RawInline('typst', '#mc-inline-code['))
-      result:insert(inline)
-      result:insert(pandoc.RawInline('typst', ']'))
+      insert_code(result, inline)
       changed = true
       index = index + 1
     elseif inline.t == 'Math' then
-      local alt = M.typst_string(M.math_alt(inline.text))
       local previous = result[#result]
       if opens_equation(previous) then
         if not previous.text:find('alt:', 1, true) then
-          previous.text = previous.text:gsub('(#math%.equation%([^%)]-), %[ $', '%1, alt: ' .. alt:gsub('%%', '%%%%') .. ', [ ')
+          local alt = labels.typst_string(M.math_alt(inline.text))
+          previous.text = previous.text:gsub('(#math%.equation%([^%)]-), %[ $', function(head)
+            return head .. ', alt: ' .. alt .. ', [ '
+          end)
         end
         result:insert(inline)
       else
+        local alt = labels.typst_string(M.math_alt(inline.text))
         local block = inline.mathtype == 'DisplayMath' and 'true' or 'false'
         result:insert(pandoc.RawInline('typst', '#math.equation(block: ' .. block .. ', alt: ' .. alt .. ', '))
         result:insert(inline)
@@ -319,8 +333,8 @@ local function rewrite(doc)
   doc = doc:walk({
     Inlines = rewrite_inlines,
     BulletList = rewrite_task_list,
+    Blocks = rewrite_details,
   })
-  doc = doc:walk({ Blocks = rewrite_details })
   return tint_code(doc)
 end
 
