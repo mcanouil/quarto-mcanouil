@@ -29,12 +29,12 @@ Nothing from 0.x carries over, so a 0.x document needs new front matter.
 - feat: Embed quarto-typst-extras for lists of figures and tables, watermarks, maths alt text, and appendix and supplementary numbering. Supplementary sections are numbered S1, with floats such as Figure S1. (#157)
 - feat: Style the code windows of HTML pages, decks and Typst PDFs to match each preset. (#158)
 - feat: The embedded filters of a tool do not run when your project has its own copy of it under `_extensions/` and names it in `filters:`, so only your copy runs. (#161)
-- feat: Style callouts, code blocks, keys, highlights, details, theorems and proofs, task lists, definition lists, tables and footnotes in every preset, the same way in HTML, Reveal.js and Typst. The `quarto` and `terminal` presets now draw callouts and code blocks as quarto-atelier does.
+- feat: Style callouts, code blocks, keys, highlights, details, theorems and proofs, task lists, definition lists, tables and footnotes in every preset, the same way in HTML, Reveal.js and Typst. The `quarto` and `terminal` presets now draw callouts and code blocks as quarto-atelier does. (#165)
 
 ### Bug Fixes
 
 - fix: Warn when your copy of veil or codefrag is in only one of `filters:` and `revealjs-plugins:`, or your copy of iconify is not in `filters:`. (#163)
-- fix: Render task lists and maths in Typst PDFs without stopping the PDF/UA-1 build. Each checkbox reads as done or not done, and each equation gets its TeX source as alternative text.
+- fix: Render task lists and maths in Typst PDFs without stopping the PDF/UA-1 build. Each checkbox reads as done or not done, and each equation gets its TeX source as alternative text. (#165)
 
 ## 0.22.0 (2026-09-23)
 
