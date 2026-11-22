@@ -15,7 +15,7 @@ format:
     output-file: example-revealjs.html
 extensions:
   mcanouil:
-    preset: gold
+    preset: terminal
     type: report
     layout: compact
 ---

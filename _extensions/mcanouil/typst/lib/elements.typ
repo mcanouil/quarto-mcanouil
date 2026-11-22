@@ -238,7 +238,7 @@
 // goes in front of it as metadata, for the cross-reference show rule.
 // - body, title, icon: as Quarto passes them; icon is none for no icon.
 // - ..args: any other argument a later Quarto passes, such as the type and
-//   the appearance asked for in quarto-dev/quarto-cli#15414. They are not
+//   the appearance asked for in issue 15414 of quarto-dev/quarto-cli. They are not
 //   used yet, so the call keeps working when Quarto adds them.
 #let callout(body: [], title: none, background_color: none, icon: none, icon_color: none, body_background_color: none, ..args) = {
   let parts = mc-callout-split(body)
