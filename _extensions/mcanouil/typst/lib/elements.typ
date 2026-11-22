@@ -237,7 +237,10 @@
 // colours that Quarto passes are not used. The specification of the callout
 // goes in front of it as metadata, for the cross-reference show rule.
 // - body, title, icon: as Quarto passes them; icon is none for no icon.
-#let callout(body: [], title: none, background_color: none, icon: none, icon_color: none, body_background_color: none) = {
+// - ..args: any other argument a later Quarto passes, such as the type and
+//   the appearance asked for in quarto-dev/quarto-cli#15414. They are not
+//   used yet, so the call keeps working when Quarto adds them.
+#let callout(body: [], title: none, background_color: none, icon: none, icon_color: none, body_background_color: none, ..args) = {
   let parts = mc-callout-split(body)
   let marker = if parts.marker == none { (mc-callout: "note", appearance: "default", titled: true) } else { parts.marker }
   // Quarto turns a minimal callout into a simple one with no icon, as the
