@@ -415,8 +415,8 @@ code_window_look() {
 	case "$1" in
 	gold) printf 'border=1/1/solid/line radius=5 shadow=0 title-edge=solid gilded=1 body=tint\n' ;;
 	mono) printf 'border=2/0/solid/ink radius=0 shadow=0 title-edge=solid gilded=0 body=tint\n' ;;
-	quarto) printf 'border=1/1/solid/line radius=9 shadow=1 title-edge=solid gilded=0 body=card\n' ;;
-	terminal) printf 'border=1/1/dashed/accent radius=0 shadow=0 title-edge=dashed gilded=0 body=tint\n' ;;
+	quarto) printf 'border=1/1/solid/line radius=6 shadow=0 title-edge=solid gilded=0 body=tint\n' ;;
+	terminal) printf 'border=1/1/solid/line radius=0 shadow=0 title-edge=solid gilded=0 body=tint\n' ;;
 	esac
 }
 

@@ -60,6 +60,44 @@
   }
 }
 
+/* Callouts: the edge on the start side only, the title in small capitals in
+ * the heading font, as in HTML. */
+.reveal .slides div.callout.callout {
+  border: 0;
+  border-inline-start: 3px solid var(--mc-callout);
+}
+
+.reveal .slides div.callout.callout div.callout-title {
+  font-family: var(--mc-font-headings);
+  font-size: 1.05em;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.04em;
+}
+
+/* Tabs: no box, a gilded underline under the current tab, as in HTML. */
+.reveal .slides .panel-tabset [role="tablist"] {
+  font-family: var(--mc-font-headings);
+}
+
+.reveal .slides .panel-tabset [role="tab"] {
+  position: relative;
+}
+
+.reveal .slides .panel-tabset [role="tab"][aria-selected="true"] {
+  border-color: transparent;
+  background-color: transparent;
+}
+
+.reveal .slides .panel-tabset [role="tab"][aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.5em;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--mc-gilded);
+}
+
 /* Code windows: a gilded edge along the top of the title bar, as in HTML. */
 .reveal .code-with-filename .code-with-filename-file {
   background-image: var(--mc-gilded);

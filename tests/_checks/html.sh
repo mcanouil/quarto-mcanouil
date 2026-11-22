@@ -668,10 +668,20 @@ check_components() {
 		measured "${measures}" 'm["activeCues"]' 'm["activeCues"]'
 	expect "html-callout-icon-decorative-${preset}" "callout icons with no text and silent generated content" \
 		measured "${measures}" 'm["icons"] and all(not i["text"] and i["silent"] for i in m["icons"])' 'm["icons"]'
+	# The quarto and terminal callouts set their label into the frame, as
+	# quarto-atelier does, and have no corner motif.
 	for size in 1440,900 320,568; do
 		measures="$(measure "${size%,*}" "${size#*,}" "" components)"
-		expect "html-callout-motif-${preset}-${size%,*}" "a corner motif on each callout, with no text over it" \
-			measured "${measures}" 'm["motifs"] == 6 and not m["motifOverlaps"]' '(m["motifs"], m["motifOverlaps"])'
+		case "${preset}" in
+		gold | mono)
+			expect "html-callout-motif-${preset}-${size%,*}" "a corner motif on each callout, with no text over it" \
+				measured "${measures}" 'm["motifs"] == 6 and not m["motifOverlaps"]' '(m["motifs"], m["motifOverlaps"])'
+			;;
+		*)
+			expect "html-callout-no-motif-${preset}-${size%,*}" "no corner motif on any callout" \
+				measured "${measures}" 'm["motifs"] == 0' 'm["motifs"]'
+			;;
+		esac
 	done
 	for scheme in light dark; do
 		expected="${scheme}"

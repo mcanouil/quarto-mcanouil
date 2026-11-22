@@ -35,6 +35,8 @@ contributes:
           at: post-quarto
         - path: bundled/typst-extras.lua
           at: post-quarto
+        - path: lua/mcanouil-final.lua
+          at: post-quarto
       extensions:
         preview-colour:
           text: false
@@ -95,6 +97,7 @@ contributes:
         - typst/lib/decoration.typ
         - typst/lib/quote.typ
         - typst/lib/code-window.typ
+        - typst/lib/elements.typ
         - typst/lib/motifs.typ
         - typst/lib/chrome.typ
         - typst/lib/slots.typ

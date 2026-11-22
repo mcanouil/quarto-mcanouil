@@ -18,6 +18,7 @@ local quote = require(quarto.utils.resolve_path('quote.lua'):gsub('%.lua$', ''))
 local html_page = require(quarto.utils.resolve_path('html-page.lua'):gsub('%.lua$', ''))
 local deck = require(quarto.utils.resolve_path('deck.lua'):gsub('%.lua$', ''))
 local workshop = require(quarto.utils.resolve_path('workshop.lua'):gsub('%.lua$', ''))
+local typst_elements = require(quarto.utils.resolve_path('typst-elements.lua'):gsub('%.lua$', ''))
 
 --- @type table[] The filter steps, run in order.
 local STEPS = {
@@ -30,6 +31,7 @@ local STEPS = {
   alt_text.filter,
   sections.pre_filter,
   quote.filter,
+  typst_elements.pre_filter,
   workshop.filters[1],
   workshop.filters[2],
   workshop.filters[3],

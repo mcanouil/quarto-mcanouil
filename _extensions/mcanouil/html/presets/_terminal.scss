@@ -63,61 +63,23 @@ $mc-terminal-radius: 0px !default;
     background-color: transparent;
   }
 
-  // Callouts: dashed boxes with a [!NOTE] label and a dot field. The title
-  // names the type, so the icon goes.
+  // Callouts: a dashed frame in the type colour, the label set into its top
+  // edge, and a solid start edge one character wide.
+  @include mc-callout-legend(0);
+
   div.callout.callout-style-default,
   div.callout.callout-style-simple {
-    border: 1px dashed var(--mc-callout);
-    border-radius: 0;
+    border-style: dashed;
+    border-inline-start: 1ch solid var(--mc-callout);
+  }
+
+  div.callout.callout-style-simple.no-icon {
+    border-inline-start-style: solid;
   }
 
   div.callout.callout-style-default > .callout-header,
   div.callout.callout-style-simple > .callout-header {
     font-family: var(--mc-font-mono);
-    text-transform: uppercase;
-  }
-
-  div.callout .callout-icon-container {
-    display: none;
-  }
-
-  // A flex container drops the white space around the title text, so the
-  // brackets sit close to it.
-  div.callout .callout-title-container {
-    display: flex;
-  }
-
-  // A custom title keeps the type in a screen reader span. With no icon, the
-  // span shows, inside the brackets and before the title, so the type is not
-  // told by colour alone: [!IMPORTANT] Database lock.
-  div.callout .callout-title-container .screen-reader-only {
-    position: static;
-    order: -1;
-    width: auto;
-    height: auto;
-    margin: 0;
-    overflow: visible;
-    clip: auto;
-    white-space: nowrap;
-  }
-
-  div.callout .callout-title-container::before {
-    order: -2;
-  }
-
-  div.callout .callout-title-container:has(.screen-reader-only)::after {
-    order: -1;
-    margin-inline-end: 0.6em;
-  }
-
-  div.callout .callout-title-container::before {
-    content: "[!";
-    content: "[!" / "";
-  }
-
-  div.callout .callout-title-container::after {
-    content: "]";
-    content: "]" / "";
   }
 
   // Tabs: [ R ], the active tab in the accent text colour.
@@ -153,28 +115,9 @@ $mc-terminal-radius: 0px !default;
     content: "> [ " / "";
   }
 
-  // Dot field: the mask is larger than the corner box, so the
-  // box shows the corner of the field with dots large enough to see.
-  div.callout.callout-style-default::after,
-  div.callout.callout-style-simple::after {
-    mask-size: 7rem;
-    opacity: 0.8;
-  }
-
-  // Code: dashed windows.
-  div.sourceCode {
-    border-style: dashed;
-    border-radius: 0;
-  }
-
-  body .code-with-filename {
-    border: 1px dashed var(--mc-accent);
-    border-radius: 0;
-  }
-
-  body .code-with-filename .code-with-filename-file {
-    border-bottom-style: dashed;
-  }
+  // Code: a line frame on the tint, square, the window title bar a step
+  // stronger.
+  @include mc-code-atelier(0);
 
   // Block quotes: a dashed box with a [QUOTE] label on its top edge.
   figure.mc-quote {

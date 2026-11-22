@@ -1,8 +1,8 @@
 /*
  * mcanouil - quarto preset of the Reveal.js deck
  * Documentation: a pill kicker, an accent bar beside slide titles, a radius of
- * 9px, code windows on the card under a soft shadow, and block quotes on a
- * card with a round quote mark and the attribution in a pill.
+ * 9px, callouts and code as in quarto-atelier, and block quotes on a card
+ * with a round quote mark and the attribution in a pill.
  *
  * @license MIT
  * @copyright 2026 Mickaël Canouil
@@ -39,15 +39,113 @@
   background: var(--mc-accent);
 }
 
-.reveal .code-with-filename {
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--mc-ink) 12%, transparent);
+/* Callouts: an outline in the colour of the type on the paper, the title set
+ * into the top border as an upper case label on the paper, after the glyph in
+ * a ring. The label stays in the flow, so a title that wraps pushes the body
+ * down: its top margin puts the middle of its first line on the border. The
+ * pads are in pixels, as the label has its own font size. */
+.reveal .slides div.callout.callout {
+  --mc-c3-pad: 18px;
+  --mc-c3-border: 1.5px;
+  margin-top: 1.1em;
+  padding: var(--mc-c3-pad) 0.75em 0.6em;
+  border: var(--mc-c3-border) solid var(--mc-callout);
+  border-radius: 6px;
+  background: transparent;
 }
 
-.reveal .code-with-filename,
-.reveal .code-with-filename div.sourceCode,
-.reveal .code-with-filename pre,
-.reveal .code-with-filename pre code {
+.reveal .slides div.callout.callout:not(.callout-titled) {
+  padding-top: 0.6em;
+}
+
+.reveal .slides div.callout.callout::after {
+  display: none;
+}
+
+.reveal .slides div.callout.callout .callout-body {
+  display: block;
+  margin: 0;
+}
+
+.reveal .slides div.callout.callout div.callout-title {
+  width: fit-content;
+  max-width: calc(100% + 0.4em);
+  margin: calc(-1 * (var(--mc-c3-pad) + var(--mc-c3-border) / 2 + 0.5lh)) 0 calc(var(--mc-c3-pad) + var(--mc-c3-border) / 2 - 0.5lh) -0.2em;
+  padding: 0 0.45em;
+  background: var(--mc-paper);
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.reveal .slides div.callout.callout div.callout-title p {
+  margin: 0;
+}
+
+/* The body starts under the label, so a simple callout drops the indent that
+ * Quarto gives it under the icon. */
+.reveal .slides div.callout.callout.callout .callout-content {
+  padding-inline: 0;
+}
+
+.reveal .slides div.callout.callout .callout-icon::before {
+  width: 1.7em;
+  height: 1.7em;
+  margin-inline-end: 0.7em;
+  border: 1px solid currentColor;
+  background-color: transparent;
+  color: var(--mc-callout-text);
+}
+
+/* A minimal callout has no icon and a dashed frame. */
+.reveal .slides div.callout.callout.callout-style-simple.no-icon {
+  border-style: dashed;
+}
+
+/* Code: a plain block and a window share the frame and the tint. The title
+ * bar of a window is a step darker, with the file name in the monospace font,
+ * and a language name in upper case. */
+.reveal div.sourceCode,
+.reveal .code-with-filename {
+  border-radius: 6px;
+}
+
+.reveal .code-with-filename .code-with-filename-file {
+  background-color: color-mix(in srgb, var(--mc-ink) 6%, var(--mc-tint));
+}
+
+.reveal .code-with-filename .code-with-filename-file pre {
+  background-color: transparent;
+  font-family: var(--mc-font-mono);
+  font-size: 0.78em;
+}
+
+/* Tabs: a pill segmented control, as in HTML. */
+.reveal .slides .panel-tabset [role="tablist"] {
+  display: flex;
+  gap: 0.2em;
+  width: max-content;
+  max-width: 100%;
+  padding: 3px;
+  border: 0;
+  border-radius: 999px;
+  background-color: var(--mc-tint);
+}
+
+.reveal .slides .panel-tabset [role="tab"],
+.reveal .slides .panel-tabset [role="tab"][aria-selected="true"] {
+  margin: 0;
+  padding: 0.2em 0.8em;
+  border: 0;
+  border-radius: 999px;
+}
+
+.reveal .slides .panel-tabset [role="tab"][aria-selected="true"] {
   background-color: var(--mc-card);
+  color: var(--mc-accent-text);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--mc-ink) 15%, transparent);
 }
 
 .reveal figure.mc-quote {

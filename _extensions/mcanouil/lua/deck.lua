@@ -9,7 +9,8 @@
 --- the closing slide from `extensions.mcanouil.closing`, delivers to the
 --- title slide partial the kicker (the event, or the session of a workshop),
 --- the duration of a workshop, the speakers and the motif, and adds the
---- style layer of the preset after the theme, so that it wins over the theme.
+--- style layer of the preset after the theme, so that it wins over the theme,
+--- with the motif of the preset as the mask of the callout corner.
 
 local fail = require('lib.fail')
 local labels = require('lib.labels')
@@ -18,6 +19,7 @@ local preset = require('preset')
 local document = require('document')
 local authors = require('authors')
 local workshop = require('workshop')
+local html_page = require('html-page')
 
 --- @type string Directory of the extension, the parent of `lua/`.
 local EXTENSION_DIR = debug.getinfo(1, 'S').source:match('^@(.*)[/\\]lua[/\\][^/\\]+$')
@@ -380,6 +382,7 @@ local function arrange(doc)
   meta['title-slide-attributes'] = attributes
   quarto.doc.include_text('in-header', table.concat({
     '<style id="mcanouil-deck-preset">',
+    ':root { --mc-motif-mask: ' .. html_page.motif_mask(state.motif) .. '; }',
     read_file(EXTENSION_DIR .. '/revealjs/presets/' .. state.preset .. '.css', 'preset style file'),
     '</style>',
   }, '\n'))

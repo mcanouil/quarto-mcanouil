@@ -17,7 +17,21 @@ $presentation-h3-font-size: 1.15em;
 $presentation-title-slide-text-align: left;
 
 $mc-slide-pad: 56px;
-$mc-semantics: note, tip, warning, important, caution;
+
+// The glyph of the icon of each callout type, as in HTML. The icon is
+// decoration: its generated text has an empty alternative, and the title
+// names the type.
+$mc-callout-glyphs: (
+  note: "i",
+  tip: "\2713",
+  warning: "!",
+  important: "!!",
+  caution: "?",
+);
+
+// A callout, with the class twice so that the rules here and in the preset
+// style files win over the callout rules of Quarto.
+$mc-callout: ".reveal .slides div.callout.callout";
 
 /*-- scss:rules --*/
 
@@ -184,6 +198,12 @@ $mc-semantics: note, tip, warning, important, caution;
   font-family: var(--mc-font-ui);
 }
 
+// A window with no file name shows the language, in upper case, as the
+// Typst code windows do.
+.reveal .code-with-filename:has(pre.cw-auto) .code-with-filename-file pre {
+  text-transform: uppercase;
+}
+
 // The title bar has one rule, below it: the frame of Quarto's own title bar
 // would draw a second edge inside the window.
 .reveal .code-with-filename .code-with-filename-file {
@@ -222,38 +242,90 @@ $mc-semantics: note, tip, warning, important, caution;
   font-size: 0.75em;
 }
 
-// Callouts: the semantic colour on the edge, the tint behind the text.
-.reveal div.callout,
-.reveal div.callout.callout-style-default,
-.reveal div.callout.callout-style-simple {
-  background: var(--mc-tint);
-  color: var(--mc-ink);
+// Callouts, as in HTML: a card tinted with the colour of the type, its edge on
+// the start side, the title in the label ink of the type after a round glyph,
+// and the corner motif of the preset. The presets restyle the same selectors.
+@each $kind, $glyph in $mc-callout-glyphs {
+  #{$mc-callout}.callout-#{$kind} {
+    --mc-callout: var(--mc-#{$kind});
+    --mc-callout-text: var(--mc-#{$kind}-text);
+  }
+
+  #{$mc-callout}.callout-#{$kind} .callout-icon::before {
+    content: $glyph;
+    content: $glyph / "";
+  }
+}
+
+#{$mc-callout} {
+  --mc-callout-room: 1.8em;
+  position: relative;
+  padding-inline-end: var(--mc-callout-room);
   border: 1px solid var(--mc-line);
-  border-left-width: 0.3rem;
+  border-inline-start: 4px solid var(--mc-callout);
   border-radius: var(--mc-radius);
-}
-
-.reveal div.callout .callout-title,
-.reveal div.callout div.callout-title p,
-.reveal div.callout .callout-body {
+  background: color-mix(in srgb, var(--mc-callout) 7%, var(--mc-paper));
   color: var(--mc-ink);
-  background: transparent;
 }
 
-@each $kind in $mc-semantics {
-  .reveal div.callout.callout-#{$kind} {
-    border-left-color: var(--mc-#{$kind});
-  }
+// Quarto fades the title with opacity, which takes the label ink below its
+// contrast, and paints a title band mixed in Sass: both go.
+#{$mc-callout} div.callout-title {
+  background: transparent;
+  color: var(--mc-callout-text);
+  font-family: var(--mc-font-ui);
+  opacity: 1;
+}
 
-  .reveal div.callout.callout-#{$kind} .callout-title,
-  .reveal div.callout.callout-#{$kind} div.callout-title p {
-    color: var(--mc-#{$kind}-text);
-  }
+#{$mc-callout} div.callout-title p {
+  color: inherit;
+}
 
-  // The title band of Quarto takes a colour mixed in Sass: the tint replaces it.
-  .reveal div.callout.callout-#{$kind}.callout-style-default .callout-title,
-  .reveal div.callout.callout-#{$kind}.callout-style-simple .callout-title {
-    background-color: transparent;
+#{$mc-callout} .callout-body,
+#{$mc-callout} .callout-content {
+  color: var(--mc-ink);
+}
+
+// The glyph in a disc of the type colour, in place of the icon of Quarto.
+#{$mc-callout} .callout-icon::before {
+  display: inline-grid;
+  place-items: center;
+  width: 1.9em;
+  height: 1.9em;
+  margin: 0 0.6em 0 0;
+  padding: 0;
+  border-radius: 50%;
+  background-image: none;
+  background-color: var(--mc-callout);
+  color: var(--mc-paper);
+  font: 800 0.6em/1 var(--mc-font-ui);
+  letter-spacing: -0.05em;
+  vertical-align: middle;
+}
+
+#{$mc-callout} .callout-icon-container {
+  display: flex;
+  align-items: center;
+}
+
+// The corner motif of the preset, from the mask that the deck defines, in the
+// colour of the type. Decoration only: no text runs under it.
+#{$mc-callout}::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--mc-callout-room);
+  height: var(--mc-callout-room);
+  background-color: var(--mc-callout);
+  mask: var(--mc-motif-mask, linear-gradient(transparent, transparent)) no-repeat top right / contain;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+@media (forced-colors: active) {
+  #{$mc-callout}::after {
+    display: none;
   }
 }
 
@@ -296,12 +368,124 @@ $mc-semantics: note, tip, warning, important, caution;
   border-color: var(--mc-line);
 }
 
-.reveal .panel-tabset [role="tablist"],
-.reveal .panel-tabset [role="tab"],
-.reveal .panel-tabset [role="tab"][aria-selected="true"] {
-  border-color: var(--mc-line);
+// The header row sits on a stronger rule than the body rows.
+.reveal table thead th {
+  border-bottom: 2px solid color-mix(in srgb, var(--mc-ink) 55%, var(--mc-line));
+  font-weight: 700;
+}
+
+.reveal hr {
+  border: 0;
+  border-top: 1px solid var(--mc-line);
+}
+
+// Tabsets, as in HTML: the tabs in the muted colour, the current tab in the
+// ink, in a box open on the content. The tabs are links in the slide, so the
+// rules repeat .slides to win over the link colour and underline.
+.reveal .slides .panel-tabset [role="tablist"] {
+  border-bottom: 1px solid var(--mc-line);
+  font-family: var(--mc-font-ui);
+}
+
+.reveal .slides .panel-tabset [role="tab"],
+.reveal .slides .panel-tabset [role="tab"]:hover {
+  border-color: transparent;
   background-color: transparent;
+  color: var(--mc-muted);
+  text-decoration: none;
+}
+
+.reveal .slides .panel-tabset [role="tab"][aria-selected="true"] {
+  border-color: var(--mc-line) var(--mc-line) var(--mc-paper);
+  background-color: var(--mc-paper);
   color: var(--mc-ink);
+}
+
+// Inline marks and keys.
+.reveal :is(mark, .mark) {
+  padding: 0 0.1em;
+  border-radius: var(--mc-radius);
+  background: color-mix(in srgb, var(--mc-accent) 28%, var(--mc-paper));
+  color: var(--mc-ink);
+}
+
+.reveal kbd {
+  padding: 0.05em 0.35em;
+  border: 1px solid color-mix(in srgb, var(--mc-line) 50%, var(--mc-muted));
+  border-bottom-width: 2px;
+  border-radius: var(--mc-radius);
+  background: var(--mc-tint);
+  color: var(--mc-ink);
+  font-size: 0.78em;
+}
+
+// Task lists: the checkbox in the accent colour.
+.reveal ul.task-list input[type="checkbox"] {
+  accent-color: var(--mc-accent);
+}
+
+// Definition lists: the term in bold ink, the definition beside a rule.
+.reveal dt {
+  color: var(--mc-ink);
+  font-weight: 700;
+}
+
+.reveal dd {
+  margin-inline-start: 0.2em;
+  padding-inline-start: 0.6em;
+  border-inline-start: 2px solid var(--mc-line);
+}
+
+// Theorems and their kin: the label in the accent text colour. Proofs and
+// their kin: the label in muted italic; a proof ends on a square mark.
+.reveal .theorem .theorem-title {
+  color: var(--mc-accent-text);
+  font-weight: 700;
+}
+
+.reveal .proof .proof-title {
+  color: var(--mc-muted);
+  font-style: italic;
+}
+
+.reveal div.proof:not(.remark, .solution) > :last-child::after {
+  content: "\25A1";
+  content: "\25A1" / "";
+  float: right;
+  color: var(--mc-muted);
+}
+
+// Details: the summary in the ink after a marker in the accent text colour,
+// the open content in a box of the preset.
+.reveal details > summary {
+  color: var(--mc-ink);
+  cursor: pointer;
+}
+
+.reveal details > summary::marker {
+  color: var(--mc-accent-text);
+}
+
+.reveal details[open] {
+  padding: 0.2em 0.6em 0.4em;
+  border: 1px solid var(--mc-line);
+  border-radius: var(--mc-radius);
+}
+
+// Slide footnotes: on the paper, under a rule, in the ink, and above the
+// footer so that its slots stay clear.
+.reveal .slides section aside:has(> .aside-footnotes) {
+  left: var(--mc-slide-pad);
+  right: var(--mc-slide-pad);
+  bottom: 40px;
+  padding-top: 0.3em;
+  border-top: 1px solid var(--mc-line);
+  color: var(--mc-ink);
+  font-size: 0.55em;
+}
+
+.reveal .slides section .aside-footnotes li::marker {
+  color: var(--mc-muted);
 }
 
 // Footer: three slots on one line, the centre slot in the flow and the side
