@@ -5,6 +5,7 @@ set -euo pipefail
 # Check hook: alternative texts of a Typst PDF.
 #
 # Usage: accessibility.sh math-alt
+#        accessibility.sh elements
 #        accessibility.sh logo-alt
 #        accessibility.sh logo-preset
 #
@@ -27,6 +28,17 @@ math_alt_kept() {
 		grep -qxF 'The sum of one over n squared tends to pi squared over six.' <<<"${alts}"
 }
 
+# Succeed when the PDF gives the state of each task and the TeX source of each
+# equation as alternative texts.
+elements_alt_kept() {
+	local alts
+	alts="$(pdf_alt_texts "${output}")"
+	grep -qxF 'Done' <<<"${alts}" &&
+		grep -qxF 'Not done' <<<"${alts}" &&
+		grep -qxF 'E = mc^2' <<<"${alts}" &&
+		grep -qxF '\\sum_{n=1}^3 n = 6' <<<"${alts}"
+}
+
 # Succeed when the Typst source holds the logo with an alternative text.
 # $1 alternative text.
 logo_delivered() {
@@ -38,6 +50,11 @@ math-alt)
 	find_verapdf
 	expect "math-alt-kept" "both equation alternative texts in the PDF" math_alt_kept
 	expect "math-alt-ua1" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
+	;;
+elements)
+	find_verapdf
+	expect "elements-alt-kept" "the task states and the TeX source of the maths as alternative texts in the PDF" elements_alt_kept
+	expect "elements-ua1" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
 	;;
 logo-alt)
 	expect "logo-user-alt" "the user brand logo in Typst with the alt text 'A grey rectangle.'" logo_delivered 'A grey rectangle.'

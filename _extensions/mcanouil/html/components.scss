@@ -357,6 +357,12 @@ body .code-with-filename:has(pre.cw-auto) .code-with-filename-file pre {
   --bs-table-active-bg: var(--mc-tint);
 }
 
+// The header row sits on a stronger rule than the body rows, as in Reveal.js
+// and Typst.
+.table > thead > tr > th {
+  border-bottom: 2px solid color-mix(in srgb, var(--mc-ink) 55%, var(--mc-line));
+}
+
 .panel-caption,
 .figure-caption,
 .subfigure-caption,
@@ -448,13 +454,13 @@ main details:not(.mc-ws-solution)[open] > summary {
 }
 
 // Theorems and their kin: the label in the accent text colour; a proof
-// keeps its italic label in the muted colour.
-main :is(.theorem, .lemma, .corollary, .proposition, .conjecture, .definition, .example, .exercise) > p:first-child > :is(.theorem-title, .lemma-title, .corollary-title, .proposition-title, .conjecture-title, .definition-title, .example-title, .exercise-title),
-main span:is(.theorem-title, .lemma-title, .corollary-title, .proposition-title, .conjecture-title, .definition-title, .example-title, .exercise-title) {
+// keeps its italic label in the muted colour. Quarto gives every kind of
+// theorem the theorem class, and every kind of proof the proof class.
+main .theorem .theorem-title {
   color: var(--mc-accent-text);
 }
 
-main span:is(.proof-title, .remark-title, .solution-title) {
+main .proof .proof-title {
   color: var(--mc-muted);
 }
 
