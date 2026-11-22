@@ -16,6 +16,8 @@
  *   ?print-pdf; the slides are then paged as Reveal.js pages them.
  * - "<slide> codewindow key=value ...": the facts of each code window, see
  *   code_window_matches in lib.sh.
+ * - "<slide> corner <top> <right>": on a ground slide, the gap between the box
+ *   of the motif and the top right corner of the window, in window pixels.
  * - "<slide> error <message>": the probe failed on the slide.
  *
  * @license MIT
@@ -236,9 +238,17 @@
     ].join(" ");
   }
 
+  function measureCorner(slide, section) {
+    var motif = section.querySelector(":scope > .mc-motif");
+    if (!motif) { return; }
+    var rect = motif.getBoundingClientRect();
+    lines.push([slide, "corner", rect.top, window.innerWidth - rect.right].join(" "));
+  }
+
   function measureSlide(slide) {
     var section = document.getElementById(slide);
     measureBoxes(slide, section);
+    measureCorner(slide, section);
     var targets = [
       [".mc-kicker", null, "text"],
       [".mc-section-number", null, "text"],

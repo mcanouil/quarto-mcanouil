@@ -309,6 +309,20 @@ text_clear_of_motif() {
 		' <<<"${boxes}"
 }
 
+# Succeed when the motif of each slide touches the top right corner of the
+# window, within one pixel, so it does not float in the band that Reveal.js
+# leaves around a slide in a window of another aspect ratio.
+# $@ slide ids.
+motif_in_corner() {
+	local slide
+	for slide in "$@"; do
+		awk -v id="${slide}" '
+			$1 == id && $2 == "corner" { found = 1; if ($3 > 1 || $3 < -1 || $4 > 1 || $4 < -1) { print "# off corner: " $0; bad = 1 } }
+			END { exit (bad || !found) }
+		' <<<"${probe_lines}" || return 1
+	done
+}
+
 # Succeed when a section slide reads number, title with its rule, then the
 # body, from the top: the number ends above the title, the body starts below
 # the title and its rule, and ends above the footer band. The number ends and
@@ -492,6 +506,10 @@ gold | mono | quarto | terminal)
 	expect "deck-code-window-${1}" "the traffic lights and the ${1} frame, title bar and body on the code window, see code_window_look in lib.sh" \
 		code_window_matches "$(awk '$1 == "pick-a-preset" && $2 == "codewindow" { $1 = ""; $2 = ""; print; exit }' <<<"${probe_lines}")" "$1"
 	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
+	PROBE_WINDOW=800,900 probe title-slide brand-presets mc-closing
+	expect "deck-motif-corner-tall-${1}" "motif in the top right corner of a window taller than the slide" motif_in_corner title-slide brand-presets mc-closing
+	PROBE_WINDOW=1600,700 probe title-slide brand-presets mc-closing
+	expect "deck-motif-corner-wide-${1}" "motif in the top right corner of a window wider than the slide" motif_in_corner title-slide brand-presets mc-closing
 	PROBE_QUERY='?print-pdf' probe brand-presets checks
 	expect "deck-section-body-order-print-${1}" "the same order and middle line in the print layout of a PDF export" section_body_after_title checks body
 	expect "deck-section-bare-print-${1}" "the same middle line in print, with no body" section_body_after_title brand-presets bare

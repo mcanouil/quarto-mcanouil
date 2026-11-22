@@ -8,6 +8,8 @@
  * busy; real time with a real timeout does not.
  *
  * Usage: node deck-probe-run.mjs <browser> <page.html> [query] [timeout-seconds]
+ * The window is 1600 by 900 pixels, or the size in PROBE_WINDOW, for example
+ * "800,900".
  * Exits 1 with no output when the probe writes nothing before the timeout.
  *
  * @license MIT
@@ -30,7 +32,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const profile = mkdtempSync(join(tmpdir(), "mc-deck-probe-"));
 const child = spawn(browser, [
   "--headless=new", "--disable-gpu", "--no-first-run", "--hide-scrollbars",
-  "--remote-debugging-port=0", `--user-data-dir=${profile}`, "--window-size=1600,900",
+  "--remote-debugging-port=0", `--user-data-dir=${profile}`, `--window-size=${process.env.PROBE_WINDOW || "1600,900"}`,
   "about:blank",
 ], { stdio: ["ignore", "ignore", "pipe"] });
 let browserError = "";
