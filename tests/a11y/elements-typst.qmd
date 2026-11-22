@@ -15,11 +15,13 @@ _quarto:
     mcanouil-typst:
       noErrorsOrWarnings: true
       ensureTypstFileRegexMatches:
-        - ['#metadata\(\(mc-callout: "warning", appearance: "simple", titled: true\)\)', '#mc-task-list\[', '#mc-task\(true\)', '#mc-task\(false\)', '#mc-kbd\[', '#mc-details\(', '#math\.equation\(block: false, alt: "E = mc\^2", ', '#math\.equation\(block: true, alt: "\\\\sum_\{n=1\}\^3 n = 6"']
+        - ['#metadata\(\(mc-callout: "warning", appearance: "simple", titled: true\)\)', '#mc-task-list\[', '#mc-task\(true\)', '#mc-task\(false\)', '#mc-kbd\[', '#mc-details\(', '#math\.equation\(block: false, alt: "E = mc\^2", ', '#math\.equation\(block: true, alt: "\\\\sum_\{n=1\}\^3 n = 6"', '#math\.equation\(alt: "x \+ 1 = 2", block: true, ']
 ---
 
 ::: {.callout-note}
+
 ## Titled note
+
 A note with `inline code`.
 :::
 
@@ -28,7 +30,9 @@ A tip with no title.
 :::
 
 ::: {.callout-warning appearance="simple"}
+
 ## Simple warning
+
 Body of a simple warning.
 :::
 
@@ -37,7 +41,9 @@ Minimal caution.
 :::
 
 ::: {#nte-cross .callout-note}
+
 ## Cross-referenced note
+
 See @nte-cross.
 :::
 
@@ -54,7 +60,9 @@ Inside the details.
 </details>
 
 ::: {#thm-a}
+
 ## Name
+
 A theorem.
 :::
 
@@ -65,3 +73,9 @@ A proof.
 The relation $E = mc^2$ holds, and so does this sum:
 
 $$\sum_{n=1}^3 n = 6$$
+
+---
+
+A labelled equation:
+
+$$x + 1 = 2$$ {#eq-labelled}

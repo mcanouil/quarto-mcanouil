@@ -26,6 +26,7 @@
 ---   wrap in `#math.equation(` keeps its call; a Quarto equation call without
 ---   `alt:` gets the TeX source.
 
+local fail = require('lib.fail')
 local labels = require('lib.labels')
 
 local M = {}
@@ -156,9 +157,13 @@ local function rewrite_inlines(inlines)
       if opens_equation(previous) then
         if not previous.text:find('alt:', 1, true) then
           local alt = labels.typst_string(M.math_alt(inline.text))
-          previous.text = previous.text:gsub('(#math%.equation%([^%)]-), %[ $', function(head)
-            return head .. ', alt: ' .. alt .. ', [ '
-          end)
+          local text, count = previous.text:gsub('#math%.equation%(', function(call)
+            return call .. 'alt: ' .. alt .. ', '
+          end, 1)
+          if count == 0 then
+            fail.raise('mcanouil: cannot add the alternative text of the equation ' .. inline.text .. ' to ' .. previous.text .. '.')
+          end
+          previous.text = text
         end
         result:insert(inline)
       else
