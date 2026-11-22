@@ -344,9 +344,9 @@ local function rewrite(doc)
 end
 
 --- @type table Filter step that marks callouts, before Quarto's filters.
-M.pre_filter = { Callout = mark_callout }
+M.pre_filter = { Callout = fail.guard(mark_callout) }
 
 --- @type table Filter step that rewrites the elements, after the embedded tools.
-M.post_filter = { Pandoc = rewrite }
+M.post_filter = { Pandoc = fail.guard(rewrite) }
 
 return M

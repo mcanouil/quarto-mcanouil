@@ -195,7 +195,7 @@
 }
 
 /* Open details: a dashed box. */
-.reveal details[open] {
+.reveal details[open]:not(.code-fold) {
   border-style: dashed;
 }
 

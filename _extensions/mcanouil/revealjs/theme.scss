@@ -456,7 +456,8 @@ $mc-callout: ".reveal .slides div.callout.callout";
 }
 
 // Details: the summary in the ink after a marker in the accent text colour,
-// the open content in a box of the preset.
+// the open content in a box of the preset. A folded code block keeps its own
+// window frame.
 .reveal details > summary {
   color: var(--mc-ink);
   cursor: pointer;
@@ -466,7 +467,7 @@ $mc-callout: ".reveal .slides div.callout.callout";
   color: var(--mc-accent-text);
 }
 
-.reveal details[open] {
+.reveal details[open]:not(.code-fold) {
   padding: 0.2em 0.6em 0.4em;
   border: 1px solid var(--mc-line);
   border-radius: var(--mc-radius);

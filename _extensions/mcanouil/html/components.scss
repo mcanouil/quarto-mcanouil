@@ -43,6 +43,11 @@ $mc-callout-glyphs: (
     box-shadow: none;
   }
 
+  div.callout.callout-style-default:not(.callout-titled),
+  div.callout.callout-style-simple:not(.callout-titled) {
+    padding-top: 0.8rem;
+  }
+
   div.callout.callout-style-default::after,
   div.callout.callout-style-simple::after {
     content: none;
@@ -431,25 +436,25 @@ hr {
 }
 
 // Disclosure: the summary in the ink behind an accent marker, the open
-// content in a line frame.
-main details:not(.mc-ws-solution) {
+// content in a line frame. A folded code block keeps its own window frame.
+main details:not(.mc-ws-solution, .code-fold) {
   margin-block: 1rem;
   padding: 0.4rem 0.75rem;
   border: 1px solid var(--mc-line);
   border-radius: var(--mc-radius, 0.375rem);
 }
 
-main details:not(.mc-ws-solution) > summary {
+main details:not(.mc-ws-solution, .code-fold) > summary {
   color: var(--mc-ink);
   font-family: var(--mc-font-ui, inherit);
   cursor: pointer;
 }
 
-main details:not(.mc-ws-solution) > summary::marker {
+main details:not(.mc-ws-solution, .code-fold) > summary::marker {
   color: var(--mc-accent-text);
 }
 
-main details:not(.mc-ws-solution)[open] > summary {
+main details:not(.mc-ws-solution, .code-fold)[open] > summary {
   margin-bottom: 0.4rem;
 }
 

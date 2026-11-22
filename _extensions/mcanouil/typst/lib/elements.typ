@@ -166,7 +166,7 @@
     let line-stroke = (paint: edge, thickness: 1.5pt, dash: if minimal or terminal { "dashed" } else { none })
     let frame = block(
       width: 100%,
-      inset: (top: room, x: 1em, bottom: 0.8em),
+      inset: (top: if label == none { 0.8em } else { room }, x: 1em, bottom: 0.8em),
       radius: if terminal { 0pt } else { mc-radius },
       stroke: if terminal { (top: line-stroke, right: line-stroke, bottom: line-stroke) } else { line-stroke },
       {
