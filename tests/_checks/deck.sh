@@ -509,8 +509,9 @@ gold | mono | quarto | terminal)
 	expect "deck-code-window-${1}" "the traffic lights and the ${1} frame, title bar and body on the code window, see code_window_look in lib.sh" \
 		code_window_matches "$(awk '$1 == "pick-a-preset" && $2 == "codewindow" { $1 = ""; $2 = ""; print; exit }' <<<"${probe_lines}")" "$1"
 	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
+	expect "deck-motif-corner-matching-${1}" "motif in the top right corner of a window with the aspect ratio of the slide" motif_in_corner corner "${CORNER_SLIDES[@]}"
 	# The motif box and its bleed do not depend on the preset, so one preset
-	# checks them.
+	# checks the other aspect ratios.
 	if [ "$1" = gold ]; then
 		for window in 800,900:taller 1600,700:wider; do
 			PROBE_WINDOW="${window%:*}" probe "${CORNER_SLIDES[@]}"
