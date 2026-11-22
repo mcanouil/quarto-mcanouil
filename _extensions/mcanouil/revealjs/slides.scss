@@ -17,11 +17,20 @@ $mc-motif-section: 70% !default;
 // Ground slides: title, section and closing slides on the gradient of the
 // preset, full height, with the motif in the top right corner. Lua sets the
 // gradient as the slide background, and the ground tokens on the slide.
+// The gradient fills the window, but Reveal.js scales the slide to fit and
+// centres it, so a window with another aspect ratio leaves a band of gradient
+// above or right of the slide. The bleed is the size of that band, in slide
+// pixels, from the variables Reveal.js sets on the viewport. The slide clips
+// its content on the left and bottom edges, and lets the motif reach into the
+// band on the top and right edges.
 .reveal .slides section.mc-ground {
+  --mc-bleed-x: max(0px, (var(--viewport-width, 0px) / var(--slide-scale, 1) - var(--slide-width, 0px)) / 2);
+  --mc-bleed-y: max(0px, (var(--viewport-height, 0px) / var(--slide-scale, 1) - var(--slide-height, 0px)) / 2);
   height: 100%;
   box-sizing: border-box;
   padding: 0 var(--mc-slide-pad);
-  overflow: hidden;
+  overflow: visible;
+  clip-path: inset(calc(-1 * var(--mc-bleed-y)) calc(-1 * var(--mc-bleed-x)) 0 0);
   color: var(--mc-on-ground-text);
 }
 
@@ -47,12 +56,12 @@ $mc-motif-section: 70% !default;
   background: var(--mc-gilded);
 }
 
-// The motif is decoration: it bleeds to the top and right edges of the slide,
+// The motif is decoration: it bleeds to the top and right edges of the window,
 // takes no pointer, and reads nothing to assistive technology.
 .reveal .slides section.mc-ground > .mc-motif {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: calc(-1 * var(--mc-bleed-y));
+  right: calc(-1 * var(--mc-bleed-x));
   width: $mc-motif-title;
   height: auto;
   aspect-ratio: 1;
