@@ -1,10 +1,12 @@
 title: Code Window
 author: Mickaël Canouil
-version: 1.9.0
+version: 1.9.1
 quarto-required: ">=1.10.19"
 contributes:
   filters:
     - at: pre-quarto
       path: main.lua
-source: mcanouil/quarto-code-window@1.9.0
+    - at: post-render
+      path: post-render.lua
+source: mcanouil/quarto-code-window@1.9.1
 source-type: github

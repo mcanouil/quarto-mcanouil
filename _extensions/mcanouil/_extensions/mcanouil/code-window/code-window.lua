@@ -708,14 +708,15 @@ end
 --- Process CodeBlock for HTML/Reveal.js formats.
 --- Explicit-filename blocks are returned for Quarto to wrap; a marker class
 --- is added when a block-level style override is present.
---- Auto-filename blocks are wrapped directly with the style class.
+--- Auto-filename blocks are returned inside the window node Quarto builds for
+--- an explicit filename, so the title bar is in the rendered page.
 --- The block reaches here with its code-window attributes already taken off
 --- by take_block_attributes, so every value below is read from the resolved
 --- table and the block carries none of them onward.
 --- @param block pandoc.CodeBlock Code block element
 --- @param resolved table<string, any> This block's attributes, resolved against the schema
 --- @param auto_label string|nil Label written by the language module, if any
---- @return pandoc.Div|pandoc.CodeBlock Wrapped block or original
+--- @return pandoc.Block DecoratedCodeBlock or original block
 local function process_html(block, resolved, auto_label)
   local overrides = read_window_overrides(block, resolved)
 
@@ -750,7 +751,9 @@ local function process_html(block, resolved, auto_label)
     end
   end
 
-  if explicit_filename and explicit_filename ~= '' then
+  -- Quarto builds a window for any filename attribute, an empty one included,
+  -- so a block that carries one is already inside a window.
+  if explicit_filename ~= nil then
     -- Let Quarto create the .code-with-filename wrapper, and mark the block so
     -- the injected script can promote a block-level override onto that wrapper.
     mark()
@@ -762,23 +765,28 @@ local function process_html(block, resolved, auto_label)
   end
 
   -- Blocks with a language of their own are labelled with its class.
-  -- Set the filename attribute so Quarto creates its own .code-with-filename
-  -- wrapper. This preserves the CodeBlock+OrderedList sibling structure
-  -- needed by Quarto's code-annotations processor.
-  block.attributes['filename'] = auto_label or block.classes[1]
+  -- Quarto turns a filename into its window node while it reads the document,
+  -- before this filter runs, so a filename set here would come too late. The
+  -- filter builds the same node instead. Quarto then renders the title bar as
+  -- for an explicit filename, and its code-annotations processor still finds
+  -- the CodeBlock and the OrderedList side by side. The cw-auto class tells the
+  -- post-render pass which windows hold a derived name. The filename
+  -- attribute stays as well, so the page carries data-filename like a block
+  -- with an explicit name.
+  local label = auto_label or block.classes[1]
+  block.attributes['filename'] = label
   table.insert(block.classes, 'cw-auto')
   mark()
 
-  return block
+  return quarto.DecoratedCodeBlock({ filename = label, code_block = block })
 end
 
 -- ============================================================================
 -- FILTER HANDLERS
 -- ============================================================================
 
---- Generate a JS snippet that builds .code-with-filename wrappers for
---- auto-filename blocks (marked with cw-auto at pre-quarto), applies the
---- configured default style class to all .code-with-filename wrappers,
+--- Generate a JS snippet that applies the configured default style class to
+--- all .code-with-filename wrappers,
 --- promotes block-level cw-style-* / cw-collapse-* marker classes, inserts
 --- a highlighted-lines chip when data-code-window-lines-label is set on the inner
 --- pre, and wraps collapsible windows in a <details> element where the
@@ -791,25 +799,6 @@ local function make_style_js(default_style, default_collapse)
   return string.format([=[
 document.addEventListener("DOMContentLoaded",function(){
   var DEFAULT_COLLAPSE=%s;
-  document.querySelectorAll("pre.cw-auto").forEach(function(pre){
-    var fn=pre.closest("[data-filename]");
-    if(!fn)return;
-    var name=fn.getAttribute("data-filename");
-    if(!name)return;
-    var scaffold=pre.closest(".code-copy-outer-scaffold")||pre.closest(".sourceCode");
-    if(!scaffold)return;
-    var w=document.createElement("div");
-    w.className="code-with-filename code-window-auto";
-    var tb=document.createElement("div");
-    tb.className="code-with-filename-file";
-    var tp=document.createElement("pre");
-    var ts=document.createElement("strong");
-    ts.textContent=name;
-    tp.appendChild(ts);tb.appendChild(tp);
-    scaffold.parentNode.insertBefore(w,scaffold);
-    w.appendChild(tb);w.appendChild(scaffold);
-    pre.classList.remove("cw-auto");
-  });
   function findMarkerSource(el){
     return el.querySelector('pre[class*="cw-style-"],pre[class*="cw-collapse-"],pre[data-code-window-lines-label]')
       ||el.querySelector('[class*="cw-style-"],[class*="cw-collapse-"],[data-code-window-lines-label]');
