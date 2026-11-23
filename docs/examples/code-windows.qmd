@@ -25,10 +25,9 @@ In HTML and Reveal.js, the window has the style of the preset:
 | `quarto` | A 1 px line frame on the tint, with 6 px rounded corners and a title bar a step darker than the tint. |
 | `terminal` | A 1 px line frame on the tint, with square corners and a title bar a step darker than the tint. |
 
-: The code window of each preset in HTML and Reveal.js. {.striped .hover tbl-colwidths="[20,80]"}
+: The code window of each preset in HTML, Reveal.js and Typst. {.striped .hover tbl-colwidths="[20,80]"}
 
-In Typst, the window takes the frame, the title bar, the traffic lights and the corner radius of the preset.
-See the [known limitations](../limitations.qmd) for the code area.
+In Typst, the window also takes the tint of the preset behind the code.
 
 ## Options
 

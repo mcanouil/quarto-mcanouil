@@ -39,8 +39,8 @@
       radius: 5pt,
     ),
     // Mono: square, a thick ink rule on top and no other edge, as in HTML and
-    // Reveal.js.
-    mono: (stroke: (top: 2pt + colours.ink, rest: none), radius: 0pt),
+    // Reveal.js (2 px is 1.5 pt).
+    mono: (stroke: (top: 1.5pt + colours.ink, rest: none), radius: 0pt),
     // Quarto (atelier): rounded, the title bar a little stronger than the
     // tint of the body.
     quarto: (surface: title-bar, radius: 6pt),

@@ -244,7 +244,7 @@ code_window_theme_test() {
 	printf 't.traffic-light-size == 0.7em and t.traffic-light-gap == 0.35em and t.label == c.muted and t.muted == c.muted and t.fill == c.tint and '
 	case "$1" in
 	gold) printf 'type(t.stroke.top.paint) == gradient and t.stroke.top.paint.stops().map(s => s.at(0)) == (c.at("accent-low"), c.at("accent-high"), c.at("accent-low")) and t.stroke.top.thickness == 1.5pt and t.stroke.rest == 0.75pt + c.line and t.surface == c.tint and t.radius == 5pt' ;;
-	mono) printf 't.stroke.top == 2pt + c.ink and t.stroke.rest == none and t.surface == c.tint and t.radius == 0pt' ;;
+	mono) printf 't.stroke.top == 1.5pt + c.ink and t.stroke.rest == none and t.surface == c.tint and t.radius == 0pt' ;;
 	quarto) printf 't.border == c.line and t.surface == color.mix((c.ink, 6%%), (c.tint, 94%%)) and t.radius == 6pt' ;;
 	terminal) printf 't.border == c.line and t.at("stroke-dash", default: none) == none and t.surface == color.mix((c.ink, 6%%), (c.tint, 94%%)) and t.radius == 0pt' ;;
 	esac
