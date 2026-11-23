@@ -40,6 +40,16 @@ A deck from an earlier version of the extension shows at a different scale.
   The slide uses the dark tokens of the preset.
 - Closing slide: from the `closing` option, on the dark ground.
 
+```markdown
+# Checks
+
+## Why presets, after dark {.dark}
+```
+
+The title, section and closing slides always use the dark ground.
+Long titles get a smaller size, so they do not touch the motif.
+`brand-mode: dark` makes every slide dark.
+
 ::: {.grid}
 
 ::: {.g-col-12 .g-col-md-6}
@@ -93,16 +103,6 @@ A deck from an earlier version of the extension shows at a different scale.
 :::
 
 :::
-
-```markdown
-# Checks
-
-## Why presets, after dark {.dark}
-```
-
-The title, section and closing slides always use the dark ground.
-Long titles get a smaller size, so they do not touch the motif.
-`brand-mode: dark` makes every slide dark.
 
 ## Speakers
 

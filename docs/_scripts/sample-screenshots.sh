@@ -46,6 +46,12 @@ skip_partial_render "${OUTPUT_DIR}"
 # Every reference on a page must name a screenshot of the list, and every
 # screenshot of the list must be shown on a page.
 manifest_names="$(grep -v '^#' "${MANIFEST}" | cut -f1 | sort -u)"
+duplicate_names="$(grep -v '^#' "${MANIFEST}" | cut -f1 | sort | uniq -d)"
+if [[ -n "${duplicate_names}" ]]; then
+	printf '[%s] Each screenshot name must be unique in docs/_samples/_screenshots.tsv; repeated: %s\n' \
+		"${LOG_PREFIX}" "$(paste -sd ' ' - <<<"${duplicate_names}")" >&2
+	exit 1
+fi
 references="$(
 	cd "${DOCS_DIR}" || exit 1
 	# grep exits 1 when no page refers to a screenshot. The check below then
@@ -88,6 +94,17 @@ trap 'rm -rf "${STAGING_DIR}"' EXIT
 while IFS=$'\t' read -r name source kind target; do
 	[[ -z "${name}" || "${name}" == \#* ]] && continue
 	png="${STAGING_DIR}/${name}.png"
+	case "${kind}" in
+	html) rendered="${SAMPLES_DIR}/${source}.html" ;;
+	revealjs) rendered="${SAMPLES_DIR}/${source}-revealjs.html" ;;
+	typst) rendered="${SAMPLES_SOURCE_DIR}/${source}.typ" ;;
+	*) rendered="" ;;
+	esac
+	if [[ -n "${rendered}" && ! -f "${rendered}" ]]; then
+		printf '[%s] %s: the render of %s has no %s file (%s); add the format to docs/_samples/%s.qmd or correct docs/_samples/_screenshots.tsv\n' \
+			"${LOG_PREFIX}" "${name}" "${source}" "${kind}" "${rendered#"${DOCS_DIR}"/}" "${source}" >&2
+		exit 1
+	fi
 	case "${kind}" in
 	html)
 		capture "${BROWSER}" "file://${SAMPLES_DIR}/${source}.html" "${png}" 1280 800 light
