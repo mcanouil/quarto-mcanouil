@@ -400,7 +400,7 @@
   let theme = mc-code-window-theme(mc-preset, colours)
   show raw.where(block: true): set block(
     fill: theme.fill,
-    stroke: 1pt + theme.border,
+    stroke: theme.stroke-thickness + theme.border,
     radius: theme.radius,
     inset: 8pt,
     width: 100%,

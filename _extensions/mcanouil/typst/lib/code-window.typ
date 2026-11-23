@@ -15,6 +15,9 @@
   let title-bar = color.mix((colours.ink, 6%), (colours.tint, 94%))
   let shared = (
     border: colours.line,
+    // The 1 px lines of HTML and Reveal.js: the title bar rule, and the frame
+    // of the presets that keep the default frame.
+    stroke-thickness: 0.75pt,
     surface: colours.tint,
     // The code of every highlighted block, in a window or not, on the tint.
     fill: colours.tint,
