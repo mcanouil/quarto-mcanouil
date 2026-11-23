@@ -1,0 +1,24 @@
+---
+title: "The terminal preset"
+subtitle: "A demo of the mcanouil extension"
+author:
+  - name: "Mickaël CANOUIL"
+    orcid: "0000-0002-3396-4549"
+date: last-modified
+lang: en-GB
+abstract: "The same text in a report, a page and a deck, with the terminal preset."
+format:
+  mcanouil-html:
+    output-file: terminal.html
+    toc: true
+  mcanouil-revealjs:
+    output-file: terminal-revealjs.html
+  mcanouil-typst:
+    output-file: terminal.pdf
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: terminal
+---
+
+{{< include _body.qmd >}}

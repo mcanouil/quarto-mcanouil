@@ -13,7 +13,13 @@ project:
   # instead: run that script before previewing locally, and note that the
   # Pages workflow runs it before every render. See
   # _extensions/README.md.
-  pre-render: ./_scripts/pre-render.sh
+  pre-render:
+    - ./_scripts/pre-render.sh
+    # Renders the demo project in _demos/ and copies its output to demos/.
+    - ./_scripts/render-demos.sh
+  # Published as they are: the demos are rendered by their own project.
+  resources:
+    - demos/**
   post-render: ./_scripts/post-render.sh
 
 website:
