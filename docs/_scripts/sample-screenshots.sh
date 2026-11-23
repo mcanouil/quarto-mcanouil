@@ -108,7 +108,15 @@ while IFS=$'\t' read -r name source kind target; do
 		capture "${BROWSER}" "file://${SAMPLES_DIR}/${source}.html" "${png}" 1280 800 light
 		;;
 	revealjs)
-		capture "${BROWSER}" "file://${SAMPLES_DIR}/${source}-revealjs.html${target}" "${png}" 1280 720 light
+		# Reveal.js shows the first slide for an anchor that matches no slide, so
+		# a renamed heading would give the title slide with no error.
+		deck="${SAMPLES_DIR}/${source}-revealjs.html"
+		if ! grep -qF "id=\"${target#\#/}\"" "${deck}"; then
+			printf '[%s] %s: no slide with the id %s in samples/%s-revealjs.html; correct docs/_samples/_screenshots.tsv\n' \
+				"${LOG_PREFIX}" "${name}" "${target#\#/}" "${source}" >&2
+			exit 1
+		fi
+		capture "${BROWSER}" "file://${deck}${target}" "${png}" 1280 720 light
 		;;
 	typst)
 		(
