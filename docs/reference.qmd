@@ -78,6 +78,11 @@ extensions:
 An unknown preset, type, layout, kind or standard stops the render.
 The message names the value and lists the values that you can use.
 
+In `mcanouil-typst`, the `type` option works as a document dispatcher, the pattern that the post [Document-Type Dispatching in Quarto Typst Extensions](https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/) describes.
+[`typst-show.typ`](https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/typst-show.typ) passes `type`, `layout` and `kind` to `mcanouil-document`.
+That function, in [`typst-template.typ`](https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/typst-template.typ), looks the type up in `mc-types` and calls its function.
+Each type has its own file in [`typst/types/`](https://github.com/mcanouil/quarto-mcanouil/tree/main/_extensions/mcanouil/typst/types).
+
 ### Header and footer
 
 `header` and `footer` each have three slots: `left`, `centre` and `right`.

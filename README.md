@@ -43,6 +43,7 @@ Please don't list them again in your `filters:`, as the formats already run them
 
 The full documentation lives at <https://m.canouil.dev/quarto-mcanouil/>.
 It covers every option, each document type and format, the embedded tools and their versions, and the known limitations.
+The Typst document types follow the pattern from the post [Document-Type Dispatching in Quarto Typst Extensions](https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/).
 
 ## Licence
 
