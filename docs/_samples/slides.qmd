@@ -1,5 +1,6 @@
 ---
 title: "Quarto extensions"
+author: "Mickaël Canouil"
 subtitle: "Build, share and maintain your own formats"
 date: 2026-07-08
 format:

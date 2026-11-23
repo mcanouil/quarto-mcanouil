@@ -1,5 +1,6 @@
 ---
 title: "Training proposal"
+author: "Mickaël Canouil"
 sender:
   name: "Mickaël Canouil"
   address:

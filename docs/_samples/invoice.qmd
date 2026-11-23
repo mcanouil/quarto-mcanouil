@@ -1,5 +1,6 @@
 ---
 title: "Consulting 2026"
+author: "Mickaël Canouil"
 sender:
   name: "Mickaël Canouil"
   email: "mickael@example.org"

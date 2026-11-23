@@ -1,5 +1,6 @@
 ---
 title: "Appendix and supplementary sections"
+author: "Mickaël Canouil"
 format:
   mcanouil-typst:
     keep-typ: true

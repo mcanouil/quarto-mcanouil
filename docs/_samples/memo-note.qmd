@@ -1,5 +1,6 @@
 ---
 title: "Quarto 1.11 migration"
+author: "Mickaël Canouil"
 format:
   mcanouil-typst:
     keep-typ: true
@@ -25,8 +26,4 @@ Every document of the team must render again before the end of the month.
 ## Decision
 
 We move all documents to the new release in one batch.
-The old release stays available for two weeks.
-
-## Next steps
-
-Each owner renders their documents and reports any difference on the team channel.
+Each owner reports any difference on the team channel.

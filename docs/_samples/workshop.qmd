@@ -1,5 +1,6 @@
 ---
 title: "Authoring essentials"
+author: "Mickaël Canouil"
 format:
   mcanouil-html: default
   mcanouil-typst:

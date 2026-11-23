@@ -1,5 +1,6 @@
 ---
 title: "Code windows"
+author: "Mickaël Canouil"
 format:
   mcanouil-html: default
 ---

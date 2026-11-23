@@ -37,9 +37,11 @@ DEMOS_DIR="${DOCS_DIR}/demos"
 OUTPUT_DIR="${DEMOS_DIR}/screenshots"
 STAGING_DIR="${DEMOS_DIR}/.screenshots-staging"
 DARK_ONLY_PRESET="terminal"
+# LOG_PREFIX is read by the helpers in _capture.sh.
+# shellcheck disable=SC2034
 LOG_PREFIX="screenshots"
 
-# shellcheck source-path=SCRIPTDIR source=_capture.sh
+# shellcheck source-path=SCRIPTDIR source=_capture.sh disable=SC1091
 source "${SCRIPT_DIR}/_capture.sh"
 
 # A render of some files only, such as a save in `quarto preview`, keeps the
@@ -51,6 +53,8 @@ fi
 
 if ! find_browser; then
 	printf '[screenshots] No Chromium-based browser found. Checked:\n' >&2
+	# checked_locations is set by find_browser in _capture.sh.
+	# shellcheck disable=SC2154
 	printf '  - %s\n' "${checked_locations[@]}" >&2
 	printf 'Set CHROME_PATH to the browser executable and render again.\n' >&2
 	exit 1

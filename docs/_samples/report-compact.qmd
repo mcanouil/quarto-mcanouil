@@ -1,5 +1,6 @@
 ---
 title: "Quarterly review"
+author: "Mickaël Canouil"
 subtitle: "Third quarter of 2026"
 abstract: "The team shipped three releases this quarter and closed most of the open issues."
 format:
