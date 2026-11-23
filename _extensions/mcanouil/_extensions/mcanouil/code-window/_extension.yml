@@ -8,3 +8,5 @@ contributes:
       path: main.lua
     - at: post-render
       path: post-render.lua
+source: mcanouil/quarto-code-window@1.10.0
+source-type: github
