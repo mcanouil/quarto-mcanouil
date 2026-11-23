@@ -1,21 +1,13 @@
 ---
 title: "The mono preset"
-subtitle: "A demo of the mcanouil extension"
-author:
-  - name: "Mickaël CANOUIL"
-    orcid: "0000-0002-3396-4549"
-date: last-modified
-lang: en-GB
 abstract: "The same text in a report, a page and a deck, with the mono preset."
 format:
   mcanouil-html:
     output-file: mono.html
-    toc: true
   mcanouil-revealjs:
     output-file: mono-revealjs.html
   mcanouil-typst:
     output-file: mono.pdf
-    keep-typ: true
 extensions:
   mcanouil:
     preset: mono

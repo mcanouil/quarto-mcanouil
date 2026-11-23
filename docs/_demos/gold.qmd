@@ -1,21 +1,13 @@
 ---
 title: "The gold preset"
-subtitle: "A demo of the mcanouil extension"
-author:
-  - name: "Mickaël CANOUIL"
-    orcid: "0000-0002-3396-4549"
-date: last-modified
-lang: en-GB
 abstract: "The same text in a report, a page and a deck, with the gold preset."
 format:
   mcanouil-html:
     output-file: gold.html
-    toc: true
   mcanouil-revealjs:
     output-file: gold-revealjs.html
   mcanouil-typst:
     output-file: gold.pdf
-    keep-typ: true
 extensions:
   mcanouil:
     preset: gold

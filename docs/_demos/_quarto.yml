@@ -3,5 +3,23 @@
 # this project and moves _output/ to ../demos/, which the website publishes.
 # Every <preset>.qmd here is one demo; _body.qmd is skipped by its leading
 # underscore.
+#
+# The options that every demo shares live here. Each <preset>.qmd sets only its
+# title, its abstract, its preset and its output file names.
 project:
   output-dir: _output
+
+subtitle: "A demo of the mcanouil extension"
+author:
+  - name: "Mickaël CANOUIL"
+    orcid: "0000-0002-3396-4549"
+date: last-modified
+lang: en-GB
+
+format:
+  mcanouil-html:
+    toc: true
+  mcanouil-revealjs: default
+  mcanouil-typst:
+    # screenshots.sh compiles the kept Typst source to PNG pages.
+    keep-typ: true
