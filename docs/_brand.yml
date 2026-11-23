@@ -1,0 +1,4 @@
+defaults:
+  bootstrap:
+    defaults:
+      atelier-preset: quarto

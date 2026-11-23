@@ -101,7 +101,8 @@ website:
     right: |
       Licence: [MIT](https://github.com/mcanouil/quarto-mcanouil?tab=MIT-1-ov-file#readme).
 
-brand: _extensions/mcanouil/pastel/brand.yml
+# The atelier preset is a Sass default in _brand.yml.
+brand: _brand.yml
 
 format:
   # Configure the extension format by name. Declaring `html` would replace
@@ -111,17 +112,10 @@ format:
     theme:
       light:
         - brand
-        - _extensions/mcanouil/pastel/pastel.scss
         - assets/theme.scss
       dark:
         - brand
-        - _extensions/mcanouil/pastel/pastel.scss
         - assets/theme.scss
-    # Under the format rather than at the top level, so they do not reach
-    # preview.qmd: mcanouil-typst embeds both tools and runs them itself.
-    filters:
-      - code-window
-      - gitlink
 
 extensions:
   # Quarto keeps the `website` block out of the metadata it hands to Lua

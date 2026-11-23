@@ -4,12 +4,13 @@ The extensions here fall into two groups, told apart by where they sit.
 
 ## Committed, under `mcanouil/`
 
-`mcanouil/atelier`, `mcanouil/iconify`, `mcanouil/gitlink`, `mcanouil/code-window`, and `mcanouil/pastel` are dependencies of the website itself: the project type and theme, the footer glyphs, the repository widget, the code block decoration, and the shared palette.
-They arrive with the scaffold, which carries its own copies, and are checked in like any other Quarto extension.
-Beyond that they are managed for you: [Quarto Wizard](https://m.canouil.dev/quarto-wizard) installs them, and the Quarto Extensions Updates workflow keeps them current by scanning this directory.
+`mcanouil/atelier` is a dependency of the website itself: the project type, the theme and its `quarto` preset.
+It bundles the footer glyphs (iconify), the repository widget (gitlink) and the code block decoration (code-window), and runs their filters.
+It arrives with the scaffold, which carries its own copy, and is checked in like any other Quarto extension.
+Beyond that it is managed for you: [Quarto Wizard](https://m.canouil.dev/quarto-wizard) installs it, and the Quarto Extensions Updates workflow keeps it current by scanning this directory.
 
 > [!IMPORTANT]
-> Do not add or update them by hand with the Quarto CLI.
+> Do not add or update it by hand with the Quarto CLI.
 >
 > `quarto add` and `quarto update` rewrite the manifest and drop the `source` and `source-type` fields, which are the only record of where each extension came from and at which version. An extension without them is invisible to the updater, and stays at whatever version it was left on.
 >
