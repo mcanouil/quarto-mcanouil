@@ -320,6 +320,10 @@ M.SKYLIGHTING_TINT = table.concat({
 --- override of the embedded code-window. Without the override, Skylighting
 --- may be undefined (no highlighting) or ignore its fill, so the document is
 --- left as it is.
+--- Upstream: mcanouil/quarto-code-window, the `fill` and `stroke` keys of the
+--- Typst theme, due in 1.10.0.
+--- Remove when: the vendored code-window has them; then set `fill` in
+--- typst/lib/code-window.typ and drop this function and `M.SKYLIGHTING_TINT`.
 --- @param doc pandoc.Pandoc
 --- @return pandoc.Pandoc
 local function tint_code(doc)
