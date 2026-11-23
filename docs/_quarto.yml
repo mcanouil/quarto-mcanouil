@@ -17,6 +17,8 @@ project:
     - ./_scripts/pre-render.sh
     # Renders the demo project in _demos/ and copies its output to demos/.
     - ./_scripts/render-demos.sh
+    # Captures the screenshots of the demos for demos.qmd.
+    - ./_scripts/screenshots.sh
   # Published as they are: the demos are rendered by their own project.
   resources:
     - demos/**
