@@ -389,6 +389,8 @@ local TYPST_COLOUR_HELPERS = [==[
 )
 // the inset of a code block: the theme's body-inset inside a window
 #let _cw-body-inset = state("cw-body-inset", _cw-theme-defaults.body-inset)
+// whether a code block sits in a window, where the window draws the only edges
+#let _cw-in-window = state("cw-in-window", false)
 
 // code-window: adaptive colour helpers (derive UI tones from page background)
 #let _cw-page-bg() = {
@@ -623,7 +625,8 @@ local function build_typst_function_def(has_hotfixes, has_own_wrapper)
         title-bar,
       )
       // Strip code block chrome so content fills flush against the window body.
-      // set block() provides defaults for Skylighting blocks (explicit fill preserved).
+      // set block() provides defaults for Skylighting blocks (explicit fill preserved);
+      // the Skylighting override reads cw-in-window to drop its own stroke and radius.
       // show raw overrides the document-level raw block styling (fill, radius).
       {
         set block(
@@ -643,7 +646,9 @@ local function build_typst_function_def(has_hotfixes, has_own_wrapper)
           below: 0pt,
         )
         _cw-body-inset.update(theme.body-inset)
+        _cw-in-window.update(true)
 %s        _cw-body-inset.update(_cw-theme-defaults.body-inset)
+        _cw-in-window.update(false)
       }
     },
   )
