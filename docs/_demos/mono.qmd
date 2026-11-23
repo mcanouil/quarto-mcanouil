@@ -1,0 +1,16 @@
+---
+title: "The mono preset"
+abstract: "The same text in a report, a page and a deck, with the mono preset."
+format:
+  mcanouil-html:
+    output-file: mono.html
+  mcanouil-revealjs:
+    output-file: mono-revealjs.html
+  mcanouil-typst:
+    output-file: mono.pdf
+extensions:
+  mcanouil:
+    preset: mono
+---
+
+{{< include _body.qmd >}}

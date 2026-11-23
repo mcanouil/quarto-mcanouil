@@ -1,0 +1,16 @@
+---
+title: "The quarto preset"
+abstract: "The same text in a report, a page and a deck, with the quarto preset."
+format:
+  mcanouil-html:
+    output-file: quarto.html
+  mcanouil-revealjs:
+    output-file: quarto-revealjs.html
+  mcanouil-typst:
+    output-file: quarto.pdf
+extensions:
+  mcanouil:
+    preset: quarto
+---
+
+{{< include _body.qmd >}}

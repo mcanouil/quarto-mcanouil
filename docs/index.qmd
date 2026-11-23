@@ -13,9 +13,9 @@ One preset gives the colours, fonts, style and motif of all three formats.
 The extension has six document types, from a full report to an invoice.
 The targets are WCAG 2.2 AA in HTML and Reveal.js, and PDF/UA-1 in PDF.
 
-[See a report rendered by this site](preview.pdf).
+[See each preset in each format](demos.qmd), or [open the report below](demos/gold.pdf).
 
-![](preview.pdf){.embed-art loading="lazy" title="A report rendered by mcanouil-typst"}
+![](demos/gold.pdf){.embed-art loading="lazy" title="A report rendered by mcanouil-typst with the gold preset"}
 
 ## Installation
 

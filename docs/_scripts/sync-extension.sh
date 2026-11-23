@@ -28,17 +28,22 @@ ROOT_DIR="$(dirname "${DOCS_DIR}")"
 # rather than installed from anywhere, and saying so in the path keeps it
 # distinct from the vendored dependencies. It also avoids a collision when the
 # extension is named after its owner.
-TARGET_DIR="${DOCS_DIR}/_extensions/local"
+#
+# The demo project under _demos/ is a separate Quarto project, so it gets its
+# own copy for the same reason.
+TARGET_DIRS=("${DOCS_DIR}/_extensions/local" "${DOCS_DIR}/_demos/_extensions/local")
 
 for extension_dir in "${ROOT_DIR}"/_extensions/*/; do
 	[[ -f "${extension_dir}_extension.yml" ]] || continue
 	extension_name="$(basename "${extension_dir}")"
-	target="${TARGET_DIR}/${extension_name}"
-	# Remove first: copying onto an existing directory nests the new copy inside
-	# the old one.
-	rm -rf "${target}"
-	mkdir -p "${TARGET_DIR}"
-	cp -R "${extension_dir%/}" "${target}"
-	printf '[sync] _extensions/%s -> docs/_extensions/local/%s\n' \
-		"${extension_name}" "${extension_name}"
+	for target_dir in "${TARGET_DIRS[@]}"; do
+		target="${target_dir}/${extension_name}"
+		# Remove first: copying onto an existing directory nests the new copy
+		# inside the old one.
+		rm -rf "${target}"
+		mkdir -p "${target_dir}"
+		cp -R "${extension_dir%/}" "${target}"
+		printf '[sync] _extensions/%s -> %s\n' \
+			"${extension_name}" "${target#"${ROOT_DIR}"/}"
+	done
 done

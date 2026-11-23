@@ -1,0 +1,16 @@
+---
+title: "The terminal preset"
+abstract: "The same text in a report, a page and a deck, with the terminal preset."
+format:
+  mcanouil-html:
+    output-file: terminal.html
+  mcanouil-revealjs:
+    output-file: terminal-revealjs.html
+  mcanouil-typst:
+    output-file: terminal.pdf
+extensions:
+  mcanouil:
+    preset: terminal
+---
+
+{{< include _body.qmd >}}

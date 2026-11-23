@@ -13,7 +13,15 @@ project:
   # instead: run that script before previewing locally, and note that the
   # Pages workflow runs it before every render. See
   # _extensions/README.md.
-  pre-render: ./_scripts/pre-render.sh
+  pre-render:
+    - ./_scripts/pre-render.sh
+    # Renders the demo project in _demos/ and copies its output to demos/.
+    - ./_scripts/render-demos.sh
+    # Captures the screenshots of the demos for demos.qmd.
+    - ./_scripts/screenshots.sh
+  # Published as they are: the demos are rendered by their own project.
+  resources:
+    - demos/**
   post-render: ./_scripts/post-render.sh
 
 website:
@@ -63,6 +71,8 @@ website:
     contents:
       - href: index.qmd
         text: "Home"
+      - href: demos.qmd
+        text: "Demos"
       - href: reference.qmd
         text: "Reference"
       - section: examples.qmd
@@ -101,7 +111,15 @@ website:
     right: |
       Licence: [MIT](https://github.com/mcanouil/quarto-mcanouil?tab=MIT-1-ov-file#readme).
 
-brand: _extensions/mcanouil/pastel/brand.yml
+# Sets `extensions.atelier.version`, the version atelier shows beside the site
+# title. _scripts/pre-render.sh writes the file from the extension manifest and
+# _scripts/post-render.sh removes it. Quarto re-reads the configuration after
+# pre-render, and a missing file is skipped.
+metadata-files:
+  - _atelier-version.yml
+
+# The atelier preset is a Sass default in _brand.yml.
+brand: _brand.yml
 
 format:
   # Configure the extension format by name. Declaring `html` would replace
@@ -111,17 +129,10 @@ format:
     theme:
       light:
         - brand
-        - _extensions/mcanouil/pastel/pastel.scss
         - assets/theme.scss
       dark:
         - brand
-        - _extensions/mcanouil/pastel/pastel.scss
         - assets/theme.scss
-    # Under the format rather than at the top level, so they do not reach
-    # preview.qmd: mcanouil-typst embeds both tools and runs them itself.
-    filters:
-      - code-window
-      - gitlink
 
 extensions:
   # Quarto keeps the `website` block out of the metadata it hands to Lua

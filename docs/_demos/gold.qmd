@@ -1,0 +1,16 @@
+---
+title: "The gold preset"
+abstract: "The same text in a report, a page and a deck, with the gold preset."
+format:
+  mcanouil-html:
+    output-file: gold.html
+  mcanouil-revealjs:
+    output-file: gold-revealjs.html
+  mcanouil-typst:
+    output-file: gold.pdf
+extensions:
+  mcanouil:
+    preset: gold
+---
+
+{{< include _body.qmd >}}
