@@ -15,25 +15,35 @@
   let title-bar = color.mix((colours.ink, 6%), (colours.tint, 94%))
   let shared = (
     border: colours.line,
+    // The 1 px lines of HTML and Reveal.js: the title bar rule, and the frame
+    // of the presets that keep the default frame.
+    stroke-thickness: 0.75pt,
     surface: colours.tint,
+    // The code of every highlighted block, in a window or not, on the tint.
+    fill: colours.tint,
     label: colours.muted,
     muted: colours.muted,
     traffic-light-size: 0.7em,
     traffic-light-gap: 0.35em,
   )
   let own = (
-    // Gold: a gilded frame, as the gilded rules of the preset.
+    // Gold: a line frame with a gilded top edge, as in HTML and Reveal.js.
+    // Every side has a stroke, so the rounded corners keep their shape.
     gold: (
-      border: gradient.linear(
-        colours.at("accent-low"),
-        colours.at("accent-high"),
-        colours.at("accent-low"),
-        space: rgb,
+      stroke: (
+        top: 1.5pt + gradient.linear(
+          colours.at("accent-low"),
+          colours.at("accent-high"),
+          colours.at("accent-low"),
+          space: rgb,
+        ),
+        rest: 0.75pt + colours.line,
       ),
       radius: 5pt,
     ),
-    // Mono: square, in an ink frame.
-    mono: (border: colours.ink, stroke-thickness: 1pt, radius: 0pt),
+    // Mono: square, a thick ink rule on top and no other edge, as in HTML and
+    // Reveal.js (2 px is 1.5 pt).
+    mono: (stroke: (top: 1.5pt + colours.ink, rest: none), radius: 0pt),
     // Quarto (atelier): rounded, the title bar a little stronger than the
     // tint of the body.
     quarto: (surface: title-bar, radius: 6pt),

@@ -46,9 +46,7 @@ local ATTRIBUTE_PREFIX = 'code-window-'
 --- could not be read, which is a state this extension renders through rather
 --- than stopping for. Everywhere else _schema.yml decides these seven, so the
 --- values below are a fallback and not a second place to change one of them.
---- The hotfix defaults are a different story, and are still kept by hand in
---- HOTFIX_DEFAULTS: they are nested in the schema and read on their own path,
---- so changing one in _schema.yml alone still changes nothing.
+--- HOTFIX_DEFAULTS, below, is the same kind of fallback for the hot-fixes.
 --- All seven stay listed, because the second case has nothing else to read
 --- from, and an option added to the schema needs an entry here as well or it
 --- has no default at all on a format the extension does not act on.
@@ -74,6 +72,9 @@ local VALID_COLLAPSE = {
   ['open'] = 'open',
 }
 
+--- The hot-fixes the extension reads, with their fallback defaults for the
+--- same two cases as FALLBACK_DEFAULTS. Everywhere else the schema builds the
+--- "hotfix" object from the defaults of its properties, and its value decides.
 local HOTFIX_DEFAULTS = {
   ['code-annotations'] = true,
   ['skylighting'] = true,
@@ -136,6 +137,39 @@ local function stringify_bool(value)
     return value and 'true' or 'false'
   end
   return value
+end
+
+--- Read one hot-fix value: a boolean, or a map with "enabled" and
+--- "quarto-version" keys, where a version at or below the running Quarto
+--- turns the hot-fix off. The value is document metadata or a schema
+--- default, so it may be a Pandoc value or a plain Lua one.
+--- @param entry any The hot-fix value
+--- @return boolean enabled
+local function read_hotfix(entry)
+  local function as_string(value)
+    if type(value) == 'boolean' then
+      return value and 'true' or 'false'
+    end
+    return pandoc.utils.stringify(value)
+  end
+  if pandoc.utils.type(entry) ~= 'table' then
+    return as_string(entry) == 'true'
+  end
+  local enabled = true
+  if entry['enabled'] ~= nil then
+    enabled = as_string(entry['enabled']) == 'true'
+  end
+  local ver = entry['quarto-version']
+  if ver ~= nil then
+    ver = as_string(ver)
+    if ver ~= '' then
+      local ok, threshold = pcall(pandoc.types.Version, ver)
+      if ok and quarto.version >= threshold then
+        enabled = false
+      end
+    end
+  end
+  return enabled
 end
 
 --- Take the attributes an author can write off a block the filter processes,
@@ -343,8 +377,10 @@ local TYPST_COLOUR_HELPERS = [==[
 // the colour keys (border, surface, label, muted) derive from the page fill
 #let _cw-theme-defaults = (
   radius: 8pt,
+  stroke: auto,
   stroke-thickness: 1pt,
   stroke-dash: none,
+  fill: auto,
   title-inset: (x: 1em, y: 0.6em),
   body-inset: 8pt,
   traffic-light-size: 0.85em,
@@ -353,6 +389,8 @@ local TYPST_COLOUR_HELPERS = [==[
 )
 // the inset of a code block: the theme's body-inset inside a window
 #let _cw-body-inset = state("cw-body-inset", _cw-theme-defaults.body-inset)
+// whether a code block sits in a window, where the window draws the only edges
+#let _cw-in-window = state("cw-in-window", false)
 
 // code-window: adaptive colour helpers (derive UI tones from page background)
 #let _cw-page-bg() = {
@@ -490,6 +528,7 @@ local function build_typst_function_def(has_hotfixes, has_own_wrapper)
     thickness: theme.stroke-thickness,
     dash: theme.stroke-dash,
   )
+  let frame-stroke = if theme.stroke == auto { window-stroke } else { theme.stroke }
 
   let filename-label = if filename != none {
     text(
@@ -571,7 +610,7 @@ local function build_typst_function_def(has_hotfixes, has_own_wrapper)
 
   block(
     width: 100%%,
-    stroke: window-stroke,
+    stroke: frame-stroke,
     radius: theme.radius,
     clip: true,
     {
@@ -586,7 +625,8 @@ local function build_typst_function_def(has_hotfixes, has_own_wrapper)
         title-bar,
       )
       // Strip code block chrome so content fills flush against the window body.
-      // set block() provides defaults for Skylighting blocks (explicit fill preserved).
+      // set block() provides defaults for Skylighting blocks (explicit fill preserved);
+      // the Skylighting override reads cw-in-window to drop its own stroke and radius.
       // show raw overrides the document-level raw block styling (fill, radius).
       {
         set block(
@@ -598,7 +638,7 @@ local function build_typst_function_def(has_hotfixes, has_own_wrapper)
           below: 0pt,
         )
         show raw.where(block: true): set block(
-          fill: none,
+          fill: if theme.fill == auto { none } else { theme.fill },
           width: 100%%,
           radius: 0pt,
           stroke: none,
@@ -606,7 +646,9 @@ local function build_typst_function_def(has_hotfixes, has_own_wrapper)
           below: 0pt,
         )
         _cw-body-inset.update(theme.body-inset)
+        _cw-in-window.update(true)
 %s        _cw-body-inset.update(_cw-theme-defaults.body-inset)
+        _cw-in-window.update(false)
       }
     },
   )
@@ -917,35 +959,22 @@ function Meta(meta)
       '"skylighting-fix" is deprecated. Use "hotfix: { skylighting: true/false }" instead.')
   end
 
-  -- Parse hotfix options with per-hotfix version-based auto-disable.
-  -- Each hotfix value can be:
-  --   boolean/string: true/false to enable/disable
-  --   map: { enabled: true/false, quarto-version: "x.y.z" }
+  -- Each hot-fix is on or off, and the schema default comes in the same two
+  -- forms as a document value, so both go through read_hotfix.
+  local schema_hotfix = schema_defaults['hotfix']
+  if type(schema_hotfix) ~= 'table' then
+    schema_hotfix = {}
+  end
   local hotfix = {}
-  for key, default in pairs(HOTFIX_DEFAULTS) do
+  for key, fallback in pairs(HOTFIX_DEFAULTS) do
     local entry = hotfix_meta and hotfix_meta[key]
-    if entry ~= nil and pandoc.utils.type(entry) == 'table' then
-      -- Map form: { enabled: bool, quarto-version: "x.y.z" }
-      local enabled = true
-      if entry['enabled'] ~= nil then
-        enabled = pandoc.utils.stringify(entry['enabled']) == 'true'
-      end
-      local ver = entry['quarto-version']
-      if ver then
-        ver = pandoc.utils.stringify(ver)
-        if ver ~= '' then
-          local ok, threshold = pcall(pandoc.types.Version, ver)
-          if ok and quarto.version >= threshold then
-            enabled = false
-          end
-        end
-      end
-      hotfix[key] = enabled
-    elseif entry ~= nil then
-      -- Simple boolean/string form
-      hotfix[key] = pandoc.utils.stringify(entry) == 'true'
+    if entry == nil then
+      entry = schema_hotfix[key]
+    end
+    if entry == nil then
+      hotfix[key] = fallback
     else
-      hotfix[key] = default
+      hotfix[key] = read_hotfix(entry)
     end
   end
 
@@ -1077,7 +1106,9 @@ local function resolve_window_params(block, resolved, auto_label)
   local filename = block.attributes['filename']
   local is_auto = false
 
-  if (not filename or filename == '') and not overrides.no_auto_filename then
+  -- An empty filename is a filename, as on the HTML path: the window keeps
+  -- an empty title rather than taking a derived label.
+  if filename == nil and not overrides.no_auto_filename then
     -- A label asks for a window whatever auto-filename says.
     if auto_label then
       filename = auto_label
@@ -1115,7 +1146,7 @@ local function process_typst_block(block, next_block)
 
   local filename, is_auto, block_style, lines_label =
     resolve_window_params(block, resolved, auto_label)
-  local has_window = filename and filename ~= ''
+  local has_window = filename ~= nil
   local effective_style = block_style or CONFIG.style
 
   -- Resolve annotations if enabled and the code-annotations hot-fix is active.
@@ -1210,7 +1241,7 @@ local function get_decorated_codeblock_filename(div)
   if not custom_id then return nil end
   if not (_quarto and _quarto.ast and _quarto.ast.custom_node_data) then return nil end
   local entry = _quarto.ast.custom_node_data[custom_id]
-  if type(entry) == 'table' and entry.filename and entry.filename ~= '' then
+  if type(entry) == 'table' and type(entry.filename) == 'string' then
     return entry.filename
   end
   return nil

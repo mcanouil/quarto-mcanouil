@@ -201,6 +201,7 @@ A project can keep its own copy of an embedded tool, for example to work on that
 When the copy is under `_extensions/`, with any owner such as `_extensions/local/veil/`, and you name it in your own `filters:`, the embedded filters of that tool do not run.
 Only your copy runs.
 If you do not name your copy, the embedded filters run as usual.
+For Typst, your copy of code-window must be version 1.10.0 or later, because the presets set its `fill` and `stroke` theme keys.
 
 Some tools also give a Reveal.js plugin or a shortcode, and Quarto loads these parts in a different way:
 
@@ -217,7 +218,7 @@ The second case is a project that has a copy of iconify that `filters:` does not
 
 | Tool | Version | Formats | Default |
 | --- | --- | --- | --- |
-| [code-window](https://github.com/mcanouil/quarto-code-window) | 1.9.0 | all | on |
+| [code-window](https://github.com/mcanouil/quarto-code-window) | 1.10.1 | all | on |
 | [div-reuse](https://github.com/mcanouil/quarto-div-reuse) | 1.5.1 | all | on |
 | [gitlink](https://github.com/mcanouil/quarto-gitlink) | 1.14.0 | all | on, off in letters and invoices |
 | [highlight-text](https://github.com/mcanouil/quarto-highlight-text) | 3.0.0 | all | on |

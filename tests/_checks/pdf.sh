@@ -238,13 +238,13 @@ running_header_in_force() {
 # Answer the Typst test that the code-window theme of a preset must pass, in
 # terms of t, the theme, and c, the tokens: the traffic lights at 0.7em, as in
 # HTML and Reveal.js, the file name in the muted colour, and the frame and the
-# title bar of the preset, all from the tokens.
+# title bar of the preset, and the tint behind the code, all from the tokens.
 # $1 preset.
 code_window_theme_test() {
-	printf 't.traffic-light-size == 0.7em and t.traffic-light-gap == 0.35em and t.label == c.muted and t.muted == c.muted and '
+	printf 't.traffic-light-size == 0.7em and t.traffic-light-gap == 0.35em and t.label == c.muted and t.muted == c.muted and t.fill == c.tint and t.stroke-thickness == 0.75pt and '
 	case "$1" in
-	gold) printf 'type(t.border) == gradient and t.border.stops().map(s => s.at(0)) == (c.at("accent-low"), c.at("accent-high"), c.at("accent-low")) and t.surface == c.tint and t.radius == 5pt' ;;
-	mono) printf 't.border == c.ink and t.stroke-thickness == 1pt and t.surface == c.tint and t.radius == 0pt' ;;
+	gold) printf 'type(t.stroke.top.paint) == gradient and t.stroke.top.paint.stops().map(s => s.at(0)) == (c.at("accent-low"), c.at("accent-high"), c.at("accent-low")) and t.stroke.top.thickness == 1.5pt and t.stroke.rest == 0.75pt + c.line and t.surface == c.tint and t.radius == 5pt' ;;
+	mono) printf 't.stroke.top == 1.5pt + c.ink and t.stroke.rest == none and t.surface == c.tint and t.radius == 0pt' ;;
 	quarto) printf 't.border == c.line and t.surface == color.mix((c.ink, 6%%), (c.tint, 94%%)) and t.radius == 6pt' ;;
 	terminal) printf 't.border == c.line and t.at("stroke-dash", default: none) == none and t.surface == color.mix((c.ink, 6%%), (c.tint, 94%%)) and t.radius == 0pt' ;;
 	esac
@@ -287,6 +287,22 @@ code_window_theme() {
 	}
 }
 
+# Succeed when the code of both windows sits inside a window for code-window,
+# and the code of the block with no window does not: the highlighted code
+# drops its own frame only inside a window, so the window frame is the only
+# edge there.
+code_window_body_frame() {
+	local result
+	result="$(typst_in_document '("coxph", "print", "nrow").map(word => state("cw-in-window", false).at(query(raw.where(text: word)).first().location()))')" || {
+		printf '%s\n' "${result}"
+		return 1
+	}
+	[ "${result}" = '[true,true,false]' ] || {
+		printf '# inside a window, for coxph, print and nrow: %s\n' "${result}"
+		return 1
+	}
+}
+
 # Succeed when the title in the metadata of the PDF is a given text.
 # $1 title.
 doc_title() {
@@ -308,6 +324,7 @@ code-window)
 	find_verapdf
 	expect "typst-code-window-theme-${2:?code-window needs a preset}" "the traffic lights and the ${2} frame and title bar from the tokens, see code_window_theme_test" \
 		code_window_theme "$2"
+	expect "typst-code-window-body-frame-${2}" "the code drops its own frame inside a window, and keeps it outside" code_window_body_frame
 	expect "typst-code-window-ua1-${2}" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
 	;;
 report) check_report "${2:?report needs a preset}" ;;
