@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0 (2026-11-23)
+
 Version 1.0.0 is a rewrite of the extension.
 Nothing from 0.x carries over, so a 0.x document needs new front matter.
 

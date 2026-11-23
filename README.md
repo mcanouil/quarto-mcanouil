@@ -11,7 +11,7 @@ The options and components of the 0.x versions are gone, so a 0.x document needs
 ## Installation
 
 ```bash
-quarto add mcanouil/quarto-mcanouil@0.22.0
+quarto add mcanouil/quarto-mcanouil@1.0.0
 ```
 
 This installs the extension under the `_extensions` subdirectory.
