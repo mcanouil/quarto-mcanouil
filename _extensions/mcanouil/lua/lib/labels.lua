@@ -72,9 +72,9 @@ end
 
 --- Format text as a Typst string literal.
 --- @param text string Text
---- @return string Literal, with quotes and backslashes escaped
+--- @return string Literal, with quotes, backslashes and new lines escaped
 function M.typst_string(text)
-  return '"' .. text:gsub('[\\"]', '\\%0') .. '"'
+  return '"' .. text:gsub('[\\"]', '\\%0'):gsub('\n', '\\n') .. '"'
 end
 
 --- Deliver every label to Typst as the `mcanouil-labels` dictionary.

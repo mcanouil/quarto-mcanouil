@@ -51,11 +51,58 @@
   background: var(--mc-ink);
 }
 
-.reveal div.callout,
-.reveal div.callout.callout-style-default,
-.reveal div.callout.callout-style-simple {
+/* Callouts: no fill, a thick top rule in the colour of the type, the title in
+ * small upper case, a square glyph and a small corner motif, as in HTML. */
+.reveal .slides div.callout.callout {
+  --mc-callout-room: 1.1em;
+  border: 0;
+  border-top: 3px solid var(--mc-callout);
+  border-radius: 0;
   background: transparent;
-  border-width: 0 0 0 0.3rem;
+}
+
+.reveal .slides div.callout.callout div.callout-title {
+  font-size: 0.8em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.reveal .slides div.callout.callout .callout-icon::before {
+  border-radius: 0;
+}
+
+.reveal .slides div.callout.callout::after {
+  opacity: 0.9;
+}
+
+/* Tabs: a segmented bar in a frame of the ink colour, the current tab
+ * inverted, as in HTML. */
+.reveal .slides .panel-tabset [role="tablist"] {
+  display: flex;
+  width: max-content;
+  max-width: 100%;
+  border: 2px solid var(--mc-ink);
+}
+
+.reveal .slides .panel-tabset [role="tablist"] li + li {
+  border-inline-start: 2px solid var(--mc-ink);
+}
+
+.reveal .slides .panel-tabset [role="tab"],
+.reveal .slides .panel-tabset [role="tab"][aria-selected="true"] {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  color: var(--mc-ink);
+  font-size: 0.8em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reveal .slides .panel-tabset [role="tab"][aria-selected="true"] {
+  background-color: var(--mc-ink);
+  color: var(--mc-paper);
+  font-weight: 700;
 }
 
 .reveal figure.mc-quote {

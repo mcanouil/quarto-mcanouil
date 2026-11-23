@@ -2,8 +2,9 @@
  * mcanouil - terminal preset of the Reveal.js deck
  * Console: a prompt and a cursor on slide titles, brackets around the kicker,
  * a heading marker before slide titles, dashed boxes and rules, square corners,
- * and block quotes in a dashed box with a bracketed label. The prompt, the
- * cursor, the markers and the label are hidden from assistive technology.
+ * callouts and code as in quarto-atelier, and block quotes in a dashed box
+ * with a bracketed label. The prompt, the cursor, the markers and the label
+ * are hidden from assistive technology.
  *
  * @license MIT
  * @copyright 2026 Mickaël Canouil
@@ -62,13 +63,68 @@
   color: var(--mc-accent-text);
 }
 
-.reveal div.sourceCode,
-.reveal .code-with-filename,
-.reveal div.callout,
-.reveal div.callout.callout-style-default,
-.reveal div.callout.callout-style-simple {
+/* Callouts: a dashed outline in the colour of the type on the paper, solid
+ * and one character wide on the start side, the title set into the top border
+ * as an upper case label on the paper, after the glyph in a ring. The label stays in the flow, so a title that wraps pushes the body
+ * down: its top margin puts the middle of its first line on the border. The
+ * pads are in pixels, as the label has its own font size. */
+.reveal .slides div.callout.callout {
+  --mc-c3-pad: 18px;
+  --mc-c3-border: 1.5px;
+  margin-top: 1.1em;
+  padding: var(--mc-c3-pad) 0.75em 0.6em;
+  border: var(--mc-c3-border) solid var(--mc-callout);
   border-style: dashed;
+  border-inline-start: 1ch solid var(--mc-callout);
+  border-radius: 0;
+  background: transparent;
 }
+
+.reveal .slides div.callout.callout:not(.callout-titled) {
+  padding-top: 0.6em;
+}
+
+.reveal .slides div.callout.callout::after {
+  display: none;
+}
+
+.reveal .slides div.callout.callout .callout-body {
+  display: block;
+  margin: 0;
+}
+
+.reveal .slides div.callout.callout div.callout-title {
+  width: fit-content;
+  max-width: calc(100% + 0.4em);
+  margin: calc(-1 * (var(--mc-c3-pad) + var(--mc-c3-border) / 2 + 0.5lh)) 0 calc(var(--mc-c3-pad) + var(--mc-c3-border) / 2 - 0.5lh) -0.2em;
+  padding: 0 0.45em;
+  background: var(--mc-paper);
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.reveal .slides div.callout.callout div.callout-title p {
+  margin: 0;
+}
+
+/* The body starts under the label, so a simple callout drops the indent that
+ * Quarto gives it under the icon. */
+.reveal .slides div.callout.callout.callout .callout-content {
+  padding-inline: 0;
+}
+
+.reveal .slides div.callout.callout .callout-icon::before {
+  width: 1.7em;
+  height: 1.7em;
+  margin-inline-end: 0.7em;
+  border: 1px solid currentColor;
+  background-color: transparent;
+  color: var(--mc-callout-text);
+}
+
 
 .reveal figure.mc-quote {
   margin-top: 1.6em;
@@ -88,16 +144,62 @@
   background: var(--mc-paper);
 }
 
-/* Code windows: the dashed frame in the accent colour, as in HTML. */
+/* Code: a plain block and a window share the frame and the tint. The title
+ * bar of a window is a step darker, with the file name in the monospace font,
+ * and a language name in upper case. */
+.reveal div.sourceCode,
 .reveal .code-with-filename {
-  border-color: var(--mc-accent);
+  border-radius: 0;
 }
 
 .reveal .code-with-filename .code-with-filename-file {
-  border-bottom-style: dashed;
+  background-color: color-mix(in srgb, var(--mc-ink) 6%, var(--mc-tint));
 }
 
-/* Workshop blocks: dashed boxes, as the terminal code windows. */
+.reveal .code-with-filename .code-with-filename-file pre {
+  background-color: transparent;
+  font-family: var(--mc-font-mono);
+  font-size: 0.78em;
+}
+
+/* Tabs: [ R ], the current tab bold after a > cursor in the accent text
+ * colour, as in HTML; the brackets and the cursor are hidden from assistive
+ * technology. */
+.reveal .slides .panel-tabset [role="tablist"] {
+  border-bottom-color: transparent;
+  font-family: var(--mc-font-mono);
+}
+
+.reveal .slides .panel-tabset [role="tab"],
+.reveal .slides .panel-tabset [role="tab"][aria-selected="true"] {
+  padding-inline: 0.5em;
+  border-color: transparent;
+  background-color: transparent;
+}
+
+.reveal .slides .panel-tabset [role="tab"][aria-selected="true"] {
+  color: var(--mc-accent-text);
+  font-weight: 700;
+}
+
+.reveal .slides .panel-tabset [role="tab"]::before {
+  content: "[ " / "";
+}
+
+.reveal .slides .panel-tabset [role="tab"]::after {
+  content: " ]" / "";
+}
+
+.reveal .slides .panel-tabset [role="tab"][aria-selected="true"]::before {
+  content: "> [ " / "";
+}
+
+/* Open details: a dashed box. */
+.reveal details[open]:not(.code-fold) {
+  border-style: dashed;
+}
+
+/* Workshop blocks: dashed boxes, as the terminal callouts. */
 .reveal .mc-ws:is(.mc-ws-objectives, .mc-ws-prerequisites, .mc-ws-exercise) {
   border-style: dashed;
 }

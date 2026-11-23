@@ -21,8 +21,8 @@ The default preset is `gold`.
 | --- | --- | --- | --- |
 | `gold` | Editorial: small capitals, gilded rules, warm boxes with a thin gold edge. | Source Serif 4, Fira Code | Facets |
 | `mono` | Swiss: graphite on white, blue links, upper case H2 under a rule, square corners. | Alegreya Sans, Fira Code | Steps |
-| `quarto` | Documentation: pill tags, rounded cards with a soft shadow, an accent bar beside headings. | Alegreya Sans, Fira Code | Ribbon |
-| `terminal` | Console: a `$` prompt on titles, `[ ]` around kickers, dashed boxes. Dark only. | JetBrains Mono | Dot field |
+| `quarto` | Documentation: pill tags, callouts framed in their colour, an accent bar beside headings. | Alegreya Sans, Fira Code | Ribbon |
+| `terminal` | Console: a `$` prompt on titles, `[ ]` around kickers, dashed callout frames. Dark only. | JetBrains Mono | Dot field |
 
 : The four presets. {.striped .hover tbl-colwidths="[14,50,22,14]"}
 

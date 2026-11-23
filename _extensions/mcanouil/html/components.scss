@@ -17,6 +17,150 @@ $mc-callout-glyphs: (
   caution: "?",
 ) !default;
 
+/*-- scss:mixins --*/
+
+// Callouts as a frame in the type colour with the label set into its top edge,
+// as a fieldset legend: the quarto and terminal presets, as quarto-atelier
+// draws them. The label sits on the paper, so the edge breaks behind it. The
+// glyph keeps the type visible in an outlined circle, and the corner motif goes.
+// $radius: corner radius of the frame.
+// $style: border style of the frame.
+// $start-edge: width of a solid start edge, or null for none.
+@mixin mc-callout-legend($radius, $style: solid, $start-edge: null) {
+  div.callout.callout-style-default,
+  div.callout.callout-style-simple {
+    --mc-legend-pad: 1.15rem;
+    --mc-legend-edge: 1.5px;
+    --mc-callout-room: 1rem;
+    margin-top: 1.5rem;
+    padding: var(--mc-legend-pad) 1rem 0.8rem;
+    border: var(--mc-legend-edge) $style var(--mc-callout);
+    @if $start-edge {
+      border-inline-start: $start-edge solid var(--mc-callout);
+    }
+    border-radius: $radius;
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  div.callout.callout-style-default:not(.callout-titled),
+  div.callout.callout-style-simple:not(.callout-titled) {
+    padding-top: 0.8rem;
+  }
+
+  div.callout.callout-style-default::after,
+  div.callout.callout-style-simple::after {
+    content: none;
+  }
+
+  div.callout.callout-style-simple.no-icon {
+    border-style: dashed;
+    @if $start-edge {
+      border-inline-start-style: solid;
+    }
+  }
+
+  div.callout.callout-style-default > .callout-header,
+  div.callout.callout-style-simple > .callout-header {
+    --mc-legend-half: 0.65em;
+    position: relative;
+    width: fit-content;
+    max-width: calc(100% + 0.4rem);
+    align-items: center;
+    gap: 0.4rem;
+    margin: calc(-1 * (var(--mc-legend-pad) + var(--mc-legend-edge) / 2 + var(--mc-legend-half))) 0 calc(var(--mc-legend-pad) + var(--mc-legend-edge) / 2 - var(--mc-legend-half)) -0.2rem;
+    padding: 0 0.45rem;
+    border: 0;
+    border-radius: 0;
+    background-color: var(--mc-paper);
+    font-family: var(--mc-font-ui, inherit);
+    font-size: 0.76rem;
+    font-variant-caps: normal;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  div.callout.callout-style-default > .callout-header:has(> .callout-btn-toggle),
+  div.callout.callout-style-simple > .callout-header:has(> .callout-btn-toggle) {
+    --mc-legend-half: 12px;
+    min-height: 24px;
+  }
+
+  div.callout > .callout-header :is(.callout-icon-container, .callout-title-container) {
+    display: flex;
+    align-items: center;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background-color: transparent;
+  }
+
+  div.callout > .callout-header .callout-btn-toggle {
+    margin: 0;
+    padding: 0;
+  }
+
+  div.callout.callout-titled .callout-icon::before,
+  div.callout:not(.callout-titled) .callout-icon::before {
+    box-sizing: border-box;
+    width: 1.2em;
+    height: 1.2em;
+    border: 1px solid var(--mc-callout-text);
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--mc-callout-text);
+    font-size: 0.75rem;
+  }
+
+  div.callout .callout-body {
+    margin: 0;
+    padding: 0;
+  }
+
+  div.callout .callout-body > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Code blocks and code windows as quarto-atelier draws them: a line frame on
+// the tint, the window title bar a step stronger than the tint, and the file
+// name small in the muted colour.
+// $radius: corner radius of the frame.
+@mixin mc-code-atelier($radius) {
+  $title-bar: color-mix(in srgb, var(--mc-ink) 6%, var(--mc-tint));
+
+  div.sourceCode,
+  body .code-with-filename {
+    border: 1px solid var(--mc-line);
+    border-radius: $radius;
+    background-color: var(--mc-tint);
+    box-shadow: none;
+  }
+
+  body .code-with-filename {
+    --code-window-bg: var(--mc-tint);
+    --code-window-title-bg: #{$title-bar};
+  }
+
+  body .code-with-filename div.sourceCode {
+    border: 0;
+    background-color: var(--mc-tint);
+  }
+
+  body .code-with-filename .code-with-filename-file {
+    border-bottom: 1px solid var(--mc-line);
+    background-color: $title-bar;
+  }
+
+  body .code-with-filename .code-with-filename-file pre {
+    font-family: var(--mc-font-mono);
+    font-size: 0.78rem;
+  }
+}
+
 /*-- scss:rules --*/
 
 // Quarto's own components (callouts, tabsets, code, tables, block quotes)
@@ -198,6 +342,12 @@ body .code-with-filename .code-with-filename-file pre {
   font-family: var(--mc-font-ui, inherit);
 }
 
+// A window with no file name shows the language, in upper case, as the
+// Typst code windows do.
+body .code-with-filename:has(pre.cw-auto) .code-with-filename-file pre {
+  text-transform: uppercase;
+}
+
 // Tables
 
 .table {
@@ -210,6 +360,12 @@ body .code-with-filename .code-with-filename-file pre {
   --bs-table-hover-bg: var(--mc-tint);
   --bs-table-active-color: var(--mc-ink);
   --bs-table-active-bg: var(--mc-tint);
+}
+
+// The header row sits on a stronger rule than the body rows, as in Reveal.js
+// and Typst.
+.table > thead > tr > th {
+  border-bottom: 2px solid color-mix(in srgb, var(--mc-ink) 55%, var(--mc-line));
 }
 
 .panel-caption,
@@ -251,4 +407,111 @@ figure.mc-quote .mc-quote-attribution {
   margin-top: 0.5rem;
   color: var(--mc-muted);
   font-size: 0.86em;
+}
+
+// Keys: a key cap on the tint, its lower edge heavier.
+kbd,
+kbd.kbd {
+  padding: 0.05rem 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--mc-muted) 50%, var(--mc-line));
+  border-bottom-width: 2px;
+  border-radius: var(--mc-radius, 0.375rem);
+  background-color: var(--mc-tint);
+  box-shadow: none;
+  color: var(--mc-ink);
+  font-size: 0.82em;
+}
+
+// Highlighted text: a wash of the accent behind the ink.
+mark,
+.mark {
+  padding: 0 0.15em;
+  background-color: color-mix(in srgb, var(--mc-accent) 28%, var(--mc-paper));
+  color: var(--mc-ink);
+}
+
+hr {
+  border-top: 1px solid var(--mc-line);
+  opacity: 1;
+}
+
+// Disclosure: the summary in the ink behind an accent marker, the open
+// content in a line frame. A folded code block keeps its own window frame.
+main details:not(.mc-ws-solution, .code-fold) {
+  margin-block: 1rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--mc-line);
+  border-radius: var(--mc-radius, 0.375rem);
+}
+
+main details:not(.mc-ws-solution, .code-fold) > summary {
+  color: var(--mc-ink);
+  font-family: var(--mc-font-ui, inherit);
+  cursor: pointer;
+}
+
+main details:not(.mc-ws-solution, .code-fold) > summary::marker {
+  color: var(--mc-accent-text);
+}
+
+main details:not(.mc-ws-solution, .code-fold)[open] > summary {
+  margin-bottom: 0.4rem;
+}
+
+// Theorems and their kin: the label in the accent text colour; a proof
+// keeps its italic label in the muted colour. Quarto gives every kind of
+// theorem the theorem class, and every kind of proof the proof class.
+main .theorem .theorem-title {
+  color: var(--mc-accent-text);
+}
+
+main .proof .proof-title {
+  color: var(--mc-muted);
+}
+
+main div.proof:not(.remark, .solution) > :last-child::after {
+  content: "\25A1";
+  content: "\25A1" / "";
+  float: inline-end;
+  color: var(--mc-muted);
+}
+
+// Task lists: the box in the accent colour.
+main li > label > input[type="checkbox"],
+main ul.task-list input[type="checkbox"] {
+  accent-color: var(--mc-accent);
+}
+
+// Definition lists: the term in bold ink, its definition behind a line.
+main dl:not(.code-annotation-container-grid) > dt {
+  color: var(--mc-ink);
+  font-weight: 700;
+}
+
+main dl:not(.code-annotation-container-grid) > dd {
+  margin-inline-start: 0;
+  padding-inline-start: 0.85rem;
+  border-inline-start: 2px solid var(--mc-line);
+}
+
+// Footnotes and the appendix: on the paper, below a line, with a small
+// muted heading. Quarto paints the appendix with a colour that Sass computed
+// from the light Bootstrap values, and fades it.
+#quarto-appendix.default {
+  border-top: 1px solid var(--mc-line);
+  background-color: transparent;
+  color: var(--mc-ink);
+}
+
+#quarto-appendix.default .quarto-appendix-heading {
+  color: var(--mc-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+#quarto-appendix.default .quarto-appendix-heading,
+#quarto-appendix.default section *[role="doc-endnotes"],
+#quarto-appendix.default section > *:not(a) {
+  opacity: 1;
 }

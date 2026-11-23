@@ -10,6 +10,8 @@ $code-window.typ()$
 
 $motifs.typ()$
 
+$elements.typ()$
+
 $chrome.typ()$
 
 $slots.typ()$
@@ -88,6 +90,7 @@ $workshop.typ()$
   show link: set text(fill: tokens.link)
   show: mc-quotes.with(meta)
   show: mc-code-windows.with(meta)
+  show: mc-elements.with(meta)
   show ref: mc-heading-ref
   mc-types.at(type)(meta + (layout: layout, kind: kind), body)
 }

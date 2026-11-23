@@ -245,8 +245,8 @@ code_window_theme_test() {
 	case "$1" in
 	gold) printf 'type(t.border) == gradient and t.border.stops().map(s => s.at(0)) == (c.at("accent-low"), c.at("accent-high"), c.at("accent-low")) and t.surface == c.tint and t.radius == 5pt' ;;
 	mono) printf 't.border == c.ink and t.stroke-thickness == 1pt and t.surface == c.tint and t.radius == 0pt' ;;
-	quarto) printf 't.border == c.line and t.surface == c.card and t.radius == 9pt' ;;
-	terminal) printf 't.border == c.accent and t.stroke-dash == "dashed" and t.surface == c.tint and t.radius == 0pt' ;;
+	quarto) printf 't.border == c.line and t.surface == color.mix((c.ink, 6%%), (c.tint, 94%%)) and t.radius == 6pt' ;;
+	terminal) printf 't.border == c.line and t.at("stroke-dash", default: none) == none and t.surface == color.mix((c.ink, 6%%), (c.tint, 94%%)) and t.radius == 0pt' ;;
 	esac
 }
 

@@ -12,6 +12,7 @@
 // - preset: name of the preset.
 // - colours: the tokens of the render mode.
 #let mc-code-window-theme(preset, colours) = {
+  let title-bar = color.mix((colours.ink, 6%), (colours.tint, 94%))
   let shared = (
     border: colours.line,
     surface: colours.tint,
@@ -33,10 +34,11 @@
     ),
     // Mono: square, in an ink frame.
     mono: (border: colours.ink, stroke-thickness: 1pt, radius: 0pt),
-    // Quarto: rounded, the title bar on the card.
-    quarto: (surface: colours.card, radius: 9pt),
-    // Terminal: square, in a dashed accent frame.
-    terminal: (border: colours.accent, stroke-dash: "dashed", radius: 0pt),
+    // Quarto (atelier): rounded, the title bar a little stronger than the
+    // tint of the body.
+    quarto: (surface: title-bar, radius: 6pt),
+    // Terminal (atelier): as quarto, square.
+    terminal: (surface: title-bar, radius: 0pt),
   )
   shared + own.at(preset)
 }

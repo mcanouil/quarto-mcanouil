@@ -1,0 +1,21 @@
+---
+title: Structured elements in Typst
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: mono
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: Callouts of each kind, a task list, keys, details, a theorem, a proof and maths compile to a PDF/UA-1 file in the mono preset, whose fonts have no ballot box glyphs, with the task states and the TeX source of the maths as alternative texts.
+        check: bash _checks/accessibility.sh elements
+    mcanouil-typst:
+      noErrorsOrWarnings: true
+      ensureTypstFileRegexMatches:
+        - ['#metadata\(\(mc-callout: "warning", appearance: "simple", titled: true\)\)', '#mc-task-list\[', '#mc-task\(true\)', '#mc-task\(false\)', '#mc-kbd\[', '#mc-details\(', '#math\.equation\(block: false, alt: "E = mc\^2", ', '#math\.equation\(block: true, alt: "\\\\sum_\{n=1\}\^3 n = 6"', '#math\.equation\(alt: "x \+ 1 = 2", block: true, ']
+---
+
+{{< include _elements-typst.qmd >}}

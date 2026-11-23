@@ -43,12 +43,12 @@ See [Header and footer](../reference.qmd#header-and-footer).
 
 ## Components
 
-Callouts, tabsets, code blocks, tables and block quotes have the style of the preset:
+Callouts, tabsets, code blocks, tables, block quotes and the other structured elements have the style of the preset, the same in HTML, Reveal.js and Typst:
 
 - `gold`: tinted callouts with a gilded edge, tabs with a gilded underline.
 - `mono`: no fills, a thick top rule in the callout colour, a segmented tab bar.
-- `quarto`: rounded white cards with a soft shadow, pill tabs.
-- `terminal`: dashed boxes with `[!NOTE]` labels, `[ R ]` tabs.
+- `quarto`: a frame in the callout colour with the label in its top edge, code in a line frame, pill tabs.
+- `terminal`: the same frame with dashes and a thick start edge, code in a square line frame, `[ R ]` tabs.
 
 A callout always has a text label.
 Its icon is decorative.

@@ -22,8 +22,8 @@ In HTML and Reveal.js, the window has the style of the preset:
 | --- | --- |
 | `gold` | A gilded edge along the top of the title bar. |
 | `mono` | A 2 px ink rule on top, square corners, no side edges. |
-| `quarto` | The code on a card, with a soft shadow. |
-| `terminal` | A dashed frame in the accent colour, and a dashed rule under the title bar. |
+| `quarto` | A 1 px line frame on the tint, with 6 px rounded corners and a title bar a step darker than the tint. |
+| `terminal` | A 1 px line frame on the tint, with square corners and a title bar a step darker than the tint. |
 
 : The code window of each preset in HTML and Reveal.js. {.striped .hover tbl-colwidths="[20,80]"}
 

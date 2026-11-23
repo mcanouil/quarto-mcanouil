@@ -4,6 +4,9 @@
 // cards with a soft shadow.
 $mc-quarto-radius: 9px !default;
 
+// Callouts and code blocks follow quarto-atelier, with its smaller radius.
+$mc-quarto-frame-radius: 6px !default;
+
 /*-- scss:rules --*/
 
 @include mc-preset(quarto) {
@@ -43,39 +46,11 @@ $mc-quarto-radius: 9px !default;
     box-shadow: 0 1px 3px color-mix(in srgb, var(--mc-ink) 14%, transparent);
   }
 
-  // Callouts: cards with a soft shadow and a ribbon in the corner, the title
-  // in a pill.
-  div.callout.callout-style-default,
-  div.callout.callout-style-simple {
-    border-inline-start-width: 1px;
-    border-color: var(--mc-line);
-    border-radius: 10px;
-    background-color: var(--mc-card);
-    box-shadow: 0 1px 3px color-mix(in srgb, var(--mc-ink) 12%, transparent);
-  }
+  // Callouts: a frame in the type colour, the label set into its top edge.
+  @include mc-callout-legend($mc-quarto-frame-radius);
 
-  div.callout.callout-style-default .callout-title-container,
-  div.callout.callout-style-simple .callout-title-container {
-    max-width: fit-content;
-    margin-block: 0.2rem;
-    padding: 0 0.6rem;
-    border-radius: 999px;
-    background-color: color-mix(in srgb, var(--mc-callout) 10%, var(--mc-card));
-  }
-
-  div.callout .callout-btn-toggle {
-    margin-inline-start: auto;
-  }
-
-  div.callout.callout-titled .callout-icon::before,
-  div.callout:not(.callout-titled) .callout-icon::before {
-    border-radius: 6px;
-  }
-
-  div.callout.callout-style-default::after,
-  div.callout.callout-style-simple::after {
-    opacity: 0.55;
-  }
+  // Code: a line frame on the tint, the window title bar a step stronger.
+  @include mc-code-atelier($mc-quarto-frame-radius);
 
   // Tabs: a pill segmented control.
   .panel-tabset .nav-tabs {
@@ -97,21 +72,6 @@ $mc-quarto-radius: 9px !default;
 
   .panel-tabset .nav-tabs .nav-link.active {
     box-shadow: 0 1px 2px color-mix(in srgb, var(--mc-ink) 15%, transparent);
-  }
-
-  // Code: rounded windows, the code on the card under a soft shadow.
-  body .code-with-filename,
-  div.sourceCode {
-    border-radius: #{$mc-quarto-radius};
-  }
-
-  body .code-with-filename {
-    --code-window-bg: var(--mc-card);
-    box-shadow: 0 1px 3px color-mix(in srgb, var(--mc-ink) 12%, transparent);
-  }
-
-  body .code-with-filename div.sourceCode {
-    background-color: var(--mc-card);
   }
 
   // Block quotes: a card with a round quote icon, the attribution in a pill.

@@ -75,17 +75,31 @@
 // - size: side of the square motif.
 // - dark: true on a dark surface; auto follows the render mode.
 // - dx, dy: offset from the corner.
-#let motif(name, corner, size, dark: auto, dx: 0pt, dy: 0pt) = {
+// - paint: one colour for every shape, as the motif mask of an HTML callout
+//   paints it, or auto for the accent colours of the preset.
+// - strength: factor of the shape opacities, or auto for the render mode.
+#let motif(name, corner, size, dark: auto, dx: 0pt, dy: 0pt, paint: auto, strength: auto) = {
   assert(name in mc-motif-geometry, message: "mcanouil: unknown motif \"" + name + "\"; use one of " + mc-motif-geometry.keys().join(", ") + ".")
   let colours = tokens()
   let on-dark = if dark == auto { mc-mode == "dark" } else { dark }
-  let strength = if on-dark { 1 } else { 0.85 }
+  let strength = if strength != auto { strength } else if on-dark { 1 } else { 0.85 }
   let unit = size / 100
   let shade(colour, opacity) = colour.transparentize(100% - opacity * strength * 100%)
   let draw(shape) = {
     let p = shape.points
     let o = shape.opacity
-    if shape.kind == "polygon" {
+    if paint != auto {
+      let x = p.at(0) * unit
+      let y = p.at(1) * unit
+      if shape.kind == "polygon" {
+        place(top + left, polygon(fill: shade(paint, o), stroke: none, ..p.chunks(2).map(((x, y)) => (x * unit, y * unit))))
+      } else if shape.kind == "rect" {
+        place(top + left, dx: x, dy: y, rect(width: p.at(2) * unit, height: p.at(3) * unit, stroke: none, fill: shade(paint, o)))
+      } else {
+        let r = p.at(2) * unit
+        place(top + left, dx: x - r, dy: y - r, circle(radius: r, stroke: none, fill: shade(paint, o)))
+      }
+    } else if shape.kind == "polygon" {
       let fill = gradient.linear(
         (shade(colours.at("accent-high"), o), 0%),
         (shade(colours.accent, o), 55%),
