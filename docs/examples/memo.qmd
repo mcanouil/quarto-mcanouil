@@ -133,7 +133,6 @@ In `mcanouil-html`, the footer band shows only when at least one footer slot has
 If all three slots are empty, the HTML memo has no band.
 The PDF always has the band.
 
-
 **A note memo in `mcanouil-html`**
 
 ![](../samples/screenshots/memo-note-html.png){fig-alt="A note memo in mcanouil-html, gold preset: the dark banner at the top, the body, and the footer band with the slots Internal and Memo 2026-07 at the bottom." loading="lazy"}

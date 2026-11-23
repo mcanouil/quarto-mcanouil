@@ -40,7 +40,6 @@ A deck from an earlier version of the extension shows at a different scale.
   The slide uses the dark tokens of the preset.
 - Closing slide: from the `closing` option, on the dark ground.
 
-
 ::: {.grid}
 
 ::: {.g-col-12 .g-col-md-6}

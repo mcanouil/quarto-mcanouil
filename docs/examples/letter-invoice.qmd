@@ -58,7 +58,6 @@ extensions:
 
 The body of the document is the body of the letter.
 
-
 **A letter**
 
 ![](../samples/screenshots/letter.png){fig-alt="A letter in the gold preset: the sender at the top left, the recipient address in the window position, the place and date, the reference, the subject and the body." loading="lazy"}
@@ -118,7 +117,6 @@ extensions:
   A text value adds your own mention.
 - `fee` is the late fee in percent, and `penalty` is the fixed recovery cost.
 - The items table has tagged header cells and tabular figures.
-
 
 **An invoice**
 
