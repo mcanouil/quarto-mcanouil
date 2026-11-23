@@ -36,6 +36,7 @@ Nothing from 0.x carries over, so a 0.x document needs new front matter.
 - fix: Warn when your copy of veil or codefrag is in only one of `filters:` and `revealjs-plugins:`, or your copy of iconify is not in `filters:`. (#163)
 - fix: Keep the corner motif of title, section and closing slides in the corner of the window, whatever the window's aspect ratio. (#164)
 - fix: Render task lists and maths in Typst PDFs without stopping the PDF/UA-1 build. Each checkbox reads as done or not done, and each equation gets its TeX source as alternative text. (#165)
+- fix: Frame the Typst code windows of the `gold` and `mono` presets as in HTML and Reveal.js: a gilded top edge on a thin line frame for `gold`, and a thick top rule with no side edges for `mono`.
 
 ## 0.22.0 (2026-09-23)
 
