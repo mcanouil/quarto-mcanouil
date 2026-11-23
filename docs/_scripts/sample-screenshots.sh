@@ -75,6 +75,20 @@ while read -r name; do
 		reference_errors=1
 	fi
 done <<<"${manifest_names}"
+# The pages also link each full render. Every linked file must exist in samples/.
+while IFS=: read -r page target; do
+	[[ -z "${target}" ]] && continue
+	if [[ ! -f "${SAMPLES_DIR}/${target}" ]]; then
+		printf '[%s] %s: the link to samples/%s points at no rendered file\n' "${LOG_PREFIX}" "${page}" "${target}" >&2
+		reference_errors=1
+	fi
+done < <(
+	cd "${DOCS_DIR}" || exit 1
+	# grep exits 1 when no page links a render.
+	{ grep -rHoE --include='*.qmd' --exclude-dir='_samples' --exclude-dir='_demos' \
+		'\.\./samples/[A-Za-z0-9_-]+\.(pdf|html)' . || true; } |
+		sed 's|^\./||; s|\.\./samples/||' | sort -u
+)
 if ((reference_errors)); then
 	printf '[%s] Fix the pages or docs/_samples/_screenshots.tsv and render again\n' "${LOG_PREFIX}" >&2
 	exit 1
