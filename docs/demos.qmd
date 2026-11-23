@@ -52,7 +52,7 @@ The fonts are Source Serif 4 and Fira Code, and the motif is Facets.
 
 ![](demos/screenshots/gold-typst-1.png){fig-alt="The gold preset in mcanouil-typst: page 1 of the report, with the title block, a callout, a table and a figure." loading="lazy"}
 
-![](demos/screenshots/gold-typst-2.png){fig-alt="The gold preset in mcanouil-typst: page 2 of the report, with a code window and a list." loading="lazy"}
+![](demos/screenshots/gold-typst-2.png){fig-alt="The gold preset in mcanouil-typst: page 2 of the report, with the second section, Next steps." loading="lazy"}
 
 [Open the PDF report](demos/gold.pdf){target="_blank" rel="noopener"}
 
@@ -98,7 +98,7 @@ The fonts are Alegreya Sans and Fira Code, and the motif is Steps.
 
 ![](demos/screenshots/mono-typst-1.png){fig-alt="The mono preset in mcanouil-typst: page 1 of the report, with the title block, a callout, a table and a figure." loading="lazy"}
 
-![](demos/screenshots/mono-typst-2.png){fig-alt="The mono preset in mcanouil-typst: page 2 of the report, with a code window and a list." loading="lazy"}
+![](demos/screenshots/mono-typst-2.png){fig-alt="The mono preset in mcanouil-typst: page 2 of the report, with the second section, Next steps." loading="lazy"}
 
 [Open the PDF report](demos/mono.pdf){target="_blank" rel="noopener"}
 
@@ -144,7 +144,7 @@ The fonts are Alegreya Sans and Fira Code, and the motif is Ribbon.
 
 ![](demos/screenshots/quarto-typst-1.png){fig-alt="The quarto preset in mcanouil-typst: page 1 of the report, with the title block, a callout, a table and a figure." loading="lazy"}
 
-![](demos/screenshots/quarto-typst-2.png){fig-alt="The quarto preset in mcanouil-typst: page 2 of the report, with a code window and a list." loading="lazy"}
+![](demos/screenshots/quarto-typst-2.png){fig-alt="The quarto preset in mcanouil-typst: page 2 of the report, with the second section, Next steps." loading="lazy"}
 
 [Open the PDF report](demos/quarto.pdf){target="_blank" rel="noopener"}
 
@@ -189,7 +189,7 @@ This preset is dark only.
 
 ![](demos/screenshots/terminal-typst-1.png){fig-alt="The terminal preset in mcanouil-typst: page 1 of the report, with the title block, a callout, a table and a figure." loading="lazy"}
 
-![](demos/screenshots/terminal-typst-2.png){fig-alt="The terminal preset in mcanouil-typst: page 2 of the report, with a code window and a list." loading="lazy"}
+![](demos/screenshots/terminal-typst-2.png){fig-alt="The terminal preset in mcanouil-typst: page 2 of the report, with the second section, Next steps." loading="lazy"}
 
 [Open the PDF report](demos/terminal.pdf){target="_blank" rel="noopener"}
 

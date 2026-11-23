@@ -38,6 +38,14 @@ OUTPUT_DIR="${DEMOS_DIR}/screenshots"
 PRESETS=(gold mono quarto terminal)
 DARK_ONLY_PRESET="terminal"
 CAPTURE_TIMEOUT=60
+MIN_SCREENSHOT_BYTES=10000
+
+# A render of some files only, such as a save in `quarto preview`, keeps the
+# screenshots of the last full render.
+if [[ "${QUARTO_PROJECT_RENDER_ALL:-}" != 1 && -d "${OUTPUT_DIR}" ]]; then
+	printf '[screenshots] Partial render: skip, and keep demos/screenshots/\n'
+	exit 0
+fi
 
 BROWSER=""
 checked_locations=()
@@ -86,7 +94,10 @@ capture() {
 	local browser_pid=$!
 	# A headless browser can hang without writing anything. Stop it after
 	# CAPTURE_TIMEOUT seconds, so the render fails instead of waiting forever.
-	(sleep "${CAPTURE_TIMEOUT}" && kill "${browser_pid}" 2>/dev/null) &
+	# The watchdog drops its output: Quarto waits until every process that holds
+	# the script's output has closed it, and an orphaned sleep would hold it for
+	# CAPTURE_TIMEOUT seconds after the script ends.
+	(sleep "${CAPTURE_TIMEOUT}" && kill "${browser_pid}") </dev/null >/dev/null 2>&1 &
 	local watchdog_pid=$!
 	if ! wait "${browser_pid}"; then
 		kill "${watchdog_pid}" 2>/dev/null || true
@@ -95,8 +106,18 @@ capture() {
 		exit 1
 	fi
 	kill "${watchdog_pid}" 2>/dev/null || true
-	if [[ ! -s "$3" ]]; then
-		printf '[screenshots] The browser wrote no screenshot of %s to %s\n' "$2" "$3" >&2
+	check_png "$3" "$2"
+}
+
+# check_png <png> <source>
+# A blank page gives a PNG of a few kilobytes; a real screenshot is larger than
+# MIN_SCREENSHOT_BYTES.
+check_png() {
+	local size=0
+	[[ -f "$1" ]] && size="$(wc -c <"$1" | tr -d ' ')"
+	if ((size < MIN_SCREENSHOT_BYTES)); then
+		printf '[screenshots] The screenshot of %s is missing or blank (%s bytes): %s\n' \
+			"$2" "${size}" "$1" >&2
 		exit 1
 	fi
 }
@@ -128,6 +149,8 @@ for preset in "${PRESETS[@]}"; do
 			--font-path "_extensions/local/mcanouil/fonts" \
 			"${preset}.typ" "${OUTPUT_DIR}/${preset}-typst-{p}.png"
 	)
+	check_png "${OUTPUT_DIR}/${preset}-typst-1.png" "${preset}.typ page 1"
+	check_png "${OUTPUT_DIR}/${preset}-typst-2.png" "${preset}.typ page 2"
 done
 
 printf '[screenshots] %s -> demos/screenshots/\n' "$(basename "${BROWSER}")"

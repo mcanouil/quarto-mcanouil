@@ -27,6 +27,13 @@ DOCS_DIR="$(dirname "${SCRIPT_DIR}")"
 DEMOS_DIR="${DOCS_DIR}/_demos"
 OUTPUT_DIR="${DOCS_DIR}/demos"
 
+# A render of some files only, such as a save in `quarto preview`, keeps the
+# demos of the last full render.
+if [[ "${QUARTO_PROJECT_RENDER_ALL:-}" != 1 && -d "${OUTPUT_DIR}" ]]; then
+	printf '[render-demos] Partial render: skip, and keep demos/\n'
+	exit 0
+fi
+
 if ! compgen -G "${DEMOS_DIR}/_extensions/local/*/_extension.yml" >/dev/null; then
 	printf '[render-demos] No extension copy under docs/_demos/_extensions/local/; run ./docs/_scripts/sync-extension.sh first\n' >&2
 	exit 1
