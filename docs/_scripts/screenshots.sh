@@ -25,7 +25,7 @@
 #
 # The browser is the first one found in: $CHROME_PATH, $QUARTO_CHROMIUM, a
 # Chrome or Chromium command on PATH, then the Chrome, Chromium, Brave and Edge
-# applications on macOS.
+# applications on macOS, then the Chromium that Playwright downloads.
 #
 
 set -euo pipefail
@@ -79,6 +79,21 @@ find_browser() {
 			return 0
 		fi
 	done
+	# The Chromium that Playwright downloads: the last match is the newest version.
+	local pattern
+	local playwright_browsers=()
+	for pattern in \
+		"${HOME}/Library/Caches/ms-playwright/chromium-*/chrome-mac*/*.app/Contents/MacOS/*" \
+		"${HOME}/.cache/ms-playwright/chromium-*/chrome-linux*/chrome"; do
+		checked_locations+=("${pattern}")
+		for candidate in ${pattern}; do
+			[[ -x "${candidate}" ]] && playwright_browsers+=("${candidate}")
+		done
+	done
+	if ((${#playwright_browsers[@]} > 0)); then
+		BROWSER="${playwright_browsers[${#playwright_browsers[@]} - 1]}"
+		return 0
+	fi
 	return 1
 }
 
@@ -98,25 +113,40 @@ capture() {
 	# CAPTURE_TIMEOUT seconds after the script ends.
 	(sleep "${CAPTURE_TIMEOUT}" && kill "${browser_pid}") </dev/null >/dev/null 2>&1 &
 	local watchdog_pid=$!
-	if ! wait "${browser_pid}"; then
-		kill "${watchdog_pid}" 2>/dev/null || true
-		printf '[screenshots] The browser stopped or took more than %s seconds on %s\n' \
-			"${CAPTURE_TIMEOUT}" "$2" >&2
+	local browser_status=0
+	wait "${browser_pid}" || browser_status=$?
+	kill "${watchdog_pid}" 2>/dev/null || true
+	# Chromium can exit with an error on teardown after it wrote a good
+	# screenshot, so the error counts only when the screenshot is not usable.
+	if ((browser_status != 0)) && ! png_is_usable "$3"; then
+		printf '[screenshots] The browser stopped (status %s) or took more than %s seconds on %s\n' \
+			"${browser_status}" "${CAPTURE_TIMEOUT}" "$2" >&2
 		exit 1
 	fi
-	kill "${watchdog_pid}" 2>/dev/null || true
 	check_png "$3" "$2"
 }
 
-# check_png <png> <source>
+# png_size <png>: the size in bytes, or 0 when the file does not exist.
+png_size() {
+	if [[ -f "$1" ]]; then
+		wc -c <"$1" | tr -d ' '
+	else
+		printf '0\n'
+	fi
+}
+
+# png_is_usable <png>
 # A blank page gives a PNG of a few kilobytes; a real screenshot is larger than
 # MIN_SCREENSHOT_BYTES.
+png_is_usable() {
+	(($(png_size "$1") >= MIN_SCREENSHOT_BYTES))
+}
+
+# check_png <png> <source>
 check_png() {
-	local size=0
-	[[ -f "$1" ]] && size="$(wc -c <"$1" | tr -d ' ')"
-	if ((size < MIN_SCREENSHOT_BYTES)); then
+	if ! png_is_usable "$1"; then
 		printf '[screenshots] The screenshot of %s is missing or blank (%s bytes): %s\n' \
-			"$2" "${size}" "$1" >&2
+			"$2" "$(png_size "$1")" "$1" >&2
 		exit 1
 	fi
 }

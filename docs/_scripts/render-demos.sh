@@ -39,6 +39,19 @@ if ! compgen -G "${DEMOS_DIR}/_extensions/local/*/_extension.yml" >/dev/null; th
 	exit 1
 fi
 
+# demos.qmd has one `## <preset>` tab for each demo file, written by hand. Stop
+# before the render when the two lists differ, so that no demo is published
+# without a tab and no tab points at a demo that does not exist.
+GALLERY="${DOCS_DIR}/demos.qmd"
+demo_names="$(for source in "${DEMOS_DIR}"/[!_]*.qmd; do basename "${source}" .qmd; done | sort)"
+tab_names="$(sed -n 's/^## \([^ ]*\)$/\1/p' "${GALLERY}" | sort)"
+if [[ "${demo_names}" != "${tab_names}" ]]; then
+	printf '[render-demos] The demos in docs/_demos/ and the tabs in docs/demos.qmd differ:\n' >&2
+	diff <(printf '%s\n' "${demo_names}") <(printf '%s\n' "${tab_names}") |
+		sed -n 's/^< /  demo without a tab: /p; s/^> /  tab without a demo: /p' >&2
+	exit 1
+fi
+
 # The outer website render exports QUARTO_PROJECT_* variables that describe its
 # own project. Unset them, so the inner render resolves the demo project
 # instead. Other QUARTO_* variables, such as QUARTO_CHROMIUM, are kept.
