@@ -111,6 +111,13 @@ website:
     right: |
       Licence: [MIT](https://github.com/mcanouil/quarto-mcanouil?tab=MIT-1-ov-file#readme).
 
+# Sets `extensions.atelier.version`, the version atelier shows beside the site
+# title. _scripts/pre-render.sh writes the file from the extension manifest and
+# _scripts/post-render.sh removes it. Quarto re-reads the configuration after
+# pre-render, and a missing file is skipped.
+metadata-files:
+  - _atelier-version.yml
+
 # The atelier preset is a Sass default in _brand.yml.
 brand: _brand.yml
 

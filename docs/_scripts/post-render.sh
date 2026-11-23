@@ -13,5 +13,5 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCS_DIR="$(dirname "${SCRIPT_DIR}")"
 
-rm -f "${DOCS_DIR}/changelog.qmd" "${DOCS_DIR}/_variables.yml"
-printf '[post-render] Removed changelog.qmd and _variables.yml\n'
+rm -f "${DOCS_DIR}/changelog.qmd" "${DOCS_DIR}/_variables.yml" "${DOCS_DIR}/_atelier-version.yml"
+printf '[post-render] Removed changelog.qmd, _variables.yml and _atelier-version.yml\n'
