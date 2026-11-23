@@ -37,6 +37,7 @@ DEMOS_DIR="${DOCS_DIR}/demos"
 OUTPUT_DIR="${DEMOS_DIR}/screenshots"
 PRESETS=(gold mono quarto terminal)
 DARK_ONLY_PRESET="terminal"
+CAPTURE_TIMEOUT=60
 
 BROWSER=""
 checked_locations=()
@@ -81,7 +82,19 @@ capture() {
 	"$1" --headless=new --disable-gpu --hide-scrollbars \
 		--blink-settings="preferredColorScheme=${scheme_value}" \
 		--window-size="$4,$5" --virtual-time-budget=5000 \
-		--screenshot="$3" "$2" >/dev/null 2>&1
+		--screenshot="$3" "$2" >/dev/null 2>&1 &
+	local browser_pid=$!
+	# A headless browser can hang without writing anything. Stop it after
+	# CAPTURE_TIMEOUT seconds, so the render fails instead of waiting forever.
+	(sleep "${CAPTURE_TIMEOUT}" && kill "${browser_pid}" 2>/dev/null) &
+	local watchdog_pid=$!
+	if ! wait "${browser_pid}"; then
+		kill "${watchdog_pid}" 2>/dev/null || true
+		printf '[screenshots] The browser stopped or took more than %s seconds on %s\n' \
+			"${CAPTURE_TIMEOUT}" "$2" >&2
+		exit 1
+	fi
+	kill "${watchdog_pid}" 2>/dev/null || true
 	if [[ ! -s "$3" ]]; then
 		printf '[screenshots] The browser wrote no screenshot of %s to %s\n' "$2" "$3" >&2
 		exit 1
