@@ -34,7 +34,7 @@ Nothing from 0.x carries over, so a 0.x document needs new front matter.
 ### Bug Fixes
 
 - fix: Warn when your copy of veil or codefrag is in only one of `filters:` and `revealjs-plugins:`, or your copy of iconify is not in `filters:`. (#163)
-- fix: Keep the corner motif of title, section and closing slides in the corner of the window, whatever the window's aspect ratio.
+- fix: Keep the corner motif of title, section and closing slides in the corner of the window, whatever the window's aspect ratio. (#164)
 - fix: Render task lists and maths in Typst PDFs without stopping the PDF/UA-1 build. Each checkbox reads as done or not done, and each equation gets its TeX source as alternative text. (#165)
 
 ## 0.22.0 (2026-09-23)

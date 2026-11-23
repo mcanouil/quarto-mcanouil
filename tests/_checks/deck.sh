@@ -28,6 +28,7 @@ readonly SPEAKER_EVENT='Mickaël Canouil · useR! 2026 · Warwick'
 readonly TALK_TITLE='Quarto extensions'
 readonly CLOSING_LINKS=('mickael.canouil.fr' '@mickael.canouil.fr' 'github.com/mcanouil')
 readonly LICENCE='Slides: m.canouil.dev/user2026 · CC BY 4.0'
+readonly CORNER_SLIDES=(title-slide brand-presets mc-closing)
 
 # Answer one line per slide of the deck, tab separated: id, classes,
 # data-background-gradient, data-background-color, data-footer, data-state,
@@ -311,13 +312,15 @@ text_clear_of_motif() {
 
 # Succeed when the motif of each slide touches the top right corner of the
 # window, within one pixel, so it does not float in the band that Reveal.js
-# leaves around a slide in a window of another aspect ratio.
-# $@ slide ids.
+# leaves around a slide in a window of another aspect ratio. In the print
+# layout the band is gone, and the motif touches the corner of the page.
+# $1 corner, for the window, or page-corner, for the print page. Then slide ids.
 motif_in_corner() {
-	local slide
+	local slide kind="$1"
+	shift
 	for slide in "$@"; do
-		awk -v id="${slide}" '
-			$1 == id && $2 == "corner" { found = 1; if ($3 > 1 || $3 < -1 || $4 > 1 || $4 < -1) { print "# off corner: " $0; bad = 1 } }
+		awk -v id="${slide}" -v kind="${kind}" '
+			$1 == id && $2 == kind { found = 1; if ($3 > 1 || $3 < -1 || $4 > 1 || $4 < -1) { print "# off corner: " $0; bad = 1 } }
 			END { exit (bad || !found) }
 		' <<<"${probe_lines}" || return 1
 	done
@@ -506,11 +509,17 @@ gold | mono | quarto | terminal)
 	expect "deck-code-window-${1}" "the traffic lights and the ${1} frame, title bar and body on the code window, see code_window_look in lib.sh" \
 		code_window_matches "$(awk '$1 == "pick-a-preset" && $2 == "codewindow" { $1 = ""; $2 = ""; print; exit }' <<<"${probe_lines}")" "$1"
 	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
-	PROBE_WINDOW=800,900 probe title-slide brand-presets mc-closing
-	expect "deck-motif-corner-tall-${1}" "motif in the top right corner of a window taller than the slide" motif_in_corner title-slide brand-presets mc-closing
-	PROBE_WINDOW=1600,700 probe title-slide brand-presets mc-closing
-	expect "deck-motif-corner-wide-${1}" "motif in the top right corner of a window wider than the slide" motif_in_corner title-slide brand-presets mc-closing
+	expect "deck-motif-corner-matching-${1}" "motif in the top right corner of a window with the aspect ratio of the slide" motif_in_corner corner "${CORNER_SLIDES[@]}"
+	# The motif box and its bleed do not depend on the preset, so one preset
+	# checks the other aspect ratios.
+	if [ "$1" = gold ]; then
+		for window in 800,900:taller 1600,700:wider; do
+			PROBE_WINDOW="${window%:*}" probe "${CORNER_SLIDES[@]}"
+			expect "deck-motif-corner-${window#*:}" "motif in the top right corner of a window ${window#*:} than the slide" motif_in_corner corner "${CORNER_SLIDES[@]}"
+		done
+	fi
 	PROBE_QUERY='?print-pdf' probe brand-presets checks
+	expect "deck-motif-corner-print-${1}" "motif in the top right corner of the page in the print layout of a PDF export" motif_in_corner page-corner brand-presets
 	expect "deck-section-body-order-print-${1}" "the same order and middle line in the print layout of a PDF export" section_body_after_title checks body
 	expect "deck-section-bare-print-${1}" "the same middle line in print, with no body" section_body_after_title brand-presets bare
 	;;
