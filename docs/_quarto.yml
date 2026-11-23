@@ -71,6 +71,8 @@ website:
     contents:
       - href: index.qmd
         text: "Home"
+      - href: demos.qmd
+        text: "Demos"
       - href: reference.qmd
         text: "Reference"
       - section: examples.qmd

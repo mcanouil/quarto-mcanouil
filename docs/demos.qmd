@@ -1,0 +1,200 @@
+---
+title: "Demos"
+subtitle: "Each preset in each format, rendered by this site."
+page-layout: full
+description: "Screenshots of one demo document in the four presets of the mcanouil extension, as an HTML page, a Reveal.js deck and a PDF report, with links to each full render."
+---
+
+The site renders one demo document for each preset, in the three formats of the extension.
+All the demos use the same text, so you can compare the presets on the same content.
+The site renders the demos and takes these screenshots each time that it is published.
+
+Select a preset tab to see its HTML page, its Reveal.js deck and its PDF report side by side.
+Each card has a link to the full render.
+
+::: {.panel-tabset}
+
+## gold
+
+Editorial: small capitals, gilded rules and warm boxes with a thin gold edge.
+The fonts are Source Serif 4 and Fira Code, and the motif is Facets.
+[Read the source of this demo on GitHub](https://github.com/mcanouil/quarto-mcanouil/blob/main/docs/_demos/gold.qmd).
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-4}
+
+**HTML page**
+
+![](demos/screenshots/gold-html-light.png){fig-alt="The gold preset in mcanouil-html, light scheme: the title block and the start of the first section." loading="lazy"}
+
+![](demos/screenshots/gold-html-dark.png){fig-alt="The gold preset in mcanouil-html, dark scheme: the title block and the start of the first section." loading="lazy"}
+
+[Open the HTML page](demos/gold.html){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-4}
+
+**Reveal.js deck**
+
+![](demos/screenshots/gold-revealjs-1.png){fig-alt="The gold preset in mcanouil-revealjs: the title slide." loading="lazy"}
+
+![](demos/screenshots/gold-revealjs-3.png){fig-alt="The gold preset in mcanouil-revealjs: a content slide with a callout and a table." loading="lazy"}
+
+[Open the Reveal.js deck](demos/gold-revealjs.html){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-4}
+
+**PDF report**
+
+![](demos/screenshots/gold-typst-1.png){fig-alt="The gold preset in mcanouil-typst: page 1 of the report, with the title block, a callout, a table and a figure." loading="lazy"}
+
+![](demos/screenshots/gold-typst-2.png){fig-alt="The gold preset in mcanouil-typst: page 2 of the report, with a code window and a list." loading="lazy"}
+
+[Open the PDF report](demos/gold.pdf){target="_blank" rel="noopener"}
+
+:::
+
+:::
+
+## mono
+
+Swiss: graphite on white, blue links, upper case H2 under a rule and square corners.
+The fonts are Alegreya Sans and Fira Code, and the motif is Steps.
+[Read the source of this demo on GitHub](https://github.com/mcanouil/quarto-mcanouil/blob/main/docs/_demos/mono.qmd).
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-4}
+
+**HTML page**
+
+![](demos/screenshots/mono-html-light.png){fig-alt="The mono preset in mcanouil-html, light scheme: the title block and the start of the first section." loading="lazy"}
+
+![](demos/screenshots/mono-html-dark.png){fig-alt="The mono preset in mcanouil-html, dark scheme: the title block and the start of the first section." loading="lazy"}
+
+[Open the HTML page](demos/mono.html){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-4}
+
+**Reveal.js deck**
+
+![](demos/screenshots/mono-revealjs-1.png){fig-alt="The mono preset in mcanouil-revealjs: the title slide." loading="lazy"}
+
+![](demos/screenshots/mono-revealjs-3.png){fig-alt="The mono preset in mcanouil-revealjs: a content slide with a callout and a table." loading="lazy"}
+
+[Open the Reveal.js deck](demos/mono-revealjs.html){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-4}
+
+**PDF report**
+
+![](demos/screenshots/mono-typst-1.png){fig-alt="The mono preset in mcanouil-typst: page 1 of the report, with the title block, a callout, a table and a figure." loading="lazy"}
+
+![](demos/screenshots/mono-typst-2.png){fig-alt="The mono preset in mcanouil-typst: page 2 of the report, with a code window and a list." loading="lazy"}
+
+[Open the PDF report](demos/mono.pdf){target="_blank" rel="noopener"}
+
+:::
+
+:::
+
+## quarto
+
+Documentation: pill tags, callouts framed in their colour and an accent bar beside headings.
+The fonts are Alegreya Sans and Fira Code, and the motif is Ribbon.
+[Read the source of this demo on GitHub](https://github.com/mcanouil/quarto-mcanouil/blob/main/docs/_demos/quarto.qmd).
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-4}
+
+**HTML page**
+
+![](demos/screenshots/quarto-html-light.png){fig-alt="The quarto preset in mcanouil-html, light scheme: the title block and the start of the first section." loading="lazy"}
+
+![](demos/screenshots/quarto-html-dark.png){fig-alt="The quarto preset in mcanouil-html, dark scheme: the title block and the start of the first section." loading="lazy"}
+
+[Open the HTML page](demos/quarto.html){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-4}
+
+**Reveal.js deck**
+
+![](demos/screenshots/quarto-revealjs-1.png){fig-alt="The quarto preset in mcanouil-revealjs: the title slide." loading="lazy"}
+
+![](demos/screenshots/quarto-revealjs-3.png){fig-alt="The quarto preset in mcanouil-revealjs: a content slide with a callout and a table." loading="lazy"}
+
+[Open the Reveal.js deck](demos/quarto-revealjs.html){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-4}
+
+**PDF report**
+
+![](demos/screenshots/quarto-typst-1.png){fig-alt="The quarto preset in mcanouil-typst: page 1 of the report, with the title block, a callout, a table and a figure." loading="lazy"}
+
+![](demos/screenshots/quarto-typst-2.png){fig-alt="The quarto preset in mcanouil-typst: page 2 of the report, with a code window and a list." loading="lazy"}
+
+[Open the PDF report](demos/quarto.pdf){target="_blank" rel="noopener"}
+
+:::
+
+:::
+
+## terminal
+
+Console: a `$` prompt on titles, `[ ]` around kickers and dashed callout frames.
+The font is JetBrains Mono, and the motif is Dot field.
+This preset is dark only.
+[Read the source of this demo on GitHub](https://github.com/mcanouil/quarto-mcanouil/blob/main/docs/_demos/terminal.qmd).
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-4}
+
+**HTML page**
+
+![](demos/screenshots/terminal-html-dark.png){fig-alt="The terminal preset in mcanouil-html, dark scheme: the title block and the start of the first section." loading="lazy"}
+
+[Open the HTML page](demos/terminal.html){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-4}
+
+**Reveal.js deck**
+
+![](demos/screenshots/terminal-revealjs-1.png){fig-alt="The terminal preset in mcanouil-revealjs: the title slide." loading="lazy"}
+
+![](demos/screenshots/terminal-revealjs-3.png){fig-alt="The terminal preset in mcanouil-revealjs: a content slide with a callout and a table." loading="lazy"}
+
+[Open the Reveal.js deck](demos/terminal-revealjs.html){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-4}
+
+**PDF report**
+
+![](demos/screenshots/terminal-typst-1.png){fig-alt="The terminal preset in mcanouil-typst: page 1 of the report, with the title block, a callout, a table and a figure." loading="lazy"}
+
+![](demos/screenshots/terminal-typst-2.png){fig-alt="The terminal preset in mcanouil-typst: page 2 of the report, with a code window and a list." loading="lazy"}
+
+[Open the PDF report](demos/terminal.pdf){target="_blank" rel="noopener"}
+
+:::
+
+:::
+
+:::

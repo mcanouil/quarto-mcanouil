@@ -9,7 +9,8 @@ format: mcanouil-typst
 ```
 
 `mcanouil-typst` renders all six document types to PDF, as a single document or as a Quarto book.
-[This report](../preview.pdf) is rendered by the site with the format.
+The site renders [this report](../demos/gold.pdf) with the format.
+The [demos](../demos.qmd) show the report in each preset.
 
 ## Accessible PDF {#accessible-pdf}
 

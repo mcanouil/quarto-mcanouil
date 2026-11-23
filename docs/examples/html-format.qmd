@@ -11,6 +11,8 @@ format: mcanouil-html
 `mcanouil-html` renders the `report`, `article`, `memo` and `workshop` types as one page.
 A Quarto book also renders with it.
 The target is WCAG 2.2 AA in every preset, in light and dark.
+The site renders [this page](../demos/gold.html) with the format.
+The [demos](../demos.qmd) show the page in each preset.
 
 ## Title block
 

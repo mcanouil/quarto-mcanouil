@@ -23,6 +23,9 @@ extensions:
       licence: "Slides: m.canouil.dev/user2026 · CC BY 4.0"
 ```
 
+The site renders [this deck](../demos/gold-revealjs.html) with the format.
+The [demos](../demos.qmd) show the deck in each preset.
+
 ## Slide size
 
 Slides are 1280 by 720 pixels, with `margin: 0`, so that the motif reaches the slide edges.
