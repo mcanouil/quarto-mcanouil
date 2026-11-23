@@ -9,6 +9,7 @@
 project:
   output-dir: _output
 
+# A fixed date keeps the screenshots the same from one build to the next.
 date: 2026-11-11
 lang: en-GB
 

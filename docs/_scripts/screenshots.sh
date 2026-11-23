@@ -43,22 +43,13 @@ LOG_PREFIX="screenshots"
 
 # shellcheck source-path=SCRIPTDIR source=_capture.sh disable=SC1091
 source "${SCRIPT_DIR}/_capture.sh"
+# shellcheck source-path=SCRIPTDIR source=_render.sh disable=SC1091
+source "${SCRIPT_DIR}/_render.sh"
 
-# A render of some files only, such as a save in `quarto preview`, keeps the
-# screenshots of the last full render.
-if [[ "${QUARTO_PROJECT_RENDER_ALL:-}" != 1 && -d "${OUTPUT_DIR}" ]]; then
-	printf '[screenshots] Partial render: skip, and keep demos/screenshots/\n'
-	exit 0
-fi
+skip_partial_render "${OUTPUT_DIR}"
 
-if ! find_browser; then
-	printf '[screenshots] No Chromium-based browser found. Checked:\n' >&2
-	# checked_locations is set by find_browser in _capture.sh.
-	# shellcheck disable=SC2154
-	printf '  - %s\n' "${checked_locations[@]}" >&2
-	printf 'Set CHROME_PATH to the browser executable and render again.\n' >&2
-	exit 1
-fi
+require_browser
+require_fonts "${DEMOS_SOURCE_DIR}"
 
 # Capture into a staging directory and move it into place at the end, so that
 # demos/screenshots/ exists only after a complete run. The partial-render guard
@@ -66,13 +57,6 @@ fi
 rm -rf "${OUTPUT_DIR}" "${STAGING_DIR}"
 mkdir -p "${STAGING_DIR}"
 trap 'rm -rf "${STAGING_DIR}"' EXIT
-
-# The fonts of the extension copy that sync-extension.sh makes.
-font_dirs=("${DEMOS_SOURCE_DIR}"/_extensions/local/*/fonts)
-if [[ ! -d "${font_dirs[0]}" ]]; then
-	printf '[screenshots] No fonts under docs/_demos/_extensions/local/; run ./docs/_scripts/sync-extension.sh first\n' >&2
-	exit 1
-fi
 
 # One demo per <preset>.qmd; _body.qmd and other partials start with `_`.
 for source in "${DEMOS_SOURCE_DIR}"/[!_]*.qmd; do
@@ -87,12 +71,7 @@ for source in "${DEMOS_SOURCE_DIR}"/[!_]*.qmd; do
 	# Each `#` section is a vertical stack, so `#/1/1` is the first slide after
 	# the first section title.
 	capture "${BROWSER}" "${slides_url}#/1/1" "${STAGING_DIR}/${preset}-revealjs-3.png" 1280 720 light
-	(
-		cd "${DEMOS_SOURCE_DIR}"
-		quarto typst compile --format png --ppi 110 --pages 1-2 \
-			--font-path "${font_dirs[0]}" \
-			"${preset}.typ" "${STAGING_DIR}/${preset}-typst-{p}.png"
-	)
+	capture_typst "${DEMOS_SOURCE_DIR}" "${preset}.typ" 1-2 "${STAGING_DIR}/${preset}-typst-{p}.png"
 	check_png "${STAGING_DIR}/${preset}-typst-1.png" "${preset}.typ page 1"
 	check_png "${STAGING_DIR}/${preset}-typst-2.png" "${preset}.typ page 2"
 done

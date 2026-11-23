@@ -120,3 +120,37 @@ check_png() {
 		exit 1
 	fi
 }
+
+# require_browser: sets BROWSER, or stops and lists the locations it checked.
+require_browser() {
+	if ! find_browser; then
+		printf '[%s] No Chromium-based browser found. Checked:\n' "${LOG_PREFIX}" >&2
+		printf '  - %s\n' "${checked_locations[@]}" >&2
+		printf 'Set CHROME_PATH to the browser executable and render again.\n' >&2
+		exit 1
+	fi
+}
+
+# require_fonts <project-dir>
+# Sets FONT_DIR to the fonts of the extension copy that sync-extension.sh makes
+# in the project, or stops.
+require_fonts() {
+	local font_dirs=("$1"/_extensions/local/*/fonts)
+	if [[ ! -d "${font_dirs[0]}" ]]; then
+		printf '[%s] No fonts under docs/%s/_extensions/local/; run ./docs/_scripts/sync-extension.sh first\n' \
+			"${LOG_PREFIX}" "$(basename "$1")" >&2
+		exit 1
+	fi
+	FONT_DIR="${font_dirs[0]}"
+}
+
+# capture_typst <project-dir> <typ> <pages> <png>
+# Compiles pages of a Typst source that the project render kept to PNG. <png>
+# can hold `{p}` for the page number. The caller checks each PNG.
+capture_typst() {
+	(
+		cd "$1" || exit 1
+		quarto typst compile --format png --ppi 110 --pages "$3" \
+			--font-path "${FONT_DIR}" "$2" "$4"
+	)
+}

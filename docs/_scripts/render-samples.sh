@@ -30,18 +30,15 @@ SAMPLES_DIR="${DOCS_DIR}/_samples"
 OUTPUT_DIR="${DOCS_DIR}/samples"
 MANIFEST="${SAMPLES_DIR}/_screenshots.tsv"
 SPEAKER_PHOTO_URL="https://github.com/mcanouil.png"
+# LOG_PREFIX is read by the helpers in _render.sh.
+# shellcheck disable=SC2034
+LOG_PREFIX="render-samples"
 
-# A render of some files only, such as a save in `quarto preview`, keeps the
-# samples of the last full render.
-if [[ "${QUARTO_PROJECT_RENDER_ALL:-}" != 1 && -d "${OUTPUT_DIR}" ]]; then
-	printf '[render-samples] Partial render: skip, and keep samples/\n'
-	exit 0
-fi
+# shellcheck source-path=SCRIPTDIR source=_render.sh disable=SC1091
+source "${SCRIPT_DIR}/_render.sh"
 
-if ! compgen -G "${SAMPLES_DIR}/_extensions/local/*/_extension.yml" >/dev/null; then
-	printf '[render-samples] No extension copy under docs/_samples/_extensions/local/; run ./docs/_scripts/sync-extension.sh first\n' >&2
-	exit 1
-fi
+skip_partial_render "${OUTPUT_DIR}"
+require_extension_copy "${SAMPLES_DIR}"
 
 # Every sample must have a screenshot, and every screenshot a sample, so that
 # no sample is rendered for nothing and no screenshot points at a missing file.
@@ -60,16 +57,4 @@ if ! curl -fsSL --max-time 30 "${SPEAKER_PHOTO_URL}" -o "${SAMPLES_DIR}/speaker.
 	exit 1
 fi
 
-# The outer website render exports QUARTO_PROJECT_* variables that describe its
-# own project. Unset them, so the inner render resolves the sample project
-# instead. Other QUARTO_* variables, such as QUARTO_CHROMIUM, are kept.
-env_args=()
-for name in $(compgen -e); do
-	[[ "${name}" == QUARTO_PROJECT_* ]] && env_args+=(-u "${name}")
-done
-
-env ${env_args[@]+"${env_args[@]}"} quarto render "${SAMPLES_DIR}"
-
-rm -rf "${OUTPUT_DIR}"
-mv "${SAMPLES_DIR}/_output" "${OUTPUT_DIR}"
-printf '[render-samples] _samples/_output -> samples/\n'
+render_project "${SAMPLES_DIR}" "${OUTPUT_DIR}"
