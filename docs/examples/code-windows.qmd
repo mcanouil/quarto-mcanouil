@@ -29,6 +29,13 @@ In HTML, Reveal.js and Typst, the window has the style of the preset:
 
 In Typst, the window also takes the tint of the preset behind the code.
 
+
+**Code windows in `mcanouil-html`**
+
+![](../samples/screenshots/code-windows.png){fig-alt="Three code blocks in mcanouil-html, gold preset: a window with three traffic lights and the file name analysis.R, a window with the language label PYTHON, and a block with no window." loading="lazy"}
+
+[Open the HTML page](../samples/code-windows.html){target="_blank" rel="noopener"}
+
 ## Options
 
 code-window reads its options under `extensions: code-window:`.

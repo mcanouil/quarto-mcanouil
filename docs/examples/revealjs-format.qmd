@@ -40,6 +40,61 @@ A deck from an earlier version of the extension shows at a different scale.
   The slide uses the dark tokens of the preset.
 - Closing slide: from the `closing` option, on the dark ground.
 
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-6}
+
+**Title slide**
+
+![](../samples/screenshots/slides-title.png){fig-alt="The title slide in the gold preset: the event as a kicker, the title, a gilded rule, the subtitle, the speaker with a round photo, and the date, on the dark ground." loading="lazy"}
+
+[Open the deck](../samples/slides-revealjs.html#/title-slide){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-6}
+
+**Section slide**
+
+![](../samples/screenshots/slides-section.png){fig-alt="A section slide in the gold preset: the number 1 and the title Brand presets on the dark ground." loading="lazy"}
+
+[Open the deck](../samples/slides-revealjs.html#/brand-presets){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-6}
+
+**Content slide**
+
+![](../samples/screenshots/slides-content.png){fig-alt="A content slide in the gold preset: the title Why presets and three bullet points on the light ground, with the footer." loading="lazy"}
+
+[Open the deck](../samples/slides-revealjs.html#/why-presets){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-6}
+
+**Dark slide**
+
+![](../samples/screenshots/slides-dark.png){fig-alt="A content slide with the dark class in the gold preset: the title and two bullet points in light text on the dark tokens." loading="lazy"}
+
+[Open the deck](../samples/slides-revealjs.html#/why-presets-after-dark){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-6}
+
+**Closing slide**
+
+![](../samples/screenshots/slides-closing.png){fig-alt="The closing slide in the gold preset: the title Thank you, two links and a licence line on the dark ground." loading="lazy"}
+
+[Open the deck](../samples/slides-revealjs.html#/mc-closing){target="_blank" rel="noopener"}
+
+:::
+
+:::
+
 ```markdown
 # Checks
 
