@@ -399,8 +399,8 @@
   let colours = meta.tokens
   let theme = mc-code-window-theme(mc-preset, colours)
   show raw.where(block: true): set block(
-    fill: colours.tint,
-    stroke: (paint: theme.border, thickness: theme.at("stroke-thickness", default: 1pt), dash: theme.at("stroke-dash", default: none)),
+    fill: theme.fill,
+    stroke: 1pt + theme.border,
     radius: theme.radius,
     inset: 8pt,
     width: 100%,
