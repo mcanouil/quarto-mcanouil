@@ -18,6 +18,8 @@
  *   code_window_matches in lib.sh.
  * - "<slide> corner <top> <right>": on a ground slide, the gap between the box
  *   of the motif and the top right corner of the window, in window pixels.
+ * - "<slide> page-corner <top> <right>": the same gap to the top right corner
+ *   of the page of the slide in the print layout of a PDF export.
  * - "<slide> error <message>": the probe failed on the slide.
  *
  * @license MIT
@@ -242,7 +244,9 @@
     var motif = section.querySelector(":scope > .mc-motif");
     if (!motif) { return; }
     var rect = motif.getBoundingClientRect();
+    var box = (section.closest(".pdf-page") || section).getBoundingClientRect();
     lines.push([slide, "corner", rect.top, window.innerWidth - rect.right].join(" "));
+    lines.push([slide, "page-corner", rect.top - box.top, box.right - rect.right].join(" "));
   }
 
   function measureSlide(slide) {
