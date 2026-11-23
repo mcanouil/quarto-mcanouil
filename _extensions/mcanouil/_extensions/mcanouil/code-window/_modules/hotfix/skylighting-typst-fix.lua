@@ -39,10 +39,11 @@ local function build_skylighting_override()
   start: 1,
   sourcelines,
 ) = {
-  let bgcolor = if fill != none { fill } else { rgb("%s") }
   let has-gutter = start + sourcelines.len() > 999
 
   context {
+    let theme-fill = (_cw-theme-defaults + _cw-theme.get()).fill
+    let bgcolor = if theme-fill != auto { theme-fill } else if fill != none { fill } else { rgb("%s") }
     let _page-bg = _cw-page-bg()
     let _fg = _cw-fg(_page-bg)
     let _border-colour = color.mix((_fg, 15%%), (_page-bg, 85%%))
