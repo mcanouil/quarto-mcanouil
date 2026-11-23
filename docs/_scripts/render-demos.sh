@@ -12,7 +12,7 @@
 # the website's sidebar, footer, brand and filters out of the demos, so each one
 # is what a user of the extension gets.
 #
-# The output is copied to demos/, which _quarto.yml lists under
+# The output is moved to demos/, which _quarto.yml lists under
 # `project.resources`, so the website publishes it as it is. demos/ is ignored by
 # Git and replaced on every run.
 #
@@ -50,5 +50,5 @@ done
 env ${env_args[@]+"${env_args[@]}"} quarto render "${DEMOS_DIR}"
 
 rm -rf "${OUTPUT_DIR}"
-cp -R "${DEMOS_DIR}/_output" "${OUTPUT_DIR}"
+mv "${DEMOS_DIR}/_output" "${OUTPUT_DIR}"
 printf '[render-demos] _demos/_output -> demos/\n'

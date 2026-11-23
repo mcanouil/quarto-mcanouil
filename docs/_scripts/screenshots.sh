@@ -35,7 +35,6 @@ DOCS_DIR="$(dirname "${SCRIPT_DIR}")"
 DEMOS_SOURCE_DIR="${DOCS_DIR}/_demos"
 DEMOS_DIR="${DOCS_DIR}/demos"
 OUTPUT_DIR="${DEMOS_DIR}/screenshots"
-PRESETS=(gold mono quarto terminal)
 DARK_ONLY_PRESET="terminal"
 CAPTURE_TIMEOUT=60
 MIN_SCREENSHOT_BYTES=10000
@@ -132,7 +131,16 @@ fi
 rm -rf "${OUTPUT_DIR}"
 mkdir -p "${OUTPUT_DIR}"
 
-for preset in "${PRESETS[@]}"; do
+# The fonts of the extension copy that sync-extension.sh makes.
+font_dirs=("${DEMOS_SOURCE_DIR}"/_extensions/local/*/fonts)
+if [[ ! -d "${font_dirs[0]}" ]]; then
+	printf '[screenshots] No fonts under docs/_demos/_extensions/local/; run ./docs/_scripts/sync-extension.sh first\n' >&2
+	exit 1
+fi
+
+# One demo per <preset>.qmd; _body.qmd and other partials start with `_`.
+for source in "${DEMOS_SOURCE_DIR}"/[!_]*.qmd; do
+	preset="$(basename "${source}" .qmd)"
 	html_url="file://${DEMOS_DIR}/${preset}.html"
 	slides_url="file://${DEMOS_DIR}/${preset}-revealjs.html"
 	if [[ "${preset}" != "${DARK_ONLY_PRESET}" ]]; then
@@ -146,7 +154,7 @@ for preset in "${PRESETS[@]}"; do
 	(
 		cd "${DEMOS_SOURCE_DIR}"
 		quarto typst compile --format png --ppi 110 --pages 1-2 \
-			--font-path "_extensions/local/mcanouil/fonts" \
+			--font-path "${font_dirs[0]}" \
 			"${preset}.typ" "${OUTPUT_DIR}/${preset}-typst-{p}.png"
 	)
 	check_png "${OUTPUT_DIR}/${preset}-typst-1.png" "${preset}.typ page 1"

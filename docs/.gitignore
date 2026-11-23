@@ -17,6 +17,5 @@
 /demos/
 /_demos/_extensions/
 /_demos/_output/
-/_demos/.quarto/
 /_demos/*.typ
 /_demos/*_files/

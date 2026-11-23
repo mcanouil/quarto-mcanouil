@@ -1,10 +1,7 @@
 # The demos are a project of their own, so the documentation website does not
 # wrap them in its sidebar, footer and theme. ../_scripts/render-demos.sh renders
-# this project and copies _output/ to ../demos/, which the website publishes.
+# this project and moves _output/ to ../demos/, which the website publishes.
+# Every <preset>.qmd here is one demo; _body.qmd is skipped by its leading
+# underscore.
 project:
   output-dir: _output
-  render:
-    - gold.qmd
-    - mono.qmd
-    - quarto.qmd
-    - terminal.qmd
