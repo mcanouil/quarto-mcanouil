@@ -16,7 +16,7 @@ if (x != y && y >= 0) {
 
 ## Look per preset
 
-In HTML and Reveal.js, the window has the style of the preset:
+In HTML, Reveal.js and Typst, the window has the style of the preset:
 
 | Preset | Window |
 | --- | --- |

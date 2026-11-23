@@ -287,6 +287,22 @@ code_window_theme() {
 	}
 }
 
+# Succeed when the code of both windows sits inside a window for code-window,
+# and the code of the block with no window does not: the highlighted code
+# drops its own frame only inside a window, so the window frame is the only
+# edge there.
+code_window_body_frame() {
+	local result
+	result="$(typst_in_document '("coxph", "print", "nrow").map(word => state("cw-in-window", false).at(query(raw.where(text: word)).first().location()))')" || {
+		printf '%s\n' "${result}"
+		return 1
+	}
+	[ "${result}" = '[true,true,false]' ] || {
+		printf '# inside a window, for coxph, print and nrow: %s\n' "${result}"
+		return 1
+	}
+}
+
 # Succeed when the title in the metadata of the PDF is a given text.
 # $1 title.
 doc_title() {
@@ -308,6 +324,7 @@ code-window)
 	find_verapdf
 	expect "typst-code-window-theme-${2:?code-window needs a preset}" "the traffic lights and the ${2} frame and title bar from the tokens, see code_window_theme_test" \
 		code_window_theme "$2"
+	expect "typst-code-window-body-frame-${2}" "the code drops its own frame inside a window, and keeps it outside" code_window_body_frame
 	expect "typst-code-window-ua1-${2}" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
 	;;
 report) check_report "${2:?report needs a preset}" ;;

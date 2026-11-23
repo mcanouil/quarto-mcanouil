@@ -12,3 +12,9 @@ A code window with the label of its language:
 ```python
 print("auto label")
 ```
+
+A highlighted code block with no window:
+
+```{.r code-window-enabled="false"}
+plain <- nrow(adsl)
+```
