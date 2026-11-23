@@ -18,7 +18,6 @@
 --- After Quarto's filters and the embedded tools:
 --- - inline code goes in `#mc-inline-code[...]`, in place of the box of the
 ---   embedded code-window, whose fill comes from the highlighting theme;
---- - the code blocks of a code window take the tint of the preset;
 --- - a task list goes in `#mc-task-list[...]`, and its `☐` and `☒` marks become
 ---   `#mc-task(false)` and `#mc-task(true)`, which draw the box with an
 ---   alternative text that gives the state, because the fonts of the presets
@@ -306,36 +305,6 @@ local function rewrite_details(blocks)
   return result
 end
 
---- @type string Comment that marks the Skylighting override of the embedded code-window.
-local SKYLIGHTING_OVERRIDE = '// skylighting-typst-fix override'
-
---- @type string Typst code that gives the code blocks the tint of the preset
---- when the caller sets no fill. It follows the last definition of Skylighting.
-M.SKYLIGHTING_TINT = table.concat({
-  '#let mc-skylighting = Skylighting',
-  '#let Skylighting(fill: none, ..args) = mc-skylighting(fill: if fill == none { mc-tokens.tint } else { fill }, ..args)',
-}, '\n')
-
---- Give the code blocks the tint of the preset, after the Skylighting
---- override of the embedded code-window. Without the override, Skylighting
---- may be undefined (no highlighting) or ignore its fill, so the document is
---- left as it is.
---- Upstream: mcanouil/quarto-code-window, the `fill` and `stroke` keys of the
---- Typst theme, due in 1.10.0.
---- Remove when: the vendored code-window has them; then set `fill` in
---- typst/lib/code-window.typ and drop this function and `M.SKYLIGHTING_TINT`.
---- @param doc pandoc.Pandoc
---- @return pandoc.Pandoc
-local function tint_code(doc)
-  for index, block in ipairs(doc.blocks) do
-    if block.t == 'RawBlock' and block.format == 'typst' and block.text:find(SKYLIGHTING_OVERRIDE, 1, true) then
-      doc.blocks:insert(index + 1, pandoc.RawBlock('typst', M.SKYLIGHTING_TINT))
-      break
-    end
-  end
-  return doc
-end
-
 --- Rewrite the structured elements of a Typst document.
 --- @param doc pandoc.Pandoc
 --- @return pandoc.Pandoc|nil
@@ -343,12 +312,11 @@ local function rewrite(doc)
   if not quarto.doc.is_format('typst') then
     return nil
   end
-  doc = doc:walk({
+  return doc:walk({
     Inlines = rewrite_inlines,
     BulletList = rewrite_task_list,
     Blocks = rewrite_details,
   })
-  return tint_code(doc)
 end
 
 --- @type table Filter step that marks callouts, before Quarto's filters.
