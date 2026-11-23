@@ -47,8 +47,9 @@ skip_partial_render "${OUTPUT_DIR}"
 # screenshot of the list must be shown on a page.
 manifest_names="$(grep -v '^#' "${MANIFEST}" | cut -f1 | sort -u)"
 references="$(
-	cd "${DOCS_DIR}"
-	# grep finds no reference before the pages show any, which is not an error.
+	cd "${DOCS_DIR}" || exit 1
+	# grep exits 1 when no page refers to a screenshot. The check below then
+	# reports each screenshot as used by no page.
 	{ grep -rHo --include='*.qmd' --exclude-dir='_samples' --exclude-dir='_demos' \
 		'samples/screenshots/[A-Za-z0-9_-]*\.png' . || true; } |
 		sed 's|^\./||; s|samples/screenshots/||; s|\.png$||' | sort -u

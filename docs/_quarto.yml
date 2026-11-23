@@ -23,7 +23,8 @@ project:
     - ./_scripts/render-samples.sh
     # Captures the screenshots of the samples for the documentation pages.
     - ./_scripts/sample-screenshots.sh
-  # Published as they are: the demos are rendered by their own project.
+  # Published as they are: the demos and the samples are rendered by their own
+  # projects.
   resources:
     - demos/**
     - samples/**

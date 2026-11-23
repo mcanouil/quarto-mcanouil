@@ -22,8 +22,9 @@ Beyond that it is managed for you: [Quarto Wizard](https://m.canouil.dev/quarto-
 It is ignored by Git and produced by `../_scripts/sync-extension.sh`, so the repository root stays the single source of truth.
 The `local` owner says where it came from, and keeps it clear of the vendored dependencies even when the extension is named after its owner.
 
-The same script also writes a second copy to `../_demos/_extensions/local/mcanouil/`.
-`_demos/` is a Quarto project of its own, which renders the demos, so it needs its own real copy for the reason given below.
+The same script also writes a copy to `../_demos/_extensions/local/mcanouil/` and to `../_samples/_extensions/local/mcanouil/`.
+`_demos/` renders the demos and `_samples/` renders the samples of the guide pages.
+Each one is a Quarto project of its own, so each needs its own real copy for the reason given below.
 
 Run the sync before previewing the site locally:
 
