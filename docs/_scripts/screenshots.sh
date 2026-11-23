@@ -39,7 +39,7 @@ STAGING_DIR="${DEMOS_DIR}/.screenshots-staging"
 DARK_ONLY_PRESET="terminal"
 LOG_PREFIX="screenshots"
 
-# shellcheck source=docs/_scripts/_capture.sh
+# shellcheck source-path=SCRIPTDIR source=_capture.sh
 source "${SCRIPT_DIR}/_capture.sh"
 
 # A render of some files only, such as a save in `quarto preview`, keeps the

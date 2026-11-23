@@ -31,7 +31,7 @@ ROOT_DIR="$(dirname "${DOCS_DIR}")"
 #
 # The demo project under _demos/ is a separate Quarto project, so it gets its
 # own copy for the same reason.
-TARGET_DIRS=("${DOCS_DIR}/_extensions/local" "${DOCS_DIR}/_demos/_extensions/local")
+TARGET_DIRS=("${DOCS_DIR}/_extensions/local" "${DOCS_DIR}/_demos/_extensions/local" "${DOCS_DIR}/_samples/_extensions/local")
 
 for extension_dir in "${ROOT_DIR}"/_extensions/*/; do
 	[[ -f "${extension_dir}_extension.yml" ]] || continue

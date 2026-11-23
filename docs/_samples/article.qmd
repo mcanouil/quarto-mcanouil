@@ -1,0 +1,51 @@
+---
+title: "Polygenic scores and type 2 diabetes"
+subtitle: "A cohort analysis"
+author:
+  - name: "Ana Author"
+    corresponding: true
+    email: "ana@example.org"
+    affiliations:
+      - name: "Inserm U1283"
+        city: "Lille"
+    roles:
+      - conceptualization: lead
+      - formal analysis: lead
+      - writing: equal
+  - name: "Ben Writer"
+    affiliations:
+      - name: "Imperial College London"
+    roles:
+      - conceptualization: equal
+      - formal analysis: supporting
+      - writing: equal
+abstract: "A polygenic score predicts the risk of type 2 diabetes in a cohort of 5000 adults."
+keywords: [genetics, diabetes, risk]
+reference-location: margin
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: article
+---
+
+# Introduction
+
+Type 2 diabetes has a strong genetic component[^heritability].
+A polygenic score adds the effects of many variants into one number for each person.
+
+::: {.column-margin}
+The score uses 400 variants from published studies.
+:::
+
+[^heritability]: Twin studies put the heritability between 30 and 70 per cent.
+
+# Methods
+
+The cohort follows 5000 adults from the north of France.
+Each adult has a genotype and a measure of fasting glucose every two years.
+
+# Results
+
+Adults in the top tenth of the score have three times the risk of those in the bottom tenth.

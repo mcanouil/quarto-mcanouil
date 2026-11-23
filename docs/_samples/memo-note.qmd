@@ -1,0 +1,32 @@
+---
+title: "Quarto 1.11 migration"
+format:
+  mcanouil-typst:
+    keep-typ: true
+  mcanouil-html: default
+extensions:
+  mcanouil:
+    type: memo
+    kind: note
+    memo:
+      to: "Data team"
+      from: "M. Canouil"
+      date: "11 Nov 2026"
+    footer:
+      left: "Internal"
+      centre: "Memo 2026-07"
+---
+
+## Context
+
+The next Quarto release changes how the Typst output is built.
+Every document of the team must render again before the end of the month.
+
+## Decision
+
+We move all documents to the new release in one batch.
+The old release stays available for two weeks.
+
+## Next steps
+
+Each owner renders their documents and reports any difference on the team channel.

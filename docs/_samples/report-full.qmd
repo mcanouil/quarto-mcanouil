@@ -1,0 +1,44 @@
+---
+title: "Clinical study report"
+subtitle: "A 24-week cohort follow-up"
+author:
+  - name: "Mickaël Canouil"
+    orcid: "0000-0002-3396-4549"
+    affiliations:
+      - name: "Inserm U1283"
+        city: "Lille"
+        country: "France"
+version: "Version 1.2"
+license: "CC BY 4.0"
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: report
+    layout: full
+---
+
+# Introduction {description="Why the study was run and what it set out to show."}
+
+The study followed a cohort of patients for 24 weeks.
+
+## Background
+
+Earlier studies measured the outcome at one time point only.
+
+## Objectives
+
+The study measures the outcome at four time points.
+
+# Study design {description="How the study was set up and who took part."}
+
+The study enrolled patients from three centres.
+
+## Population
+
+Adults with a confirmed diagnosis could take part.
+
+## Analysis
+
+A mixed model compares the arms at each time point.

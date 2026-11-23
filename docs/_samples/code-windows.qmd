@@ -1,0 +1,24 @@
+---
+title: "Code windows"
+format:
+  mcanouil-html: default
+---
+
+A code window with a file name:
+
+```{.r filename="analysis.R"}
+fit <- coxph(Surv(time, event) ~ arm, data = adsl)
+summary(fit)
+```
+
+A code window with the label of its language:
+
+```python
+print("Hello from Python")
+```
+
+A highlighted code block with no window:
+
+```{.r code-window-enabled="false"}
+n_subjects <- nrow(adsl)
+```

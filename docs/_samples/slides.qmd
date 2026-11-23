@@ -1,0 +1,32 @@
+---
+title: "Quarto extensions"
+subtitle: "Build, share and maintain your own formats"
+date: 2026-07-08
+format:
+  mcanouil-revealjs:
+    output-file: slides-revealjs.html
+extensions:
+  mcanouil:
+    event: "useR! 2026 · Warwick"
+    speakers:
+      - photo: speaker.png
+        alt: "Portrait of Mickaël Canouil"
+    closing:
+      links:
+        - mickael.canouil.fr
+        - github.com/mcanouil
+      licence: "Slides: m.canouil.dev/user2026 · CC BY 4.0"
+---
+
+# Brand presets
+
+## Why presets?
+
+- One source of truth for colour and type.
+- Contrast checked at render time.
+- Same look in PDF, HTML and slides.
+
+## Why presets, after dark {.dark}
+
+- The dark slide takes the dark tokens of the preset.
+- Links stay readable: [mickael.canouil.fr](https://mickael.canouil.fr).

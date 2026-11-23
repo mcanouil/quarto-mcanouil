@@ -1,0 +1,26 @@
+# One screenshot per line, tab separated: name, source, kind, target.
+# name: PNG file name without extension, unique.
+# source: base name of the sample in this directory.
+# kind: html (target -), revealjs (target: slide anchor), typst (target: page).
+# A documentation page shows each one as samples/screenshots/<name>.png.
+memo-note	memo-note	typst	1
+memo-note-html	memo-note	html	-
+memo-minutes	memo-minutes	typst	1
+memo-agenda	memo-agenda	typst	1
+memo-brief	memo-brief	typst	1
+report-compact	report-compact	typst	1
+report-full-cover	report-full	typst	1
+report-full-contents	report-full	typst	2
+article	article	typst	1
+letter	letter	typst	1
+invoice	invoice	typst	1
+workshop-html	workshop	html	-
+workshop-typst	workshop	typst	2
+workshop-revealjs	workshop	revealjs	#/front-matter
+slides-title	slides	revealjs	#/0
+slides-section	slides	revealjs	#/1
+slides-content	slides	revealjs	#/1/1
+slides-dark	slides	revealjs	#/1/2
+slides-closing	slides	revealjs	#/2
+special-sections	special-sections	typst	2
+code-windows	code-windows	html	-
