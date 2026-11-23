@@ -35,6 +35,7 @@ DOCS_DIR="$(dirname "${SCRIPT_DIR}")"
 DEMOS_SOURCE_DIR="${DOCS_DIR}/_demos"
 DEMOS_DIR="${DOCS_DIR}/demos"
 OUTPUT_DIR="${DEMOS_DIR}/screenshots"
+STAGING_DIR="${DEMOS_DIR}/.screenshots-staging"
 DARK_ONLY_PRESET="terminal"
 CAPTURE_TIMEOUT=60
 MIN_SCREENSHOT_BYTES=10000
@@ -158,8 +159,12 @@ if ! find_browser; then
 	exit 1
 fi
 
-rm -rf "${OUTPUT_DIR}"
-mkdir -p "${OUTPUT_DIR}"
+# Capture into a staging directory and move it into place at the end, so that
+# demos/screenshots/ exists only after a complete run. The partial-render guard
+# above trusts that directory, so a failed run must not leave a partial one.
+rm -rf "${OUTPUT_DIR}" "${STAGING_DIR}"
+mkdir -p "${STAGING_DIR}"
+trap 'rm -rf "${STAGING_DIR}"' EXIT
 
 # The fonts of the extension copy that sync-extension.sh makes.
 font_dirs=("${DEMOS_SOURCE_DIR}"/_extensions/local/*/fonts)
@@ -174,21 +179,22 @@ for source in "${DEMOS_SOURCE_DIR}"/[!_]*.qmd; do
 	html_url="file://${DEMOS_DIR}/${preset}.html"
 	slides_url="file://${DEMOS_DIR}/${preset}-revealjs.html"
 	if [[ "${preset}" != "${DARK_ONLY_PRESET}" ]]; then
-		capture "${BROWSER}" "${html_url}" "${OUTPUT_DIR}/${preset}-html-light.png" 1280 800 light
+		capture "${BROWSER}" "${html_url}" "${STAGING_DIR}/${preset}-html-light.png" 1280 800 light
 	fi
-	capture "${BROWSER}" "${html_url}" "${OUTPUT_DIR}/${preset}-html-dark.png" 1280 800 dark
-	capture "${BROWSER}" "${slides_url}#/0" "${OUTPUT_DIR}/${preset}-revealjs-1.png" 1280 720 light
+	capture "${BROWSER}" "${html_url}" "${STAGING_DIR}/${preset}-html-dark.png" 1280 800 dark
+	capture "${BROWSER}" "${slides_url}#/0" "${STAGING_DIR}/${preset}-revealjs-1.png" 1280 720 light
 	# Each `#` section is a vertical stack, so `#/1/1` is the first slide after
 	# the first section title.
-	capture "${BROWSER}" "${slides_url}#/1/1" "${OUTPUT_DIR}/${preset}-revealjs-3.png" 1280 720 light
+	capture "${BROWSER}" "${slides_url}#/1/1" "${STAGING_DIR}/${preset}-revealjs-3.png" 1280 720 light
 	(
 		cd "${DEMOS_SOURCE_DIR}"
 		quarto typst compile --format png --ppi 110 --pages 1-2 \
 			--font-path "${font_dirs[0]}" \
-			"${preset}.typ" "${OUTPUT_DIR}/${preset}-typst-{p}.png"
+			"${preset}.typ" "${STAGING_DIR}/${preset}-typst-{p}.png"
 	)
-	check_png "${OUTPUT_DIR}/${preset}-typst-1.png" "${preset}.typ page 1"
-	check_png "${OUTPUT_DIR}/${preset}-typst-2.png" "${preset}.typ page 2"
+	check_png "${STAGING_DIR}/${preset}-typst-1.png" "${preset}.typ page 1"
+	check_png "${STAGING_DIR}/${preset}-typst-2.png" "${preset}.typ page 2"
 done
 
+mv "${STAGING_DIR}" "${OUTPUT_DIR}"
 printf '[screenshots] %s -> demos/screenshots/\n' "$(basename "${BROWSER}")"

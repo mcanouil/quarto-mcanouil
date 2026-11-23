@@ -39,12 +39,14 @@ if ! compgen -G "${DEMOS_DIR}/_extensions/local/*/_extension.yml" >/dev/null; th
 	exit 1
 fi
 
-# demos.qmd has one `## <preset>` tab for each demo file, written by hand. Stop
-# before the render when the two lists differ, so that no demo is published
-# without a tab and no tab points at a demo that does not exist.
+# demos.qmd has one tab for each demo file, written by hand, and every tab shows
+# the dark HTML screenshot of its demo. Stop before the render when the demo
+# files and those screenshots differ, so that no demo is published without a tab
+# and no tab points at a demo that does not exist.
 GALLERY="${DOCS_DIR}/demos.qmd"
 demo_names="$(for source in "${DEMOS_DIR}"/[!_]*.qmd; do basename "${source}" .qmd; done | sort)"
-tab_names="$(sed -n 's/^## \([^ ]*\)$/\1/p' "${GALLERY}" | sort)"
+tab_names="$(grep -o 'demos/screenshots/[A-Za-z0-9_-]*-html-dark\.png' "${GALLERY}" |
+	sed 's|^demos/screenshots/||; s|-html-dark\.png$||' | sort -u)"
 if [[ "${demo_names}" != "${tab_names}" ]]; then
 	printf '[render-demos] The demos in docs/_demos/ and the tabs in docs/demos.qmd differ:\n' >&2
 	diff <(printf '%s\n' "${demo_names}") <(printf '%s\n' "${tab_names}") |
