@@ -1,6 +1,6 @@
 title: Veil
 author: Mickaël Canouil
-version: 0.4.1
+version: 0.4.3
 quarto-required: ">=1.9.38"
 contributes:
   filters:
@@ -16,5 +16,5 @@ contributes:
         - veil.js
       stylesheet:
         - veil.css
-source: mcanouil/quarto-veil@0.4.1
+source: mcanouil/quarto-veil@0.4.3
 source-type: github
