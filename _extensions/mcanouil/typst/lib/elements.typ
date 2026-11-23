@@ -240,6 +240,9 @@
 // - ..args: any other argument a later Quarto passes, such as the type and
 //   the appearance asked for in issue 15414 of quarto-dev/quarto-cli. They are not
 //   used yet, so the call keeps working when Quarto adds them.
+// Upstream: quarto-dev/quarto-cli issue 15414, pull request 15415.
+// Remove when: the minimum Quarto version passes kind and appearance; then
+// read them from args in place of the marker.
 #let callout(body: [], title: none, background_color: none, icon: none, icon_color: none, body_background_color: none, ..args) = {
   let parts = mc-callout-split(body)
   let marker = if parts.marker == none { (mc-callout: "note", appearance: "default", titled: true) } else { parts.marker }

@@ -10,6 +10,10 @@
 --- body: `#metadata((mc-callout: "<type>", appearance: "<appearance>", titled: <bool>))`.
 --- Quarto's Typst callout call carries no type, so the `callout` function of
 --- the template reads the marker and drops it from the body.
+--- Upstream: quarto-dev/quarto-cli issue 15414, pull request 15415, which pass
+--- `kind` and `appearance` to `callout`.
+--- Remove when: the minimum Quarto version passes them; then drop
+--- `mark_callout`, `M.pre_filter` and the marker reading in elements.typ.
 ---
 --- After Quarto's filters and the embedded tools:
 --- - inline code goes in `#mc-inline-code[...]`, in place of the box of the
