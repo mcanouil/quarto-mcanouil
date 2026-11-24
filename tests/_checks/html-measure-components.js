@@ -155,6 +155,7 @@ window.addEventListener("load", () => document.fonts.ready.then(() => {
     const range = document.createRange();
     range.selectNodeContents(node);
     const line = range.getClientRects()[0];
+    if (!line) return null;
     const context = document.createElement("canvas").getContext("2d");
     context.font = getComputedStyle(node.parentElement).font;
     const metrics = context.measureText("H");

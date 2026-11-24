@@ -27,6 +27,7 @@ need pdftotext
 need pdfinfo
 need pdffonts
 need pdftoppm
+need python3
 
 # Answer the shapes of the motifs of the Typst library, one line each:
 # "<motif> <kind> <numbers...> <opacity>".

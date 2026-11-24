@@ -88,7 +88,6 @@ $mc-callout-glyphs: (
   div.callout.callout-style-default > .callout-header:has(> .callout-btn-toggle),
   div.callout.callout-style-simple > .callout-header:has(> .callout-btn-toggle) {
     --mc-legend-half: 12px;
-    min-height: 24px;
   }
 
   div.callout > .callout-header :is(.callout-icon-container, .callout-title-container) {

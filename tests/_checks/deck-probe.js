@@ -263,11 +263,14 @@
       if (!icon || !label) { return; }
       var walker = document.createTreeWalker(label, NodeFilter.SHOW_TEXT);
       var node = walker.nextNode();
-      while (node && !node.textContent.trim()) { node = walker.nextNode(); }
+      while (node && !(node.textContent.trim() && !node.parentElement.closest(".screen-reader-only"))) {
+        node = walker.nextNode();
+      }
       if (!node) { return; }
       var range = document.createRange();
       range.selectNodeContents(node);
       var line = range.getClientRects()[0];
+      if (!line) { return; }
       var context = document.createElement("canvas").getContext("2d");
       context.font = getComputedStyle(node.parentElement).font;
       var metrics = context.measureText("H");
