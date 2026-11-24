@@ -1,0 +1,51 @@
+---
+title: "Consulting 2026"
+author: "Mickaël Canouil"
+sender:
+  name: "Mickaël Canouil"
+  email: "mickael@example.org"
+  registration: "123 456 789"
+  vat: "FR1234567890"
+  address:
+    street: "12 Example Street"
+    zip: 59000
+    city: "Lille"
+    country: "France"
+recipient:
+  name: "Company Ltd"
+  address:
+    street: "10 Station Road"
+    zip: 75008
+    city: "Paris"
+    country: "France"
+invoice:
+  number: "2026-014"
+  issued: 2026-11-01
+  due: 2026-12-01
+  reference: "REF-2026-014"
+  fee: 2.28
+  penalty: 40
+  currency: EUR
+  items:
+    - description: "Workshop"
+      details: "Two days on site"
+      quantity: 2
+      unit-price: 1200
+      vat: 20
+    - description: "Handbooks"
+      details: "Three printed copies"
+      quantity: 3
+      unit-price: 33.33
+      vat: 20
+bank:
+  bic: "AZERTYUI"
+  iban: "FR12 1234 4567 7890 1234 5678 901"
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: invoice
+---
+
+All amounts are in euros.

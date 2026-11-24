@@ -26,18 +26,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCS_DIR="$(dirname "${SCRIPT_DIR}")"
 DEMOS_DIR="${DOCS_DIR}/_demos"
 OUTPUT_DIR="${DOCS_DIR}/demos"
+# LOG_PREFIX is read by the helpers in _render.sh.
+# shellcheck disable=SC2034
+LOG_PREFIX="render-demos"
 
-# A render of some files only, such as a save in `quarto preview`, keeps the
-# demos of the last full render.
-if [[ "${QUARTO_PROJECT_RENDER_ALL:-}" != 1 && -d "${OUTPUT_DIR}" ]]; then
-	printf '[render-demos] Partial render: skip, and keep demos/\n'
-	exit 0
-fi
+# shellcheck source-path=SCRIPTDIR source=_render.sh disable=SC1091
+source "${SCRIPT_DIR}/_render.sh"
 
-if ! compgen -G "${DEMOS_DIR}/_extensions/local/*/_extension.yml" >/dev/null; then
-	printf '[render-demos] No extension copy under docs/_demos/_extensions/local/; run ./docs/_scripts/sync-extension.sh first\n' >&2
-	exit 1
-fi
+skip_partial_render "${OUTPUT_DIR}"
+require_extension_copy "${DEMOS_DIR}"
 
 # demos.qmd has one tab for each demo file, written by hand, and every tab shows
 # the dark HTML screenshot of its demo. Stop before the render when the demo
@@ -54,16 +51,4 @@ if [[ "${demo_names}" != "${tab_names}" ]]; then
 	exit 1
 fi
 
-# The outer website render exports QUARTO_PROJECT_* variables that describe its
-# own project. Unset them, so the inner render resolves the demo project
-# instead. Other QUARTO_* variables, such as QUARTO_CHROMIUM, are kept.
-env_args=()
-for name in $(compgen -e); do
-	[[ "${name}" == QUARTO_PROJECT_* ]] && env_args+=(-u "${name}")
-done
-
-env ${env_args[@]+"${env_args[@]}"} quarto render "${DEMOS_DIR}"
-
-rm -rf "${OUTPUT_DIR}"
-mv "${DEMOS_DIR}/_output" "${OUTPUT_DIR}"
-printf '[render-demos] _demos/_output -> demos/\n'
+render_project "${DEMOS_DIR}" "${OUTPUT_DIR}"

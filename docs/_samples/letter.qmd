@@ -1,0 +1,30 @@
+---
+title: "Training proposal"
+author: "Mickaël Canouil"
+sender:
+  name: "Mickaël Canouil"
+  address:
+    - "12 Example Street"
+    - "Lille"
+place: "Lille"
+reference: "2026-014"
+subject: "Training proposal"
+address:
+  - "Company Ltd"
+  - "10 Station Road"
+  - "London"
+opening: "Dear Sir or Madam,"
+closing: "Yours faithfully,"
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: letter
+---
+
+Thank you for your interest in a Quarto training for your team.
+I propose two days on site, with one day on documents and one day on websites.
+
+The programme is attached.
+I can adapt it to the tools that your team already uses.

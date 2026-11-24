@@ -58,6 +58,12 @@ extensions:
 
 The body of the document is the body of the letter.
 
+**A letter**
+
+![](../samples/screenshots/letter.png){fig-alt="A letter in the gold preset: the sender at the top left, the recipient address in the window position, the place and date, the reference, the subject and the body." loading="lazy"}
+
+[Open the PDF](../samples/letter.pdf){target="_blank" rel="noopener"}
+
 ## Invoice
 
 The data model is that of [quarto-invoice](https://github.com/mcanouil/quarto-invoice).
@@ -111,6 +117,12 @@ extensions:
   A text value adds your own mention.
 - `fee` is the late fee in percent, and `penalty` is the fixed recovery cost.
 - The items table has tagged header cells and tabular figures.
+
+**An invoice**
+
+![](../samples/screenshots/invoice.png){fig-alt="An invoice in the gold preset: the sender and the recipient, the invoice number and dates, the items table with VAT and totals, and the payment details in a tinted box." loading="lazy"}
+
+[Open the PDF](../samples/invoice.pdf){target="_blank" rel="noopener"}
 
 ## Standards
 

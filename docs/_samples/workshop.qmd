@@ -1,0 +1,103 @@
+---
+title: "Authoring essentials"
+author: "Mickaël Canouil"
+format:
+  mcanouil-html: default
+  mcanouil-typst:
+    keep-typ: true
+  mcanouil-revealjs:
+    output-file: workshop-revealjs.html
+extensions:
+  mcanouil:
+    type: workshop
+    solutions: inline
+    event: "Mastering Quarto CLI"
+    duration: "90 min"
+    session:
+      number: 2
+      total: 7
+---
+
+# Session overview
+
+## Before we start {#before-we-start}
+
+::: {revealjs:layout-ncol="2"}
+
+::: {.objectives}
+
+- Write front matter that renders one document to two formats.
+- Label a figure and cite it with a cross-reference.
+- Check your work against the checkpoint.
+
+:::
+
+::: {.prerequisites}
+
+- Quarto 1.12 or later.
+- The project of session 1.
+
+:::
+
+:::
+
+# Markdown basics
+
+## Text formatting {#text-formatting}
+
+Basic text formatting you use every day:
+
+- **Bold** with `**bold**`, *italic* with `*italic*`.
+- Arrows and operators keep their two characters in code: `->`, `!=`, `<=` and `=>`.
+
+---
+
+Code reads as written, with no ligatures:
+
+```{.r filename="compare.R"}
+if (x != y && y >= 0) {
+  z <- x |> sqrt()
+}
+```
+
+## Front matter {#exercise-front-matter}
+
+::: {.exercise duration="15 min" format="solo"}
+
+Create `portfolio.qmd`, a document that renders to HTML and to Typst.
+
+::: {.solution}
+
+The first solution sets two formats in the front matter.
+
+```yaml
+format:
+  html: default
+  typst: default
+```
+
+:::
+
+:::
+
+## Cross-references {#exercise-cross-references}
+
+::: {.exercise duration="20 min" format="pairs"}
+
+Label the figure, then cite it in the text.
+
+::: {.solution}
+
+The second solution labels the figure with `{#fig-plot}` and cites it with `@fig-plot`.
+
+:::
+
+:::
+
+## Checkpoint {#checkpoint}
+
+::: {.checkpoint}
+
+Your document renders to HTML and to Typst, and the figure link works.
+
+:::

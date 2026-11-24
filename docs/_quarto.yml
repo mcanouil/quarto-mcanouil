@@ -19,9 +19,15 @@ project:
     - ./_scripts/render-demos.sh
     # Captures the screenshots of the demos for demos.qmd.
     - ./_scripts/screenshots.sh
-  # Published as they are: the demos are rendered by their own project.
+    # Renders the sample project in _samples/ and copies its output to samples/.
+    - ./_scripts/render-samples.sh
+    # Captures the screenshots of the samples for the documentation pages.
+    - ./_scripts/sample-screenshots.sh
+  # Published as they are: the demos and the samples are rendered by their own
+  # projects.
   resources:
     - demos/**
+    - samples/**
   post-render: ./_scripts/post-render.sh
 
 website:

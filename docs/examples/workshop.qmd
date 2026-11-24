@@ -47,6 +47,12 @@ An exercise is numbered with the session number and its position.
 Without a session, the number is its position only.
 The `duration` and `format` attributes of an exercise add to its label.
 
+**The objectives and prerequisites blocks in `mcanouil-html`**
+
+![](../samples/screenshots/workshop-html.png){fig-alt="The top of a workshop page in mcanouil-html, gold preset: the kicker Session 2 of 7, the title, the duration, then the Objectives and Prerequisites blocks." loading="lazy"}
+
+[Open the HTML page](../samples/workshop.html){target="_blank" rel="noopener"}
+
 ```markdown
 ::: {.exercise duration="15 min" format="pairs"}
 
@@ -77,6 +83,30 @@ Outside an exercise, the render stops with a message.
 : How each format shows a solution. {.striped .hover tbl-colwidths="[30,70]"}
 
 The solution fades in only when the reader has no reduced motion setting.
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-6}
+
+**Reveal.js**
+
+![](../samples/screenshots/workshop-revealjs.png){fig-alt="A workshop exercise slide in the gold preset: the label Exercise 2.1, 15 min, solo, and the task text. The solution is hidden." loading="lazy"}
+
+[Open the deck](../samples/workshop-revealjs.html#/exercise-front-matter){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-6}
+
+**PDF, `solutions: inline`**
+
+![](../samples/screenshots/workshop-typst.png){fig-alt="Page 2 of a workshop handout in the gold preset: exercise 2.2 with its solution inside the exercise box, then the checkpoint block." loading="lazy"}
+
+[Open the PDF](../samples/workshop.pdf){target="_blank" rel="noopener"}
+
+:::
+
+:::
 
 ## Solution names
 

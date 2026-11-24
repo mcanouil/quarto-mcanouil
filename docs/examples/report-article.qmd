@@ -26,6 +26,12 @@ extensions:
     layout: compact
 ```
 
+**A compact report**
+
+![](../samples/screenshots/report-compact.png){fig-alt="Page 1 of a compact report in the gold preset: the title, the subtitle, the abstract box, then the body with a table." loading="lazy"}
+
+[Open the PDF](../samples/report-compact.pdf){target="_blank" rel="noopener"}
+
 ## Full report
 
 The full layout adds a cover, a main contents, one divider per chapter, a chapter contents page, and a closing page.
@@ -55,6 +61,32 @@ extensions:
 
 In `mcanouil-html`, the full layout renders as the compact one.
 Each chapter gets a chapter header with its number, its title and the "In this chapter" list.
+
+The first two pages of a full report:
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-6}
+
+**Cover**
+
+![](../samples/screenshots/report-full-cover.png){fig-alt="The cover of a full report in the gold preset: a large gilded motif in the top corner, the title, the subtitle and the author near the bottom." loading="lazy"}
+
+[Open the PDF](../samples/report-full.pdf){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-6}
+
+**Main contents**
+
+![](../samples/screenshots/report-full-contents.png){fig-alt="The main contents page of a full report in the gold preset: the chapters and their sections with page numbers." loading="lazy"}
+
+[Open the PDF](../samples/report-full.pdf){target="_blank" rel="noopener"}
+
+:::
+
+:::
 
 ## Book project
 
@@ -104,6 +136,12 @@ extensions:
 The article has one column and a wide outer margin for margin notes and asides.
 It has a tinted abstract box, keywords, numbered headings and numbered references.
 The `.column-margin` div and the `reference-location: margin` option put content in the margin.
+
+**An article**
+
+![](../samples/screenshots/article.png){fig-alt="Page 1 of an article in the gold preset: the title block with two authors, the abstract box, numbered sections, notes in the outer margin and a CRediT table." loading="lazy"}
+
+[Open the PDF](../samples/article.pdf){target="_blank" rel="noopener"}
 
 ## Authors {#authors}
 

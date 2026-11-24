@@ -26,6 +26,12 @@ In a single document, the special sections move to the end, in this order:
 
 You can write them anywhere in the source.
 
+**An article with an appendix and a supplementary section**
+
+![](../samples/screenshots/special-sections.png){fig-alt="A one page article in the gold preset: the results with a figure, then Appendix A with section A.1 and equation A.1, then section S1 with table S1." loading="lazy"}
+
+[Open the PDF](../samples/special-sections.pdf){target="_blank" rel="noopener"}
+
 ```markdown
 # Introduction
 

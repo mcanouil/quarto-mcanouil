@@ -1,0 +1,33 @@
+---
+title: "Quarterly review"
+author: "Mickaël Canouil"
+subtitle: "Third quarter of 2026"
+abstract: "The team shipped three releases this quarter and closed most of the open issues."
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: report
+    layout: compact
+---
+
+# Introduction
+
+This review covers the work of the team from July to September.
+
+# Releases
+
+Three releases went out on time, and each one passed the accessibility checks.
+
+| Release | Date         | Issues closed |
+|---------|--------------|--------------:|
+| 1.4     | 8 July       |            12 |
+| 1.5     | 12 August    |             9 |
+| 1.6     | 23 September |            15 |
+
+: Releases of the quarter. {#tbl-releases}
+
+# Next quarter
+
+The team plans two releases and a review of the documentation.

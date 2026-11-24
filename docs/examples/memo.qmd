@@ -42,6 +42,52 @@ If you do not set `date-time`, the banner uses `memo: date`, then the document `
 A field without a value does not show.
 In the PDF, the banner fields are a tagged table.
 
+The four kinds, in the `gold` preset:
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-6}
+
+**`note`**
+
+![](../samples/screenshots/memo-note.png){fig-alt="Page 1 of a note memo in the gold preset: a dark banner with the kind label Note, the title and the To, From and Date fields, then the body sections." loading="lazy"}
+
+[Open the PDF](../samples/memo-note.pdf){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-6}
+
+**`minutes`**
+
+![](../samples/screenshots/memo-minutes.png){fig-alt="Page 1 of a minutes memo in the gold preset: the banner with the date and time, present and absent fields, then the decisions and a table of actions." loading="lazy"}
+
+[Open the PDF](../samples/memo-minutes.pdf){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-6}
+
+**`agenda`**
+
+![](../samples/screenshots/memo-agenda.png){fig-alt="Page 1 of an agenda memo in the gold preset: the banner with the date and time, place and participants fields, then a numbered list of timed items." loading="lazy"}
+
+[Open the PDF](../samples/memo-agenda.pdf){target="_blank" rel="noopener"}
+
+:::
+
+::: {.g-col-12 .g-col-md-6}
+
+**`brief`**
+
+![](../samples/screenshots/memo-brief.png){fig-alt="Page 1 of a brief memo in the gold preset: the banner with the date, audience and purpose fields, then the status and risks sections." loading="lazy"}
+
+[Open the PDF](../samples/memo-brief.pdf){target="_blank" rel="noopener"}
+
+:::
+
+:::
+
 ## Minutes
 
 Write the decisions as text and the actions as a table with three columns: action, owner, due date.
@@ -86,3 +132,9 @@ A memo can start at `##`: the format shifts the headings and gives no warning.
 In `mcanouil-html`, the footer band shows only when at least one footer slot has content.
 If all three slots are empty, the HTML memo has no band.
 The PDF always has the band.
+
+**A note memo in `mcanouil-html`**
+
+![](../samples/screenshots/memo-note-html.png){fig-alt="A note memo in mcanouil-html, gold preset: the dark banner at the top, the body, and the footer band with the slots Internal and Memo 2026-07 at the bottom." loading="lazy"}
+
+[Open the HTML page](../samples/memo-note.html){target="_blank" rel="noopener"}

@@ -1,0 +1,18 @@
+# The samples are a project of their own, so the documentation website does not
+# wrap them in its sidebar, footer and theme. ../_scripts/render-samples.sh
+# renders this project and moves _output/ to ../samples/, which the website
+# publishes. ../_scripts/sample-screenshots.sh then captures the screenshots
+# listed in _screenshots.tsv.
+#
+# Each <sample>.qmd shows one variant of the extension, in the formats that its
+# screenshots need. The options that every sample shares live here.
+project:
+  output-dir: _output
+
+# A fixed date keeps the screenshots the same from one build to the next.
+date: 2026-11-11
+lang: en-GB
+
+extensions:
+  mcanouil:
+    preset: gold

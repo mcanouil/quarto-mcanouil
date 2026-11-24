@@ -1,0 +1,22 @@
+---
+title: "Release readiness"
+author: "Mickaël Canouil"
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    type: memo
+    kind: brief
+    memo:
+      audience: "Product leads"
+      purpose: "Agree the go or no go for the release"
+---
+
+## Status
+
+All blocking issues are closed and the last build passes.
+
+## Risks
+
+Two minor issues remain open, and neither one blocks the release.
