@@ -482,8 +482,8 @@ M.INVOICE_STRINGS = { 'issued', 'due', 'fee', 'penalty', 'currency' }
 --- @type string[] Fields of an invoice item that Typst reads as strings.
 M.ITEM_STRINGS = { 'quantity', 'unit-price', 'vat' }
 
---- Answer a metadata value as a Typst string literal, with the text of raw inlines kept: Quarto passes paths to
---- Typst as raw Typst inlines.
+--- Answer a metadata value as a Typst string literal, with the text of raw inlines kept: Pandoc reads a value such
+--- as `see \terms` as a raw TeX inline, which `stringify` would drop.
 --- @param value any Metadata value
 --- @return pandoc.MetaInlines|nil Literal, or nil when the value is unset
 function M.typst_literal(value)

@@ -32,7 +32,7 @@
 // - digits: decimals to keep; a text with more decimals stops the render.
 // - what: name of the field, for the error message.
 #let parse-decimal(value, digits, what) = {
-  let text = str(value).replace("\\", "").trim().replace(",", ".")
+  let text = str(value).trim().replace(",", ".")
   let negative = text.starts-with("-")
   if negative or text.starts-with("+") { text = text.slice(1) }
   if text.match(regex("^(\d+\.?\d*|\.\d+)\z")) == none {
@@ -121,7 +121,7 @@
 // - value: text such as "2026-11-01".
 // - what: name of the field, for the error message.
 #let parse-date(value, what) = {
-  let found = str(value).replace("\\", "").trim().match(regex("^(\d{4})-(\d{2})-(\d{2})\z"))
+  let found = str(value).trim().match(regex("^(\d{4})-(\d{2})-(\d{2})\z"))
   if found == none {
     panic("invoice: " + what + " \"" + str(value) + "\" is not a date; write it as 2026-11-01.")
   }
