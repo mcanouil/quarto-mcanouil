@@ -6,6 +6,7 @@ set -euo pipefail
 #
 # Usage: pdf.sh report <preset>
 #        pdf.sh code-window <preset>
+#        pdf.sh callout-label <preset>
 #        pdf.sh report-no-author
 #        pdf.sh center-alias
 #        pdf.sh subdir
