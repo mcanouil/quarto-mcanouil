@@ -138,6 +138,40 @@ window.addEventListener("load", () => document.fonts.ready.then(() => {
     if (style.display === "none" || style.content === "none" || style.content === "normal") return "";
     return style.content;
   };
+  // The middle of the capital letters of a callout label against the middle
+  // of its icon, in pixels (negative: the label sits higher). Canvas metrics
+  // of "H" in the label font give the cap height and the ascent above the
+  // baseline, and the first line box of the label gives the baseline. The
+  // icon box must be the ring itself (ringGap 0), so that its middle is the
+  // middle of the ring.
+  const labelAlign = (callout) => {
+    const icon = callout.querySelector(".callout-header .callout-icon");
+    const title = callout.querySelector(".callout-header .callout-title-container");
+    if (!icon || !title || !shown(icon) || !shown(title)) return null;
+    const walker = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode()) && !(node.textContent.trim() && shown(node.parentElement) && !node.parentElement.closest(".screen-reader-only")));
+    if (!node) return null;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    const line = range.getClientRects()[0];
+    if (!line) return null;
+    const context = document.createElement("canvas").getContext("2d");
+    context.font = getComputedStyle(node.parentElement).font;
+    const metrics = context.measureText("H");
+    const capMiddle = line.top + metrics.fontBoundingBoxAscent - metrics.actualBoundingBoxAscent / 2;
+    const ring = icon.getBoundingClientRect();
+    const ringStyle = getComputedStyle(icon, "::before");
+    let ringSize = parseFloat(ringStyle.height);
+    if (ringStyle.boxSizing === "content-box") {
+      ringSize += parseFloat(ringStyle.borderTopWidth) + parseFloat(ringStyle.borderBottomWidth) +
+        parseFloat(ringStyle.paddingTop) + parseFloat(ringStyle.paddingBottom);
+    }
+    return {
+      offset: Math.round((capMiddle - (ring.top + ring.height / 2)) * 100) / 100,
+      ringGap: Math.round(Math.abs(ring.height - ringSize) * 100) / 100,
+    };
+  };
   out.callouts = [...document.querySelectorAll(".callout")].map((callout) => {
     const title = callout.querySelector(".callout-header .callout-title-container");
     const hidden = title && title.querySelector(".screen-reader-only");
@@ -149,6 +183,7 @@ window.addEventListener("load", () => document.fonts.ready.then(() => {
       typeShown: !hidden || Boolean(typeText) || /[^\s"\/]/.test(glyph(callout).replace(/\/ ?""$/, "")),
       typeText,
       glyph: glyph(callout),
+      align: labelAlign(callout),
     };
   });
 

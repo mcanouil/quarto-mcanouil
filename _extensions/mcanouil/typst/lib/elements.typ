@@ -87,7 +87,8 @@
 // - type: callout type.
 // - colours: the tokens.
 // - size: side of the icon.
-#let mc-callout-icon(type, colours, size) = {
+// - cap: height of a capital letter of the label, as the label draws it.
+#let mc-callout-icon(type, colours, size, cap) = {
   let filled = mc-preset in ("gold", "mono")
   let ink = colours.at(type + "-text")
   let paint = if filled { colours.paper } else { ink }
@@ -111,9 +112,12 @@
     radius: if mc-preset == "mono" { 0pt } else { 50% },
     fill: if filled { colours.at(type) } else { none },
     stroke: if filled { none } else { 1pt + ink },
-    align(center + horizon, mark),
+    place(center + horizon, mark),
   )
-  box(baseline: (size - 0.7em) / 2, pdf.artifact(shape))
+  // The glyph is placed, so the shape has no text baseline and its bottom
+  // sits on the line: the shift puts its middle on the middle of the capital
+  // letters of the label.
+  box(baseline: (size - cap) / 2, pdf.artifact(shape))
 }
 
 // Answer the label of a callout: the icon, then the title in the style of
@@ -131,15 +135,21 @@
   ).at(mc-preset)
   set text(size: style.size, fill: colours.at(type + "-text"), weight: "bold")
   set par(first-line-indent: 0pt, hanging-indent: 0pt)
+  let styled(it) = if mc-preset == "gold" {
+    text(tracking: 0.04em, smallcaps(all: true, it))
+  } else {
+    text(tracking: if mc-preset == "mono" { 0.1em } else { 0.06em }, upper(it))
+  }
   if icon {
-    mc-callout-icon(type, colours, style.icon)
+    // The ink of "H" in the label style: small capitals in gold, capitals
+    // elsewhere.
+    context {
+      let cap = measure(text(top-edge: "bounds", bottom-edge: "baseline", styled("H"))).height
+      mc-callout-icon(type, colours, style.icon, cap)
+    }
     h(0.5em)
   }
-  if mc-preset == "gold" {
-    text(tracking: 0.04em, smallcaps(all: true, title))
-  } else {
-    text(tracking: if mc-preset == "mono" { 0.1em } else { 0.06em }, upper(title))
-  }
+  styled(title)
 }
 
 // Answer a callout in the style of the preset.

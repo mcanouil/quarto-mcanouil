@@ -104,10 +104,24 @@
   letter-spacing: 0.06em;
   line-height: 1.3;
   text-transform: uppercase;
+  /* The label stays one line high when its text is trimmed to the capital
+   * letters, so the margins above still put it on the border. */
+  min-height: 1lh;
 }
 
+/* Upper case letters have no descenders, so a centred line box puts them
+ * high. Trimming the label to the capital letters centres them on the ring.
+ * Browsers without text-box keep the line box. */
 .reveal .slides div.callout.callout div.callout-title p {
   margin: 0;
+  text-box: trim-both cap alphabetic;
+}
+
+/* The icon box is the ring itself, with no line box around it, so that the
+ * ring sits in the middle of the label. */
+.reveal .slides div.callout.callout .callout-icon {
+  display: flex;
+  align-items: center;
 }
 
 /* The body starts under the label, so a simple callout drops the indent that
