@@ -680,6 +680,8 @@ check_components() {
 		*)
 			expect "html-callout-no-motif-${preset}-${size%,*}" "no corner motif on any callout" \
 				measured "${measures}" 'm["motifs"] == 0' 'm["motifs"]'
+			expect "html-callout-label-align-${preset}-${size%,*}" "the capital letters of each callout label centred on its icon" \
+				measured "${measures}" 'all(c["align"] and abs(c["align"]["offset"]) <= 0.75 and c["align"]["ringGap"] <= 0.5 for c in m["callouts"])' '[c["align"] for c in m["callouts"]]'
 			;;
 		esac
 	done
