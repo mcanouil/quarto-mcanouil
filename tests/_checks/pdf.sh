@@ -310,18 +310,23 @@ code_window_body_frame() {
 # to its right, and rows that a frame edge crosses are left out.
 # $1 preset.
 callout_label_centred() {
-	local scheme=light image
+	local scheme=light body top dir
 	[ "$1" = terminal ] && scheme=dark
-	image="$(mktemp -d)/page"
-	pdftoppm -r 600 -f 1 -l 1 -singlefile "${output}" "${image}"
-	local body
 	body="$(pdftotext -bbox -f 1 -l 1 "${output}" - | sed -n 's/.*yMin="\([0-9.]*\)".*>Hazard<.*/\1/p' | head -n 1)"
-	python3 -I - "${image}.ppm" "${body}" \
+	[ -n "${body}" ] || {
+		printf '# no callout body found\n'
+		return 1
+	}
+	# Only the band above the body, 40 pt high and 4 in wide from the left edge.
+	top="$(awk -v y="${body}" 'BEGIN { printf "%d", y * 600 / 72 - 333 }')"
+	dir="$(mktemp -d)"
+	pdftoppm -r 600 -f 1 -l 1 -x 0 -y "${top}" -W 2400 -H 333 -singlefile "${output}" "${dir}/band"
+	python3 -I - "${dir}/band.ppm" \
 		"$(preset_value "$1" "${scheme}" "$(case "$1" in gold | mono) echo note ;; *) echo note-text ;; esac)")" \
 		"$(preset_value "$1" "${scheme}" note-text)" <<'PY'
 import sys
 
-path, body_pt, ring_hex, text_hex = sys.argv[1:5]
+path, ring_hex, text_hex = sys.argv[1:4]
 with open(path, "rb") as handle:
     data = handle.read()
 parts = data.split(b"\n", 3)
@@ -339,15 +344,12 @@ def matcher(colour):
     return near
 
 ring_near, text_near = matcher(rgb(ring_hex)), matcher(rgb(text_hex))
-step = 2
 
 def edge_row(y):
     return sum(ring_near(x, y) for x in range(0, width, 8)) > width / 8 * 0.3
 
-if not body_pt:
-    sys.exit("# no callout body found")
-bottom = int(float(body_pt) * 600 / 72)
-band = [y for y in range(max(0, bottom - 40 * 600 // 72), bottom, step) if not edge_row(y)]
+band = [y for y in range(0, height, 2) if not edge_row(y)]
+# Every third row is enough to find the columns of the icon and the label.
 columns = sorted({x for x in range(width) for y in band[::3] if ring_near(x, y)})
 if not columns:
     sys.exit("# no icon found")
@@ -358,6 +360,7 @@ for x in columns:
     else:
         groups.append([x, x])
 # A frame edge or a start bar runs down to the body; the icon stops above it.
+# The last three rows of the band touch the body, and only edges reach them.
 low = band[-3:]
 icon = next((g for g in groups if not any(ring_near(x, y) for x in range(g[0], g[1] + 1) for y in low)), None)
 if icon is None:
@@ -371,6 +374,9 @@ offset = ((text_rows[0] + text_rows[-1]) - (ring_rows[0] + ring_rows[-1])) / 2 *
 print("# label middle minus icon middle: %.2f pt" % offset)
 sys.exit(0 if abs(offset) <= 0.4 else 1)
 PY
+	local status=$?
+	rm -rf "${dir}"
+	return "${status}"
 }
 
 # Succeed when the title in the metadata of the PDF is a given text.

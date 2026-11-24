@@ -115,7 +115,8 @@ $mc-callout-glyphs: (
 
   // Upper case letters have no descenders, so a centred line box puts them
   // high. Trimming the title box to the capital letters centres them on the
-  // ring. Browsers without text-box keep the line box.
+  // ring. text-box trims block boxes only, so the title is a block. Browsers
+  // without text-box keep the line box.
   div.callout > .callout-header .callout-title-container {
     display: block;
     text-box: trim-both cap alphabetic;

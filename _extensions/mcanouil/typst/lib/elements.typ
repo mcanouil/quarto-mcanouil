@@ -143,7 +143,10 @@
   if icon {
     // The ink of "H" in the label style: small capitals in gold, capitals
     // elsewhere.
-    context mc-callout-icon(type, colours, style.icon, measure(text(top-edge: "bounds", bottom-edge: "baseline", styled("H"))).height)
+    context {
+      let cap = measure(text(top-edge: "bounds", bottom-edge: "baseline", styled("H"))).height
+      mc-callout-icon(type, colours, style.icon, cap)
+    }
     h(0.5em)
   }
   styled(title)
