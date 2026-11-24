@@ -93,7 +93,6 @@
 
 /* The icon box is the ring itself, with no line box around it, so that the
  * ring sits in the middle of the label. */
-.reveal .slides div.callout.callout .callout-icon-container,
 .reveal .slides div.callout.callout .callout-icon {
   display: flex;
   align-items: center;

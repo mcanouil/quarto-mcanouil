@@ -312,7 +312,7 @@ code_window_body_frame() {
 # $1 preset.
 callout_label_centred() {
 	local scheme=light body top dir
-	[ "$1" = terminal ] && scheme=dark
+	[ "$1" != terminal ] || scheme=dark
 	body="$(pdftotext -bbox -f 1 -l 1 "${output}" - | sed -n 's/.*yMin="\([0-9.]*\)".*>Hazard<.*/\1/p' | head -n 1)"
 	[ -n "${body}" ] || {
 		printf '# no callout body found\n'
