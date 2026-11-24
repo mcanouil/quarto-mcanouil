@@ -1,0 +1,19 @@
+---
+title: Callout label
+format:
+  mcanouil-typst:
+    keep-typ: true
+extensions:
+  mcanouil:
+    preset: quarto
+_quarto:
+  tests:
+    run:
+      extension-test:
+        description: The capital letters of the label of a quarto callout in Typst sit in the middle of its icon.
+        check: bash _checks/pdf.sh callout-label quarto
+---
+
+::: {.callout-note}
+Hazard ratios are adjusted for age and sex.
+:::

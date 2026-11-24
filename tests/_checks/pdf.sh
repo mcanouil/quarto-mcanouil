@@ -303,6 +303,76 @@ code_window_body_frame() {
 	}
 }
 
+# Succeed when the capital letters of the callout label sit in the middle of
+# its icon on page 1, within 0.4 pt. The page is read at 600 dpi in the 40 pt
+# above the first word of the callout body ("Hazard"): the icon is the first
+# group of columns in the icon colour, the label the pixels in the label colour
+# to its right, and rows that a frame edge crosses are left out.
+# $1 preset.
+callout_label_centred() {
+	local scheme=light image
+	[ "$1" = terminal ] && scheme=dark
+	image="$(mktemp -d)/page"
+	pdftoppm -r 600 -f 1 -l 1 -singlefile "${output}" "${image}"
+	local body
+	body="$(pdftotext -bbox -f 1 -l 1 "${output}" - | sed -n 's/.*yMin="\([0-9.]*\)".*>Hazard<.*/\1/p' | head -n 1)"
+	python3 -I - "${image}.ppm" "${body}" \
+		"$(preset_value "$1" "${scheme}" "$(case "$1" in gold | mono) echo note ;; *) echo note-text ;; esac)")" \
+		"$(preset_value "$1" "${scheme}" note-text)" <<'PY'
+import sys
+
+path, body_pt, ring_hex, text_hex = sys.argv[1:5]
+with open(path, "rb") as handle:
+    data = handle.read()
+parts = data.split(b"\n", 3)
+width, height = map(int, parts[1].split())
+pixels = parts[3]
+
+def rgb(value):
+    value = value.lstrip("#")
+    return tuple(int(value[i:i + 2], 16) for i in (0, 2, 4))
+
+def matcher(colour):
+    def near(x, y):
+        i = (y * width + x) * 3
+        return sum(abs(pixels[i + k] - colour[k]) for k in range(3)) < 80
+    return near
+
+ring_near, text_near = matcher(rgb(ring_hex)), matcher(rgb(text_hex))
+step = 2
+
+def edge_row(y):
+    return sum(ring_near(x, y) for x in range(0, width, 8)) > width / 8 * 0.3
+
+if not body_pt:
+    sys.exit("# no callout body found")
+bottom = int(float(body_pt) * 600 / 72)
+band = [y for y in range(max(0, bottom - 40 * 600 // 72), bottom, step) if not edge_row(y)]
+columns = sorted({x for x in range(width) for y in band[::3] if ring_near(x, y)})
+if not columns:
+    sys.exit("# no icon found")
+groups = []
+for x in columns:
+    if groups and x - groups[-1][1] <= 6:
+        groups[-1][1] = x
+    else:
+        groups.append([x, x])
+# A frame edge or a start bar runs down to the body; the icon stops above it.
+low = band[-3:]
+icon = next((g for g in groups if not any(ring_near(x, y) for x in range(g[0], g[1] + 1) for y in low)), None)
+if icon is None:
+    sys.exit("# no icon found")
+left, right = icon
+ring_rows = [y for y in band if any(ring_near(x, y) for x in range(left, right + 1))]
+text_rows = [y for y in band if any(text_near(x, y) for x in range(right + 8, min(width, right + 1200), 2))]
+if not ring_rows or not text_rows:
+    sys.exit("# no icon or no label rows")
+offset = ((text_rows[0] + text_rows[-1]) - (ring_rows[0] + ring_rows[-1])) / 2 * 72 / 600
+print("# label middle minus icon middle: %.2f pt" % offset)
+sys.exit(0 if abs(offset) <= 0.4 else 1)
+PY
+}
+
 # Succeed when the title in the metadata of the PDF is a given text.
 # $1 title.
 doc_title() {
@@ -326,6 +396,10 @@ code-window)
 		code_window_theme "$2"
 	expect "typst-code-window-body-frame-${2}" "the code drops its own frame inside a window, and keeps it outside" code_window_body_frame
 	expect "typst-code-window-ua1-${2}" "veraPDF ua1 compliance" verapdf_ua1 "${output}"
+	;;
+callout-label)
+	expect "typst-callout-label-align-${2:?callout-label needs a preset}" "the capital letters of the callout label in the middle of its icon" \
+		callout_label_centred "$2"
 	;;
 report) check_report "${2:?report needs a preset}" ;;
 report-no-author)
