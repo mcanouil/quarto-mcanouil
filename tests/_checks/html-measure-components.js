@@ -160,7 +160,12 @@ window.addEventListener("load", () => document.fonts.ready.then(() => {
     const metrics = context.measureText("H");
     const capMiddle = line.top + metrics.fontBoundingBoxAscent - metrics.actualBoundingBoxAscent / 2;
     const ring = icon.getBoundingClientRect();
-    const ringSize = parseFloat(getComputedStyle(icon, "::before").height);
+    const ringStyle = getComputedStyle(icon, "::before");
+    let ringSize = parseFloat(ringStyle.height);
+    if (ringStyle.boxSizing === "content-box") {
+      ringSize += parseFloat(ringStyle.borderTopWidth) + parseFloat(ringStyle.borderBottomWidth) +
+        parseFloat(ringStyle.paddingTop) + parseFloat(ringStyle.paddingBottom);
+    }
     return {
       offset: Math.round((capMiddle - (ring.top + ring.height / 2)) * 100) / 100,
       ringGap: Math.round(Math.abs(ring.height - ringSize) * 100) / 100,

@@ -20,6 +20,9 @@
  *   of the motif and the top right corner of the window, in window pixels.
  * - "<slide> page-corner <top> <right>": the same gap to the top right corner
  *   of the page of the slide in the print layout of a PDF export.
+ * - "<slide> calloutlabel <offset> <ring-gap>": for each callout title, the
+ *   middle of the capital letters of the label minus the middle of the icon,
+ *   and the difference between the icon box and its ring, in slide pixels.
  * - "<slide> error <message>": the probe failed on the slide.
  *
  * @license MIT
@@ -249,10 +252,44 @@
     lines.push([slide, "page-corner", rect.top - box.top, box.right - rect.right].join(" "));
   }
 
+  // Canvas metrics of "H" in the label font give the cap height and the
+  // ascent above the baseline; the first line box of the label gives the
+  // baseline. The icon box is the ring only when the ring gap is 0.
+  function measureCalloutLabels(slide, section) {
+    var scale = printing() ? 1 : Reveal.getScale();
+    section.querySelectorAll(".callout .callout-title").forEach(function (title) {
+      var icon = title.querySelector(".callout-icon");
+      var label = title.querySelector("p");
+      if (!icon || !label) { return; }
+      var walker = document.createTreeWalker(label, NodeFilter.SHOW_TEXT);
+      var node = walker.nextNode();
+      while (node && !node.textContent.trim()) { node = walker.nextNode(); }
+      if (!node) { return; }
+      var range = document.createRange();
+      range.selectNodeContents(node);
+      var line = range.getClientRects()[0];
+      var context = document.createElement("canvas").getContext("2d");
+      context.font = getComputedStyle(node.parentElement).font;
+      var metrics = context.measureText("H");
+      var ring = icon.getBoundingClientRect();
+      var ringStyle = getComputedStyle(icon, "::before");
+      var ringSize = parseFloat(ringStyle.height);
+      if (ringStyle.boxSizing === "content-box") {
+        ringSize += parseFloat(ringStyle.borderTopWidth) + parseFloat(ringStyle.borderBottomWidth) +
+          parseFloat(ringStyle.paddingTop) + parseFloat(ringStyle.paddingBottom);
+      }
+      var capMiddle = line.top / scale + metrics.fontBoundingBoxAscent - metrics.actualBoundingBoxAscent / 2;
+      var ringMiddle = (ring.top + ring.height / 2) / scale;
+      lines.push([slide, "calloutlabel", (capMiddle - ringMiddle).toFixed(2),
+        Math.abs(ring.height / scale - ringSize).toFixed(2)].join(" "));
+    });
+  }
+
   function measureSlide(slide) {
     var section = document.getElementById(slide);
     measureBoxes(slide, section);
     measureCorner(slide, section);
+    measureCalloutLabels(slide, section);
     var targets = [
       [".mc-kicker", null, "text"],
       [".mc-section-number", null, "text"],

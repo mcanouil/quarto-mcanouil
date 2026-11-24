@@ -380,6 +380,21 @@ expected_colours() {
 	done
 }
 
+# Succeed when the probe read a callout label on the slide, each with its
+# capital letters within 0.75 px of the middle of its icon, and an icon box
+# that is the ring.
+# $1 slide.
+callout_label_centred() {
+	awk -v slide="$1" '
+		$1 == slide && $2 == "calloutlabel" {
+			n++
+			offset = $3 < 0 ? -$3 : $3
+			if (offset > 0.75 || $4 > 0.5) { bad = 1; printf "# %s offset %s ring gap %s\n", slide, $3, $4 }
+		}
+		END { if (n == 0) print "# no callout label on " slide; exit (n == 0 || bad) }
+	' <<<"${probe_lines}"
+}
+
 # Succeed when the probe read every expected text and mark, and each meets its
 # contrast ratio (4.5:1 for text, 3:1 for large text and marks). Names each
 # missing reading and each low ratio.
@@ -508,6 +523,11 @@ gold | mono | quarto | terminal)
 	expect "deck-section-bare-${1}" "section slide with no body: the number ends and the title starts on the middle line" section_body_after_title brand-presets bare
 	expect "deck-code-window-${1}" "the traffic lights and the ${1} frame, title bar and body on the code window, see code_window_look in lib.sh" \
 		code_window_matches "$(awk '$1 == "pick-a-preset" && $2 == "codewindow" { $1 = ""; $2 = ""; print; exit }' <<<"${probe_lines}")" "$1"
+	case "$1" in
+	quarto | terminal)
+		expect "deck-callout-label-align-${1}" "the capital letters of the callout label centred on its icon" callout_label_centred one-rule
+		;;
+	esac
 	expect "deck-computed-contrast-${1}" "all expected readings, at 4.5:1 for text and 3:1 for large text and marks, as the browser paints them" colours_readable "$1"
 	expect "deck-motif-corner-matching-${1}" "motif in the top right corner of a window with the aspect ratio of the slide" motif_in_corner corner "${CORNER_SLIDES[@]}"
 	# The motif box and its bleed do not depend on the preset, so one preset
